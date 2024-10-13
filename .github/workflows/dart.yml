@@ -24,6 +24,10 @@ jobs:
         with:
           channel: stable
 
+      - run: |
+          git config --global url.https://${{ secrets.PAT }}@github.com/.insteadOf https://github.com/
+
+
       - name: Install dependencies
         run: flutter pub get
 
