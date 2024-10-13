@@ -1,8 +1,8 @@
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:pixiv_dart_api/controller/bases.dart';
-import 'package:pixiv_dart_api/controller/logging.dart';
+import '../controller/bases.dart';
+import '../controller/logging.dart';
 
 import '../model/user.dart' show Account;
 import 'settings.dart';

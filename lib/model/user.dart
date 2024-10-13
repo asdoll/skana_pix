@@ -1,8 +1,8 @@
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:pixiv_dart_api/controller/bases.dart';
-import 'package:pixiv_dart_api/controller/exceptions.dart';
+import '../controller/bases.dart';
+import '../controller/exceptions.dart';
 
 class User {
   String profileImg;
@@ -49,7 +49,8 @@ class Account {
   String tokenType;
   DateTime acquisitionTime;
 
-  Account(this.accessToken, this.refreshToken, this.expiresIn, this.tokenType, this.acquisitionTime, this.user);
+  Account(this.accessToken, this.refreshToken, this.expiresIn, this.tokenType,
+      this.acquisitionTime, this.user);
 
   Account.fromJson(Map<String, dynamic> json)
       : accessToken = json['access_token'],
@@ -68,7 +69,7 @@ class Account {
         'acquisition_time': acquisitionTime.toIso8601String(),
       };
 
-  static Future<Account?> fromPath() async{
+  static Future<Account?> fromPath() async {
     final file = File("${BasePath.dataPath}/account.json");
     try {
       var json = jsonDecode(await file.readAsString());
@@ -97,7 +98,6 @@ class Account {
     final expiryDate = acquisitionTime.add(Duration(seconds: expiresIn));
     return expiryDate.isAfter(DateTime.now());
   }
-
 }
 
 class UserDetails {

@@ -1,4 +1,4 @@
-import 'package:pixiv_dart_api/pixiv_dart_api.dart';
+import '../pixiv_dart_api.dart';
 
 Future<List<Illust>> getIllustSamples() async {
   var account = await Account.fromPath();

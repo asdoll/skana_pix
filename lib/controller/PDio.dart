@@ -8,7 +8,8 @@ import 'logging.dart';
 class LogInterceptor implements Interceptor {
   @override
   void onError(DioException err, ErrorInterceptorHandler handler) {
-    netErrLog("${err.requestOptions.method} ${err.requestOptions.path}\n$err\n${err.response?.data.toString()}");
+    netErrLog(
+        "${err.requestOptions.method} ${err.requestOptions.path}\n$err\n${err.response?.data.toString()}");
     switch (err.type) {
       case DioExceptionType.badResponse:
         var statusCode = err.response?.statusCode;
@@ -69,8 +70,9 @@ class LogInterceptor implements Interceptor {
     } else {
       content = response.data.toString();
     }
-    String msg = "Response ${response.realUri.toString()} ${response.statusCode}\n"
-            "headers:\n$headers\n$content";
+    String msg =
+        "Response ${response.realUri.toString()} ${response.statusCode}\n"
+        "headers:\n$headers\n$content";
     if (response.statusCode != null && response.statusCode! < 400) {
       netInfoLog(msg);
     } else {
@@ -87,7 +89,8 @@ class LogInterceptor implements Interceptor {
     if (options.headers["Host"] == null && options.headers["host"] == null) {
       options.headers["host"] = options.uri.host;
     }
-    netInfoLog("${options.method} ${options.uri}\n${options.headers}\n${options.data}");
+    netInfoLog(
+        "${options.method} ${options.uri}\n${options.headers}\n${options.data}");
     handler.next(options);
   }
 }
@@ -102,12 +105,12 @@ class PDio extends DioForNative {
       CancelToken? cancelToken,
       Options? options,
       ProgressCallback? onSendProgress,
-      ProgressCallback? onReceiveProgress}) async{
+      ProgressCallback? onReceiveProgress}) async {
     if (!isInitialized) {
       isInitialized = true;
       interceptors.add(LogInterceptor());
     }
-    if(T == Map<String, dynamic>) {
+    if (T == Map<String, dynamic>) {
       var res = await super.request<String>(path,
           data: data,
           queryParameters: queryParameters,
@@ -115,17 +118,16 @@ class PDio extends DioForNative {
           options: options,
           onSendProgress: onSendProgress,
           onReceiveProgress: onReceiveProgress);
-      if(res.data == null) {
+      if (res.data == null) {
         return Response(
-          data: null,
-          requestOptions: res.requestOptions,
-          statusCode: res.statusCode,
-          statusMessage: res.statusMessage,
-          isRedirect: res.isRedirect,
-          redirects: res.redirects,
-          extra: res.extra,
-          headers: res.headers
-        );
+            data: null,
+            requestOptions: res.requestOptions,
+            statusCode: res.statusCode,
+            statusMessage: res.statusMessage,
+            isRedirect: res.isRedirect,
+            redirects: res.redirects,
+            extra: res.extra,
+            headers: res.headers);
       }
       try {
         var json = jsonDecode(res.data!);
@@ -137,12 +139,10 @@ class PDio extends DioForNative {
             isRedirect: res.isRedirect,
             redirects: res.redirects,
             extra: res.extra,
-            headers: res.headers
-        );
-      }
-      catch(e) {
+            headers: res.headers);
+      } catch (e) {
         var data = res.data!;
-        if(data.length > 50) {
+        if (data.length > 50) {
           data = "${data.substring(0, 50)}...";
         }
         throw "Failed to decode response: $e\n$data";
@@ -165,43 +165,43 @@ void setSystemProxy() {
 class _ProxyHttpOverrides extends HttpOverrides {
   String proxy = "DIRECT";
 
-   String findProxy(Uri uri) {
-  //   var haveUserProxy = appdata.settings["proxy"] != null &&
-  //       appdata.settings["proxy"].toString().removeAllBlank.isNotEmpty;
-  //   if (!App.isLinux && !haveUserProxy) {
-  //     var channel = const MethodChannel("pixes/proxy");
-  //     channel.invokeMethod("getProxy").then((value) {
-  //       if (value.toString().toLowerCase() == "no proxy") {
-  //         proxy = "DIRECT";
-  //       } else {
-  //         if (proxy.contains("https")) {
-  //           var proxies = value.split(";");
-  //           for (String proxy in proxies) {
-  //             proxy = proxy.removeAllBlank;
-  //             if (proxy.startsWith('https=')) {
-  //               value = proxy.substring(6);
-  //             }
-  //           }
-  //         }
-  //         proxy = "PROXY $value";
-  //       }
-  //     });
-  //   } else {
-  //     if (haveUserProxy) {
-  //       proxy = "PROXY ${appdata.settings["proxy"]}";
-  //     }
-  //   }
-  //   // check validation
-  //   if (proxy.startsWith("PROXY")) {
-  //     var uri = proxy.replaceFirst("PROXY", "").removeAllBlank;
-  //     if (!uri.startsWith("http")) {
-  //       uri += "http://";
-  //     }
-  //     if (!uri.isURL) {
-  //       return "DIRECT";
-  //     }
-  //   }
-     return proxy;
+  String findProxy(Uri uri) {
+    //   var haveUserProxy = appdata.settings["proxy"] != null &&
+    //       appdata.settings["proxy"].toString().removeAllBlank.isNotEmpty;
+    //   if (!App.isLinux && !haveUserProxy) {
+    //     var channel = const MethodChannel("pixes/proxy");
+    //     channel.invokeMethod("getProxy").then((value) {
+    //       if (value.toString().toLowerCase() == "no proxy") {
+    //         proxy = "DIRECT";
+    //       } else {
+    //         if (proxy.contains("https")) {
+    //           var proxies = value.split(";");
+    //           for (String proxy in proxies) {
+    //             proxy = proxy.removeAllBlank;
+    //             if (proxy.startsWith('https=')) {
+    //               value = proxy.substring(6);
+    //             }
+    //           }
+    //         }
+    //         proxy = "PROXY $value";
+    //       }
+    //     });
+    //   } else {
+    //     if (haveUserProxy) {
+    //       proxy = "PROXY ${appdata.settings["proxy"]}";
+    //     }
+    //   }
+    //   // check validation
+    //   if (proxy.startsWith("PROXY")) {
+    //     var uri = proxy.replaceFirst("PROXY", "").removeAllBlank;
+    //     if (!uri.startsWith("http")) {
+    //       uri += "http://";
+    //     }
+    //     if (!uri.isURL) {
+    //       return "DIRECT";
+    //     }
+    //   }
+    return proxy;
   }
 
   @override

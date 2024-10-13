@@ -1,7 +1,6 @@
 part of 'api_client.dart';
 
 extension IllustExt on ApiClient {
-  
   Future<Res<List<Illust>>> getRecommendedIllusts() async {
     var res = await apiGet(recommendationUrl);
     if (res.success) {
@@ -54,7 +53,7 @@ extension IllustExt on ApiClient {
     }
   }
 
-    Future<Res<List<TrendingTag>>> getHotTags() async {
+  Future<Res<List<TrendingTag>>> getHotTags() async {
     var res = await apiGet(
         "/v1/trending-tags/illust?filter=for_android&include_translated_tag_results=true");
     if (res.error) {
@@ -123,6 +122,7 @@ extension IllustExt on ApiClient {
       return Res.error(res.errorMessage);
     }
   }
+
   /// mode: day, week, month, day_male, day_female, week_original, week_rookie, day_manga, week_manga, month_manga, day_r18_manga, day_r18
   Future<Res<List<Illust>>> getRanking(String mode, [String? nextUrl]) async {
     var res = await apiGet(
@@ -180,7 +180,7 @@ extension IllustExt on ApiClient {
     }
   }
 
-    Future<Res<List<Illust>>> relatedIllusts(String id) async {
+  Future<Res<List<Illust>>> relatedIllusts(String id) async {
     var res =
         await apiGet("/v2/illust/related?filter=for_android&illust_id=$id");
     if (res.success) {

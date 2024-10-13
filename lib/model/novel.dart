@@ -1,4 +1,4 @@
-import 'package:pixiv_dart_api/utils/parser.dart';
+import '../utils/parser.dart';
 
 import 'author.dart' show Author;
 import 'tag.dart';

@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'dart:io';
 
-import 'package:pixiv_dart_api/utils/io_extension.dart';
+import '../utils/io_extension.dart';
 import 'package:sqlite3/sqlite3.dart';
 
 import '../model/illust.dart';

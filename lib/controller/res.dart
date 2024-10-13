@@ -1,17 +1,16 @@
 import 'exceptions.dart' show BadResponseException;
 
-
-class Res<T>{
+class Res<T> {
   ///error info
   final String? errorMessage;
 
-  String get errMsg => errorMessage??"Unknown Error";
+  String get errMsg => errorMessage ?? "Unknown Error";
 
   /// data
   final T? _data;
 
   /// is there an error
-  bool get error => errorMessage!=null || _data==null;
+  bool get error => errorMessage != null || _data == null;
 
   /// whether succeed
   bool get success => !error;
@@ -29,11 +28,15 @@ class Res<T>{
   @override
   String toString() => _data.toString();
 
-  Res.fromErrorRes(Res another, {this.subData}):
-        _data=null,errorMessage=another.errMsg;
+  Res.fromErrorRes(Res another, {this.subData})
+      : _data = null,
+        errorMessage = another.errMsg;
 
   /// network result
-  const Res(this._data,{this.errorMessage, this.subData});
+  const Res(this._data, {this.errorMessage, this.subData});
 
-  Res.error(dynamic e):errorMessage=e.toString(), _data=null, subData=null;
+  Res.error(dynamic e)
+      : errorMessage = e.toString(),
+        _data = null,
+        subData = null;
 }

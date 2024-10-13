@@ -1,9 +1,9 @@
-import 'package:pixiv_dart_api/controller/logging.dart';
+import '../controller/logging.dart';
 
 class BadResponseException implements Exception {
   final String message;
 
-  BadResponseException(this.message){
+  BadResponseException(this.message) {
     loggerError("Bad Response:$message");
   }
 
@@ -16,7 +16,7 @@ class BadResponseException implements Exception {
 class BadRequestException implements Exception {
   final String message;
 
-  BadRequestException(this.message){
+  BadRequestException(this.message) {
     loggerError("Bad Request:$message");
   }
 
@@ -25,4 +25,3 @@ class BadRequestException implements Exception {
     return message;
   }
 }
-

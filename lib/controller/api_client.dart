@@ -4,9 +4,9 @@ import 'dart:math';
 import 'package:dio/dio.dart';
 import 'package:intl/intl.dart';
 import 'package:crypto/crypto.dart';
-import 'package:pixiv_dart_api/controller/exceptions.dart';
-import 'package:pixiv_dart_api/controller/logging.dart';
-import 'package:pixiv_dart_api/model/user.dart';
+import '../controller/exceptions.dart';
+import '../controller/logging.dart';
+import '../model/user.dart';
 
 import '../model/author.dart';
 import '../model/comment.dart';

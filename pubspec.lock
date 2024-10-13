@@ -187,15 +187,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.9.0"
-  pixiv_dart_api:
-    dependency: "direct main"
-    description:
-      path: "."
-      ref: HEAD
-      resolved-ref: efe587913b53fac9ee21b1332b14f5b05d81d19b
-      url: "https://github.com/asdoll/pixiv_dart_api.git"
-    source: git
-    version: "0.0.1"
   sky_engine:
     dependency: transitive
     description: flutter
@@ -210,7 +201,7 @@ packages:
     source: hosted
     version: "1.10.0"
   sqlite3:
-    dependency: transitive
+    dependency: "direct main"
     description:
       name: sqlite3
       sha256: "45f168ae2213201b54e09429ed0c593dc2c88c924a1488d6f9c523a255d567cb"
