@@ -40,6 +40,8 @@ class ApiClient extends BaseClient {
 
   String get accessToken => account.accessToken;
 
+  int errorCount = 0;
+
   Map<String, String> get headers {
     final time =
         DateFormat("yyyy-MM-dd'T'HH:mm:ss'+00:00'").format(DateTime.now());
@@ -86,11 +88,13 @@ class ApiClient extends BaseClient {
               contentType: Headers.formUrlEncodedContentType,
               headers: headers));
       if (res.statusCode != 200) {
+        errorCount++;
         throw "Invalid Status code ${res.statusCode}";
       }
       final data = json.decode(res.data!);
       account = Account.fromJson(data);
       Savers.writeAccountJson(account);
+      errorCount=0;
       return const Res(true);
     } catch (e, s) {
       netErrLog("$e\n$s");
@@ -115,12 +119,14 @@ class ApiClient extends BaseClient {
       if (res.statusCode != 200) {
         var data = res.data ?? "";
         if (data.contains("Invalid refresh token")) {
-          throw "Failed to refresh token. Please log out.";
+          errorCount++;
+          throw "Failed to refresh token.";
         }
       }
       var newAccount = Account.fromJson(json.decode(res.data!));
       account = newAccount;
       Savers.writeAccountJson(account);
+      errorCount=0;
       return const Res(true);
     } catch (e, s) {
       netErrLog("$e\n$s");
@@ -138,6 +144,7 @@ class ApiClient extends BaseClient {
           queryParameters: query,
           options: Options(headers: headers, validateStatus: (status) => true));
       if (res.statusCode == 200) {
+        errorCount = 0;
         return Res(res.data!);
       } else if (res.statusCode == 400) {
         if (res.data.toString().contains("Access Token")) {
@@ -157,6 +164,7 @@ class ApiClient extends BaseClient {
         return Res.error("Invalid Status Code: ${res.statusCode}");
       }
     } catch (e, s) {
+      errorCount++;
       netErrLog("$e\n$s");
       return Res.error(e);
     }
@@ -172,6 +180,7 @@ class ApiClient extends BaseClient {
           queryParameters: query,
           options: Options(headers: headers, validateStatus: (status) => true));
       if (res.statusCode == 200) {
+        errorCount = 0;
         return Res(res.data!);
       } else if (res.statusCode == 400) {
         if (res.data.toString().contains("Access Token")) {
@@ -188,6 +197,7 @@ class ApiClient extends BaseClient {
         return Res.error("Invalid Status Code: ${res.statusCode}");
       }
     } catch (e, s) {
+      errorCount++;
       netErrLog("$e\n$s");
       return Res.error(e);
     }
@@ -222,6 +232,7 @@ class ApiClient extends BaseClient {
               validateStatus: (status) => true,
               contentType: Headers.formUrlEncodedContentType));
       if (res.statusCode == 200) {
+        errorCount = 0;
         return Res(res.data!);
       } else if (res.statusCode == 400) {
         if (res.data.toString().contains("Access Token")) {
@@ -241,6 +252,7 @@ class ApiClient extends BaseClient {
         return Res.error("Invalid Status Code: ${res.statusCode}");
       }
     } catch (e, s) {
+      errorCount++;
       netErrLog("$e\n$s");
       return Res.error(e);
     }

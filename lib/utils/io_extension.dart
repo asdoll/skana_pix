@@ -1,5 +1,9 @@
 import 'dart:io';
 
+import 'package:flutter/material.dart';
+
+import '../view/defaults.dart';
+
 extension FSExt on FileSystemEntity {
   Future<void> deleteIfExists() async {
     if (await exists()) {
@@ -54,4 +58,12 @@ String bytesToText(int bytes) {
   } else {
     return "${(bytes / 1024 / 1024 / 1024).toStringAsFixed(2)} GB";
   }
+}
+
+bool isDarkMode(BuildContext context) {
+  return Theme.of(context).brightness == Brightness.dark;
+}
+
+ThemeData getTheme(BuildContext context) {
+  return isDarkMode(context)?DynamicData.darkTheme:DynamicData.themeData;
 }

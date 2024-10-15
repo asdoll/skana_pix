@@ -38,6 +38,13 @@ dependencies:
   intl: ^0.19.0
   dio: ^5.7.0
   sqlite3: ^2.4.6
+  google_fonts: ^4.0.4
+  persistent_bottom_nav_bar: ^6.2.1
+  font_awesome_flutter: ^10.7.0
+  flashy_tab_bar2: ^0.0.10
+  floating_tabbar: ^1.0.3
+  url_launcher: ^6.3.1
+  webview_flutter: ^4.10.0
 
 dev_dependencies:
   flutter_test:
@@ -60,6 +67,9 @@ flutter:
   # included with your application, so that you can use the icons in
   # the material Icons class.
   uses-material-design: true
+
+  assets:
+    - assets/i18n/
 
   # To add assets to your application, add an assets section, like this:
   # assets:

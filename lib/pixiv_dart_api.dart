@@ -8,6 +8,7 @@ export 'controller/res.dart';
 export 'controller/saves.dart';
 export 'controller/exceptions.dart';
 export 'controller/settings.dart';
+export 'controller/connector.dart';
 
 export 'model/author.dart';
 export 'model/comment.dart';
