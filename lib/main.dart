@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:skana_pix/pixiv_dart_api.dart';
 
+import 'utils/applinks.dart';
 import 'utils/translate.dart';
 import 'view/homepage.dart';
 import 'view/defaults.dart';
@@ -15,6 +16,7 @@ Future<void> main() async {
     };
     await ConnectManager().init();
     await TranslateMap.init();
+    handleLinks();
     runApp(const MyApp());
   }, (e, s) {
     loggerError("Unhandled Exception: $e\n$s");
