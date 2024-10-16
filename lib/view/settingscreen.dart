@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:skana_pix/pixiv_dart_api.dart';
 
 
 class SettingScreen extends StatefulWidget {
@@ -16,11 +17,21 @@ class _SettingscreenState extends State<SettingScreen> {
         title: const Text("Settings Screen"),
       ),
       body: Center(
-        child: ElevatedButton(
+        child: Column(
+          children: <Widget> [ElevatedButton(
           onPressed: () {
+            moveUserData();
           },
-          child: const Text("Go to Main Screen"),
+          child: const Text("remove login data"),
         ),
+        ElevatedButton(
+          onPressed: () {
+            putBackUserData();
+          },
+          child: const Text("put back login data"),
+        ),
+      ],
+      ),
       ),
     );
   }

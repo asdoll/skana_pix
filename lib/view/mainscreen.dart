@@ -33,7 +33,7 @@ class _MainScreenState extends State<MainScreen> {
         itemBuilder: (BuildContext context, int index) {
           return ListTile(
             tileColor: index.isOdd ? oddItemColor : evenItemColor,
-            title: Text('${titles[0]} $index'),
+            title: Text(ConnectManager().apiClient.account.user.name),
           );
         },
       ),

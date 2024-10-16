@@ -26,12 +26,12 @@ abstract class BaseClient {
 }
 
 class BasePath {
-  static String dataPath = "data/";
-  static String cachePath = "cache/";
-  static String get accountJsonPath => "${dataPath}account.json";
-  static String get appSettingJsonPath => "${dataPath}setting.json";
-  static String get downloadPath => '${dataPath}downloads/';
+  static String dataPath = "data";
+  static String cachePath = "cache";
+  static String get accountJsonPath => "$dataPath/account.json";
+  static String get appSettingJsonPath => "$dataPath/setting.json";
+  static String get downloadPath => '$dataPath/downloads/';
   static String downloadSubPath = r"illust/${id}-p${index}.${ext}";
-  static String get downloadNovelPath => "${downloadPath}novel/";
+  static String get downloadNovelPath => "$downloadPath/novel/";
   static String get downloadDbPath => "${dataPath}download.db";
 }

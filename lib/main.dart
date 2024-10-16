@@ -1,10 +1,24 @@
-import 'package:flutter/material.dart';
+import 'dart:async';
 
+import 'package:flutter/material.dart';
+import 'package:skana_pix/pixiv_dart_api.dart';
+
+import 'utils/translate.dart';
 import 'view/homepage.dart';
 import 'view/defaults.dart';
 
-void main() {
-  runApp(const MyApp());
+Future<void> main() async {
+  runZonedGuarded(() async {
+    WidgetsFlutterBinding.ensureInitialized();
+    FlutterError.onError = (details) {
+      Log.error("Unhandled", "${details.exception}\n${details.stack}");
+    };
+    await ConnectManager().init();
+    await TranslateMap.init();
+    runApp(const MyApp());
+  }, (e, s) {
+    loggerError("Unhandled Exception: $e\n$s");
+  });
 }
 
 class MyApp extends StatelessWidget {
@@ -19,6 +33,7 @@ class MyApp extends StatelessWidget {
       darkTheme: DynamicData.darkTheme,
       themeMode: ThemeMode.system,
       home: const HomePage(title: 'Skana_pix'),
+      navigatorKey: DynamicData.rootNavigatorKey,
     );
   }
 }

@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 
+import '../controller/bases.dart';
 import '../view/defaults.dart';
 
 extension FSExt on FileSystemEntity {
@@ -66,4 +67,18 @@ bool isDarkMode(BuildContext context) {
 
 ThemeData getTheme(BuildContext context) {
   return isDarkMode(context)?DynamicData.darkTheme:DynamicData.themeData;
+}
+
+void moveUserData(){
+  var dataFile = File(BasePath.accountJsonPath);
+  if(dataFile.existsSync()) {
+    dataFile.renameSync("${BasePath.dataPath}/account2.json");
+  }
+}
+
+void putBackUserData(){
+  var dataFile = File("${BasePath.dataPath}/account2.json");
+  if(dataFile.existsSync()) {
+    dataFile.renameSync(BasePath.accountJsonPath);
+  }
 }

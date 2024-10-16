@@ -9,7 +9,7 @@ class TranslateMap {
   static bool loaded = false;
 
   static Future<void> init() async {
-    var data = await rootBundle.loadString("assets/i18n.json");
+    var data = await rootBundle.loadString("assets/i18n/i18n.json");
     translation = Map<String, Map<String, dynamic>>.from(jsonDecode(data));
     if (translation.isNotEmpty) {
       loaded = true;

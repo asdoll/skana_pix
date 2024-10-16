@@ -58,10 +58,10 @@ class _LoginPageState extends State<LoginPage> {
                         children: [
                           SizedBox(
                             width: 96,
-                          child: TextButton(
-                            onPressed: checked? onContinue : null,
-                            child: Text("Continue".i18n),
-                          ),
+                            child: TextButton(
+                              onPressed: onContinue,
+                              child: Text("Continue".i18n),
+                            ),
                           ),
                           const SizedBox(
                             height: 16,
@@ -77,21 +77,6 @@ class _LoginPageState extends State<LoginPage> {
                       ),
                     ),
                   ),
-                  Row(
-                    children: [
-                      Checkbox(
-                          value: checked,
-                          onChanged: (value) => setState(() {
-                                checked = value ?? false;
-                              })),
-                      const SizedBox(
-                        width: 8,
-                      ),
-                      Expanded(
-                        child: Text("I understand pixes is a free unofficial application.".i18n),
-                      )
-                    ],
-                  )
                 ],
               ),
             )),
@@ -179,32 +164,70 @@ class _LoginPageState extends State<LoginPage> {
 
   void onContinue() async {
     bool? useExternal;
+    bool exitLogin = false;
+    await showDialog(
+        context: context,
+        barrierDismissible: true,
+        builder: (context) {
+          var alertDialog = AlertDialog(
+              content: Text("I understand this is a free unofficial application.".i18n),
+              actions: [
+                TextButton(
+                  child: Text("Cancel".i18n),
+                  onPressed: () {
+                    exitLogin = true;
+                    DynamicData.rootNavigatorKey.currentState!.pop();
+                  },
+                ),
+                TextButton(
+                  child: Text("Continue".i18n),
+                  onPressed: () {
+                    exitLogin = false;
+                    DynamicData.rootNavigatorKey.currentState!.pop();
+                  },
+                ),
+                ElevatedButton(
+                  onPressed: () {
+                    putBackUserData();
+                    exitLogin = true;
+                    DynamicData.rootNavigatorKey.currentState!.pop();
+                  },
+                  child: const Text("put back login data"),
+                ),
+              ]);
+          return alertDialog;
+        },
+      );
+    if (exitLogin) {
+      return;
+    }
     if (DynamicData.isMobile) {
       await showDialog(
         context: context,
         barrierDismissible: true,
         builder: (context) {
           var alertDialog = AlertDialog(
-            title: Text("Choose a way to login".i18n),
-            content: Text("${"Use Webview: you cannot sign in with Google.".i18n}"
-                "\n\n"
-                "${"Use an external browser: You can sign in using Google. However, some browsers may not be compatible with the application".i18n}"),
-            actions: [
-              TextButton(
-                child: Text("Webview".i18n),
-                onPressed: () {
-                  useExternal = false;
-                  DynamicData.rootNavigatorKey.currentState!.pop();
-                },
-              ),
-              TextButton(
-                child: Text("External browser".i18n),
-                onPressed: () {
-                  useExternal = true;
-                  DynamicData.rootNavigatorKey.currentState!.pop();
-                },
-              )
-            ]);
+              title: Text("Choose a way to login".i18n),
+              content: Text(
+                  "${"Use Webview: you cannot sign in with Google.".i18n}"
+                  "\n\n"
+                  "${"Use an external browser: You can sign in using Google. However, some browsers may not be compatible with the application".i18n}"),
+              actions: [
+                TextButton(
+                  child: Text("Webview".i18n),
+                  onPressed: () {
+                    useExternal = false;
+                    DynamicData.rootNavigatorKey.currentState!.pop();
+                  },
+                ),
+                TextButton(
+                  child: Text("External browser".i18n),
+                  onPressed: () {
+                    useExternal = true;
+                    DynamicData.rootNavigatorKey.currentState!.pop();
+                  },
+                ),
+              ]);
           return alertDialog;
         },
       );

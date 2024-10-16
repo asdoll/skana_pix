@@ -5,6 +5,7 @@ import 'package:persistent_bottom_nav_bar/persistent_bottom_nav_bar.dart';
 
 import 'package:flutter/material.dart';
 
+import 'loginpage.dart';
 import 'mainscreen.dart';
 import 'settingscreen.dart';
 
@@ -95,12 +96,17 @@ class _HomePageState extends State<HomePage> {
   }
 
   @override
-  Widget build(BuildContext context) => Scaffold(
-        
-        body: Material(
-          color: getTheme(context).primaryColor,
-          child:
-          PersistentTabView(
+  Widget build(BuildContext context) {
+    if(ConnectManager().notLoggedIn){
+      return Material(
+        child: LoginPage(() => setState(() {})),
+      );
+    }
+
+    return Scaffold(
+      body: Material(
+        color: getTheme(context).primaryColor,
+        child: PersistentTabView(
           context,
           controller: _controller,
           screens: _buildScreens(),
@@ -133,6 +139,7 @@ class _HomePageState extends State<HomePage> {
           navBarStyle:
               _navBarStyle, // Choose the nav bar style with this property
         ),
-        ),
-      );
+      ),
+    );
+  }
 }
