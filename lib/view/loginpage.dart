@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:skana_pix/pixiv_dart_api.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 import '../componentwidgets/webview.dart';
+import '../utils/applinks.dart';
 import '../utils/navigation.dart';
 import '../utils/translate.dart';
 import 'defaults.dart';
@@ -203,7 +204,6 @@ class _LoginPageState extends State<LoginPage> {
     }
     useExternal = DynamicData.isMobile;
     var url = await ConnectManager().apiClient.generateWebviewUrl();
-    bool Function(dynamic uri)? onLink;
     onLink = (uri) {
       if (uri.scheme == "pixiv") {
         onFinished(uri.queryParameters["code"]!);
