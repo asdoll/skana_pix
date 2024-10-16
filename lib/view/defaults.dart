@@ -27,8 +27,8 @@ class DynamicData {
   );
   
   static get locale => PlatformDispatcher.instance.locale;
-  static get isMobile => Platform.isAndroid || Platform.isIOS;
-  static get isIOS => Platform.isIOS;
+  static bool get isMobile => Platform.isAndroid || Platform.isIOS;
+  static bool get isIOS => Platform.isIOS;
 
   static final rootNavigatorKey = GlobalKey<NavigatorState>();
 

@@ -201,44 +201,9 @@ class _LoginPageState extends State<LoginPage> {
     if (exitLogin) {
       return;
     }
-    if (DynamicData.isMobile) {
-      await showDialog(
-        context: context,
-        barrierDismissible: true,
-        builder: (context) {
-          var alertDialog = AlertDialog(
-              title: Text("Choose a way to login".i18n),
-              content: Text(
-                  "${"Use Webview: you cannot sign in with Google.".i18n}"
-                  "\n\n"
-                  "${"Use an external browser: You can sign in using Google. However, some browsers may not be compatible with the application".i18n}"),
-              actions: [
-                TextButton(
-                  child: Text("Webview".i18n),
-                  onPressed: () {
-                    useExternal = false;
-                    DynamicData.rootNavigatorKey.currentState!.pop();
-                  },
-                ),
-                TextButton(
-                  child: Text("External browser".i18n),
-                  onPressed: () {
-                    useExternal = true;
-                    DynamicData.rootNavigatorKey.currentState!.pop();
-                  },
-                ),
-              ]);
-          return alertDialog;
-        },
-      );
-    } else {
-      useExternal = true;
-    }
-    if (useExternal == null) {
-      return;
-    }
+    useExternal = DynamicData.isMobile;
     var url = await ConnectManager().apiClient.generateWebviewUrl();
-    var onLink;
+    bool Function(dynamic uri)? onLink;
     onLink = (uri) {
       if (uri.scheme == "pixiv") {
         onFinished(uri.queryParameters["code"]!);
@@ -250,7 +215,7 @@ class _LoginPageState extends State<LoginPage> {
     setState(() {
       waitingForAuth = true;
     });
-    if (!useExternal! && mounted) {
+    if (!useExternal && mounted) {
       context.to(() => WebviewPage(
             url,
             onNavigation: (req) {
