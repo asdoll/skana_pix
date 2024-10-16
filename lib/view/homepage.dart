@@ -1,3 +1,4 @@
+import 'package:flutter/services.dart';
 import 'package:skana_pix/pixiv_dart_api.dart';
 
 import 'defaults.dart';
@@ -98,12 +99,22 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     if(ConnectManager().notLoggedIn){
-      return Material(
+      return Scaffold(
+      appBar: AppBar(
+        toolbarHeight: 0.0,
+        systemOverlayStyle: SystemUiOverlayStyle.light.copyWith(systemNavigationBarColor: Theme.of(context).scaffoldBackgroundColor),
+      ),
+      body:Material(
         child: LoginPage(() => setState(() {})),
+      ),
       );
     }
 
     return Scaffold(
+       appBar: AppBar(
+        toolbarHeight: 0.0,
+        systemOverlayStyle: SystemUiOverlayStyle.light.copyWith(systemNavigationBarColor: Theme.of(context).scaffoldBackgroundColor),
+      ),
       body: Material(
         color: getTheme(context).primaryColor,
         child: PersistentTabView(

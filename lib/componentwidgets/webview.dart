@@ -56,7 +56,7 @@ class _WebviewPageState extends State<WebviewPage> {
           padding: EdgeInsets.only(top: MediaQuery.of(context).padding.top, left: 16, right: 16),
           child: Row(
             children: [
-              const Text("Webview"),
+              //const Text("Webview"),
               const Spacer(),
               IconButton(
                 icon: const Icon(Icons.open_in_new, size: 20,),

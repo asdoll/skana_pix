@@ -44,10 +44,13 @@ class _LoginPageState extends State<LoginPage> {
               height: 300,
               child: Column(
                 children: [
+                  const SizedBox(
+                    height: 16,
+                  ),
                   Align(
                     alignment: Alignment.centerLeft,
                     child: Text(
-                      "Login".i18n,
+                      ("   ${"Login".i18n}"),
                       style: const TextStyle(
                           fontSize: 24, fontWeight: FontWeight.bold),
                     ),
@@ -58,8 +61,8 @@ class _LoginPageState extends State<LoginPage> {
                         mainAxisSize: MainAxisSize.min,
                         children: [
                           SizedBox(
-                            width: 96,
-                            child: TextButton(
+                            width: 110,
+                            child: FilledButton(
                               onPressed: onContinue,
                               child: Text("Continue".i18n),
                             ),
@@ -202,7 +205,7 @@ class _LoginPageState extends State<LoginPage> {
     if (exitLogin) {
       return;
     }
-    useExternal = DynamicData.isMobile;
+    useExternal = !DynamicData.isMobile;
     var url = await ConnectManager().apiClient.generateWebviewUrl();
     onLink = (uri) {
       if (uri.scheme == "pixiv") {
