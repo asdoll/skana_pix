@@ -206,7 +206,9 @@ class _ProxyHttpOverrides extends HttpOverrides {
 
   @override
   HttpClient createHttpClient(SecurityContext? context) {
-    final client = super.createHttpClient(context);
+    final client = super.createHttpClient(context)..badCertificateCallback =
+                        (X509Certificate cert, String host, int port) =>
+                            true;
     client.connectionTimeout = const Duration(seconds: 5);
     client.findProxy = findProxy;
     return client;

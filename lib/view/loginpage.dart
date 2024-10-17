@@ -50,9 +50,9 @@ class _LoginPageState extends State<LoginPage> {
                   Align(
                     alignment: Alignment.centerLeft,
                     child: Text(
-                      ("   ${"Login".i18n}"),
+                      ("   ${"SkanaPix".i18n}"),
                       style: const TextStyle(
-                          fontSize: 24, fontWeight: FontWeight.bold),
+                          fontSize: 20),
                     ),
                   ),
                   Expanded(
@@ -64,7 +64,7 @@ class _LoginPageState extends State<LoginPage> {
                             width: 110,
                             child: FilledButton(
                               onPressed: onContinue,
-                              child: Text("Continue".i18n),
+                              child: Text("Login".i18n),
                             ),
                           ),
                           const SizedBox(

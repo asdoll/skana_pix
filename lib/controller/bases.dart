@@ -23,6 +23,10 @@ abstract class BaseClient {
 
   String get userDetailUrl => "/v1/user/detail";
   String get bookmarkIllustUrl => "/v1/user/bookmarks/illust";
+
+  static String get ImageHost => "i.pximg.net";
+  static String get ImageCatHost => "i.pixiv.re";
+  static String get ImageSHost => "s.pximg.net";
 }
 
 class BasePath {

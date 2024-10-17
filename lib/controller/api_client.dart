@@ -316,6 +316,22 @@ class ApiClient extends BaseClient {
     }
   }
 
+  Future<Res<List<UserPreview>>> getMypixiv(String uid, String type,
+      [String? nextUrl]) async {
+    var path = nextUrl ??
+        "/v1/user/mypixiv?filter=for_android&user_id=$uid";
+    var res = await apiGet(path);
+    if (res.success) {
+      return Res(
+          (res.data["user_previews"] as List)
+              .map((e) => UserPreview.fromJson(e))
+              .toList(),
+          subData: res.data["next_url"]);
+    } else {
+      return Res.error(res.errorMessage);
+    }
+  }
+
   Future<Res<List<UserPreview>>> getRecommendationUsers() async {
     var res = await apiGet("/v1/user/recommended?filter=for_android");
     if (res.success) {

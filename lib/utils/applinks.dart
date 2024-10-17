@@ -1,5 +1,3 @@
-import 'dart:io';
-
 import 'package:app_links/app_links.dart';
 import 'package:skana_pix/pixiv_dart_api.dart';
 

@@ -14,6 +14,7 @@ Future<void> main() async {
     FlutterError.onError = (details) {
       Log.error("Unhandled", "${details.exception}\n${details.stack}");
     };
+    setSystemProxy();
     await ConnectManager().init();
     await TranslateMap.init();
     handleLinks();
