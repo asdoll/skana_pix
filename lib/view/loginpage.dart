@@ -50,9 +50,8 @@ class _LoginPageState extends State<LoginPage> {
                   Align(
                     alignment: Alignment.centerLeft,
                     child: Text(
-                      ("   ${"SkanaPix".i18n}"),
-                      style: const TextStyle(
-                          fontSize: 20),
+                      ("     ${"SkanaPix".i18n}"),
+                      style: const TextStyle(fontSize: 20),
                     ),
                   ),
                   Expanded(
@@ -167,14 +166,16 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   void onContinue() async {
-    bool? useExternal;
+    bool useExternal = true;
     bool exitLogin = false;
-    await showDialog(
+    if (DynamicData.isMobile) {
+      await showDialog(
         context: context,
         barrierDismissible: true,
         builder: (context) {
           var alertDialog = AlertDialog(
-              content: Text("I understand this is a free unofficial application.".i18n),
+              content: Text(
+                  "I understand this is a free unofficial application.".i18n),
               actions: [
                 TextButton(
                   child: Text("Cancel".i18n),
@@ -184,28 +185,29 @@ class _LoginPageState extends State<LoginPage> {
                   },
                 ),
                 TextButton(
-                  child: Text("Continue".i18n),
+                  child: Text("Continue with Webview".i18n),
                   onPressed: () {
                     exitLogin = false;
+                    useExternal = false;
                     DynamicData.rootNavigatorKey.currentState!.pop();
                   },
                 ),
-                ElevatedButton(
+                TextButton(
+                  child: Text("Continue with External Browser".i18n),
                   onPressed: () {
-                    putBackUserData();
-                    exitLogin = true;
+                    exitLogin = false;
+                    useExternal = true;
                     DynamicData.rootNavigatorKey.currentState!.pop();
                   },
-                  child: const Text("put back login data"),
                 ),
               ]);
           return alertDialog;
         },
       );
+    }
     if (exitLogin) {
       return;
     }
-    useExternal = !DynamicData.isMobile;
     var url = await ConnectManager().apiClient.generateWebviewUrl();
     onLink = (uri) {
       if (uri.scheme == "pixiv") {

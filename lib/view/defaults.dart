@@ -14,7 +14,6 @@ class DynamicData {
       seedColor: Colors.indigoAccent,
       brightness: Brightness.light,
     ),
-    fontFamily: 'NotoSans',
     useMaterial3: true,
   );
   static var darkTheme = ThemeData(
@@ -23,7 +22,6 @@ class DynamicData {
       seedColor: Colors.indigoAccent,
       brightness: Brightness.dark,
     ),
-    fontFamily: 'NotoSans',
     useMaterial3: true,
   );
 

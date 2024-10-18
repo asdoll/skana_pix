@@ -34,11 +34,6 @@ class ImagePage extends StatefulWidget {
 
   final int initialPage;
 
-  // static show(List<String> urls, {int initialPage = 0}) {
-  //   DynamicData.rootNavigatorKey.currentState?.push(AppPageRoute(
-  //       builder: (context) => ImagePage(urls, initialPage: initialPage)));
-  // }
-
   @override
   State<ImagePage> createState() => _ImagePageState();
 }
@@ -114,10 +109,11 @@ class _ImagePageState extends State<ImagePage> {
                 shareShow = false;
               });
               var file = await imagesCacheManager.getFileFromCache(nowUrl);
-              if (file != null && mounted)
+              if (file != null && mounted) {
                 setState(() {
                   shareShow = true;
                 });
+              }
             },
             loadingBuilder: (context, event) => _buildLoading(event),
           )),

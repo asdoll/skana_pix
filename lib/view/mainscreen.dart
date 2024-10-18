@@ -15,11 +15,6 @@ class MainScreen extends StatefulWidget {
 }
 
 class _MainScreenState extends State<MainScreen> {
-  List<String> titles = <String>[
-    'Cloud',
-    'Beach',
-    'Sunny',
-  ];
   @override
   void initState() {
     super.initState();
@@ -58,22 +53,22 @@ class _MainScreenState extends State<MainScreen> {
               toolbarHeight: 0.0,
               bottom: TabBar(
                 tabs: [
-                  new Container(
+                  Container(
                     height: 30.0,
                     width: 80,
-                    child: new Tab(text: 'Illust'.i18n),
+                    child: Tab(text: 'Illust'.i18n),
                   ),
-                  new Container(
+                  Container(
                     height: 30.0,
                     width: 80,
                     // color: Colors.red,
-                    child: new Tab(text: 'Manga'.i18n),
+                    child: Tab(text: 'Manga'.i18n),
                   ),
-                  new Container(
+                  Container(
                     height: 30.0,
                     width: 80,
                     // color: Colors.red,
-                    child: new Tab(text: 'Novel'.i18n),
+                    child: Tab(text: 'Novel'.i18n),
                   ),
                 ],
                 indicatorSize: TabBarIndicatorSize.tab,

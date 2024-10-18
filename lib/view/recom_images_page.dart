@@ -23,23 +23,29 @@ class _RecomImagesPageState
   @override
   Widget buildContent(BuildContext context, final List<Illust> data) {
     checkIllusts(data);
-    return LayoutBuilder(builder: (context, constrains) {
-      return MasonryGridView.builder(
-        controller: DynamicData.recommendScrollController,
-        padding: const EdgeInsets.symmetric(horizontal: 8) +
-            EdgeInsets.only(bottom: context.padding.bottom),
-        gridDelegate: const SliverSimpleGridDelegateWithMaxCrossAxisExtent(
-          maxCrossAxisExtent: 240,
-        ),
-        itemCount: data.length,
-        itemBuilder: (context, index) {
-          if (index == data.length - 1) {
-            nextPage();
-          }
-          return IllustCard(data[index], false);
-        },
-      );
-    });
+    return RefreshIndicator(
+        onRefresh: _onRefresh,
+        child: LayoutBuilder(builder: (context, constrains) {
+          return MasonryGridView.builder(
+            controller: DynamicData.recommendScrollController,
+            padding: const EdgeInsets.symmetric(horizontal: 8) +
+                EdgeInsets.only(bottom: context.padding.bottom),
+            gridDelegate: const SliverSimpleGridDelegateWithMaxCrossAxisExtent(
+              maxCrossAxisExtent: 240,
+            ),
+            itemCount: data.length,
+            itemBuilder: (context, index) {
+              if (index == data.length - 1) {
+                nextPage();
+              }
+              return IllustCard(data[index], false);
+            },
+          );
+        }));
+  }
+
+  Future<void> _onRefresh() async {
+    reset();
   }
 
   @override

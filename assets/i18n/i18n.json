@@ -183,7 +183,9 @@
         "Related Artworks": "相关作品",
         "Emphasize artworks from following artists": "强调关注画师的作品",
         "The border of the artworks will be darker": "作品的边框将被加深",
-        "Network Error. Please refresh to try again.": "网络错误. 请刷新重试."
+        "Network Error. Please refresh to try again.": "网络错误. 请刷新重试.",
+        "Continue with Webview": "使用内置浏览器继续",
+        "Continue with External Browser": "使用外部浏览器继续"
     },
     "zh_TW": {
         "Search": "搜索",
@@ -369,6 +371,8 @@
         "Related Artworks": "相關作品",
         "Emphasize artworks from following artists": "強調關注畫師的作品",
         "The border of the artworks will be darker": "作品的邊框將被加深",
-        "Network Error. Please refresh to try again.": "網絡錯誤. 請刷新重試."
+        "Network Error. Please refresh to try again.": "網絡錯誤. 請刷新重試.",
+        "Continue with Webview": "使用內置瀏覽器繼續",
+        "Continue with External Browser": "使用外部瀏覽器繼續"
     }
 }
