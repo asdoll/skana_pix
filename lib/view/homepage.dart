@@ -39,10 +39,6 @@ class _HomePageState extends State<HomePage> {
   void jumpTab() {
     _controller.jumpToTab(0);
   }
-
-  final _scrollController1 = ScrollController();
-  final _scrollController2 = ScrollController();
-  final _scrollController3 = ScrollController();
   List<PersistentBottomNavBarItem> _navBarsItems() {
     return [
       PersistentBottomNavBarItem(
@@ -51,13 +47,9 @@ class _HomePageState extends State<HomePage> {
         title: ("Trending"),
         activeColorPrimary: DynamicData.activeNavColor,
         inactiveColorPrimary: DynamicData.inActiveNavColor,
-        scrollController: _scrollController1,
+        scrollController: DynamicData.recommendScrollController,
         routeAndNavigatorSettings: RouteAndNavigatorSettings(
           initialRoute: "/",
-          routes: {
-            "/first": (final context) => const MainScreen2(),
-            "/second": (final context) => const MainScreen3(),
-          },
         ),
         iconSize: 30.0,
       ),
@@ -67,7 +59,7 @@ class _HomePageState extends State<HomePage> {
         title: ("Feed"),
         activeColorPrimary: DynamicData.activeNavColor,
         inactiveColorPrimary: DynamicData.inActiveNavColor,
-        scrollController: _scrollController2,
+        //scrollController: DynamicData.recommendMangaScrollController,
         routeAndNavigatorSettings: RouteAndNavigatorSettings(
           initialRoute: "/",
           routes: {
@@ -83,7 +75,7 @@ class _HomePageState extends State<HomePage> {
         title: ("Users"),
         activeColorPrimary: DynamicData.activeNavColor,
         inactiveColorPrimary: DynamicData.inActiveNavColor,
-        scrollController: _scrollController3,
+        //scrollController: DynamicData.recommendMangaScrollController,
         routeAndNavigatorSettings: RouteAndNavigatorSettings(
           initialRoute: "/",
           routes: {
@@ -127,7 +119,7 @@ class _HomePageState extends State<HomePage> {
               true, // This needs to be true if you want to move up the screen on a non-scrollable screen when keyboard appears. Default is true.
           stateManagement: true, // Default is true.
           hideNavigationBarWhenKeyboardAppears: true,
-          popBehaviorOnSelectedNavBarItemPress: PopBehavior.once,
+          popBehaviorOnSelectedNavBarItemPress: PopBehavior.all,
           padding: const EdgeInsets.only(top: 8),
           backgroundColor: getTheme(context).scaffoldBackgroundColor,
           isVisible: true,

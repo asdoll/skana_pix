@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:persistent_bottom_nav_bar/persistent_bottom_nav_bar.dart';
 import 'package:skana_pix/pixiv_dart_api.dart';
+import 'package:skana_pix/utils/translate.dart';
 import 'package:skana_pix/view/defaults.dart';
+import 'package:skana_pix/view/loginpage.dart';
+
+import 'recom_images_page.dart';
 
 
 class MainScreen extends StatefulWidget {
@@ -24,28 +28,9 @@ class _MainScreenState extends State<MainScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final colorScheme = DynamicData.themeData.colorScheme;
-    final Color oddItemColor = colorScheme.primary.withOpacity(0.05);
-    final Color evenItemColor = colorScheme.primary.withOpacity(0.15);
     List<Widget> tabs = [
-      ListView.builder(
-        itemCount: 25,
-        itemBuilder: (BuildContext context, int index) {
-          return ListTile(
-            tileColor: index.isOdd ? oddItemColor : evenItemColor,
-            title: Text(ConnectManager().apiClient.account.user.name),
-          );
-        },
-      ),
-      ListView.builder(
-        itemCount: 25,
-        itemBuilder: (BuildContext context, int index) {
-          return ListTile(
-            tileColor: index.isOdd ? oddItemColor : evenItemColor,
-            title: Text('${titles[1]} $index'),
-          );
-        },
-      ),
+      RecomImagesPage(0),
+      RecomImagesPage(1),
       Center(
         child: ElevatedButton(
           onPressed: () {
@@ -76,19 +61,19 @@ class _MainScreenState extends State<MainScreen> {
               new Container(
                   height: 30.0,
                   width: 80,
-                  child: new Tab(text: 'Illust'),
+                  child: new Tab(text: 'Illust'.i18n),
                 ),
               new Container(
                   height: 30.0,
                   width: 80,
                   // color: Colors.red,
-                  child: new Tab(text: 'Manga'),
+                  child: new Tab(text: 'Manga'.i18n),
                 ),
               new Container(
                   height: 30.0,
                   width: 80,
                   // color: Colors.red,
-                  child: new Tab(text: 'Novel'),
+                  child: new Tab(text: 'Novel'.i18n),
                 ),
             ],
             dividerColor: Colors.transparent,

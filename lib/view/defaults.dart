@@ -33,4 +33,13 @@ class DynamicData {
   static final rootNavigatorKey = GlobalKey<NavigatorState>();
 
   static GlobalKey<NavigatorState>? mainNavigatorKey;
+
+  static bool get hideR18 => true;
+  static bool get feedAIBadge => true;
+  static bool get longPressSaveConfirm => true;
+
+  static List<String> blockedTags = [];
+  static List<String> blockedUsers = [];
+  
+  static final recommendScrollController = ScrollController();
 }

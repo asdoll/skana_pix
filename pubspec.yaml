@@ -49,6 +49,9 @@ dependencies:
   app_links: ^6.3.2
   flutter_cache_manager: ^3.4.1
   cached_network_image: ^3.4.1
+  waterfall_flow: ^3.0.3
+  easy_refresh: ^3.4.0
+  flutter_staggered_grid_view: ^0.7.0
 
 dev_dependencies:
   flutter_test:

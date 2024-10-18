@@ -1,81 +1,100 @@
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
+import 'package:persistent_bottom_nav_bar/persistent_bottom_nav_bar.dart';
 import 'package:skana_pix/componentwidgets/loading.dart';
+import 'package:skana_pix/componentwidgets/routes.dart';
 import 'package:skana_pix/pixiv_dart_api.dart';
+import 'package:skana_pix/utils/navigation.dart';
+import 'package:skana_pix/utils/translate.dart';
+import 'package:skana_pix/view/defaults.dart';
+
+import 'imagelist.dart';
+import 'nullhero.dart';
+import 'pixivimage.dart';
+import 'staricon.dart';
+
+typedef UpdateFavoriteFunc = void Function(bool v);
 
 class IllustCard extends StatefulWidget {
-  const IllustCard(this.illust, {this.nextPage, this.previousPage, super.key});
+  const IllustCard(this.illust, this.showMangaBadage, {super.key});
+
+  final showMangaBadage;
 
   final Illust illust;
 
-  final void Function()? nextPage;
-
-  final void Function()? previousPage;
+  static Map<String, UpdateFavoriteFunc> favoriteCallbacks = {};
 
   @override
   _IllustCardState createState() => _IllustCardState();
 }
 
 class _IllustCardState extends State<IllustCard> {
-  late IllustStore store;
-  late List<IllustStore>? iStores;
+  late Illust illust;
+  bool isBookmarking = false;
   late String tag;
-  late LightingStore _lightingStore;
 
   @override
   void initState() {
-    store = widget.store;
-    iStores = widget.iStores;
-    _lightingStore = widget.lightingStore;
-    tag = this.hashCode.toString();
+    illust = widget.illust;
+    tag = hashCode.toString();
+    IllustCard.favoriteCallbacks[widget.illust.id.toString()] = (v) {
+      setState(() {
+        widget.illust.isBookmarked = v;
+      });
+    };
     super.initState();
+  }
+
+  @override
+  void dispose() {
+    IllustCard.favoriteCallbacks.remove(widget.illust.id.toString());
+    super.dispose();
   }
 
   @override
   void didUpdateWidget(covariant IllustCard oldWidget) {
     super.didUpdateWidget(oldWidget);
-    store = widget.store;
-    iStores = widget.iStores;
-    _lightingStore = widget.lightingStore;
+    illust = widget.illust;
   }
 
   @override
   Widget build(BuildContext context) {
-    if (userSetting.hIsNotAllow)
-      for (int i = 0; i < store.illusts!.tags.length; i++) {
-        if (store.illusts!.tags[i].name.startsWith('R-18'))
-          return InkWell(
-            onTap: () => _buildTap(context),
-            onLongPress: () => _onLongPressSave(),
-            child: Card(
-              margin: EdgeInsets.all(8.0),
-              elevation: 8.0,
-              clipBehavior: Clip.antiAlias,
-              shape: const RoundedRectangleBorder(
-                  borderRadius: BorderRadius.all(Radius.circular(8.0))),
-              child: Image.asset('assets/images/h.jpg'),
-            ),
-          );
-      }
+    if ((illust.isR18 || illust.isR18G) && DynamicData.hideR18) {
+      return InkWell(
+        onTap: () => _buildTap(context),
+        onLongPress: () => _onLongPressSave(),
+        child: Card(
+          margin: EdgeInsets.all(8.0),
+          elevation: 8.0,
+          clipBehavior: Clip.antiAlias,
+          shape: const RoundedRectangleBorder(
+              borderRadius: BorderRadius.all(Radius.circular(8.0))),
+          child: Image.asset('assets/images/h.jpg'),
+        ),
+      );
+    }
+    //return buildR18InkWell(context);
     return buildInkWell(context);
   }
 
   _onLongPressSave() async {
-    if (userSetting.longPressSaveConfirm) {
+    if (DynamicData.longPressSaveConfirm) {
       final result = await showDialog(
           context: context,
           builder: (context) {
             return AlertDialog(
-              title: Text(I18n.of(context).save),
-              content: Text(store.illusts?.title ?? ""),
+              title: Text("Save".i18n),
+              content: Text(illust.title),
               actions: <Widget>[
                 TextButton(
-                  child: Text(I18n.of(context).cancel),
+                  child: Text("Cancel".i18n),
                   onPressed: () {
                     Navigator.of(context).pop(false);
                   },
                 ),
                 TextButton(
-                  child: Text(I18n.of(context).ok),
+                  child: Text("Ok".i18n),
                   onPressed: () {
                     Navigator.of(context).pop(true);
                   },
@@ -87,35 +106,27 @@ class _IllustCardState extends State<IllustCard> {
         return;
       }
     }
-    saveStore.saveImage(store.illusts!);
-    if (userSetting.starAfterSave && (store.state == 0)) {
-      store.star(
-          restrict: userSetting.defaultPrivateLike ? "private" : "public");
-    }
+    // saveStore.saveImage(store.illusts!);
+    // if (userSetting.starAfterSave && (store.state == 0)) {
+    //   store.star(
+    //       restrict: userSetting.defaultPrivateLike ? "private" : "public");
+    // }
   }
 
   Future _buildTap(BuildContext context) {
-    return Navigator.of(context, rootNavigator: true)
-        .push(MaterialPageRoute(builder: (_) {
-      return PictureListPage(
-        iStores: iStores!,
-        store: store,
-        lightingStore: _lightingStore,
-        heroString: tag,
-      );
-    }));
+    return context.to(() => ImageListPage(widget.illust));
   }
 
   Widget cardText() {
-    if (store.illusts!.type != "illust") {
+    if (illust.type == "manga" && widget.showMangaBadage) {
       return Text(
-        store.illusts!.type,
+        illust.type.i18n,
         style: TextStyle(color: Colors.white),
       );
     }
-    if (store.illusts!.metaPages.isNotEmpty) {
+    if (illust.images.length > 1) {
       return Text(
-        store.illusts!.metaPages.length.toString(),
+        illust.images.length.toString(),
         style: TextStyle(color: Colors.white),
       );
     }
@@ -126,22 +137,19 @@ class _IllustCardState extends State<IllustCard> {
     return tooLong
         ? NullHero(
             tag: tag,
-            child: PixivImage(store.illusts!.imageUrls.squareMedium,
+            child: PixivImage(illust.images.first.squareMedium,
                 fit: BoxFit.fitWidth),
           )
         : NullHero(
             tag: tag,
-            child:
-                PixivImage(store.illusts!.feedPreviewUrl, fit: BoxFit.fitWidth),
+            child: PixivImage(illust.images.first.medium, fit: BoxFit.fitWidth),
           );
   }
 
   Widget buildInkWell(BuildContext context) {
-    var tooLong =
-        store.illusts!.height.toDouble() / store.illusts!.width.toDouble() > 3;
-    var radio = (tooLong)
-        ? 1.0
-        : store.illusts!.width.toDouble() / store.illusts!.height.toDouble();
+    var tooLong = illust.height.toDouble() / illust.width.toDouble() > 3;
+    var radio =
+        (tooLong) ? 1.0 : illust.width.toDouble() / illust.height.toDouble();
     return Card(
         margin: EdgeInsets.all(8.0),
         clipBehavior: Clip.antiAlias,
@@ -160,8 +168,7 @@ class _IllustCardState extends State<IllustCard> {
                           right: 5.0,
                           child: Row(
                             children: [
-                              if (userSetting.feedAIBadge &&
-                                  store.illusts!.illustAIType == 2)
+                              if (DynamicData.feedAIBadge && illust.isAi)
                                 _buildAIBadge(),
                               _buildVisibility()
                             ],
@@ -174,6 +181,56 @@ class _IllustCardState extends State<IllustCard> {
         ));
   }
 
+  Widget buildR18InkWell(BuildContext context) {
+    var tooLong = illust.height.toDouble() / illust.width.toDouble() > 3;
+    var radio =
+        (tooLong) ? 1.0 : illust.width.toDouble() / illust.height.toDouble();
+    return Card(
+        margin: EdgeInsets.all(8.0),
+        clipBehavior: Clip.antiAlias,
+        color: Theme.of(context).colorScheme.surface,
+        child: _buildAnimationWraper(
+          context,
+          Column(
+            children: <Widget>[
+              AspectRatio(
+                  aspectRatio: radio,
+                  child: Stack(
+                    children: [
+                      Positioned.fill(
+                          child: blurWidget(_buildPic(tag, tooLong))),
+                      Positioned(
+                          top: 5.0,
+                          right: 5.0,
+                          child: Row(
+                            children: [
+                              if (DynamicData.feedAIBadge && illust.isAi)
+                                _buildAIBadge(),
+                              _buildR18Badge()
+                            ],
+                          )),
+                    ],
+                  )),
+              _buildBottom(context),
+            ],
+          ),
+        ));
+  }
+
+  Widget blurWidget(Widget w) {
+    return Stack(
+    children: <Widget>[
+      w,
+      BackdropFilter(
+          filter: ImageFilter.blur(
+        sigmaX: 5.0,
+        sigmaY: 5.0,
+      ),
+      child: Container()
+      ),
+    ]);
+  }
+
   Widget _buildAIBadge() {
     return Container(
       decoration: BoxDecoration(
@@ -184,6 +241,22 @@ class _IllustCardState extends State<IllustCard> {
         padding: const EdgeInsets.symmetric(vertical: 2.0, horizontal: 2.0),
         child: Text(
           "AI",
+          style: TextStyle(color: Colors.white),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildR18Badge() {
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.black26,
+        borderRadius: BorderRadius.all(Radius.circular(4.0)),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 2.0, horizontal: 2.0),
+        child: Text(
+          "R18",
           style: TextStyle(color: Colors.white),
         ),
       ),
@@ -203,48 +276,40 @@ class _IllustCardState extends State<IllustCard> {
   }
 
   _buildLongPressToSaveHint() async {
-    if (Platform.isIOS) {
-      final pref = await SharedPreferences.getInstance();
-      final firstLongPress = await pref.getBool("first_long_press") ?? true;
-      if (firstLongPress) {
-        await pref.setBool("first_long_press", false);
-        await showDialog(
-            context: context,
-            builder: (context) {
-              return AlertDialog(
-                title: Text('长按保存'),
-                content: Text('长按卡片将会保存插画到相册'),
-                actions: <Widget>[
-                  TextButton(
-                      onPressed: () {
-                        Navigator.of(context).pop();
-                      },
-                      child: Text(I18n.of(context).ok))
-                ],
-              );
-            });
-      }
-    }
+    // if (DynamicData.isIOS) {
+    //   final pref = await SharedPreferences.getInstance();
+    //   final firstLongPress = await pref.getBool("first_long_press") ?? true;
+    //   if (firstLongPress) {
+    //     await pref.setBool("first_long_press", false);
+    //     await showDialog(
+    //         context: context,
+    //         builder: (context) {
+    //           return AlertDialog(
+    //             title: Text('长按保存'),
+    //             content: Text('长按卡片将会保存插画到相册'),
+    //             actions: <Widget>[
+    //               TextButton(
+    //                   onPressed: () {
+    //                     Navigator.of(context).pop();
+    //                   },
+    //                   child: Text(I18n.of(context).ok))
+    //             ],
+    //           );
+    //         });
+    //   }
+    // }
     _onLongPressSave();
   }
 
   Future _buildInkTap(BuildContext context, String heroTag) {
-    return Navigator.of(context, rootNavigator: true)
-        .push(MaterialPageRoute(builder: (_) {
-      if (iStores != null) {
-        return PictureListPage(
-          heroString: heroTag,
-          store: store,
-          lightingStore: _lightingStore,
-          iStores: iStores!,
-        );
-      }
-      return IllustLightingPage(
-        id: store.illusts!.id,
-        heroString: heroTag,
-        store: store,
-      );
-    }));
+    return PersistentNavBarNavigator.pushNewScreen(
+      context,
+      screen: ImageListPage(illust),
+      withNavBar: false, // OPTIONAL VALUE. True by default.
+      pageTransitionAnimation: PageTransitionAnimation.cupertino,
+      customPageRoute:
+          AppPageRoute(builder: (context) => ImageListPage(illust)),
+    );
   }
 
   Widget _buildBottom(BuildContext context) {
@@ -257,14 +322,14 @@ class _IllustCardState extends State<IllustCard> {
             child:
                 Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
               Text(
-                store.illusts!.title,
+                illust.title,
                 maxLines: 1,
                 overflow: TextOverflow.clip,
                 style: Theme.of(context).textTheme.bodyMedium,
                 strutStyle: StrutStyle(forceStrutHeight: true, leading: 0),
               ),
               Text(
-                store.illusts!.user.name,
+                illust.author.name,
                 maxLines: 1,
                 overflow: TextOverflow.clip,
                 style: Theme.of(context).textTheme.bodySmall,
@@ -275,47 +340,28 @@ class _IllustCardState extends State<IllustCard> {
           Align(
             alignment: Alignment.centerRight,
             child: GestureDetector(
-              child: Observer(builder: (_) {
-                return StarIcon(
-                  state: store.state,
-                );
-              }),
-              onTap: () async {
-                if (userSetting.saveAfterStar && (store.state == 0)) {
-                  saveStore.saveImage(store.illusts!);
-                }
-                store.star(
-                    restrict:
-                        userSetting.defaultPrivateLike ? "private" : "public");
-                if (userSetting.followAfterStar) {
-                  bool success = await store.followAfterStar();
-                  if (success) {
-                    BotToast.showText(
-                        text:
-                            "${store.illusts!.user.name} ${I18n.of(context).followed}");
-                  }
-                }
-              },
-              onLongPress: () async {
-                final result = await showModalBottomSheet(
-                  context: context,
-                  clipBehavior: Clip.hardEdge,
-                  shape: RoundedRectangleBorder(
-                    borderRadius:
-                        BorderRadius.vertical(top: Radius.circular(16)),
-                  ),
-                  constraints: BoxConstraints.expand(
-                      height: MediaQuery.of(context).size.height * .618),
-                  isScrollControlled: true,
-                  builder: (_) => TagForIllustPage(id: store.illusts!.id),
-                );
-                if (result?.isNotEmpty ?? false) {
-                  LPrinter.d(result);
-                  String restrict = result['restrict'];
-                  List<String>? tags = result['tags'];
-                  store.star(restrict: restrict, tags: tags, force: true);
-                }
-              },
+              child: StarIcon(state: likeState()),
+              onTap: likes,
+              // onLongPress: () async {
+              //   final result = await showModalBottomSheet(
+              //     context: context,
+              //     clipBehavior: Clip.hardEdge,
+              //     shape: RoundedRectangleBorder(
+              //       borderRadius:
+              //           BorderRadius.vertical(top: Radius.circular(16)),
+              //     ),
+              //     constraints: BoxConstraints.expand(
+              //         height: MediaQuery.of(context).size.height * .618),
+              //     isScrollControlled: true,
+              //     builder: (_) => TagForIllustPage(id: illust.id),
+              //   );
+              //   if (result?.isNotEmpty ?? false) {
+              //     LPrinter.d(result);
+              //     String restrict = result['restrict'];
+              //     List<String>? tags = result['tags'];
+              //     store.star(restrict: restrict, tags: tags, force: true);
+              //   }
+              // },
             ),
           )
         ],
@@ -323,10 +369,41 @@ class _IllustCardState extends State<IllustCard> {
     );
   }
 
+  int likeState() {
+    if (isBookmarking) {
+      return 1;
+    }
+    if (illust.isBookmarked) {
+      return 2;
+    }
+    return 0;
+  }
+
+  void likes([String type = "public"]) async {
+    if (isBookmarking) return;
+    setState(() {
+      isBookmarking = true;
+    });
+    var method = widget.illust.isBookmarked ? "delete" : "add";
+    var res = await ConnectManager()
+        .apiClient
+        .addBookmark(widget.illust.id.toString(), method, type);
+    if (res.error) {
+      if (mounted) {
+        context.showToast(message: "Network Error");
+      }
+    } else {
+      widget.illust.isBookmarked = !widget.illust.isBookmarked;
+    }
+    setState(() {
+      isBookmarking = false;
+    });
+  }
+
   Widget _buildVisibility() {
     return Visibility(
-      visible: store.illusts!.type != "illust" ||
-          store.illusts!.metaPages.isNotEmpty,
+      visible: ((illust.type == "manga") && (widget.showMangaBadage)) ||
+          illust.images.length > 1,
       child: Align(
         alignment: Alignment.topRight,
         child: Padding(
@@ -358,7 +435,7 @@ class IllustStoreWidget extends StatefulWidget {
 class _IllustStoreWidgetState extends LoadingState<IllustStoreWidget, Illust> {
   @override
   Widget buildContent(BuildContext context, Illust data) {
-    return IllustCard(data);
+    return IllustCard(data, false);
   }
 
   @override
