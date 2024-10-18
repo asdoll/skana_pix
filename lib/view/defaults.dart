@@ -3,9 +3,10 @@ import 'dart:ui';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 
 class DynamicData {
-  static var activeNavColor =  Colors.indigoAccent;
+  static var activeNavColor = Colors.indigoAccent;
   static var inActiveNavColor = CupertinoColors.systemGrey;
   static var themeData = ThemeData(
     brightness: Brightness.light,
@@ -25,7 +26,13 @@ class DynamicData {
     fontFamily: 'NotoSans',
     useMaterial3: true,
   );
-  
+
+  static ThemeData get themes =>
+      (SchedulerBinding.instance.platformDispatcher.platformBrightness ==
+              Brightness.dark)
+          ? themeData
+          : darkTheme;
+
   static get locale => PlatformDispatcher.instance.locale;
   static bool get isMobile => Platform.isAndroid || Platform.isIOS;
   static bool get isIOS => Platform.isIOS;
@@ -40,6 +47,6 @@ class DynamicData {
 
   static List<String> blockedTags = [];
   static List<String> blockedUsers = [];
-  
+
   static final recommendScrollController = ScrollController();
 }

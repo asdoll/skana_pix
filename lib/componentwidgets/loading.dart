@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:skana_pix/pixiv_dart_api.dart';
 import 'package:skana_pix/utils/navigation.dart';
+import 'package:skana_pix/utils/translate.dart';
 import 'package:skana_pix/utils/widgetplugin.dart';
 
-abstract class LoadingState<T extends StatefulWidget, S extends Object> extends State<T>{
+abstract class LoadingState<T extends StatefulWidget, S extends Object>
+    extends State<T> {
   bool isLoading = false;
 
   S? data;
@@ -28,7 +30,7 @@ abstract class LoadingState<T extends StatefulWidget, S extends Object> extends 
       error = null;
     });
     loadData().then((value) {
-      if(value.success) {
+      if (value.success) {
         setState(() {
           isLoading = false;
           data = value.data;
@@ -63,7 +65,7 @@ abstract class LoadingState<T extends StatefulWidget, S extends Object> extends 
   void initState() {
     isLoading = true;
     loadData().then((value) {
-      if(value.success) {
+      if (value.success) {
         setState(() {
           isLoading = false;
           data = value.data;
@@ -82,9 +84,9 @@ abstract class LoadingState<T extends StatefulWidget, S extends Object> extends 
   Widget build(BuildContext context) {
     Widget child;
 
-    if(isLoading){
+    if (isLoading) {
       child = buildLoading();
-    } else if (error != null){
+    } else if (error != null) {
       child = buildError();
     } else {
       child = buildContent(context, data!);
@@ -94,7 +96,8 @@ abstract class LoadingState<T extends StatefulWidget, S extends Object> extends 
   }
 }
 
-abstract class MultiPageLoadingState<T extends StatefulWidget, S extends Object> extends State<T>{
+abstract class MultiPageLoadingState<T extends StatefulWidget, S extends Object>
+    extends State<T> {
   bool _isFirstLoading = true;
 
   bool _isLoading = false;
@@ -116,21 +119,22 @@ abstract class MultiPageLoadingState<T extends StatefulWidget, S extends Object>
   bool get isFirstLoading => _isFirstLoading;
 
   void nextPage() {
-    if(_isLoading) return;
+    if (_isLoading) return;
     _isLoading = true;
     loadData(_page).then((value) {
       _isLoading = false;
-      if(value.success) {
+      if (value.success) {
         _page++;
         setState(() {
           _data!.addAll(value.data);
         });
       } else {
-        var message = value.errorMessage ?? "Network Error";
-        if(message == "No more data") {
+        var message = value.errorMessage ??
+            "Network Error. Please refresh to try again.".i18n;
+        if (message == "No more data") {
           return;
         }
-        if(message.length > 20) {
+        if (message.length > 45) {
           message = "${message.substring(0, 20)}...";
         }
         context.showToast(message: message);
@@ -151,7 +155,7 @@ abstract class MultiPageLoadingState<T extends StatefulWidget, S extends Object>
 
   void firstLoad() {
     loadData(_page).then((value) {
-      if(value.success) {
+      if (value.success) {
         _page++;
         setState(() {
           _isFirstLoading = false;
@@ -160,7 +164,10 @@ abstract class MultiPageLoadingState<T extends StatefulWidget, S extends Object>
       } else {
         setState(() {
           _isFirstLoading = false;
-          _error = value.errorMessage!;
+          if (value.errorMessage != null &&
+              value.errorMessage!.contains("timeout")) {
+            _error = "Network Error. Please refresh to try again.".i18n;
+          }
         });
       }
     });
@@ -200,9 +207,9 @@ abstract class MultiPageLoadingState<T extends StatefulWidget, S extends Object>
   Widget build(BuildContext context) {
     Widget child;
 
-    if(_isFirstLoading){
+    if (_isFirstLoading) {
       child = buildLoading(context);
-    } else if (_error != null){
+    } else if (_error != null) {
       child = buildError(context, _error!);
     } else {
       child = buildContent(context, _data!);

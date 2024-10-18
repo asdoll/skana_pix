@@ -31,7 +31,8 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   final PersistentTabController _controller =
       PersistentTabController(initialIndex: 0);
-  final NavBarStyle _navBarStyle = NavBarStyle.style12;
+  final NavBarStyle _navBarStyle = NavBarStyle.style6;
+
   List<Widget> _buildScreens() {
     return [MainScreen(), SettingScreen(), SettingScreen()];
   }
@@ -39,25 +40,26 @@ class _HomePageState extends State<HomePage> {
   void jumpTab() {
     _controller.jumpToTab(0);
   }
+
   List<PersistentBottomNavBarItem> _navBarsItems() {
     return [
       PersistentBottomNavBarItem(
         icon: Icon(Icons.auto_awesome),
         inactiveIcon: Icon(Icons.auto_awesome_outlined),
-        title: ("Trending"),
-        activeColorPrimary: DynamicData.activeNavColor,
+        //title: ("Trending"),
+        activeColorPrimary: DynamicData.themeData.primaryColor,
         inactiveColorPrimary: DynamicData.inActiveNavColor,
         scrollController: DynamicData.recommendScrollController,
         routeAndNavigatorSettings: RouteAndNavigatorSettings(
           initialRoute: "/",
         ),
-        iconSize: 30.0,
+        iconSize: 26.0,
       ),
       PersistentBottomNavBarItem(
         icon: Icon(Icons.motion_photos_on),
         inactiveIcon: Icon(Icons.motion_photos_on_outlined),
-        title: ("Feed"),
-        activeColorPrimary: DynamicData.activeNavColor,
+        //title: ("Feed"),
+        activeColorPrimary: DynamicData.themeData.primaryColor,
         inactiveColorPrimary: DynamicData.inActiveNavColor,
         //scrollController: DynamicData.recommendMangaScrollController,
         routeAndNavigatorSettings: RouteAndNavigatorSettings(
@@ -67,13 +69,13 @@ class _HomePageState extends State<HomePage> {
             "/second": (final context) => const MainScreen3(),
           },
         ),
-        iconSize: 30.0,
+        iconSize: 26.0,
       ),
       PersistentBottomNavBarItem(
         icon: Icon(Icons.pest_control_rodent),
         inactiveIcon: Icon(Icons.pest_control_rodent_outlined),
-        title: ("Users"),
-        activeColorPrimary: DynamicData.activeNavColor,
+        //title: ("Users"),
+        activeColorPrimary: DynamicData.themeData.primaryColor,
         inactiveColorPrimary: DynamicData.inActiveNavColor,
         //scrollController: DynamicData.recommendMangaScrollController,
         routeAndNavigatorSettings: RouteAndNavigatorSettings(
@@ -83,29 +85,33 @@ class _HomePageState extends State<HomePage> {
             "/second": (final context) => const MainScreen3(),
           },
         ),
-        iconSize: 30.0,
+        iconSize: 26.0,
       ),
     ];
   }
 
   @override
   Widget build(BuildContext context) {
-    if(ConnectManager().notLoggedIn){
+    if (ConnectManager().notLoggedIn) {
       return Scaffold(
-      appBar: AppBar(
-        toolbarHeight: 0.0,
-        systemOverlayStyle: SystemUiOverlayStyle.light.copyWith(systemNavigationBarColor: Theme.of(context).scaffoldBackgroundColor),
-      ),
-      body:Material(
-        child: LoginPage(() => setState(() {})),
-      ),
+        appBar: AppBar(
+          toolbarHeight: 0.0,
+          systemOverlayStyle: SystemUiOverlayStyle.light.copyWith(
+              systemNavigationBarColor:
+                  Theme.of(context).scaffoldBackgroundColor),
+        ),
+        body: Material(
+          child: LoginPage(() => setState(() {})),
+        ),
       );
     }
 
     return Scaffold(
-       appBar: AppBar(
+      appBar: AppBar(
         toolbarHeight: 0.0,
-        systemOverlayStyle: SystemUiOverlayStyle.light.copyWith(systemNavigationBarColor: Theme.of(context).scaffoldBackgroundColor),
+        systemOverlayStyle: SystemUiOverlayStyle.light.copyWith(
+            systemNavigationBarColor:
+                Theme.of(context).scaffoldBackgroundColor),
       ),
       body: Material(
         color: getTheme(context).primaryColor,
@@ -120,7 +126,7 @@ class _HomePageState extends State<HomePage> {
           stateManagement: true, // Default is true.
           hideNavigationBarWhenKeyboardAppears: true,
           popBehaviorOnSelectedNavBarItemPress: PopBehavior.all,
-          padding: const EdgeInsets.only(top: 8),
+          padding: const EdgeInsets.only(top: 4),
           backgroundColor: getTheme(context).scaffoldBackgroundColor,
           isVisible: true,
           animationSettings: const NavBarAnimationSettings(
@@ -138,7 +144,7 @@ class _HomePageState extends State<HomePage> {
             ),
           ),
           confineToSafeArea: true,
-          navBarHeight: kBottomNavigationBarHeight,
+          navBarHeight: 42,
           navBarStyle:
               _navBarStyle, // Choose the nav bar style with this property
         ),

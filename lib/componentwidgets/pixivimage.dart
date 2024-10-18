@@ -3,7 +3,6 @@ import 'package:cached_network_image/cached_network_image.dart';
 
 import '../controller/caches.dart';
 
-
 class PixivImage extends StatefulWidget {
   final String url;
   final Widget? placeWidget;
@@ -88,8 +87,6 @@ class _PixivImageState extends State<PixivImage> {
         fit: fit ?? BoxFit.fitWidth);
   }
 }
-
-
 
 class PixivProvider {
   static ImageProvider url(String url, {String? preUrl}) {

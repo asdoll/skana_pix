@@ -7,7 +7,6 @@ import 'package:skana_pix/view/loginpage.dart';
 
 import 'recom_images_page.dart';
 
-
 class MainScreen extends StatefulWidget {
   const MainScreen({super.key});
 
@@ -49,42 +48,43 @@ class _MainScreenState extends State<MainScreen> {
       theme: DynamicData.themeData,
       darkTheme: DynamicData.darkTheme,
       themeMode: ThemeMode.system,
-      home:
-      DefaultTabController(
-      initialIndex: 0,
-      length: 3,
-      child: Scaffold(
-        appBar: AppBar(
-          toolbarHeight: 0.0,
-          bottom: TabBar(
-            tabs: [
-              new Container(
-                  height: 30.0,
-                  width: 80,
-                  child: new Tab(text: 'Illust'.i18n),
-                ),
-              new Container(
-                  height: 30.0,
-                  width: 80,
-                  // color: Colors.red,
-                  child: new Tab(text: 'Manga'.i18n),
-                ),
-              new Container(
-                  height: 30.0,
-                  width: 80,
-                  // color: Colors.red,
-                  child: new Tab(text: 'Novel'.i18n),
-                ),
-            ],
-            dividerColor: Colors.transparent,
-            indicatorSize: TabBarIndicatorSize.tab,
+      home: DefaultTabController(
+        initialIndex: 0,
+        length: 3,
+        child: Scaffold(
+          appBar: PreferredSize(
+            preferredSize: Size.fromHeight(32.0), // here the desired height
+            child: AppBar(
+              toolbarHeight: 0.0,
+              bottom: TabBar(
+                tabs: [
+                  new Container(
+                    height: 30.0,
+                    width: 80,
+                    child: new Tab(text: 'Illust'.i18n),
+                  ),
+                  new Container(
+                    height: 30.0,
+                    width: 80,
+                    // color: Colors.red,
+                    child: new Tab(text: 'Manga'.i18n),
+                  ),
+                  new Container(
+                    height: 30.0,
+                    width: 80,
+                    // color: Colors.red,
+                    child: new Tab(text: 'Novel'.i18n),
+                  ),
+                ],
+                indicatorSize: TabBarIndicatorSize.tab,
+              ),
+            ),
           ),
+          body: TabBarView(
+            children: tabs,
           ),
-        body: TabBarView(
-          children: tabs,
         ),
       ),
-    ),
     );
   }
 }

@@ -8,6 +8,7 @@ import 'package:skana_pix/pixiv_dart_api.dart';
 import 'package:skana_pix/utils/navigation.dart';
 import 'package:skana_pix/utils/translate.dart';
 import 'package:skana_pix/view/defaults.dart';
+import 'package:blur/blur.dart';
 
 import 'imagelist.dart';
 import 'nullhero.dart';
@@ -61,20 +62,9 @@ class _IllustCardState extends State<IllustCard> {
   @override
   Widget build(BuildContext context) {
     if ((illust.isR18 || illust.isR18G) && DynamicData.hideR18) {
-      return InkWell(
-        onTap: () => _buildTap(context),
-        onLongPress: () => _onLongPressSave(),
-        child: Card(
-          margin: EdgeInsets.all(8.0),
-          elevation: 8.0,
-          clipBehavior: Clip.antiAlias,
-          shape: const RoundedRectangleBorder(
-              borderRadius: BorderRadius.all(Radius.circular(8.0))),
-          child: Image.asset('assets/images/h.jpg'),
-        ),
-      );
+      return buildR18InkWell(context);
     }
-    //return buildR18InkWell(context);
+
     return buildInkWell(context);
   }
 
@@ -218,17 +208,11 @@ class _IllustCardState extends State<IllustCard> {
   }
 
   Widget blurWidget(Widget w) {
-    return Stack(
-    children: <Widget>[
-      w,
-      BackdropFilter(
-          filter: ImageFilter.blur(
-        sigmaX: 5.0,
-        sigmaY: 5.0,
-      ),
-      child: Container()
-      ),
-    ]);
+    return Blur(
+      blur: 5,
+      blurColor: Colors.grey,
+      child: w,
+    );
   }
 
   Widget _buildAIBadge() {
@@ -306,9 +290,10 @@ class _IllustCardState extends State<IllustCard> {
       context,
       screen: ImageListPage(illust),
       withNavBar: false, // OPTIONAL VALUE. True by default.
-      pageTransitionAnimation: PageTransitionAnimation.cupertino,
-      customPageRoute:
-          AppPageRoute(builder: (context) => ImageListPage(illust)),
+      pageTransitionAnimation: PageTransitionAnimation.scale,
+      // customPageRoute: AppPageRoute(
+      //     builder: (context) =>
+      //         ImagePage(illust.images.map((e) => e.large).toList())),
     );
   }
 

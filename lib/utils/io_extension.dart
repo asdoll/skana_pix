@@ -1,6 +1,9 @@
 import 'dart:io';
+import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
+import 'package:file_selector/file_selector.dart';
+import 'package:flutter_file_dialog/flutter_file_dialog.dart';
 
 import '../controller/bases.dart';
 import '../view/defaults.dart';
@@ -23,9 +26,9 @@ extension FSExt on FileSystemEntity {
   int get size {
     if (this is File) {
       return (this as File).lengthSync();
-    } else if(this is Directory){
+    } else if (this is Directory) {
       var size = 0;
-      for(var file in (this as Directory).listSync()){
+      for (var file in (this as Directory).listSync()) {
         size += file.size;
       }
       return size;
@@ -36,7 +39,7 @@ extension FSExt on FileSystemEntity {
 
 extension DirectoryExt on Directory {
   bool havePermission() {
-    if(!existsSync()) return false;
+    if (!existsSync()) return false;
     // if(App.isMacOS) {
     //   return true;
     // }
@@ -50,11 +53,11 @@ extension DirectoryExt on Directory {
 }
 
 String bytesToText(int bytes) {
-  if(bytes < 1024) {
+  if (bytes < 1024) {
     return "$bytes B";
-  } else if(bytes < 1024 * 1024) {
+  } else if (bytes < 1024 * 1024) {
     return "${(bytes / 1024).toStringAsFixed(2)} KB";
-  } else if(bytes < 1024 * 1024 * 1024) {
+  } else if (bytes < 1024 * 1024 * 1024) {
     return "${(bytes / 1024 / 1024).toStringAsFixed(2)} MB";
   } else {
     return "${(bytes / 1024 / 1024 / 1024).toStringAsFixed(2)} GB";
@@ -66,19 +69,40 @@ bool isDarkMode(BuildContext context) {
 }
 
 ThemeData getTheme(BuildContext context) {
-  return isDarkMode(context)?DynamicData.darkTheme:DynamicData.themeData;
+  return isDarkMode(context) ? DynamicData.darkTheme : DynamicData.themeData;
 }
 
-void moveUserData(){
+void moveUserData() {
   var dataFile = File(BasePath.accountJsonPath);
-  if(dataFile.existsSync()) {
+  if (dataFile.existsSync()) {
     dataFile.renameSync("${BasePath.dataPath}/account2.json");
   }
 }
 
-void putBackUserData(){
+void putBackUserData() {
   var dataFile = File("${BasePath.dataPath}/account2.json");
-  if(dataFile.existsSync()) {
+  if (dataFile.existsSync()) {
     dataFile.renameSync(BasePath.accountJsonPath);
+  }
+}
+
+void saveFile(File file, [String? name]) async {
+  if (!DynamicData.isMobile) {
+    var fileName = file.path.split('/').last;
+    final FileSaveLocation? result =
+        await getSaveLocation(suggestedName: name ?? fileName);
+    if (result == null) {
+      return;
+    }
+
+    final Uint8List fileData = await file.readAsBytes();
+    String mimeType = 'image/${fileName.split('.').last}';
+    final XFile textFile =
+        XFile.fromData(fileData, mimeType: mimeType, name: name ?? fileName);
+    await textFile.saveTo(result.path);
+  } else {
+    final params =
+        SaveFileDialogParams(sourceFilePath: file.path, fileName: name);
+    await FlutterFileDialog.saveFile(params: params);
   }
 }
