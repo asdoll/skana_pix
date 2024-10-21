@@ -17,30 +17,40 @@ import 'staricon.dart';
 typedef UpdateFavoriteFunc = void Function(bool v);
 
 class IllustCard extends StatefulWidget {
-  const IllustCard(this.illust, this.showMangaBadage, {super.key});
+  const IllustCard(this.illusts, this.showMangaBadage,
+      {this.initialPage = 0, this.type = 0, super.key});
 
   final showMangaBadage;
 
-  final Illust illust;
+  final List<Illust> illusts;
 
   static Map<String, UpdateFavoriteFunc> favoriteCallbacks = {};
+
+  final int initialPage;
+
+  final int type;
 
   @override
   _IllustCardState createState() => _IllustCardState();
 }
 
 class _IllustCardState extends State<IllustCard> {
-  late Illust illust;
+  late List<Illust> illusts;
   bool isBookmarking = false;
   late String tag;
+  late int page = 0;
+  Illust get illust => illusts[page];
+  String get nextUrl =>
+      illusts.length < 2 ? "end" : (widget.type == 0 ? "illust" : "manga");
 
   @override
   void initState() {
-    illust = widget.illust;
+    illusts = widget.illusts;
+    page = widget.initialPage;
     tag = hashCode.toString();
-    IllustCard.favoriteCallbacks[widget.illust.id.toString()] = (v) {
+    IllustCard.favoriteCallbacks[illust.id.toString()] = (v) {
       setState(() {
-        widget.illust.isBookmarked = v;
+        illust.isBookmarked = v;
       });
     };
     super.initState();
@@ -48,14 +58,15 @@ class _IllustCardState extends State<IllustCard> {
 
   @override
   void dispose() {
-    IllustCard.favoriteCallbacks.remove(widget.illust.id.toString());
+    IllustCard.favoriteCallbacks.remove(illust.id.toString());
     super.dispose();
   }
 
   @override
   void didUpdateWidget(covariant IllustCard oldWidget) {
     super.didUpdateWidget(oldWidget);
-    illust = widget.illust;
+    illusts = widget.illusts;
+    page = widget.initialPage;
   }
 
   @override
@@ -103,7 +114,12 @@ class _IllustCardState extends State<IllustCard> {
   }
 
   Future _buildTap(BuildContext context) {
-    return context.to(() => ImageListPage(widget.illust,initialPage: 0, illusts: [],));
+    return context.to(() => ImageListPage(
+          illust,
+          illusts: illusts,
+          initialPage: page,
+          nextUrl: nextUrl,
+        ));
   }
 
   Widget cardText() {
@@ -285,7 +301,8 @@ class _IllustCardState extends State<IllustCard> {
   Future _buildInkTap(BuildContext context, String heroTag) {
     return PersistentNavBarNavigator.pushNewScreen(
       context,
-      screen:ImageListPage(widget.illust,initialPage: 0, illusts: []),
+      screen: ImageListPage(illust,
+          initialPage: page, illusts: illusts, nextUrl: nextUrl),
       withNavBar: false, // OPTIONAL VALUE. True by default.
       pageTransitionAnimation: PageTransitionAnimation.scale,
       // customPageRoute: AppPageRoute(
@@ -308,14 +325,16 @@ class _IllustCardState extends State<IllustCard> {
                 maxLines: 1,
                 overflow: TextOverflow.clip,
                 style: Theme.of(context).textTheme.bodyMedium,
-                strutStyle: const StrutStyle(forceStrutHeight: true, leading: 0),
+                strutStyle:
+                    const StrutStyle(forceStrutHeight: true, leading: 0),
               ),
               Text(
                 illust.author.name,
                 maxLines: 1,
                 overflow: TextOverflow.clip,
                 style: Theme.of(context).textTheme.bodySmall,
-                strutStyle: const StrutStyle(forceStrutHeight: true, leading: 0),
+                strutStyle:
+                    const StrutStyle(forceStrutHeight: true, leading: 0),
               )
             ]),
           ),
@@ -366,16 +385,16 @@ class _IllustCardState extends State<IllustCard> {
     setState(() {
       isBookmarking = true;
     });
-    var method = widget.illust.isBookmarked ? "delete" : "add";
+    var method = illust.isBookmarked ? "delete" : "add";
     var res = await ConnectManager()
         .apiClient
-        .addBookmark(widget.illust.id.toString(), method, type);
+        .addBookmark(illust.id.toString(), method, type);
     if (res.error) {
       if (mounted) {
         context.showToast(message: "Network Error");
       }
     } else {
-      widget.illust.isBookmarked = !widget.illust.isBookmarked;
+      illust.isBookmarked = !illust.isBookmarked;
     }
     setState(() {
       isBookmarking = false;
@@ -417,7 +436,7 @@ class IllustStoreWidget extends StatefulWidget {
 class _IllustStoreWidgetState extends LoadingState<IllustStoreWidget, Illust> {
   @override
   Widget buildContent(BuildContext context, Illust data) {
-    return IllustCard(data, false);
+    return IllustCard([data], false);
   }
 
   @override

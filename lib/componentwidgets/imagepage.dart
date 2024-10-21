@@ -6,7 +6,6 @@ import 'package:photo_view/photo_view.dart';
 import 'package:photo_view/photo_view_gallery.dart';
 import 'package:skana_pix/pixiv_dart_api.dart';
 import 'package:path/path.dart';
-import 'package:skana_pix/view/loginpage.dart';
 import '../controller/caches.dart';
 import 'message.dart';
 import 'pixivimage.dart';
@@ -95,7 +94,7 @@ class _ImagePageState extends State<ImagePage> {
                 shareShow = false;
               });
               var file = await imagesCacheManager.getFileFromCache(nowUrl);
-              if (file != null && mounted) {
+              if (file != null) {
                 setState(() {
                   shareShow = true;
                 });
@@ -187,6 +186,15 @@ class _ImagePageState extends State<ImagePage> {
                           color: Colors.white,
                         ),
                         onPressed: () {
+                          File file = File(join(
+                              BasePath.cachePath,
+                              "share_cache",
+                              basenameWithoutExtension(nowUrl) +
+                                  (nowUrl.endsWith(".png") ? ".png" : ".jpg")));
+                          if (!file.existsSync()) {
+                            file.createSync(recursive: true);
+                          }
+
                           //saveStore.saveImage(widget.urls[currentPage]);
                         }),
                     onLongPress: () async {
@@ -202,28 +210,33 @@ class _ImagePageState extends State<ImagePage> {
                           color: Colors.white,
                         ),
                         onPressed: () async {
-                        var file =
-                            await imagesCacheManager.getFileFromCache(nowUrl);
-                        if (file != null) {
-                          String targetPath = join(
-                              BasePath.cachePath,
-                              "share_cache",
-                              basenameWithoutExtension(file.file.path) +
-                                  (nowUrl.endsWith(".png") ? ".png" : ".jpg"));
-                          File targetFile = File(targetPath);
-                          if (!targetFile.existsSync()) {
-                            targetFile.createSync(recursive: true);
+                          var file =
+                              await imagesCacheManager.getFileFromCache(nowUrl);
+                          if (file != null) {
+                            String targetPath = join(
+                                BasePath.cachePath,
+                                "share_cache",
+                                basenameWithoutExtension(file.file.path) +
+                                    (nowUrl.endsWith(".png")
+                                        ? ".png"
+                                        : ".jpg"));
+                            File targetFile = File(targetPath);
+                            if (!targetFile.existsSync()) {
+                              targetFile.createSync(recursive: true);
+                            }
+                            file.file.copySync(targetPath);
+                            final box =
+                                context.findRenderObject() as RenderBox?;
+                            Share.shareXFiles([XFile(targetPath)],
+                                sharePositionOrigin:
+                                    box!.localToGlobal(Offset.zero) & box.size);
+                          } else {
+                            if (context.mounted) {
+                              showToast(context,
+                                  message: "can not find image cache");
+                            }
                           }
-                          file.file.copySync(targetPath);
-                          Share.shareXFiles(
-                            [XFile(targetPath)],
-                          );
-                        } else {
-                          if(context.mounted) {
-                            showToast(context, message: "can not find image cache");
-                          }
-                        }
-                      });
+                        });
                   }),
                 ),
                 // IconButton(

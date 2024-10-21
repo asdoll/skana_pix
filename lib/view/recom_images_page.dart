@@ -38,7 +38,8 @@ class _RecomImagesPageState
               if (index == data.length - 1) {
                 nextPage();
               }
-              return IllustCard(data[index], false);
+              return IllustCard(data, false,
+                  initialPage: index, type: widget.type);
             },
           );
         }));
@@ -50,8 +51,6 @@ class _RecomImagesPageState
 
   @override
   Future<Res<List<Illust>>> loadData(page) {
-    return widget.type == 0
-        ? getRecommendedIllusts()
-        : getRecommendedMangas();
+    return widget.type == 0 ? getRecommendedIllusts() : getRecommendedMangas();
   }
 }

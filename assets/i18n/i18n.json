@@ -37,6 +37,8 @@
         "Share": "分享",
         "Link": "链接",
         "Unfollow": "取消关注",
+        "Unfo": "取关",
+        "Block+": "屏蔽+",
         "Favorite": "收藏",
         "Comment": "评论",
         "Comments": "评论",
@@ -187,7 +189,8 @@
         "Continue with Webview": "使用内置浏览器继续",
         "Continue with External Browser": "使用外部浏览器继续",
         "Ok": "确定",
-        "Block in?": "屏蔽于?"
+        "Block in?": "屏蔽于?",
+        "Block More": "屏蔽更多"
     },
     "zh_TW": {
         "Search": "搜索",
@@ -227,6 +230,7 @@
         "Share": "分享",
         "Link": "鏈接",
         "Unfollow": "取消關注",
+        "Unfo": "取關",
         "Favorite": "收藏",
         "Comment": "評論",
         "Comments": "評論",
@@ -377,6 +381,8 @@
         "Continue with Webview": "使用內置瀏覽器繼續",
         "Continue with External Browser": "使用外部瀏覽器繼續",
         "Ok": "確定",
-        "Block in?": "屏蔽在?"
+        "Block in?": "屏蔽在?",
+        "Block More": "屏蔽更多",
+        "Block+": "屏蔽+"
     }
 }

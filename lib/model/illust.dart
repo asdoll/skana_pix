@@ -1,3 +1,4 @@
+import 'package:skana_pix/utils/filters.dart';
 
 import 'author.dart' show Author;
 import 'tag.dart' show Tag;
@@ -29,11 +30,13 @@ class Illust {
   bool isBookmarked;
   final bool isAi;
   final bool isUgoira;
-  final bool isBlocked;
+  final bool isMuted;
 
   bool get isR18 => tags.contains(const Tag("R-18", null));
 
   bool get isR18G => tags.contains(const Tag("R-18G", null));
+
+  bool get isBlocked => isMuted || (checkIllusts([this]).isEmpty);
 
   Illust.fromJson(Map<String, dynamic> json)
       : id = json['id'],
@@ -77,11 +80,10 @@ class Illust {
         isBookmarked = json['is_bookmarked'],
         isAi = json['illust_ai_type'] == 2,
         isUgoira = json['type'] == "ugoira",
-        isBlocked = json['is_muted'] ?? false;
+        isMuted = json['is_muted'] ?? false;
 
   @override
   String toString() {
-    return 'Illust{id: $id, title: $title, type: $type, images: $images, caption: $caption, restrict: $restrict, author: $author, tags: $tags, createDate: $createDate, pageCount: $pageCount, width: $width, height: $height, totalView: $totalView, totalBookmarks: $totalBookmarks, isBookmarked: $isBookmarked, isAi: $isAi, isUgoira: $isUgoira, isBlocked: $isBlocked}';
+    return 'Illust{id: $id, title: $title, type: $type, images: $images, caption: $caption, restrict: $restrict, author: $author, tags: $tags, createDate: $createDate, pageCount: $pageCount, width: $width, height: $height, totalView: $totalView, totalBookmarks: $totalBookmarks, isBookmarked: $isBookmarked, isAi: $isAi, isUgoira: $isUgoira, isMuted: $isMuted}';
   }
-  
 }

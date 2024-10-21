@@ -327,7 +327,9 @@ class SideBarRoute<T> extends PopupRoute<T> {
             bottom: 0,
             child: Container(
               decoration: BoxDecoration(
-                  color: Theme.of(context).scaffoldBackgroundColor.withOpacity(0.98),
+                  color: Theme.of(context)
+                      .scaffoldBackgroundColor
+                      .withOpacity(0.98),
                   borderRadius: const BorderRadius.only(
                       topLeft: Radius.circular(4),
                       bottomLeft: Radius.circular(4))),

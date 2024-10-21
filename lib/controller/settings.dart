@@ -171,56 +171,65 @@ class UserSetting {
     }
     set('language', "${loc.languageCode}_${loc.countryCode}");
   }
+
   void addBlockedTags(List<String> tags) {
-    for(var tag in tags){
-      if(!blockedTags.contains(tag)){
-        tags.add(tag);
+    for (var tag in tags) {
+      if (!blockedTags.contains(tag)) {
+        blockedTags.add(tag);
       }
     }
     set('blockedTags', blockedTags);
   }
+
   void addBlockedUsers(List<String> users) {
-    for(var user in users){
-      if(!blockedUsers.contains(user)){
-        users.add(user);
+    for (var user in users) {
+      if (!blockedUsers.contains(user)) {
+        blockedUsers.add(user);
       }
     }
     set('blockedUsers', blockedUsers);
   }
+
   void addBlockedIllusts(List<String> illusts) {
-    for(var illust in illusts){
-      if(!blockedIllusts.contains(illust)){
-        illusts.add(illust);
+    for (var illust in illusts) {
+      if (!blockedIllusts.contains(illust)) {
+        blockedIllusts.add(illust);
       }
     }
     set('blockedIllusts', blockedIllusts);
   }
+
   void clearBlockedTags() {
     blockedTags.clear();
     set('blockedTags', blockedTags);
   }
+
   void clearBlockedUsers() {
     blockedUsers.clear();
     set('blockedUsers', blockedUsers);
   }
+
   void clearBlockedIllusts() {
     blockedIllusts.clear();
     set('blockedIllusts', blockedIllusts);
   }
+
   void removeBlockedTags(List<String> tags) {
-    for(var tag in tags){
+    for (var tag in tags) {
       blockedTags.remove(tag);
     }
     set('blockedTags', blockedTags);
   }
+
   void removeBlockedUsers(List<String> users) {
-    for(var user in users){
+    for (var user in users) {
       blockedUsers.remove(user);
     }
     set('blockedUsers', blockedUsers);
   }
+
   void removeBlockedIllusts(List<String> illusts) {
-    for(var illust in illusts){
+    for (var illust in illusts) {
       blockedIllusts.remove(illust);
     }
     set('blockedIllusts', blockedIllusts);

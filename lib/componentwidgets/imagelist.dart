@@ -1,14 +1,8 @@
-import 'dart:io';
-import 'dart:math';
-
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:photo_view/photo_view.dart';
-import 'package:photo_view/photo_view_gallery.dart';
+import 'package:persistent_bottom_nav_bar/persistent_bottom_nav_bar.dart';
 import 'package:share_plus/share_plus.dart';
-import 'package:skana_pix/controller/caches.dart';
 import 'package:skana_pix/pixiv_dart_api.dart';
 import 'package:skana_pix/utils/navigation.dart';
 import 'package:skana_pix/utils/translate.dart';
@@ -20,7 +14,6 @@ import '../controller/histories.dart';
 import '../utils/filters.dart';
 import 'commentpage.dart';
 import 'imagepage.dart';
-import 'loading.dart';
 import 'message.dart';
 import 'pixivimage.dart';
 import 'relatedillusts.dart';
@@ -318,10 +311,9 @@ class _IllustPageState extends State<IllustPage> {
     if (isBlocked) {
       return ListView(
         children: [
-          Text(
-            widget.illust.title,
-            style: const TextStyle(fontSize: 24),
-          ).paddingVertical(8).paddingHorizontal(12),
+          AppBar(
+            title: Text(widget.illust.title),
+          ),
           const Positioned.fill(
               child: Center(
             child: Center(
@@ -335,13 +327,11 @@ class _IllustPageState extends State<IllustPage> {
     return ListView.builder(
         controller: scrollController,
         itemCount: widget.illust.images.length + 2,
-        padding: EdgeInsets.zero,
+        padding: EdgeInsets.only(
+            top: 0, bottom: _kBottomBarHeight + context.padding.bottom),
         itemBuilder: (context, index) {
           if (index == 0) {
-            return Text(
-              widget.illust.title,
-              style: const TextStyle(fontSize: 24),
-            ).paddingVertical(8).paddingHorizontal(12);
+            return AppBar(title: Text(widget.illust.title));
           }
           return buildImage(width, height, index);
         });
@@ -377,8 +367,9 @@ class _IllustPageState extends State<IllustPage> {
         width: imageWidth,
         height: imageHeight,
         child: GestureDetector(
-            onTap: () =>
-                ImagePage(widget.illust.images.map((e) => e.original).toList()),
+            onTap: () => PersistentNavBarNavigator.pushNewScreen(context,
+                screen: ImagePage(
+                    widget.illust.images.map((e) => e.large).toList())),
             child: PixivImage(
               imageUrl,
               width: width,
@@ -637,7 +628,7 @@ class _BottomBarState extends State<_BottomBar> with TickerProviderStateMixin {
                     animationController.forward();
                   })
           ],
-        );
+        ).toCenter();
       }),
     );
   }
@@ -671,17 +662,20 @@ class _BottomBarState extends State<_BottomBar> with TickerProviderStateMixin {
     final bool showUserName = MediaQuery.of(context).size.width > 640;
 
     return Card(
-      margin: const EdgeInsets.symmetric(vertical: 8),
+      margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 4),
       child: SizedBox(
         height: double.infinity,
-        width: showUserName ? 246 : 136,
+        width: showUserName ? 246 : 116,
         child: Row(
           children: [
+            const SizedBox(
+              width: 8,
+            ),
             SizedBox(
-              height: 40,
-              width: 40,
+              height: 30,
+              width: 30,
               child: ClipRRect(
-                borderRadius: BorderRadius.circular(40),
+                borderRadius: BorderRadius.circular(30),
                 child: ColoredBox(
                   color: Theme.of(context).colorScheme.secondaryContainer,
                   child: GestureDetector(
@@ -690,8 +684,8 @@ class _BottomBarState extends State<_BottomBar> with TickerProviderStateMixin {
                     //     )),
                     child: PixivImage(
                       widget.illust.author.avatar,
-                      width: 40,
-                      height: 40,
+                      width: 30,
+                      height: 30,
                       fit: BoxFit.cover,
                     ),
                   ),
@@ -709,10 +703,10 @@ class _BottomBarState extends State<_BottomBar> with TickerProviderStateMixin {
                 ),
               ),
             if (isFollowing)
-              ElevatedButton(
+              TextButton(
                   onPressed: follow,
                   child: const SizedBox(
-                    width: 42,
+                    width: 26,
                     height: 24,
                     child: Center(
                       child: SizedBox.square(
@@ -724,15 +718,14 @@ class _BottomBarState extends State<_BottomBar> with TickerProviderStateMixin {
                     ),
                   ))
             else if (!widget.illust.author.isFollowed)
-              ElevatedButton(
-                  onPressed: follow, child: Text("Follow".i18n).fixWidth(62))
+              TextButton(onPressed: follow, child: Text("Follow".i18n))
             else
-              ElevatedButton(
+              TextButton(
                 onPressed: follow,
                 child: Text(
-                  "Unfollow".i18n,
+                  "Unfo".i18n,
                   style: TextStyle(color: Theme.of(context).colorScheme.error),
-                ).fixWidth(62),
+                ),
               ),
           ],
         ),
@@ -773,8 +766,12 @@ class _BottomBarState extends State<_BottomBar> with TickerProviderStateMixin {
     });
   }
 
-  void blockIt(){
-    settings.addBlockedIllusts([widget.illust.id.toString()]);
+  void blockIt() {
+    if (widget.illust.isBlocked) {
+      settings.removeBlockedIllusts([widget.illust.id.toString()]);
+    } else {
+      settings.addBlockedIllusts([widget.illust.id.toString()]);
+    }
   }
 
   Iterable<Widget> buildActions(double width) sync* {
@@ -783,13 +780,13 @@ class _BottomBarState extends State<_BottomBar> with TickerProviderStateMixin {
     );
 
     void download() {
-      DownloadManager().addDownloadingTask(widget.illust);
-      setState(() {});
+      // DownloadManager().addDownloadingTask(widget.illust);
+      // setState(() {});
     }
 
     bool showText = width > 640;
 
-    yield ElevatedButton(
+    yield FilledButton.tonal(
       onPressed: likes,
       child: SizedBox(
         height: 28,
@@ -832,61 +829,62 @@ class _BottomBarState extends State<_BottomBar> with TickerProviderStateMixin {
       width: 8,
     );
 
-    if (!downloaded(widget.illust.id)) {
-      if (downloading(widget.illust.id)) {
-        yield ElevatedButton(
-          onPressed: () => {},
-          child: SizedBox(
-            height: 28,
-            child: Row(
-              children: [
-                Icon(
-                  Icons.download_outlined,
-                  color: Theme.of(context).colorScheme.outline,
-                  size: 18,
+    // if (!downloaded(widget.illust.id)) {
+    //   if (downloading(widget.illust.id)) {
+    //     yield ElevatedButton(
+    //       onPressed: () => {},
+    //       child: SizedBox(
+    //         height: 28,
+    //         child: Row(
+    //           children: [
+    //             Icon(
+    //               Icons.download_outlined,
+    //               color: Theme.of(context).colorScheme.outline,
+    //               size: 18,
+    //             ),
+    //             if (showText)
+    //               const SizedBox(
+    //                 width: 8,
+    //               ),
+    //             if (showText)
+    //               Text(
+    //                 "Downloading".i18n,
+    //                 style:
+    //                     TextStyle(color: Theme.of(context).colorScheme.outline),
+    //               ),
+    //           ],
+    //         ),
+    //       ),
+    //     );
+    //   } else
+    {
+      yield FilledButton.tonal(
+        onPressed: download,
+        child: SizedBox(
+          height: 28,
+          child: Row(
+            children: [
+              const Icon(
+                Icons.download_outlined,
+                size: 18,
+              ),
+              if (showText)
+                const SizedBox(
+                  width: 8,
                 ),
-                if (showText)
-                  const SizedBox(
-                    width: 8,
-                  ),
-                if (showText)
-                  Text(
-                    "Downloading".i18n,
-                    style:
-                        TextStyle(color: Theme.of(context).colorScheme.outline),
-                  ),
-              ],
-            ),
+              if (showText) Text("Download".i18n),
+            ],
           ),
-        );
-      } else {
-        yield ElevatedButton(
-          onPressed: download,
-          child: SizedBox(
-            height: 28,
-            child: Row(
-              children: [
-                const Icon(
-                  Icons.download_outlined,
-                  size: 18,
-                ),
-                if (showText)
-                  const SizedBox(
-                    width: 8,
-                  ),
-                if (showText) Text("Download".i18n),
-              ],
-            ),
-          ),
-        );
-      }
+        ),
+      );
     }
+    // }
 
     yield const SizedBox(
       width: 8,
     );
 
-    yield ElevatedButton(
+    yield FilledButton.tonal(
       onPressed: () => CommentsPage.show(context, widget.illust.id.toString()),
       child: SizedBox(
         height: 28,
@@ -913,19 +911,23 @@ class _BottomBarState extends State<_BottomBar> with TickerProviderStateMixin {
       child: Row(
         children: [
           const SizedBox(
-            width: 2,
+            width: 10,
           ),
           Expanded(
             child: Container(
+              width: 100,
               height: 52,
               decoration: BoxDecoration(
                   border: Border.all(
                       color: Theme.of(context).colorScheme.outlineVariant,
                       width: 0.6),
                   borderRadius: BorderRadius.circular(4)),
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+              padding: const EdgeInsets.symmetric(horizontal: 25, vertical: 4),
               child: Row(
                 children: [
+                  const SizedBox(
+                    width: 8,
+                  ),
                   Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
@@ -940,7 +942,7 @@ class _BottomBarState extends State<_BottomBar> with TickerProviderStateMixin {
                     ],
                   ),
                   const SizedBox(
-                    width: 12,
+                    width: 20,
                   ),
                   Text(
                     widget.illust.totalView.toString(),
@@ -948,23 +950,27 @@ class _BottomBarState extends State<_BottomBar> with TickerProviderStateMixin {
                         color: Theme.of(context).colorScheme.primary,
                         fontWeight: FontWeight.w500,
                         fontSize: 18),
-                  )
+                  ),
+                  const SizedBox(
+                    width: 8,
+                  ),
                 ],
               ),
             ),
           ),
           const SizedBox(
-            width: 16,
+            width: 10,
           ),
           Expanded(
               child: Container(
+            width: 100,
             height: 52,
             decoration: BoxDecoration(
                 border: Border.all(
                     color: Theme.of(context).colorScheme.outlineVariant,
                     width: 0.6),
                 borderRadius: BorderRadius.circular(4)),
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+            padding: const EdgeInsets.symmetric(horizontal: 25, vertical: 4),
             child: Row(
               children: [
                 Column(
@@ -981,7 +987,7 @@ class _BottomBarState extends State<_BottomBar> with TickerProviderStateMixin {
                   ],
                 ),
                 const SizedBox(
-                  width: 12,
+                  width: 20,
                 ),
                 Text(
                   widget.illust.totalBookmarks.toString(),
@@ -994,7 +1000,7 @@ class _BottomBarState extends State<_BottomBar> with TickerProviderStateMixin {
             ),
           )),
           const SizedBox(
-            width: 2,
+            width: 10,
           ),
         ],
       ),
@@ -1019,17 +1025,18 @@ class _BottomBarState extends State<_BottomBar> with TickerProviderStateMixin {
                 //context.to(() => SearchResultPage(e.name));
               },
               child: Card(
-                margin: const EdgeInsets.symmetric(vertical: 4, horizontal: 6),
+                color: Theme.of(context).colorScheme.secondaryContainer,
+                margin: const EdgeInsets.symmetric(vertical: 4, horizontal: 2),
                 child: Text(
                   text,
-                  style: const TextStyle(fontSize: 13),
-                ),
+                  style: const TextStyle(fontSize: 12),
+                ).paddingAll(4),
               ),
             ),
           );
         }).toList(),
       ),
-    ).paddingVertical(8).paddingHorizontal(2);
+    ).paddingVertical(8).paddingHorizontal(5);
   }
 
   Widget buildMoreActions() {
@@ -1037,7 +1044,7 @@ class _BottomBarState extends State<_BottomBar> with TickerProviderStateMixin {
       runSpacing: 8,
       spacing: 8,
       children: [
-        ElevatedButton(
+        FilledButton.tonal(
           onPressed: () => likes("private"),
           child: SizedBox(
             height: 28,
@@ -1045,8 +1052,8 @@ class _BottomBarState extends State<_BottomBar> with TickerProviderStateMixin {
               children: [
                 if (isBookmarking)
                   const SizedBox(
-                    width: 18,
-                    height: 18,
+                    width: 15,
+                    height: 15,
                     child: CircularProgressIndicator.adaptive(
                       strokeWidth: 2,
                     ),
@@ -1055,12 +1062,12 @@ class _BottomBarState extends State<_BottomBar> with TickerProviderStateMixin {
                   Icon(
                     Icons.favorite,
                     color: Theme.of(context).colorScheme.error,
-                    size: 18,
+                    size: 15,
                   )
                 else
                   const Icon(
                     Icons.favorite_border,
-                    size: 18,
+                    size: 15,
                   ),
                 const SizedBox(
                   width: 8,
@@ -1072,8 +1079,8 @@ class _BottomBarState extends State<_BottomBar> with TickerProviderStateMixin {
               ],
             ),
           ),
-        ).fixWidth(96),
-        ElevatedButton(
+        ).fixWidth(120),
+        FilledButton.tonal(
           onPressed: () {
             Share.share(
                 "${widget.illust.title}\nhttps://pixiv.net/artworks/${widget.illust.id}");
@@ -1084,7 +1091,7 @@ class _BottomBarState extends State<_BottomBar> with TickerProviderStateMixin {
               children: [
                 const Icon(
                   Icons.share,
-                  size: 18,
+                  size: 15,
                 ),
                 const SizedBox(
                   width: 8,
@@ -1093,8 +1100,8 @@ class _BottomBarState extends State<_BottomBar> with TickerProviderStateMixin {
               ],
             ),
           ),
-        ).fixWidth(96),
-        ElevatedButton(
+        ).fixWidth(120),
+        FilledButton.tonal(
           onPressed: () {
             var text = "https://pixiv.net/artworks/${widget.illust.id}";
             Clipboard.setData(ClipboardData(text: text));
@@ -1104,7 +1111,7 @@ class _BottomBarState extends State<_BottomBar> with TickerProviderStateMixin {
             height: 28,
             child: Row(
               children: [
-                const Icon(Icons.copy, size: 18),
+                const Icon(Icons.copy, size: 15),
                 const SizedBox(
                   width: 8,
                 ),
@@ -1112,8 +1119,8 @@ class _BottomBarState extends State<_BottomBar> with TickerProviderStateMixin {
               ],
             ),
           ),
-        ).fixWidth(96),
-        ElevatedButton(
+        ).fixWidth(120),
+        FilledButton.tonal(
           onPressed: () {
             context.to(() => RelatedIllustsPage(widget.illust.id.toString()));
           },
@@ -1121,7 +1128,7 @@ class _BottomBarState extends State<_BottomBar> with TickerProviderStateMixin {
             height: 28,
             child: Row(
               children: [
-                const Icon(Icons.stars, size: 18),
+                const Icon(Icons.stars, size: 15),
                 const SizedBox(
                   width: 8,
                 ),
@@ -1129,10 +1136,10 @@ class _BottomBarState extends State<_BottomBar> with TickerProviderStateMixin {
               ],
             ),
           ),
-        ).fixWidth(96),
-        ElevatedButton(
+        ).fixWidth(120),
+        FilledButton.tonal(
           onPressed: () async {
-            
+            blockIt();
             if (mounted) {
               widget.updateCallback?.call();
             }
@@ -1141,37 +1148,29 @@ class _BottomBarState extends State<_BottomBar> with TickerProviderStateMixin {
             height: 28,
             child: Row(
               children: [
-                if (isBookmarking)
-                  const SizedBox(
-                    width: 18,
-                    height: 18,
-                    child: CircularProgressIndicator.adaptive(
-                      strokeWidth: 2,
-                    ),
-                  )
-                else if (widget.illust.isBookmarked)
+                if (widget.illust.isBlocked)
                   Icon(
-                    Icons.favorite,
+                    Icons.block,
                     color: Theme.of(context).colorScheme.error,
-                    size: 18,
+                    size: 15,
                   )
                 else
                   const Icon(
-                    Icons.favorite_border,
-                    size: 18,
+                    Icons.block,
+                    size: 15,
                   ),
                 const SizedBox(
                   width: 8,
                 ),
-                if (widget.illust.isBookmarked)
+                if (widget.illust.isBlocked)
                   Text("Cancel".i18n)
                 else
-                  Text("Private".i18n)
+                  Text("Block".i18n)
               ],
             ),
           ),
-        ).fixWidth(96),
-        ElevatedButton(
+        ).fixWidth(120),
+        FilledButton.tonal(
           onPressed: () async {
             await Navigator.of(context)
                 .push(SideBarRoute(_BlockingPage(widget.illust)));
@@ -1183,15 +1182,15 @@ class _BottomBarState extends State<_BottomBar> with TickerProviderStateMixin {
             height: 28,
             child: Row(
               children: [
-                const Icon(Icons.block, size: 18),
+                const Icon(Icons.block, size: 15),
                 const SizedBox(
                   width: 8,
                 ),
-                Text("Block More".i18n)
+                Text("Block+".i18n)
               ],
             ),
           ),
-        ).fixWidth(96),
+        ).fixWidth(120),
       ],
     ).paddingHorizontal(2).paddingBottom(4);
   }
@@ -1207,8 +1206,6 @@ class _BlockingPage extends StatefulWidget {
 }
 
 class __BlockingPageState extends State<_BlockingPage> {
-  List<int> blockedTags = [];
-
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -1217,7 +1214,7 @@ class __BlockingPageState extends State<_BlockingPage> {
         Expanded(
           child: ListView.builder(
             padding: EdgeInsets.only(bottom: context.padding.bottom),
-            itemCount: widget.illust.tags.length + 2,
+            itemCount: widget.illust.tags.length + 1,
             itemBuilder: (context, index) {
               var text = index == 0
                   ? widget.illust.author.name
@@ -1229,14 +1226,14 @@ class __BlockingPageState extends State<_BlockingPage> {
 
               return Card(
                 margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-                shape: blockedTags.contains(index)
-                    ? new RoundedRectangleBorder(
-                        side: new BorderSide(
+                shape: blockedTagOrUser(index)
+                    ? RoundedRectangleBorder(
+                        side: BorderSide(
                             color: Theme.of(context).colorScheme.outlineVariant,
                             width: 2.0),
                         borderRadius: BorderRadius.circular(4.0))
-                    : new RoundedRectangleBorder(
-                        side: new BorderSide(
+                    : RoundedRectangleBorder(
+                        side: BorderSide(
                             color: Theme.of(context)
                                 .colorScheme
                                 .outlineVariant
@@ -1245,19 +1242,33 @@ class __BlockingPageState extends State<_BlockingPage> {
                 child: ListTile(
                   title: Text(text),
                   subtitle: Text(subTitle),
-                  trailing: ElevatedButton(
+                  trailing: FilledButton.tonal(
                           onPressed: () {
-                            if (blockedTags.contains(index)) {
-                              blockedTags.remove(index);
+                            if (index == 0) {
+                              if (settings.blockedUsers.contains(
+                                  widget.illust.author.id.toString())) {
+                                settings.removeBlockedUsers(
+                                    [widget.illust.author.id.toString()]);
+                              } else {
+                                settings.addBlockedUsers(
+                                    [widget.illust.author.id.toString()]);
+                              }
                             } else {
-                              blockedTags.add(index);
+                              if (settings.blockedTags.contains(
+                                  widget.illust.tags[index - 1].name)) {
+                                settings.removeBlockedTags(
+                                    [widget.illust.tags[index - 1].name]);
+                              } else {
+                                settings.addBlockedTags(
+                                    [widget.illust.tags[index - 1].name]);
+                              }
                             }
                             setState(() {});
                           },
-                          child: blockedTags.contains(index)
+                          child: blockedTagOrUser(index)
                               ? Text("Cancel".i18n)
                               : Text("Block".i18n))
-                      .fixWidth(72),
+                      .fixWidth(100),
                 ),
               );
             },
@@ -1265,6 +1276,13 @@ class __BlockingPageState extends State<_BlockingPage> {
         )
       ],
     );
+  }
+
+  bool blockedTagOrUser(int index) {
+    if (index == 0) {
+      return settings.blockedUsers.contains(widget.illust.author.id.toString());
+    }
+    return settings.blockedTags.contains(widget.illust.tags[index - 1].name);
   }
 
   bool isSubmitting = false;
