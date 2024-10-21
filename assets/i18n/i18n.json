@@ -185,7 +185,9 @@
         "The border of the artworks will be darker": "作品的边框将被加深",
         "Network Error. Please refresh to try again.": "网络错误. 请刷新重试.",
         "Continue with Webview": "使用内置浏览器继续",
-        "Continue with External Browser": "使用外部浏览器继续"
+        "Continue with External Browser": "使用外部浏览器继续",
+        "Ok": "确定",
+        "Block in?": "屏蔽于?"
     },
     "zh_TW": {
         "Search": "搜索",
@@ -373,6 +375,8 @@
         "The border of the artworks will be darker": "作品的邊框將被加深",
         "Network Error. Please refresh to try again.": "網絡錯誤. 請刷新重試.",
         "Continue with Webview": "使用內置瀏覽器繼續",
-        "Continue with External Browser": "使用外部瀏覽器繼續"
+        "Continue with External Browser": "使用外部瀏覽器繼續",
+        "Ok": "確定",
+        "Block in?": "屏蔽在?"
     }
 }

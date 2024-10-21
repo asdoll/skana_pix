@@ -1,3 +1,9 @@
+import 'dart:io';
+
+import 'package:flutter/foundation.dart';
+
+import 'bases.dart';
+
 class LogItem {
   final LogLevel level;
   final String title;
@@ -35,14 +41,27 @@ class Log {
   static LogLevel dFlag = LogLevel.error;
 
   /// only for debug
-  static const String? logFile = null;
+  static String? logFile;
+
+  static Future<void> init() async {
+    Log.dFlag = LogLevel.warning;
+    logFile = "${BasePath.dataPath}/log.txt";
+    var file = File(logFile!);
+    if (!await file.exists()) {
+      await file.create();
+    }
+  }
 
   static void printWarning(String text) {
-    print('\x1B[33m$text\x1B[0m');
+    if (kDebugMode) {
+      print('\x1B[33m$text\x1B[0m');
+    }
   }
 
   static void printError(String text) {
-    print('\x1B[31m$text\x1B[0m');
+    if (kDebugMode) {
+      print('\x1B[31m$text\x1B[0m');
+    }
   }
 
   static void addLog(LogLevel level, String title, String content) {
@@ -57,7 +76,9 @@ class Log {
         case LogLevel.warning:
           printWarning(content);
         case LogLevel.info:
-          print(content);
+          if (kDebugMode) {
+            print(content);
+          }
       }
     }
 
@@ -68,9 +89,9 @@ class Log {
     }
 
     _logs.add(newLog);
-    // if(logFile != null) {
-    //   File(logFile!).writeAsString(newLog.toString(), mode: FileMode.append);
-    // }
+    if (logFile != null) {
+      File(logFile!).writeAsString(newLog.toString(), mode: FileMode.append);
+    }
     if (_logs.length > maxLogNumber) {
       var res = _logs.remove(
           _logs.firstWhere((element) => element.level == LogLevel.info));

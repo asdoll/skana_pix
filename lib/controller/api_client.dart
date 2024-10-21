@@ -25,7 +25,6 @@ part 'illust_apis.dart';
 
 class ApiClient extends BaseClient {
   Account account;
-  User get user => account.user;
   PDio pDio;
 
   ApiClient(this.account, this.pDio);
@@ -203,7 +202,7 @@ class ApiClient extends BaseClient {
     }
   }
 
-  String? encodeFormData(Map<String, dynamic>? data) {
+  String? encodeFromData(Map<String, dynamic>? data) {
     if (data == null) return null;
     StringBuffer buffer = StringBuffer();
     data.forEach((key, value) {
@@ -226,7 +225,7 @@ class ApiClient extends BaseClient {
       }
       final res = await pDio.post<Map<String, dynamic>>(path,
           queryParameters: query,
-          data: encodeFormData(data),
+          data: encodeFromData(data),
           options: Options(
               headers: headers,
               validateStatus: (status) => true,

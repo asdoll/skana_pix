@@ -141,7 +141,7 @@ class DownloadManager {
     _currentBytes += bytes;
   }
 
-  int get maxConcurrentTasks => settings.maxParallels;
+  int get maxConcurrentTasks => settings.maxParallelDownload;
 
   bool _paused = false;
 
@@ -234,3 +234,6 @@ class DownloadManager {
     _paused = false;
   }
 }
+
+Function get downloaded => DownloadManager().checkDownloaded;
+Function get downloading => DownloadManager().checkDownloading;

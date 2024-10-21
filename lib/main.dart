@@ -17,6 +17,8 @@ Future<void> main() async {
     setSystemProxy();
     await ConnectManager().init();
     await TranslateMap.init();
+    await Log.init();
+    await settings.init();
     handleLinks();
     runApp(const MyApp());
   }, (e, s) {

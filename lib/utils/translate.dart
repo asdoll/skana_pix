@@ -1,7 +1,7 @@
 import 'dart:convert';
 
 import 'package:flutter/services.dart';
-import 'package:skana_pix/view/defaults.dart';
+import 'package:skana_pix/pixiv_dart_api.dart';
 
 class TranslateMap {
   static late final Map<String, Map<String, dynamic>> translation;
@@ -19,12 +19,11 @@ class TranslateMap {
 
 extension Translation on String {
   String get i18n {
-    var locale = DynamicData.locale;
     if (!TranslateMap.loaded) {
       TranslateMap.init();
     }
     return TranslateMap
-                  .translation["${locale.languageCode}_${locale.countryCode}"]
+                  .translation[settings.locale]
               ?[this] ?? this;
 
   }

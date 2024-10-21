@@ -5,7 +5,6 @@ import '../controller/bases.dart';
 import '../controller/logging.dart';
 
 import '../model/user.dart' show Account;
-import 'settings.dart';
 
 class Savers {
   static void createPathIfNotExists(String path) {
@@ -20,18 +19,6 @@ class Savers {
       final encoder = JsonEncoder.withIndent(' ' * 4);
       final file = File(BasePath.accountJsonPath);
       await file.writeAsString(encoder.convert(account.toJson()));
-      return true;
-    } on FileSystemException catch (e) {
-      loggerError("Error writing account json: $e");
-      return false;
-    }
-  }
-
-  static Future<bool> writeSettingJson() async {
-    try {
-      final encoder = JsonEncoder.withIndent(' ' * 4);
-      final file = File(BasePath.appSettingJsonPath);
-      await file.writeAsString(encoder.convert(settings.toJson()));
       return true;
     } on FileSystemException catch (e) {
       loggerError("Error writing account json: $e");

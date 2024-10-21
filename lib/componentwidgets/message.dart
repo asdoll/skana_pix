@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:skana_pix/utils/translate.dart';
 
 void showToast(BuildContext context, {required String message, IconData? icon}) {
   var newEntry = OverlayEntry(
@@ -43,7 +44,7 @@ class ToastOverlay extends StatelessWidget {
                     width: 8,
                   ),
                 Text(
-                  message,
+                  message.i18n,
                   style: TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.w500,

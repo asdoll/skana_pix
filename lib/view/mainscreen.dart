@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:persistent_bottom_nav_bar/persistent_bottom_nav_bar.dart';
-import 'package:skana_pix/pixiv_dart_api.dart';
 import 'package:skana_pix/utils/translate.dart';
 import 'package:skana_pix/view/defaults.dart';
-import 'package:skana_pix/view/loginpage.dart';
 
 import 'recom_images_page.dart';
 

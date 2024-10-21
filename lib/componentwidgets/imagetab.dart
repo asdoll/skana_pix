@@ -3,13 +3,12 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:persistent_bottom_nav_bar/persistent_bottom_nav_bar.dart';
 import 'package:skana_pix/componentwidgets/loading.dart';
-import 'package:skana_pix/componentwidgets/routes.dart';
 import 'package:skana_pix/pixiv_dart_api.dart';
 import 'package:skana_pix/utils/navigation.dart';
 import 'package:skana_pix/utils/translate.dart';
-import 'package:skana_pix/view/defaults.dart';
 import 'package:blur/blur.dart';
 
+import '../view/defaults.dart';
 import 'imagelist.dart';
 import 'nullhero.dart';
 import 'pixivimage.dart';
@@ -61,7 +60,7 @@ class _IllustCardState extends State<IllustCard> {
 
   @override
   Widget build(BuildContext context) {
-    if ((illust.isR18 || illust.isR18G) && DynamicData.hideR18) {
+    if ((illust.isR18 || illust.isR18G) && settings.hideR18) {
       return buildR18InkWell(context);
     }
 
@@ -69,7 +68,7 @@ class _IllustCardState extends State<IllustCard> {
   }
 
   _onLongPressSave() async {
-    if (DynamicData.longPressSaveConfirm) {
+    if (settings.longPressSaveConfirm) {
       final result = await showDialog(
           context: context,
           builder: (context) {
@@ -104,7 +103,7 @@ class _IllustCardState extends State<IllustCard> {
   }
 
   Future _buildTap(BuildContext context) {
-    return context.to(() => ImageListPage(widget.illust));
+    return context.to(() => ImageListPage(widget.illust,initialPage: 0, illusts: [],));
   }
 
   Widget cardText() {
@@ -141,7 +140,7 @@ class _IllustCardState extends State<IllustCard> {
     var radio =
         (tooLong) ? 1.0 : illust.width.toDouble() / illust.height.toDouble();
     return Card(
-        margin: EdgeInsets.all(8.0),
+        margin: const EdgeInsets.all(8.0),
         clipBehavior: Clip.antiAlias,
         color: Theme.of(context).colorScheme.surface,
         child: _buildAnimationWraper(
@@ -158,7 +157,7 @@ class _IllustCardState extends State<IllustCard> {
                           right: 5.0,
                           child: Row(
                             children: [
-                              if (DynamicData.feedAIBadge && illust.isAi)
+                              if (settings.feedAIBadge && illust.isAi)
                                 _buildAIBadge(),
                               _buildVisibility()
                             ],
@@ -176,7 +175,7 @@ class _IllustCardState extends State<IllustCard> {
     var radio =
         (tooLong) ? 1.0 : illust.width.toDouble() / illust.height.toDouble();
     return Card(
-        margin: EdgeInsets.all(8.0),
+        margin: const EdgeInsets.all(8.0),
         clipBehavior: Clip.antiAlias,
         color: Theme.of(context).colorScheme.surface,
         child: _buildAnimationWraper(
@@ -194,7 +193,7 @@ class _IllustCardState extends State<IllustCard> {
                           right: 5.0,
                           child: Row(
                             children: [
-                              if (DynamicData.feedAIBadge && illust.isAi)
+                              if (settings.feedAIBadge && illust.isAi)
                                 _buildAIBadge(),
                               _buildR18Badge()
                             ],
@@ -260,35 +259,33 @@ class _IllustCardState extends State<IllustCard> {
   }
 
   _buildLongPressToSaveHint() async {
-    // if (DynamicData.isIOS) {
-    //   final pref = await SharedPreferences.getInstance();
-    //   final firstLongPress = await pref.getBool("first_long_press") ?? true;
-    //   if (firstLongPress) {
-    //     await pref.setBool("first_long_press", false);
-    //     await showDialog(
-    //         context: context,
-    //         builder: (context) {
-    //           return AlertDialog(
-    //             title: Text('长按保存'),
-    //             content: Text('长按卡片将会保存插画到相册'),
-    //             actions: <Widget>[
-    //               TextButton(
-    //                   onPressed: () {
-    //                     Navigator.of(context).pop();
-    //                   },
-    //                   child: Text(I18n.of(context).ok))
-    //             ],
-    //           );
-    //         });
-    //   }
-    // }
+    if (DynamicData.isIOS) {
+      if (settings.firstLongPressSave) {
+        settings.set("firstLongPressSave", false);
+        await showDialog(
+            context: context,
+            builder: (context) {
+              return AlertDialog(
+                title: Text('长按保存'),
+                content: Text('长按卡片将会保存插画到相册'),
+                actions: <Widget>[
+                  TextButton(
+                      onPressed: () {
+                        Navigator.of(context).pop();
+                      },
+                      child: Text('Ok'.i18n))
+                ],
+              );
+            });
+      }
+    }
     _onLongPressSave();
   }
 
   Future _buildInkTap(BuildContext context, String heroTag) {
     return PersistentNavBarNavigator.pushNewScreen(
       context,
-      screen: ImageListPage(illust),
+      screen:ImageListPage(widget.illust,initialPage: 0, illusts: []),
       withNavBar: false, // OPTIONAL VALUE. True by default.
       pageTransitionAnimation: PageTransitionAnimation.scale,
       // customPageRoute: AppPageRoute(
@@ -311,14 +308,14 @@ class _IllustCardState extends State<IllustCard> {
                 maxLines: 1,
                 overflow: TextOverflow.clip,
                 style: Theme.of(context).textTheme.bodyMedium,
-                strutStyle: StrutStyle(forceStrutHeight: true, leading: 0),
+                strutStyle: const StrutStyle(forceStrutHeight: true, leading: 0),
               ),
               Text(
                 illust.author.name,
                 maxLines: 1,
                 overflow: TextOverflow.clip,
                 style: Theme.of(context).textTheme.bodySmall,
-                strutStyle: StrutStyle(forceStrutHeight: true, leading: 0),
+                strutStyle: const StrutStyle(forceStrutHeight: true, leading: 0),
               )
             ]),
           ),
@@ -425,6 +422,6 @@ class _IllustStoreWidgetState extends LoadingState<IllustStoreWidget, Illust> {
 
   @override
   Future<Res<Illust>> loadData() {
-    return ConnectManager().apiClient.getIllustByID(widget.id);
+    return getIllustByID(widget.id);
   }
 }

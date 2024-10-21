@@ -16,6 +16,7 @@ class WebviewPage extends StatefulWidget {
 
 class _WebviewPageState extends State<WebviewPage> {
   WebViewController? controller;
+  var loadingPercentage = 0;
 
   @override
   void initState() {
@@ -40,11 +41,9 @@ class _WebviewPageState extends State<WebviewPage> {
           : Colors.black)
       ..setNavigationDelegate(
         NavigationDelegate(
-          onProgress: (int progress) {
-            // Update loading bar.
-          },
-          onPageStarted: (String url) {},
-          onPageFinished: (String url) {},
+       onPageStarted: (String url) => setState(() => loadingPercentage = 0),
+        onProgress: (int progress) => setState(() => loadingPercentage = progress),
+        onPageFinished: (String url) => setState(() => loadingPercentage = 100),
           onWebResourceError: (WebResourceError error) {},
           onNavigationRequest: handleNavigation,
         ),
@@ -65,6 +64,7 @@ class _WebviewPageState extends State<WebviewPage> {
                   context.pop();
                 },
               ),
+              LinearProgressIndicator( value: loadingPercentage / 100.0)
             ],
           )
         ),

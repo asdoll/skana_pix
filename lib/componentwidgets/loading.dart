@@ -20,7 +20,7 @@ abstract class LoadingState<T extends StatefulWidget, S extends Object>
 
   Widget buildLoading() {
     return const Center(
-      child: CircularProgressIndicator(),
+      child: CircularProgressIndicator.adaptive(),
     );
   }
 
@@ -181,7 +181,7 @@ abstract class MultiPageLoadingState<T extends StatefulWidget, S extends Object>
 
   Widget buildLoading(BuildContext context) {
     return const Center(
-      child: CircularProgressIndicator(),
+      child: CircularProgressIndicator.adaptive(),
     );
   }
 

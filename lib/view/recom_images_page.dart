@@ -51,7 +51,7 @@ class _RecomImagesPageState
   @override
   Future<Res<List<Illust>>> loadData(page) {
     return widget.type == 0
-        ? ConnectManager().apiClient.getRecommendedIllusts()
-        : ConnectManager().apiClient.getRecommendedMangas();
+        ? getRecommendedIllusts()
+        : getRecommendedMangas();
   }
 }

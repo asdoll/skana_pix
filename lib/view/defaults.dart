@@ -25,26 +25,20 @@ class DynamicData {
     useMaterial3: true,
   );
 
-  static ThemeData get themes =>
+  static ThemeData get themes => 
       (SchedulerBinding.instance.platformDispatcher.platformBrightness ==
               Brightness.dark)
           ? themeData
           : darkTheme;
 
-  static get locale => PlatformDispatcher.instance.locale;
   static bool get isMobile => Platform.isAndroid || Platform.isIOS;
   static bool get isIOS => Platform.isIOS;
+  static bool get isDesktop => Platform.isWindows || Platform.isMacOS || Platform.isLinux;
 
   static final rootNavigatorKey = GlobalKey<NavigatorState>();
 
   static GlobalKey<NavigatorState>? mainNavigatorKey;
 
-  static bool get hideR18 => true;
-  static bool get feedAIBadge => true;
-  static bool get longPressSaveConfirm => true;
-
-  static List<String> blockedTags = [];
-  static List<String> blockedUsers = [];
-
   static final recommendScrollController = ScrollController();
 }
+

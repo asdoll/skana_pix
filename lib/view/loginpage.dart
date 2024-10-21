@@ -155,7 +155,7 @@ class _LoginPageState extends State<LoginPage> {
                   ),
                   const Expanded(
                     child: Center(
-                      child: CircularProgressIndicator(),
+                      child: CircularProgressIndicator.adaptive(),
                     ),
                   ),
                 ],
@@ -208,7 +208,7 @@ class _LoginPageState extends State<LoginPage> {
     if (exitLogin) {
       return;
     }
-    var url = await ConnectManager().apiClient.generateWebviewUrl();
+    var url = await generateWebviewUrl();
     onLink = (uri) {
       if (uri.scheme == "pixiv") {
         onFinished(uri.queryParameters["code"]!);
@@ -242,7 +242,7 @@ class _LoginPageState extends State<LoginPage> {
       isLogging = true;
       waitingForAuth = false;
     });
-    var res = await ConnectManager().apiClient.loginWithCode(code);
+    var res = await loginWithCode(code);
     if (res.error) {
       if (mounted) {
         context.showToast(message: res.errorMessage!);
