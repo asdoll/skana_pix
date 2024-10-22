@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:bot_toast/bot_toast.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:photo_view/photo_view.dart';
@@ -195,10 +196,10 @@ class _ImagePageState extends State<ImagePage> {
                             file.createSync(recursive: true);
                           }
 
-                          //saveStore.saveImage(widget.urls[currentPage]);
+                          saveUrl(widget.urls[currentPage],context: context);
                         }),
                     onLongPress: () async {
-                      //saveStore.saveImage(widget.urls[currentPage]);
+                      saveUrl(widget.urls[currentPage],context: context);
                     }),
                 AnimatedOpacity(
                   opacity: shareShow ? 1 : 0.5,
@@ -231,10 +232,7 @@ class _ImagePageState extends State<ImagePage> {
                                 sharePositionOrigin:
                                     box!.localToGlobal(Offset.zero) & box.size);
                           } else {
-                            if (context.mounted) {
-                              showToast(context,
-                                  message: "can not find image cache");
-                            }
+                              BotToast.showText(text: "can not find image cache");
                           }
                         });
                   }),

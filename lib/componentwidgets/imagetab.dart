@@ -1,5 +1,6 @@
 import 'dart:ui';
 
+import 'package:bot_toast/bot_toast.dart';
 import 'package:flutter/material.dart';
 import 'package:persistent_bottom_nav_bar/persistent_bottom_nav_bar.dart';
 import 'package:skana_pix/componentwidgets/loading.dart';
@@ -106,7 +107,7 @@ class _IllustCardState extends State<IllustCard> {
         return;
       }
     }
-    // saveStore.saveImage(store.illusts!);
+    saveImage(illust);
     // if (userSetting.starAfterSave && (store.state == 0)) {
     //   store.star(
     //       restrict: userSetting.defaultPrivateLike ? "private" : "public");
@@ -391,7 +392,7 @@ class _IllustCardState extends State<IllustCard> {
         .addBookmark(illust.id.toString(), method, type);
     if (res.error) {
       if (mounted) {
-        context.showToast(message: "Network Error");
+        BotToast.showText(text: "Network Error".i18n);
       }
     } else {
       illust.isBookmarked = !illust.isBookmarked;

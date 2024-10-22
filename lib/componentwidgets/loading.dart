@@ -1,3 +1,4 @@
+import 'package:bot_toast/bot_toast.dart';
 import 'package:flutter/material.dart';
 import 'package:skana_pix/pixiv_dart_api.dart';
 import 'package:skana_pix/utils/navigation.dart';
@@ -137,7 +138,7 @@ abstract class MultiPageLoadingState<T extends StatefulWidget, S extends Object>
         if (message.length > 45) {
           message = "${message.substring(0, 20)}...";
         }
-        context.showToast(message: message);
+        BotToast.showText(text:message);
       }
     });
   }

@@ -1,3 +1,4 @@
+import 'package:bot_toast/bot_toast.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:persistent_bottom_nav_bar/persistent_bottom_nav_bar.dart';
@@ -55,20 +56,23 @@ class _IllustDetailContentState extends State<IllustDetailContent> {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        _buildInfoArea(context, _illust),
-        _buildNameAvatar(context, _illust),
-        _buildTagArea(context, _illust),
-        _buildCaptionArea(_illust),
-        _buildCommentTextArea(context, _illust),
-        Padding(
-          padding: const EdgeInsets.only(left: 16.0, right: 16.0, bottom: 4.0),
-          child: Text("Related artworks".i18n),
-        )
-      ],
+    return Material(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          _buildInfoArea(context, _illust),
+          _buildNameAvatar(context, _illust),
+          _buildTagArea(context, _illust),
+          _buildCaptionArea(_illust),
+          _buildCommentTextArea(context, _illust),
+          Padding(
+            padding:
+                const EdgeInsets.only(left: 16.0, right: 16.0, bottom: 4.0),
+            child: Text("Related artworks".i18n),
+          )
+        ],
+      ),
     );
   }
 
@@ -517,7 +521,7 @@ class _IllustDetailContentState extends State<IllustDetailContent> {
     var res = await followUser(widget.illust.author.id.toString(), method);
     if (res.error) {
       if (mounted) {
-        context.showToast(message: "Network Error");
+        BotToast.showText(text: "Network Error".i18n);
       }
     } else {
       widget.illust.author.isFollowed = !widget.illust.author.isFollowed;

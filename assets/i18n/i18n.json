@@ -198,7 +198,8 @@
         "Save": "保存",
         "Permission Denied": "权限被拒绝",
         "Pixel": "像素",
-        "AI-generated" : "AI生成"
+        "AI-generated" : "AI生成",
+        "Unblock": "取消屏蔽"
     },
     "zh_TW": {
         "Search": "搜索",
@@ -399,6 +400,7 @@
         "Save": "保存",
         "Permission Denied": "權限被拒絕",
         "Pixel": "像素",
-        "AI-generated" : "AI生成"
+        "AI-generated" : "AI生成",
+        "Unblock": "取消屏蔽"
     }
 }

@@ -12,7 +12,7 @@ import 'package:permission_handler/permission_handler.dart';
 import 'package:skana_pix/pixiv_dart_api.dart';
 import 'package:skana_pix/utils/translate.dart';
 import 'package:image_gallery_saver_plus/image_gallery_saver_plus.dart';
-
+import 'package:bot_toast/bot_toast.dart';
 
 import '../controller/bases.dart';
 import '../view/defaults.dart';
@@ -62,7 +62,7 @@ extension DirectoryExt on Directory {
 }
 
 extension TimeExts on DateTime {
-    String toShortTime() {
+  String toShortTime() {
     try {
       var formatter = DateFormat('yyyy-MM-dd HH:mm');
       return formatter.format(toLocal());
@@ -135,16 +135,39 @@ String getExtensionName(String url) {
   return '.jpg';
 }
 
+void saveUrl(String url, {BuildContext? context}) async {
+  BotToast.showText( text: "Saved".i18n);
+  if (DynamicData.isIOS && (await Permission.photosAddOnly.status.isDenied)) {
+    if (await Permission.storage.request().isDenied && context != null) {
+      BotToast.showText(text: "Permission denied".i18n);
+      return;
+    }
+  }
+  if (url.isEmpty) {
+    return;
+  }
+  var file = await imagesCacheManager.getSingleFile(url);
+  if (file.existsSync()) {
+    var fileName = url.split('/').last;
+    if (!fileName.contains('.')) {
+      fileName += getExtensionName(url);
+    }
+    await ImageGallerySaverPlus.saveImage(await file.readAsBytes(),
+        quality: 100, name: fileName);
+      BotToast.showText(text: "Saved".i18n);
+  }
+}
+
 void saveImage(Illust illust,
     {List<bool>? indexes, BuildContext? context, String? quality}) async {
   if (DynamicData.isIOS && (await Permission.photosAddOnly.status.isDenied)) {
-    if (await Permission.storage.request().isDenied && context != null) {
-      showToast(context, message: "Permission denied".i18n);
+    if (await Permission.storage.request().isDenied) {
+      BotToast.showText(text: "Permission denied".i18n);
       return;
     }
   }
   for (int i = 0; i < illust.images.length; i++) {
-    if(indexes!=null && !indexes[i]) {
+    if (indexes != null && !indexes[i]) {
       continue;
     }
     var image = illust.images[i];
@@ -176,9 +199,7 @@ void saveImage(Illust illust,
       }
       await ImageGallerySaverPlus.saveImage(await file.readAsBytes(),
           quality: 100, name: fileName);
-      if (context!=null) {
-        showToast(context, message: "${illust.title} ${"Saved".i18n}");
-      }
+      BotToast.showText(text: "${illust.title} ${"Saved".i18n}");
     }
   }
 }

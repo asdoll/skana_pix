@@ -1,3 +1,4 @@
+import 'package:bot_toast/bot_toast.dart';
 import 'package:flutter/material.dart';
 import 'package:skana_pix/pixiv_dart_api.dart';
 import 'package:url_launcher/url_launcher_string.dart';
@@ -245,7 +246,7 @@ class _LoginPageState extends State<LoginPage> {
     var res = await loginWithCode(code);
     if (res.error) {
       if (mounted) {
-        context.showToast(message: res.errorMessage!);
+        BotToast.showText(text: res.errorMessage!);
       }
       setState(() {
         isLogging = false;
