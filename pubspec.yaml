@@ -44,7 +44,7 @@ dependencies:
   flashy_tab_bar2: ^0.0.10
   floating_tabbar: ^1.0.3
   url_launcher: ^6.3.1
-  webview_flutter: ^4.10.0
+  webview_flutter: ^4.9.0
   path_provider: ^2.1.4
   app_links: ^6.3.2
   flutter_cache_manager: ^3.4.1
@@ -58,6 +58,10 @@ dependencies:
   blur: ^4.0.0
   shared_preferences: ^2.3.2
   share_plus: ^10.1.0
+  permission_handler: ^11.3.1
+  image_gallery_saver_plus: ^3.0.5
+  flutter_widget_from_html: ^0.15.2
+
 
 dev_dependencies:
   flutter_test:

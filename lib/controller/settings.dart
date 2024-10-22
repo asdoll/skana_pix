@@ -21,6 +21,8 @@ class UserSetting {
   bool longPressSaveConfirm = true;
   bool firstLongPressSave = true;
   List<String> blockedIllusts = [];
+  int saveChoice = 0;//0:all 1:ToDir 2:ToGallery
+  List<String> bookmarkedTags = [];
 
   Future<void> saveDefaults() async {
     await prefs.setString('darkMode', darkMode);
@@ -39,6 +41,8 @@ class UserSetting {
     await prefs.setBool('longPressSaveConfirm', longPressSaveConfirm);
     await prefs.setBool('firstLongPressSave', firstLongPressSave);
     await prefs.setStringList('blockedIllusts', blockedIllusts);
+    await prefs.setInt('saveChoice', saveChoice);
+    await prefs.setStringList('bookmarkedTags', bookmarkedTags);
   }
 
   Future<void> init() async {
@@ -65,6 +69,8 @@ class UserSetting {
     longPressSaveConfirm = prefs.getBool('longPressSaveConfirm') ?? true;
     firstLongPressSave = prefs.getBool('firstLongPressSave') ?? true;
     blockedIllusts = prefs.getStringList('blockedIllusts') ?? [];
+    saveChoice = prefs.getInt('saveChoice') ?? 0;
+    bookmarkedTags = prefs.getStringList('bookmarkedTags') ?? [];
   }
 
   void set(String key, dynamic value) {
@@ -133,6 +139,14 @@ class UserSetting {
         blockedIllusts = value;
         prefs.setStringList('blockedIllusts', blockedIllusts);
         break;
+      case 'saveChoice':
+        saveChoice = value;
+        prefs.setInt('saveChoice', saveChoice);
+        break;
+      case 'bookmarkedTags':
+        bookmarkedTags = value;
+        prefs.setStringList('bookmarkedTags', bookmarkedTags);
+        break;
     }
   }
 
@@ -181,6 +195,14 @@ class UserSetting {
     set('blockedTags', blockedTags);
   }
 
+  void addBookmarkedTags(List<String> tags) {
+    for (var tag in tags) {
+      if (!bookmarkedTags.contains(tag)) {
+        bookmarkedTags.add(tag);
+      }
+    }
+    set('bookmarkedTags', bookmarkedTags);
+  }
   void addBlockedUsers(List<String> users) {
     for (var user in users) {
       if (!blockedUsers.contains(user)) {
@@ -214,11 +236,23 @@ class UserSetting {
     set('blockedIllusts', blockedIllusts);
   }
 
+  void clearBookmarkedTags() {
+    bookmarkedTags.clear();
+    set('bookmarkedTags', bookmarkedTags);
+  }
+
   void removeBlockedTags(List<String> tags) {
     for (var tag in tags) {
       blockedTags.remove(tag);
     }
     set('blockedTags', blockedTags);
+  }
+
+  void removeBookmarkedTags(List<String> tags) {
+    for (var tag in tags) {
+      bookmarkedTags.remove(tag);
+    }
+    set('bookmarkedTags', bookmarkedTags);
   }
 
   void removeBlockedUsers(List<String> users) {

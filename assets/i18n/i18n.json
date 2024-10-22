@@ -6,7 +6,7 @@
         "Artwork": "插画",
         "Explore": "探索",
         "Bookmarks": "收藏",
-        "Following": "关注",
+        "Following": "正在关注",
         "History": "历史",
         "Ranking": "排行",
         "Settings": "设置",
@@ -190,7 +190,15 @@
         "Continue with External Browser": "使用外部浏览器继续",
         "Ok": "确定",
         "Block in?": "屏蔽于?",
-        "Block More": "屏蔽更多"
+        "Block More": "屏蔽更多",
+        "Multi-choice Save": "多选保存",
+        "Copy Info": "复制信息",
+        "Copied to clipboard" : "已复制到剪贴板",
+        "Report": "举报",
+        "Save": "保存",
+        "Permission Denied": "权限被拒绝",
+        "Pixel": "像素",
+        "AI-generated" : "AI生成"
     },
     "zh_TW": {
         "Search": "搜索",
@@ -199,7 +207,7 @@
         "Artwork": "作品",
         "Explore": "探索",
         "Bookmarks": "收藏",
-        "Following": "關注",
+        "Following": "正在關注",
         "History": "歷史",
         "Ranking": "排行",
         "Settings": "設置",
@@ -383,6 +391,14 @@
         "Ok": "確定",
         "Block in?": "屏蔽在?",
         "Block More": "屏蔽更多",
-        "Block+": "屏蔽+"
+        "Block+": "屏蔽+",
+        "Multi-choice Save": "多選保存",
+        "Copy Info": "複製信息",
+        "Copied to clipboard" : "已複製到剪貼板",
+        "Report": "舉報",
+        "Save": "保存",
+        "Permission Denied": "權限被拒絕",
+        "Pixel": "像素",
+        "AI-generated" : "AI生成"
     }
 }

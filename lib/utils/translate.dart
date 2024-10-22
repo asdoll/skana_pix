@@ -28,3 +28,15 @@ extension Translation on String {
 
   }
 }
+
+String get copyInfoText => "${"Illust ID:".i18n} {illust_id}\n${"Title:".i18n} {title}\n${"User ID:".i18n} {user_id}\n${"User Name:".i18n} {user_name}\n${"Tags:".i18n} {tags}";
+
+  String illustToShareInfoText(Illust illust) {
+    final str = copyInfoText
+        .replaceAll('{illust_id}', illust.id.toString())
+        .replaceAll("{user_name}", illust.author.name)
+        .replaceAll("{tags}", illust.tags.map((e) => e.toString()).join(', '))
+        .replaceAll("{user_id}", illust.author.id.toString())
+        .replaceAll("{title}", illust.title);
+    return str;
+  }

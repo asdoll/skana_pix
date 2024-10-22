@@ -4,6 +4,15 @@ import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:file_selector/file_selector.dart';
 import 'package:flutter_file_dialog/flutter_file_dialog.dart';
+import 'package:intl/intl.dart';
+import 'package:skana_pix/componentwidgets/message.dart';
+import 'package:skana_pix/controller/caches.dart';
+import 'package:skana_pix/model/illust.dart';
+import 'package:permission_handler/permission_handler.dart';
+import 'package:skana_pix/pixiv_dart_api.dart';
+import 'package:skana_pix/utils/translate.dart';
+import 'package:image_gallery_saver_plus/image_gallery_saver_plus.dart';
+
 
 import '../controller/bases.dart';
 import '../view/defaults.dart';
@@ -48,6 +57,17 @@ extension DirectoryExt on Directory {
       return true;
     } catch (e) {
       return false;
+    }
+  }
+}
+
+extension TimeExts on DateTime {
+    String toShortTime() {
+    try {
+      var formatter = DateFormat('yyyy-MM-dd HH:mm');
+      return formatter.format(toLocal());
+    } catch (e) {
+      return toString();
     }
   }
 }
@@ -104,5 +124,61 @@ void saveFile(File file, [String? name]) async {
     final params =
         SaveFileDialogParams(sourceFilePath: file.path, fileName: name);
     await FlutterFileDialog.saveFile(params: params);
+  }
+}
+
+String getExtensionName(String url) {
+  var fileName = url.split('/').last;
+  if (fileName.contains('.')) {
+    return '.${fileName.split('.').last}';
+  }
+  return '.jpg';
+}
+
+void saveImage(Illust illust,
+    {List<bool>? indexes, BuildContext? context, String? quality}) async {
+  if (DynamicData.isIOS && (await Permission.photosAddOnly.status.isDenied)) {
+    if (await Permission.storage.request().isDenied && context != null) {
+      showToast(context, message: "Permission denied".i18n);
+      return;
+    }
+  }
+  for (int i = 0; i < illust.images.length; i++) {
+    if(indexes!=null && !indexes[i]) {
+      continue;
+    }
+    var image = illust.images[i];
+    String url = "";
+    switch (quality) {
+      case "original":
+        url = (image.original);
+        break;
+      case "large":
+        url = (image.large);
+        break;
+      case "medium":
+        url = (image.medium);
+        break;
+      case "square_medium":
+        url = (image.squareMedium);
+        break;
+      default:
+        url = (image.original);
+    }
+    if (url.isEmpty) {
+      continue;
+    }
+    var file = await imagesCacheManager.getSingleFile(url);
+    if (file.existsSync()) {
+      var fileName = url.split('/').last;
+      if (!fileName.contains('.')) {
+        fileName += getExtensionName(url);
+      }
+      await ImageGallerySaverPlus.saveImage(await file.readAsBytes(),
+          quality: 100, name: fileName);
+      if (context!=null) {
+        showToast(context, message: "${illust.title} ${"Saved".i18n}");
+      }
+    }
   }
 }

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:persistent_bottom_nav_bar/persistent_bottom_nav_bar.dart';
 import 'package:share_plus/share_plus.dart';
+import 'package:skana_pix/componentwidgets/imagedetail.dart';
 import 'package:skana_pix/pixiv_dart_api.dart';
 import 'package:skana_pix/utils/navigation.dart';
 import 'package:skana_pix/utils/translate.dart';
@@ -12,12 +13,16 @@ import 'package:skana_pix/view/defaults.dart';
 import '../controller/downloader.dart';
 import '../controller/histories.dart';
 import '../utils/filters.dart';
+import 'avatar.dart';
+import 'backarea.dart';
 import 'commentpage.dart';
+import 'followbutton.dart';
 import 'imagepage.dart';
 import 'message.dart';
 import 'pixivimage.dart';
 import 'relatedillusts.dart';
 import 'routes.dart';
+import 'userpage.dart';
 
 const _kBottomBarHeight = 64.0;
 
@@ -192,6 +197,8 @@ class _IllustPageState extends State<IllustPage> {
 
   final _bottomBarController = _BottomBarController();
 
+  late ScrollController _scrollController;
+
   // KeyEventListenerState? keyboardListener;
 
   @override
@@ -199,6 +206,7 @@ class _IllustPageState extends State<IllustPage> {
     // keyboardListener = KeyEventListener.of(context);
     // keyboardListener?.removeAll();
     // keyboardListener?.addHandler(handleKey);
+    _scrollController = ScrollController();
     IllustPage.followCallbacks[id] = (v) {
       setState(() {
         widget.illust.author.isFollowed = v;
@@ -215,6 +223,7 @@ class _IllustPageState extends State<IllustPage> {
   void dispose() {
     //keyboardListener?.removeHandler(handleKey);
     IllustPage.followCallbacks.remove(id);
+    _scrollController.dispose();
     super.dispose();
   }
 
@@ -235,13 +244,6 @@ class _IllustPageState extends State<IllustPage> {
                   top: 0,
                   child: buildBody(constrains.maxWidth, constrains.maxHeight),
                 ),
-                _BottomBar(
-                  widget.illust,
-                  constrains.maxHeight,
-                  constrains.maxWidth,
-                  updateCallback: () => setState(() {}),
-                  controller: _bottomBarController,
-                ),
               ],
             );
           }),
@@ -249,8 +251,6 @@ class _IllustPageState extends State<IllustPage> {
       ),
     );
   }
-
-  final scrollController = ScrollController();
 
   // void handleKey(LogicalKeyboardKey key) {
   //   const kShortcutScrollOffset = 200;
@@ -311,9 +311,7 @@ class _IllustPageState extends State<IllustPage> {
     if (isBlocked) {
       return ListView(
         children: [
-          AppBar(
-            title: Text(widget.illust.title),
-          ),
+          _buildAppbar(),
           const Positioned.fill(
               child: Center(
             child: Center(
@@ -325,13 +323,16 @@ class _IllustPageState extends State<IllustPage> {
       );
     }
     return ListView.builder(
-        controller: scrollController,
-        itemCount: widget.illust.images.length + 2,
+        controller: _scrollController,
+        itemCount: widget.illust.images.length + 3,
         padding: EdgeInsets.only(
             top: 0, bottom: _kBottomBarHeight + context.padding.bottom),
         itemBuilder: (context, index) {
           if (index == 0) {
-            return AppBar(title: Text(widget.illust.title));
+            return _buildAppbar();
+          }
+          if (index == widget.illust.images.length + 2) {
+            return IllustDetailContent(illust: widget.illust);
           }
           return buildImage(width, height, index);
         });
@@ -339,10 +340,6 @@ class _IllustPageState extends State<IllustPage> {
 
   Widget buildImage(double width, double height, int index) {
     index--;
-    // File? downloadFile;
-    // if (downloaded(widget.illust.id)) {
-    //   downloadFile = DownloadManager().getImage(widget.illust.id, index);
-    // }
     if (index == widget.illust.images.length) {
       return SizedBox(
         height: _kBottomBarHeight + context.padding.bottom,
@@ -388,6 +385,366 @@ class _IllustPageState extends State<IllustPage> {
     return Center(
       child: image,
     );
+  }
+
+  Widget _buildAppbar() {
+    return Column(
+      children: [
+        Container(
+          height: MediaQuery.of(context).padding.top,
+        ),
+        Container(
+          child: Row(
+            mainAxisSize: MainAxisSize.max,
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              CommonBackArea(),
+              Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  IconButton(
+                      icon: Icon(Icons.expand_less),
+                      onPressed: () {
+                        double p = _scrollController.position.maxScrollExtent -
+                            (widget.illust.images.length / 3.0) *
+                                (MediaQuery.of(context).size.width / 3.0);
+                        if (p < 0) p = 0;
+                        _scrollController.position.jumpTo(p);
+                      }),
+                  IconButton(
+                      icon: Icon(Icons.more_vert),
+                      onPressed: () {
+                        buildShowModalBottomSheet(context, widget.illust);
+                      })
+                ],
+              )
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  Future buildShowModalBottomSheet(BuildContext context, Illust illust) {
+    return showModalBottomSheet(
+        isScrollControlled: true,
+        context: context,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.vertical(
+            top: Radius.circular(16),
+          ),
+        ),
+        builder: (_) {
+          return Container(
+            decoration: BoxDecoration(
+                borderRadius: BorderRadius.only(
+                    topLeft: Radius.circular(8.0),
+                    topRight: Radius.circular(8.0))),
+            child: SingleChildScrollView(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                mainAxisSize: MainAxisSize.min,
+                children: <Widget>[
+                  SizedBox(
+                    height: 8,
+                  ),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: <Widget>[
+                      _buildNameAvatar(context, illust),
+                      if (illust.images.length > 1)
+                        ListTile(
+                          title: Text("Multi-choice Save".i18n),
+                          leading: const Icon(
+                            Icons.save,
+                          ),
+                          onTap: () async {
+                            Navigator.of(context).pop();
+                            _showMutiChoiceDialog(illust, context);
+                          },
+                        ),
+                      ListTile(
+                        title: Text("Copy Info".i18n),
+                        leading: Icon(
+                          Icons.local_library_outlined,
+                        ),
+                        onTap: () async {
+                          final str = illustToShareInfoText(illust);
+                          await Clipboard.setData(ClipboardData(text: str));
+                          showToast(context,
+                              message: "Copied to clipboard".i18n,
+                              icon: Icons.copy);
+                          Navigator.of(context).pop();
+                        },
+                      ),
+                      Builder(builder: (context) {
+                        return ListTile(
+                          title: Text("Share".i18n),
+                          leading: Icon(
+                            Icons.share,
+                          ),
+                          onTap: () {
+                            final box =
+                                context.findRenderObject() as RenderBox?;
+                            final pos = box != null
+                                ? box.localToGlobal(Offset.zero) & box.size
+                                : null;
+                            Navigator.of(context).pop();
+                            Share.share(
+                                "https://www.pixiv.net/artworks/${widget.illust.id}",
+                                sharePositionOrigin: pos);
+                          },
+                        );
+                      }),
+                      ListTile(
+                        leading: Icon(
+                          Icons.link,
+                        ),
+                        title: Text("Link".i18n),
+                        onTap: () async {
+                          await Clipboard.setData(ClipboardData(
+                              text:
+                                  "https://www.pixiv.net/artworks/${widget.illust.id}"));
+                          showToast(context,
+                              message: "Copied to clipboard".i18n,
+                              icon: Icons.copy);
+                          Navigator.of(context).pop();
+                        },
+                      ),
+                      ListTile(
+                        title: Text("Block".i18n),
+                        leading: Icon(Icons.block),
+                        onTap: () {
+                          blockIt();
+                          setState(() {});
+                          Navigator.pop(context);
+                        },
+                      ),
+                    ],
+                  ),
+                  Container(
+                    height: MediaQuery.of(context).padding.bottom,
+                  )
+                ],
+              ),
+            ),
+          );
+        });
+  }
+
+  void blockIt() {
+    if (widget.illust.isBlocked) {
+      settings.removeBlockedIllusts([widget.illust.id.toString()]);
+    } else {
+      settings.addBlockedIllusts([widget.illust.id.toString()]);
+    }
+  }
+
+  Future _showMutiChoiceDialog(Illust illust, BuildContext context) async {
+    List<bool> indexs = [];
+    bool allOn = false;
+    for (int i = 0; i < illust.images.length; i++) {
+      indexs.add(false);
+    }
+    final result = await showModalBottomSheet(
+        context: context,
+        isScrollControlled: true,
+        shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.vertical(top: Radius.circular(16.0))),
+        builder: (context) {
+          return StatefulBuilder(builder: (context, setDialogState) {
+            return SafeArea(
+              child: SizedBox(
+                height: MediaQuery.of(context).size.height * 0.8,
+                child: Column(
+                  children: [
+                    Container(
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 16),
+                        child: Text(illust.title),
+                      ),
+                    ),
+                    Expanded(
+                      child: GridView.builder(
+                        itemBuilder: (context, index) {
+                          final data = illust.images[index];
+                          return Container(
+                              child: Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: InkWell(
+                              onTap: () {
+                                setDialogState(() {
+                                  indexs[index] = !indexs[index];
+                                });
+                              },
+                              onLongPress: () {
+                                PersistentNavBarNavigator.pushNewScreen(
+                                    context,
+                                    screen: ImagePage(
+                                        illust.images.map((e) => e.large).toList(),
+                                        initialPage: index));
+                              },
+                              child: Stack(
+                                children: [
+                                  PixivImage(
+                                    data.squareMedium,
+                                    placeWidget: Container(
+                                      child: Center(
+                                        child: Text(index.toString()),
+                                      ),
+                                    ),
+                                  ),
+                                  Align(
+                                      alignment: Alignment.bottomRight,
+                                      child: Visibility(
+                                          visible: indexs[index],
+                                          child: Padding(
+                                            padding: const EdgeInsets.all(4.0),
+                                            child: Icon(
+                                              Icons.check_circle,
+                                              color: Colors.green,
+                                            ),
+                                          ))),
+                                ],
+                              ),
+                            ),
+                          ));
+                        },
+                        itemCount: illust.images.length,
+                        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                            crossAxisCount: 3),
+                      ),
+                    ),
+                    ListTile(
+                      leading: Icon(!allOn
+                          ? Icons.check_circle_outline
+                          : Icons.check_circle),
+                      title: Text("All".i18n),
+                      onTap: () {
+                        allOn = !allOn;
+                        for (var i = 0; i < indexs.length; i++) {
+                          indexs[i] = allOn;
+                        }
+                        setDialogState(() {});
+                      },
+                    ),
+                    ListTile(
+                      leading: Icon(Icons.save),
+                      title: Text("Save".i18n),
+                      onTap: () {
+                        Navigator.of(context).pop("OK");
+                      },
+                    ),
+                  ],
+                ),
+              ),
+            );
+          });
+        });
+    switch (result) {
+      case "OK":
+        {
+          saveImage(illust, indexes: indexs, context: context);
+        }
+    }
+  }
+
+  Widget _buildNameAvatar(BuildContext context, Illust illust) {
+      return InkWell(
+        onTap: () async {
+          await _push2UserPage(context, illust);
+        },
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: <Widget>[
+            Padding(
+                padding: const EdgeInsets.only(left: 16.0),
+                child: Hero(
+                  tag: illust.author.avatar +
+                      hashCode.toString(),
+                  child: PainterAvatar(
+                    url: illust.author.avatar,
+                    id: illust.author.id,
+                    size: Size(32, 32),
+                    onTap: () async {
+                      await _push2UserPage(context, illust);
+                    },
+                  ),
+                ),
+                ),
+            Expanded(
+              child: Padding(
+                padding: const EdgeInsets.all(12.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: <Widget>[
+                    Hero(
+                      tag: illust.author.name + hashCode.toString(),
+                      child: SelectionArea(
+                        child: Text(
+                          illust.author.name,
+                          style: TextStyle(
+                              fontSize: 14,
+                              color:
+                                  Theme.of(context).textTheme.bodySmall!.color),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            UserFollowButton(
+              followed: illust.author.isFollowed,
+              onPressed: () async {
+                follow();
+              },
+            ),
+            const SizedBox(
+              width: 12,
+            )
+          ],
+        ),
+      );
+  }
+
+  bool isFollowing = false;
+
+  void follow() async {
+    if (isFollowing) return;
+    setState(() {
+      isFollowing = true;
+    });
+    var method = widget.illust.author.isFollowed ? "delete" : "add";
+    var res = await followUser(widget.illust.author.id.toString(), method);
+    if (res.error) {
+      if (mounted) {
+        context.showToast(message: "Network Error");
+      }
+    } else {
+      widget.illust.author.isFollowed = !widget.illust.author.isFollowed;
+    }
+    setState(() {
+      isFollowing = false;
+    });
+    // UserInfoPage.followCallbacks[widget.illust.author.id.toString()]
+    //     ?.call(widget.illust.author.isFollowed);
+    // UserPreviewWidget.followCallbacks[widget.illust.author.id.toString()]
+    //     ?.call(widget.illust.author.isFollowed);
+  }
+
+  Future<void> _push2UserPage(BuildContext context, Illust illust) async {
+    await PersistentNavBarNavigator.pushNewScreen(
+        context,
+        screen: UserPage(
+          id: illust.author.id,
+          heroTag: hashCode.toString(),
+        ));
   }
 }
 
