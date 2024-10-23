@@ -31,6 +31,10 @@ class DynamicData {
           ? themeData
           : darkTheme;
 
+  static bool get isDarkMode =>
+      SchedulerBinding.instance.platformDispatcher.platformBrightness ==
+      Brightness.dark;
+
   static bool get isMobile => Platform.isAndroid || Platform.isIOS;
   static bool get isIOS => Platform.isIOS;
   static bool get isAndroid => Platform.isAndroid;

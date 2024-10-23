@@ -15,11 +15,11 @@ Future<void> main() async {
     FlutterError.onError = (details) {
       Log.error("Unhandled", "${details.exception}\n${details.stack}");
     };
+    await settings.init();
     setSystemProxy();
     await ConnectManager().init();
     await TranslateMap.init();
     await Log.init();
-    await settings.init();
     handleLinks();
     runApp(const MyApp());
   }, (e, s) {
@@ -39,7 +39,7 @@ class MyApp extends StatelessWidget {
       navigatorObservers: [BotToastNavigatorObserver()],
       theme: DynamicData.themeData,
       darkTheme: DynamicData.darkTheme,
-      themeMode: ThemeMode.system,
+      themeMode: settings.themeMode,
       home: const HomePage(title: 'Skana_pix'),
       navigatorKey: DynamicData.rootNavigatorKey,
     );

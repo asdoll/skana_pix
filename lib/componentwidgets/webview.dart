@@ -64,10 +64,11 @@ class _WebviewPageState extends State<WebviewPage> {
                   context.pop();
                 },
               ),
-              LinearProgressIndicator( value: loadingPercentage / 100.0)
+              
             ],
           )
         ),
+        LinearProgressIndicator(value: loadingPercentage / 100),
         Expanded(
           child: WebViewWidget(controller: controller!,),
         ),

@@ -3,7 +3,7 @@
         "Search": "搜索",
         "Downloading": "下载中",
         "Downloaded": "已下载",
-        "Artwork": "插画",
+        "Artwork": "作品",
         "Explore": "探索",
         "Bookmarks": "收藏",
         "Following": "正在关注",
@@ -199,7 +199,17 @@
         "Permission Denied": "权限被拒绝",
         "Pixel": "像素",
         "AI-generated" : "AI生成",
-        "Unblock": "取消屏蔽"
+        "Unblock": "取消屏蔽",
+        "Followed": "已关注",
+        "Unfollowed": "已取关",
+        "View replies": "查看回复",
+        "Reply to": "回复",
+        "Block User": "屏蔽用户",
+        "Block Comment": "屏蔽评论",
+        "Commented": "已评论",
+        "Loading": "加载中",
+        "Failed": "加载失败",
+        "Successed": "加载成功"
     },
     "zh_TW": {
         "Search": "搜索",
@@ -401,6 +411,16 @@
         "Permission Denied": "權限被拒絕",
         "Pixel": "像素",
         "AI-generated" : "AI生成",
-        "Unblock": "取消屏蔽"
+        "Unblock": "取消屏蔽",
+        "Followed": "已關注",
+        "Unfollowed": "已取關",
+        "View replies": "查看回覆",
+        "Reply to": "回覆",
+        "Block User": "屏蔽用戶",
+        "Block Comment": "屏蔽評論",
+        "Commented": "已評論",
+        "Loading": "加載中",
+        "Failed": "加載失敗",
+        "Successed": "加載成功"
     }
 }

@@ -5,7 +5,6 @@ import 'package:flutter/material.dart';
 import 'package:file_selector/file_selector.dart';
 import 'package:flutter_file_dialog/flutter_file_dialog.dart';
 import 'package:intl/intl.dart';
-import 'package:skana_pix/componentwidgets/message.dart';
 import 'package:skana_pix/controller/caches.dart';
 import 'package:skana_pix/model/illust.dart';
 import 'package:permission_handler/permission_handler.dart';

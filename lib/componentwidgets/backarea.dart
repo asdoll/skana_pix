@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:icon_decoration/icon_decoration.dart';
 
 class CommonBackArea extends StatefulWidget {
   const CommonBackArea({super.key});
@@ -13,7 +14,10 @@ class _CommonBackAreaState extends State<CommonBackArea> {
   Widget build(BuildContext context) {
     return GestureDetector(
       child: IconButton(
-        icon: _isLongPress ? Icon(Icons.home) : BackButtonIcon(),
+        icon: DecoratedIcon(
+          icon: Icon(_isLongPress ? Icons.home : Icons.arrow_back),
+          decoration: const IconDecoration(border: IconBorder(width: 1.5)),
+        ),
         onPressed: () {
           Navigator.pop(context);
         },

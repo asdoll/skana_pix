@@ -18,5 +18,6 @@ export 'model/searches.dart';
 export 'model/tag.dart';
 export 'model/user.dart';
 export 'model/novel.dart';
+export 'model/spotlight.dart';
 
 export 'utils/io_extension.dart';

@@ -8,7 +8,6 @@ import 'package:photo_view/photo_view_gallery.dart';
 import 'package:skana_pix/pixiv_dart_api.dart';
 import 'package:path/path.dart';
 import '../controller/caches.dart';
-import 'message.dart';
 import 'pixivimage.dart';
 
 import 'package:share_plus/share_plus.dart';

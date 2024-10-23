@@ -1,9 +1,11 @@
 import 'package:bot_toast/bot_toast.dart';
+import 'package:easy_refresh/easy_refresh.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:persistent_bottom_nav_bar/persistent_bottom_nav_bar.dart';
 import 'package:share_plus/share_plus.dart';
+import 'package:skana_pix/componentwidgets/headerfooter.dart';
 import 'package:skana_pix/componentwidgets/imagedetail.dart';
 import 'package:skana_pix/pixiv_dart_api.dart';
 import 'package:skana_pix/utils/navigation.dart';
@@ -18,13 +20,14 @@ import 'backarea.dart';
 import 'followbutton.dart';
 import 'imagepage.dart';
 import 'pixivimage.dart';
+import 'staricon.dart';
 import 'userpage.dart';
 import 'package:icon_decoration/icon_decoration.dart';
 
 const _kBottomBarHeight = 64.0;
 
 class ImageListPage extends StatefulWidget {
-  const ImageListPage(Illust illust,
+  const ImageListPage(
       {required this.illusts,
       required this.initialPage,
       this.nextUrl,
@@ -193,6 +196,11 @@ class _IllustPageState extends State<IllustPage> {
   String get id => "${widget.illust.author.id}#${widget.illust.id}";
 
   late ScrollController _scrollController;
+  late EasyRefreshController _refreshController;
+
+  List<Illust> related = [];
+  bool isLoading = false;
+  bool errorRelated = false;
 
   // KeyEventListenerState? keyboardListener;
 
@@ -202,6 +210,23 @@ class _IllustPageState extends State<IllustPage> {
     // keyboardListener?.removeAll();
     // keyboardListener?.addHandler(handleKey);
     _scrollController = ScrollController();
+    _refreshController = EasyRefreshController(
+        controlFinishLoad: true, controlFinishRefresh: true);
+    isLoading = true;
+    loadRelated().then((value) {
+      if (value.success) {
+        setState(() {
+          isLoading = false;
+          related = value.data;
+        });
+      } else {
+        setState(() {
+          isLoading = false;
+          errorRelated = true;
+          BotToast.showText(text: "Network Error".i18n);
+        });
+      }
+    });
     IllustPage.followCallbacks[id] = (v) {
       setState(() {
         widget.illust.author.isFollowed = v;
@@ -224,25 +249,40 @@ class _IllustPageState extends State<IllustPage> {
 
   @override
   Widget build(BuildContext context) {
-    return ColoredBox(
-      color: Theme.of(context).scaffoldBackgroundColor,
-      child: SizedBox.expand(
-        child: ColoredBox(
-          color: Theme.of(context).scaffoldBackgroundColor,
-          child: LayoutBuilder(builder: (context, constrains) {
-            return Stack(
-              children: [
-                Positioned(
-                  bottom: 0,
-                  left: 0,
-                  right: 0,
-                  top: 0,
-                  child: buildBody(constrains.maxWidth, constrains.maxHeight),
-                ),
-                _buildAppbar(),
-              ],
-            );
-          }),
+    return Scaffold(
+      extendBody: true,
+      extendBodyBehindAppBar: true,
+      floatingActionButton: GestureDetector(
+        onLongPress: () {
+          // _showBookMarkTag();
+        },
+        child: FloatingActionButton(
+            heroTag: widget.illust.id,
+            onPressed: likes,
+            child: StarIcon(
+              state: likeState(),
+            )),
+      ),
+      body: ColoredBox(
+        color: Theme.of(context).scaffoldBackgroundColor,
+        child: SizedBox.expand(
+          child: ColoredBox(
+            color: Theme.of(context).scaffoldBackgroundColor,
+            child: LayoutBuilder(builder: (context, constrains) {
+              return Stack(
+                children: [
+                  Positioned(
+                    bottom: 0,
+                    left: 0,
+                    right: 0,
+                    top: 0,
+                    child: buildBody(constrains.maxWidth, constrains.maxHeight),
+                  ),
+                  _buildAppbar(),
+                ],
+              );
+            }),
+          ),
         ),
       ),
     );
@@ -267,7 +307,7 @@ class _IllustPageState extends State<IllustPage> {
                   decoration: TextDecoration.none,
                   fontWeight: FontWeight.w700),
             ),
-            SizedBox(
+            const SizedBox(
               height: 16,
             ),
             FilledButton.tonal(
@@ -280,17 +320,46 @@ class _IllustPageState extends State<IllustPage> {
         ),
       );
     }
-    return ListView.builder(
+    return EasyRefresh(
+      footer: DefaultHeaderFooter.footer(context),
+      controller: _refreshController,
+      onLoad: () {
+        nextPage();
+      },
+      child: CustomScrollView(
         controller: _scrollController,
-        itemCount: widget.illust.images.length + 2,
-        padding: EdgeInsets.only(
-            top: 0, bottom: _kBottomBarHeight + context.padding.bottom),
-        itemBuilder: (context, index) {
-          if (index == widget.illust.images.length + 1) {
-            return IllustDetailContent(illust: widget.illust);
-          }
-          return buildImage(width, height, index);
-        });
+        slivers: [
+          if ((widget.illust.width / widget.illust.height) > 5)
+            SliverToBoxAdapter(
+                child: Container(height: MediaQuery.of(context).padding.top)),
+          SliverList(
+              delegate: SliverChildBuilderDelegate((context, index) {
+            return buildImage(width, height, index);
+          }, childCount: widget.illust.images.length + 1)),
+          SliverToBoxAdapter(
+            child: IllustDetailContent(illust: widget.illust),
+          ),
+          SliverGrid(
+              delegate:
+                  SliverChildBuilderDelegate((BuildContext context, int index) {
+                return InkWell(
+                  onTap: () {
+                    PersistentNavBarNavigator.pushNewScreen(context,
+                        screen: ImageListPage(illusts: related,
+                            initialPage: index,
+                            nextUrl: nextUrl));
+                  },
+                  child: PixivImage(
+                    related[index].images.first.squareMedium,
+                    enableMemoryCache: false,
+                  ),
+                );
+              }, childCount: related.length),
+              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: 3)),
+        ],
+      ),
+    );
   }
 
   Widget buildImage(double width, double height, int index) {
@@ -358,16 +427,24 @@ class _IllustPageState extends State<IllustPage> {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   IconButton(
-                      icon: const DecoratedIcon(icon:Icon(Icons.expand_less),decoration: IconDecoration(border: IconBorder(width: 1.5)),),
+                      icon: const DecoratedIcon(
+                        icon: Icon(Icons.expand_less),
+                        decoration:
+                            IconDecoration(border: IconBorder(width: 1.5)),
+                      ),
                       onPressed: () {
                         double p = _scrollController.position.maxScrollExtent -
-                            (widget.illust.images.length / 3.0) *
+                            (related.length / 3.0) *
                                 (MediaQuery.of(context).size.width / 3.0);
                         if (p < 0) p = 0;
                         _scrollController.position.jumpTo(p);
                       }),
                   IconButton(
-                      icon: const DecoratedIcon(icon:Icon(Icons.more_vert),decoration: IconDecoration(border: IconBorder(width: 1.5)),),
+                      icon: const DecoratedIcon(
+                        icon: Icon(Icons.more_vert),
+                        decoration:
+                            IconDecoration(border: IconBorder(width: 1.5)),
+                      ),
                       onPressed: () {
                         buildShowModalBottomSheet(context, widget.illust);
                       })
@@ -501,6 +578,37 @@ class _IllustPageState extends State<IllustPage> {
     } else {
       settings.addBlockedIllusts([widget.illust.id.toString()]);
     }
+  }
+
+  bool isBookmarking = false;
+
+  int likeState() {
+    if (isBookmarking) {
+      return 1;
+    }
+    if (widget.illust.isBookmarked) {
+      return 2;
+    }
+    return 0;
+  }
+
+  void likes([String type = "public"]) async {
+    if (isBookmarking) return;
+    setState(() {
+      isBookmarking = true;
+    });
+    var method = widget.illust.isBookmarked ? "delete" : "add";
+    var res = await ConnectManager()
+        .apiClient
+        .addBookmark(widget.illust.id.toString(), method, type);
+    if (res.error) {
+      BotToast.showText(text: "Network Error".i18n);
+    } else {
+      widget.illust.isBookmarked = !widget.illust.isBookmarked;
+    }
+    setState(() {
+      isBookmarking = false;
+    });
   }
 
   Future _showMutiChoiceDialog(Illust illust, BuildContext context) async {
@@ -704,6 +812,78 @@ class _IllustPageState extends State<IllustPage> {
           id: illust.author.id,
           heroTag: hashCode.toString(),
         ));
+  }
+
+  String? nextUrl;
+
+  Future<Res<List<Illust>>> loadRelated() async {
+    if (nextUrl == "end") {
+      return Res.error("No more data");
+    }
+    Res<List<Illust>> res = nextUrl == null
+        ? await relatedIllusts(widget.illust.id.toString())
+        : await getIllustsWithNextUrl(nextUrl!);
+    if (!res.error) {
+      nextUrl = res.subData;
+      nextUrl ??= "end";
+    }
+    if (nextUrl == "end") {
+      _refreshController.finishLoad(IndicatorResult.noMore);
+    } else {
+      _refreshController.finishLoad();
+    }
+    return res;
+  }
+
+  void nextPage() {
+    if (isLoading) return;
+    isLoading = true;
+    loadRelated().then((value) {
+      isLoading = false;
+      if (value.success) {
+        setState(() {
+          related.addAll(value.data);
+        });
+      } else {
+        var message = value.errorMessage ??
+            "Network Error. Please refresh to try again.".i18n;
+        if (message == "No more data") {
+          return;
+        }
+        if (message.length > 45) {
+          message = "${message.substring(0, 20)}...";
+        }
+        BotToast.showText(text: message);
+      }
+    });
+  }
+
+  void reset() {
+    setState(() {
+      nextUrl = null;
+      isLoading = false;
+      related = [];
+      errorRelated = false;
+    });
+    firstLoad();
+  }
+
+  void firstLoad() {
+    loadRelated().then((value) {
+      if (value.success) {
+        setState(() {
+          related = value.data;
+        });
+      } else {
+        setState(() {
+          if (value.errorMessage != null &&
+              value.errorMessage!.contains("timeout")) {
+            BotToast.showText(
+                text: "Network Error. Please refresh to try again.".i18n);
+          }
+        });
+      }
+    });
   }
 }
 

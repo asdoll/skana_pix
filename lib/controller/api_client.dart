@@ -4,6 +4,7 @@ import 'dart:math';
 import 'package:dio/dio.dart';
 import 'package:intl/intl.dart';
 import 'package:crypto/crypto.dart';
+import 'package:skana_pix/model/spotlight.dart';
 import '../controller/exceptions.dart';
 import '../controller/logging.dart';
 import '../model/user.dart';
@@ -15,10 +16,12 @@ import '../model/mutelist.dart';
 import '../model/novel.dart';
 import '../model/searches.dart';
 import '../model/tag.dart';
+import '../model/spotlight.dart';
 import 'PDio.dart';
 import 'bases.dart';
 import 'res.dart';
 import 'saves.dart';
+import 'settings.dart';
 
 part 'novel_apis.dart';
 part 'illust_apis.dart';
@@ -46,6 +49,28 @@ class ApiClient extends BaseClient {
         DateFormat("yyyy-MM-dd'T'HH:mm:ss'+00:00'").format(DateTime.now());
     final hash =
         md5.convert(utf8.encode(time + BaseClient.hashSalt)).toString();
+    if (settings.getLocale().contains("zh")) {
+      if (settings.getLocale().contains("TW")) {
+        return {
+          "X-Client-Time": time,
+          "X-Client-Hash": hash,
+          "User-Agent": "PixivAndroidApp/5.0.234 (Android 14.0; Pixes)",
+          "accept-language": "zh-TW",
+          "Accept-Encoding": "gzip",
+          if (account.accessToken.isNotEmpty)
+            "Authorization": "Bearer $accessToken"
+        };
+      }
+      return {
+        "X-Client-Time": time,
+        "X-Client-Hash": hash,
+        "User-Agent": "PixivAndroidApp/5.0.234 (Android 14.0; Pixes)",
+        "accept-language": "zh-TW",
+        "Accept-Encoding": "gzip",
+        if (account.accessToken.isNotEmpty)
+          "Authorization": "Bearer $accessToken"
+      };
+    }
     return {
       "X-Client-Time": time,
       "X-Client-Hash": hash,
@@ -93,7 +118,7 @@ class ApiClient extends BaseClient {
       final data = json.decode(res.data!);
       account = Account.fromJson(data);
       Savers.writeAccountJson(account);
-      errorCount=0;
+      errorCount = 0;
       return const Res(true);
     } catch (e, s) {
       netErrLog("$e\n$s");
@@ -125,7 +150,7 @@ class ApiClient extends BaseClient {
       var newAccount = Account.fromJson(json.decode(res.data!));
       account = newAccount;
       Savers.writeAccountJson(account);
-      errorCount=0;
+      errorCount = 0;
       return const Res(true);
     } catch (e, s) {
       netErrLog("$e\n$s");
@@ -317,8 +342,7 @@ class ApiClient extends BaseClient {
 
   Future<Res<List<UserPreview>>> getMypixiv(String uid, String type,
       [String? nextUrl]) async {
-    var path = nextUrl ??
-        "/v1/user/mypixiv?filter=for_android&user_id=$uid";
+    var path = nextUrl ?? "/v1/user/mypixiv?filter=for_android&user_id=$uid";
     var res = await apiGet(path);
     if (res.success) {
       return Res(

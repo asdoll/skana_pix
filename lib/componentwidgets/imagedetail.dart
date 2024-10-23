@@ -70,7 +70,7 @@ class _IllustDetailContentState extends State<IllustDetailContent> {
             padding:
                 const EdgeInsets.only(left: 16.0, right: 16.0, bottom: 4.0),
             child: Text("Related artworks".i18n),
-          )
+          ),
         ],
       ),
     );
@@ -294,7 +294,7 @@ class _IllustDetailContentState extends State<IllustDetailContent> {
         padding: EdgeInsets.only(left: 16.0, right: 16.0),
         child: InkWell(
           onTap: () {
-            context.to(() => CommentsPage(id: data.id));
+            context.to(() => CommentPage(id: data.id));
           },
           child: Center(
             child: Padding(

@@ -104,3 +104,5 @@ Function get getNovelSeries => ConnectManager().apiClient.getNovelSeries;
 Function get getUserNovels => ConnectManager().apiClient.getUserNovels;
 Function get commentNovel => ConnectManager().apiClient.commentNovel;
 Function get getNovelById => ConnectManager().apiClient.getNovelById;
+Function get getSpotlightArticles => ConnectManager().apiClient.getSpotlightArticles;
+Function get getNextSpotlightArticles => ConnectManager().apiClient.getNextSpotlightArticles;

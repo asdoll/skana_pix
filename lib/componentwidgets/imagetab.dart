@@ -116,7 +116,6 @@ class _IllustCardState extends State<IllustCard> {
 
   Future _buildTap(BuildContext context) {
     return context.to(() => ImageListPage(
-          illust,
           illusts: illusts,
           initialPage: page,
           nextUrl: nextUrl,
@@ -302,8 +301,7 @@ class _IllustCardState extends State<IllustCard> {
   Future _buildInkTap(BuildContext context, String heroTag) {
     return PersistentNavBarNavigator.pushNewScreen(
       context,
-      screen: ImageListPage(illust,
-          initialPage: page, illusts: illusts, nextUrl: nextUrl),
+      screen: ImageListPage(initialPage: page, illusts: illusts, nextUrl: nextUrl),
       withNavBar: false, // OPTIONAL VALUE. True by default.
       pageTransitionAnimation: PageTransitionAnimation.scale,
       // customPageRoute: AppPageRoute(
@@ -391,9 +389,7 @@ class _IllustCardState extends State<IllustCard> {
         .apiClient
         .addBookmark(illust.id.toString(), method, type);
     if (res.error) {
-      if (mounted) {
-        BotToast.showText(text: "Network Error".i18n);
-      }
+      BotToast.showText(text: "Network Error".i18n);
     } else {
       illust.isBookmarked = !illust.isBookmarked;
     }
@@ -438,6 +434,25 @@ class _IllustStoreWidgetState extends LoadingState<IllustStoreWidget, Illust> {
   @override
   Widget buildContent(BuildContext context, Illust data) {
     return IllustCard([data], false);
+  }
+
+  @override
+  Future<Res<Illust>> loadData() {
+    return getIllustByID(widget.id);
+  }
+}
+
+class IllustPageLite extends StatefulWidget {
+  final String id;
+  const IllustPageLite(this.id, {super.key});
+  @override
+  _IllustPageLiteState createState() => _IllustPageLiteState();
+}
+
+class _IllustPageLiteState extends LoadingState<IllustPageLite, Illust> {
+  @override
+  Widget buildContent(BuildContext context, Illust data) {
+    return ImageListPage(illusts: [data], initialPage: 0);
   }
 
   @override

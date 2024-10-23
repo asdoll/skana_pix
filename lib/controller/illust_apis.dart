@@ -149,9 +149,14 @@ extension IllustExt on ApiClient {
     }
   }
 
-  Future<Res<bool>> comment(String id, String content) async {
-    var res = await apiPost("/v1/illust/comment/add",
-        data: {"illust_id": id, "comment": content});
+  Future<Res<bool>> comment(String id, String content, {String? parentId}) async {
+    Map<String, String> data;
+    if(parentId != null && parentId.isNotEmpty) {
+        data = {"illust_id": id, "comment": content,"parent_comment_id": parentId};
+    } else {
+        data = {"illust_id": id, "comment": content};
+    }
+    var res = await apiPost("/v1/illust/comment/add", data: data);
     if (res.success) {
       return const Res(true);
     } else {
@@ -186,7 +191,7 @@ extension IllustExt on ApiClient {
     if (res.success) {
       return Res((res.data["illusts"] as List)
           .map((e) => Illust.fromJson(e))
-          .toList());
+          .toList(),subData: res.data["next_url"]);
     } else {
       return Res.error(res.errorMessage);
     }
@@ -202,6 +207,24 @@ extension IllustExt on ApiClient {
       return Res(html.substring(start, end));
     } else {
       return Res.error(res.errorMessage);
+    }
+  }
+
+  Future<SpotlightResponse> getSpotlightArticles(String category) async {
+    var res = await apiGet("/v1/spotlight/articles?filter=for_android?category=$category");
+    if (res.success) {
+      return SpotlightResponse.fromJson(res.data);
+    } else {
+      return SpotlightResponse(spotlightArticles: [], nextUrl: "error");
+    }
+  }
+
+  Future<SpotlightResponse> getNextSpotlightArticles(String nextUrl) async {
+    var res = await apiGet(nextUrl);
+    if (res.success) {
+      return SpotlightResponse.fromJson(res.data);
+    } else {
+      return SpotlightResponse(spotlightArticles: [], nextUrl: "error");
     }
   }
 }

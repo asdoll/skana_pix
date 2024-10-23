@@ -1,5 +1,6 @@
 import 'dart:ui';
 
+import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:skana_pix/pixiv_dart_api.dart';
 
@@ -23,6 +24,7 @@ class UserSetting {
   List<String> blockedIllusts = [];
   int saveChoice = 0;//0:all 1:ToDir 2:ToGallery
   List<String> bookmarkedTags = [];
+  List<String> blockedComments = [];
 
   Future<void> saveDefaults() async {
     await prefs.setString('darkMode', darkMode);
@@ -43,6 +45,7 @@ class UserSetting {
     await prefs.setStringList('blockedIllusts', blockedIllusts);
     await prefs.setInt('saveChoice', saveChoice);
     await prefs.setStringList('bookmarkedTags', bookmarkedTags);
+    await prefs.setStringList('blockedComments', blockedComments);
   }
 
   Future<void> init() async {
@@ -71,6 +74,7 @@ class UserSetting {
     blockedIllusts = prefs.getStringList('blockedIllusts') ?? [];
     saveChoice = prefs.getInt('saveChoice') ?? 0;
     bookmarkedTags = prefs.getStringList('bookmarkedTags') ?? [];
+    blockedComments = prefs.getStringList('blockedComments') ?? [];
   }
 
   void set(String key, dynamic value) {
@@ -147,6 +151,23 @@ class UserSetting {
         bookmarkedTags = value;
         prefs.setStringList('bookmarkedTags', bookmarkedTags);
         break;
+      case 'blockedComments':
+        blockedComments = value;
+        prefs.setStringList('blockedComments', blockedComments);
+        break;
+    }
+  }
+
+  ThemeMode get themeMode {
+    switch (darkMode) {
+      case 'system':
+        return ThemeMode.system;
+      case 'light':
+        return ThemeMode.light;
+      case 'dark':
+        return ThemeMode.dark;
+      default:
+        return ThemeMode.system;
     }
   }
 
@@ -211,7 +232,14 @@ class UserSetting {
     }
     set('blockedUsers', blockedUsers);
   }
-
+  void addBlockedComments(List<String> comments) {
+    for (var comment in comments) {
+      if (!blockedComments.contains(comment)) {
+        blockedComments.add(comment);
+      }
+    }
+    set('blockedComments', blockedComments);
+  }
   void addBlockedIllusts(List<String> illusts) {
     for (var illust in illusts) {
       if (!blockedIllusts.contains(illust)) {
@@ -236,6 +264,10 @@ class UserSetting {
     set('blockedIllusts', blockedIllusts);
   }
 
+  void clearBlockedComments() {
+    blockedComments.clear();
+    set('blockedComments', blockedComments);
+  }
   void clearBookmarkedTags() {
     bookmarkedTags.clear();
     set('bookmarkedTags', bookmarkedTags);
@@ -260,6 +292,13 @@ class UserSetting {
       blockedUsers.remove(user);
     }
     set('blockedUsers', blockedUsers);
+  }
+
+  void removeBlockedComments(List<String> comments) {
+    for (var comment in comments) {
+      blockedComments.remove(comment);
+    }
+    set('blockedComments', blockedComments);
   }
 
   void removeBlockedIllusts(List<String> illusts) {

@@ -1,6 +1,7 @@
 import 'package:flutter/services.dart';
 import 'package:skana_pix/pixiv_dart_api.dart';
 
+import '../componentwidgets/spotlightpage.dart';
 import 'defaults.dart';
 import 'package:persistent_bottom_nav_bar/persistent_bottom_nav_bar.dart';
 
@@ -34,7 +35,7 @@ class _HomePageState extends State<HomePage> {
   final NavBarStyle _navBarStyle = NavBarStyle.style6;
 
   List<Widget> _buildScreens() {
-    return [MainScreen(), SettingScreen(), SettingScreen()];
+    return [MainScreen(), SpotlightPage(), SettingScreen()];
   }
 
   void jumpTab() {

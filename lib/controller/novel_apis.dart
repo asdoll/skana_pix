@@ -135,11 +135,14 @@ extension NovelExt on ApiClient {
         subData: res.data["next_url"]);
   }
 
-  Future<Res<bool>> commentNovel(String id, String content) async {
-    var res = await apiPost("/v1/novel/comment/add", data: {
-      "novel_id": id,
-      "content": content,
-    });
+  Future<Res<bool>> commentNovel(String id, String comment,{String? parentId}) async {
+    Map<String, String> data;
+    if(parentId != null&& parentId.isNotEmpty) {
+        data = {"novel_id": id, "comment": comment,"parent_comment_id": parentId};
+    } else {
+        data = {"novel_id": id, "comment": comment};
+    }
+    var res = await apiPost("/v1/novel/comment/add", data: data);
     if (res.error) {
       return Res.fromErrorRes(res);
     }
