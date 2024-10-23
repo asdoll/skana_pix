@@ -195,6 +195,7 @@ class _CommentPageState extends State<CommentPage> {
               Expanded(
                 child: EasyRefresh(
                   controller: easyRefreshController,
+                  header: DefaultHeaderFooter.header(context),
                   onRefresh: () => reset(),
                   onLoad: () => nextPage(),
                   child: (comments.isEmpty)
@@ -555,7 +556,7 @@ class _CommentPageState extends State<CommentPage> {
     return res;
   }
 
-  void nextPage() {
+  nextPage() {
     if (isLoading) return;
     isLoading = true;
     loadData().then((value) {
@@ -564,36 +565,41 @@ class _CommentPageState extends State<CommentPage> {
         setState(() {
           comments.addAll(value.data);
         });
+        easyRefreshController.finishLoad();
+        return true;
       } else {
         var message = value.errorMessage ??
             "Network Error. Please refresh to try again.".i18n;
-        if (message == "No more data") {
-          return;
-        }
+        if (message == "No more data") {}
         if (message.length > 45) {
           message = "${message.substring(0, 20)}...";
         }
         errorMessage = message;
         BotToast.showText(text: message);
+        easyRefreshController.finishLoad(IndicatorResult.fail);
+        return false;
       }
     });
   }
 
-  void reset() {
+  reset() {
     setState(() {
       nextUrl = null;
       isLoading = false;
       comments = [];
     });
     firstLoad();
+    return true;
   }
 
-  void firstLoad() {
+  firstLoad() {
     loadData().then((value) {
       if (value.success) {
         setState(() {
           comments = value.data;
         });
+        easyRefreshController.finishRefresh();
+        return true;
       } else {
         setState(() {
           if (value.errorMessage != null &&
@@ -603,8 +609,11 @@ class _CommentPageState extends State<CommentPage> {
                 text: "Network Error. Please refresh to try again.".i18n);
           }
         });
+        easyRefreshController.finishRefresh(IndicatorResult.fail);
+        return false;
       }
     });
+    return false;
   }
 
   bool supportTranslate = false;
