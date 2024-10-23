@@ -2,63 +2,71 @@ import 'package:bot_toast/bot_toast.dart';
 import 'package:easy_refresh/easy_refresh.dart';
 import 'package:flutter/material.dart';
 import 'package:skana_pix/pixiv_dart_api.dart';
-import 'package:skana_pix/utils/translate.dart';
+import 'package:mobx/mobx.dart';
 import 'package:skana_pix/view/defaults.dart';
 import 'package:waterfall_flow/waterfall_flow.dart';
+
+import 'package:flutter_mobx/flutter_mobx.dart';
 
 import 'headerfooter.dart';
 import 'spotlightcard.dart';
 
-class SpotlightPage extends StatelessWidget {
+class SpotlightPage extends StatefulWidget {
   const SpotlightPage({super.key});
 
+  @override
+  _SpotlightPageState createState() => _SpotlightPageState();
+}
+
+class _SpotlightPageState extends State<SpotlightPage> {
   @override
   Widget build(BuildContext context) {
     final ScrollController controller = ScrollController();
     final EasyRefreshController refreshController = EasyRefreshController(
         controlFinishLoad: true, controlFinishRefresh: true);
     SpotlightStoreBase spotlightStore = SpotlightStoreBase(refreshController);
-    return Scaffold(
-      appBar: AppBar(
-        centerTitle: true,
-        title: 
-        DynamicData.isDarkMode
-            ? Image.asset(
-                'assets/images/pixivision-white-logo.png',
-                fit: BoxFit.fitHeight,
-                height: 40,
-              )
-            : Image.asset(
-                'assets/images/pixivision-black-logo.png',
-                fit: BoxFit.fitHeight,
-                height: 40,
-              ),
-        actions: <Widget>[
-          IconButton(
-            icon: Icon(Icons.arrow_upward),
-            onPressed: () {
-              controller.animateTo(0,
-                  duration: Duration(seconds: 1), curve: Curves.ease);
-            },
-          )
-        ],
-      ),
-      body: EasyRefresh(
-        onLoad: () => spotlightStore.next(),
-        onRefresh: () => spotlightStore.fetch(),
-        header: DefaultHeaderFooter.header(context),
-        refreshOnStart: true,
-        controller: refreshController,
-        child: WaterfallFlow.builder(
-          gridDelegate: _buildGridDelegate(context),
-          controller: controller,
-          itemBuilder: (BuildContext context, int index) {
-            return SpotlightCard(spotlight: spotlightStore.articles[index]);
-          },
-          itemCount: spotlightStore.articles.length,
+    return Observer(builder: (_) {
+      return Scaffold(
+        appBar: AppBar(
+          centerTitle: true,
+          title: DynamicData.isDarkMode
+              ? Image.asset(
+                  'assets/images/pixivision-white-logo.png',
+                  fit: BoxFit.fitHeight,
+                  height: 40,
+                )
+              : Image.asset(
+                  'assets/images/pixivision-black-logo.png',
+                  fit: BoxFit.fitHeight,
+                  height: 40,
+                ),
+          actions: <Widget>[
+            IconButton(
+              icon: Icon(Icons.arrow_upward),
+              onPressed: () {
+                controller.animateTo(0,
+                    duration: Duration(seconds: 1), curve: Curves.ease);
+              },
+            )
+          ],
         ),
-      ),
-    );
+        body: EasyRefresh(
+          onLoad: () => spotlightStore.next(),
+          onRefresh: () => spotlightStore.fetch(),
+          header: DefaultHeaderFooter.header(context),
+          refreshOnStart: true,
+          controller: refreshController,
+          child: WaterfallFlow.builder(
+            gridDelegate: _buildGridDelegate(context),
+            controller: controller,
+            itemBuilder: (BuildContext context, int index) {
+              return SpotlightCard(spotlight: spotlightStore.articles[index]);
+            },
+            itemCount: spotlightStore.articles.length,
+          ),
+        ),
+      );
+    });
   }
 
   SliverWaterfallFlowDelegate _buildGridDelegate(BuildContext context) {
@@ -91,7 +99,7 @@ class SpotlightPage extends StatelessWidget {
 }
 
 class SpotlightStoreBase {
-  List<SpotlightArticle> articles = [];
+  ObservableList<SpotlightArticle> articles = ObservableList();
   String? nextUrl;
   final EasyRefreshController? _controller;
 
@@ -112,7 +120,6 @@ class SpotlightStoreBase {
       articles.clear();
       articles.addAll(response.spotlightArticles);
       nextUrl = response.nextUrl;
-      BotToast.showText(text: articles.first.title);
       _controller?.finishRefresh(IndicatorResult.success);
       return true;
     } catch (e) {

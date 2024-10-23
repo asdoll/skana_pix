@@ -358,6 +358,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "4.0.0"
+  flutter_mobx:
+    dependency: "direct main"
+    description:
+      name: flutter_mobx
+      sha256: "859fbf452fa9c2519d2700b125dd7fb14c508bbdd7fb65e26ca8ff6c92280e2e"
+      url: "https://pub.dev"
+    source: hosted
+    version: "2.2.1+1"
   flutter_staggered_grid_view:
     dependency: "direct main"
     description:
@@ -616,6 +624,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.0.0"
+  mobx:
+    dependency: "direct main"
+    description:
+      name: mobx
+      sha256: "63920b27b32ad1910adfe767ab1750e4c212e8923232a1f891597b362074ea5e"
+      url: "https://pub.dev"
+    source: hosted
+    version: "2.3.3+2"
   nested:
     dependency: transitive
     description:

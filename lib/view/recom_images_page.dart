@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:bot_toast/bot_toast.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:skana_pix/pixiv_dart_api.dart';
@@ -8,6 +9,7 @@ import 'package:skana_pix/view/defaults.dart';
 
 import '../componentwidgets/imagetab.dart';
 import '../componentwidgets/loading.dart';
+import '../componentwidgets/spotlightcard.dart';
 import '../utils/filters.dart';
 
 class RecomImagesPage extends StatefulWidget {
@@ -20,6 +22,14 @@ class RecomImagesPage extends StatefulWidget {
 
 class _RecomImagesPageState
     extends MultiPageLoadingState<RecomImagesPage, Illust> {
+  List<SpotlightArticle> spotlights = [];
+
+  @override
+  void initState() {
+    super.initState();
+    parseSpotlightArticles();
+  }
+
   @override
   Widget buildContent(BuildContext context, final List<Illust> data) {
     checkIllusts(data);
@@ -45,8 +55,43 @@ class _RecomImagesPageState
         }));
   }
 
+  Widget buildSpotlight(BuildContext context) {
+    return Container(
+      height: 230,
+      child: ListView.builder(
+        scrollDirection: Axis.horizontal,
+        itemCount: spotlights.length,
+        itemBuilder: (context, index) {
+          return SpotlightCard(spotlight: spotlights[index]);
+        },
+      ),
+    );
+  }
+
   Future<void> _onRefresh() async {
     reset();
+  }
+
+  @override
+  void reset() {
+    super.reset();
+    parseSpotlightArticles();
+  }
+
+  void parseSpotlightArticles() {
+    loadSpotlightArticles().then((value) {
+      if (value.nextUrl != null && value.nextUrl == "error") {
+        BotToast.showText(text: "Failed to load spotlight articles");
+        return;
+      }
+      setState(() {
+        spotlights = value.spotlightArticles;
+      });
+    });
+  }
+
+  Future<SpotlightResponse> loadSpotlightArticles() {
+    return getSpotlightArticles("all");
   }
 
   @override

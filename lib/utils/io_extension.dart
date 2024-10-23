@@ -135,7 +135,7 @@ String getExtensionName(String url) {
 }
 
 void saveUrl(String url, {BuildContext? context}) async {
-  BotToast.showText( text: "Saved".i18n);
+  BotToast.showText(text: "Saved".i18n);
   if (DynamicData.isIOS && (await Permission.photosAddOnly.status.isDenied)) {
     if (await Permission.storage.request().isDenied && context != null) {
       BotToast.showText(text: "Permission denied".i18n);
@@ -153,7 +153,7 @@ void saveUrl(String url, {BuildContext? context}) async {
     }
     await ImageGallerySaverPlus.saveImage(await file.readAsBytes(),
         quality: 100, name: fileName);
-      BotToast.showText(text: "Saved".i18n);
+    BotToast.showText(text: "Saved".i18n);
   }
 }
 
@@ -201,4 +201,14 @@ void saveImage(Illust illust,
       BotToast.showText(text: "${illust.title} ${"Saved".i18n}");
     }
   }
+}
+
+String trimSize(String? s, [int length = 20]) {
+  if (s == null) {
+    return "";
+  }
+  if (s.length > length) {
+    return "${s.substring(0, length)}...";
+  }
+  return s;
 }

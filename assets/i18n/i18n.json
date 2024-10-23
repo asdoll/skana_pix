@@ -209,7 +209,8 @@
         "Commented": "已评论",
         "Loading": "加载中",
         "Failed": "加载失败",
-        "Successed": "加载成功"
+        "Successed": "加载成功",
+        "Failed to load Pixivision articles": "加载Pixivision文章失败"
     },
     "zh_TW": {
         "Search": "搜索",
@@ -421,6 +422,7 @@
         "Commented": "已評論",
         "Loading": "加載中",
         "Failed": "加載失敗",
-        "Successed": "加載成功"
+        "Successed": "加載成功",
+        "Failed to load Pixivision articles": "加載Pixivision文章失敗"
     }
 }

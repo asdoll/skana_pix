@@ -1,5 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:persistent_bottom_nav_bar/persistent_bottom_nav_bar.dart';
 import 'package:skana_pix/controller/caches.dart';
 import 'package:skana_pix/pixiv_dart_api.dart';
 
@@ -10,15 +11,15 @@ class SpotlightCard extends StatelessWidget {
 
   const SpotlightCard({Key? key, required this.spotlight}) : super(key: key);
 
-   Widget build(BuildContext context) {
+  Widget build(BuildContext context) {
     return Padding(
       padding: EdgeInsets.all(4.0),
       child: GestureDetector(
         onTap: () async {
-          Navigator.of(context)
-              .push(MaterialPageRoute(builder: (BuildContext context) {
-            return SoupPage(url: spotlight.articleUrl, spotlight: spotlight);
-          }));
+          PersistentNavBarNavigator.pushNewScreen(context,
+              screen: Material(
+                  child: SoupPage(
+                      url: spotlight.articleUrl, spotlight: spotlight)));
         },
         child: Container(
           height: 230,

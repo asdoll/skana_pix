@@ -3,9 +3,14 @@ import 'dart:io';
 import 'package:bot_toast/bot_toast.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:html/parser.dart';
+import 'package:icon_decoration/icon_decoration.dart';
+import 'package:mobx/mobx.dart';
 import 'package:skana_pix/componentwidgets/nullhero.dart';
 import 'package:skana_pix/pixiv_dart_api.dart';
+import 'package:skana_pix/utils/widgetplugin.dart';
+import 'package:skana_pix/view/defaults.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 
 import 'avatar.dart';
@@ -26,11 +31,10 @@ class SoupPage extends StatefulWidget {
 }
 
 class _SoupPageState extends State<SoupPage> {
-  late SoupFetcher _soupStore;
+  final SoupFetcher _soupStore = SoupFetcher();
 
   @override
   void initState() {
-    _soupStore = SoupFetcher();
     _soupStore.fetch(widget.url);
     super.initState();
   }
@@ -38,40 +42,72 @@ class _SoupPageState extends State<SoupPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: NestedScrollView(
-          body: buildBlocProvider(),
-          headerSliverBuilder: (BuildContext context, bool innerBoxIsScrolled) {
-            return [
-              if (widget.spotlight != null)
-                SliverAppBar(
-                  pinned: true,
-                  expandedHeight: 200.0,
-                  flexibleSpace: FlexibleSpaceBar(
-                    centerTitle: true,
-                    title: Text(widget.spotlight!.pureTitle),
-                    background: NullHero(
-                      tag: widget.heroTag,
-                      child: PixivImage(
-                        widget.spotlight!.thumbnail,
-                        fit: BoxFit.cover,
-                        height: 200,
+      body: Observer(builder: (context) {
+        return NestedScrollView(
+            body: buildBlocProvider(),
+            headerSliverBuilder:
+                (BuildContext context, bool innerBoxIsScrolled) {
+              return [
+                if (widget.spotlight != null)
+                  SliverAppBar(
+                    leading: const DecoratedIcon(
+                      icon: Icon(Icons.arrow_back),
+                      decoration:
+                          IconDecoration(border: IconBorder(width: 1.5)),
+                    ),
+                    pinned: true,
+                    expandedHeight: 200.0,
+                    flexibleSpace: FlexibleSpaceBar(
+                      centerTitle: true,
+                      title: Stack(
+                        children: <Widget>[
+                          // Stroked text as border.
+                          Text(
+                            widget.spotlight!.pureTitle,
+                            style: TextStyle(
+                              foreground: Paint()
+                                ..style = PaintingStyle.stroke
+                                ..strokeWidth = 0.5
+                                ..color = Theme.of(context).colorScheme.surface,
+                            ),
+                          ),
+                          // Solid text as fill.
+                          Text(
+                            widget.spotlight!.pureTitle,
+                            style: TextStyle(
+                              color: Theme.of(context).colorScheme.onSurface,
+                            ),
+                          ),
+                        ],
+                      ),
+                      background: NullHero(
+                        tag: widget.heroTag,
+                        child: PixivImage(
+                          widget.spotlight!.thumbnail,
+                          fit: BoxFit.cover,
+                          height: 200,
+                        ),
                       ),
                     ),
-                  ),
-                  actions: <Widget>[
-                    IconButton(
-                      icon: Icon(Icons.share),
-                      onPressed: () async {
-                        var url = widget.spotlight!.articleUrl;
-                        await launchUrlString(url);
-                      },
-                    )
-                  ],
-                )
-              else
-                SliverAppBar()
-            ];
-          }),
+                    actions: <Widget>[
+                      IconButton(
+                        icon: const DecoratedIcon(
+                          icon: Icon(Icons.share),
+                          decoration:
+                              IconDecoration(border: IconBorder(width: 1.5)),
+                        ),
+                        onPressed: () async {
+                          var url = widget.spotlight!.articleUrl;
+                          await launchUrlString(url);
+                        },
+                      )
+                    ],
+                  )
+                else
+                  SliverAppBar()
+              ];
+            });
+      }),
     );
   }
 
@@ -81,10 +117,7 @@ class _SoupPageState extends State<SoupPage> {
       itemBuilder: (BuildContext context, int index) {
         return Builder(builder: (context) {
           if (index == 0) {
-            if (_soupStore.description.isEmpty)
-              return Container(
-                height: 1,
-              );
+            if (_soupStore.description.isEmpty) return Container(height: 1);
             return Card(
               child: Padding(
                 padding: const EdgeInsets.all(8.0),
@@ -106,15 +139,28 @@ class _SoupPageState extends State<SoupPage> {
               clipBehavior: Clip.antiAlias,
               child: Column(
                 children: <Widget>[
-                  ListTile(
-                    leading: PainterAvatar(
-                      url: amWork.userImage!,
-                      id: int.parse(Uri.parse(amWork.userLink!).pathSegments[
-                          Uri.parse(amWork.userLink!).pathSegments.length - 1]),
-                    ),
-                    title: Text(amWork.title!),
-                    subtitle: Text(amWork.user!),
-                  ),
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      SizedBox(width: 20),
+                      PainterAvatar(
+                        url: amWork.userImage!,
+                        id: int.parse(Uri.parse(amWork.userLink!).pathSegments[
+                            Uri.parse(amWork.userLink!).pathSegments.length -
+                                1]),
+                        size: Size(60, 60),
+                      ),
+                      SizedBox(width: 15),
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(trimSize(amWork.title!)),
+                          SizedBox(height: 4),
+                          Text(amWork.user!),
+                        ],
+                      ),
+                    ],
+                  ).paddingVertical(8),
                   PixivImage(amWork.showImage!),
                 ],
               ),
@@ -128,7 +174,7 @@ class _SoupPageState extends State<SoupPage> {
 }
 
 class SoupFetcher {
-  List<AmWork> amWorks = [];
+  ObservableList<AmWork> amWorks = ObservableList();
   final dio = Dio(BaseOptions(headers: {
     HttpHeaders.acceptLanguageHeader: settings.locale.contains('zh')
         ? (settings.locale == "zh_TW" ? 'zh-TW,zh;q=0.9' : 'zh-CN,zh;q=0.9')
@@ -179,7 +225,6 @@ class SoupFetcher {
           .first;
       description = workInfo.toTargetString();
     }
-
     for (var value in nodes) {
       try {
         if (!value.attributes['class']!.contains('illust')) {
