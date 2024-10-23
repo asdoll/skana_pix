@@ -4,7 +4,6 @@ import 'dart:math';
 import 'package:dio/dio.dart';
 import 'package:intl/intl.dart';
 import 'package:crypto/crypto.dart';
-import 'package:skana_pix/model/spotlight.dart';
 import '../controller/exceptions.dart';
 import '../controller/logging.dart';
 import '../model/user.dart';
