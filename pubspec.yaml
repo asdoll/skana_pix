@@ -95,6 +95,7 @@ flutter:
     - assets/
     - assets/i18n/
     - assets/emojis/
+    - assets/icon/
     - assets/images/
 
 
