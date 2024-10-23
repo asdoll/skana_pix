@@ -66,6 +66,7 @@ dependencies:
   html: ^0.15.4
   mobx: ^2.3.3+2
   flutter_mobx: ^2.2.1+1
+  flutter_launcher_icons: ^0.14.1
 
 
 dev_dependencies:
