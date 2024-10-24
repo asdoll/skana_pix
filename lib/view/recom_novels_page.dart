@@ -3,7 +3,8 @@ import 'package:easy_refresh/easy_refresh.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:mobx/mobx.dart';
-import 'package:skana_pix/componentwidgets/souppage.dart';
+import 'package:skana_pix/componentwidgets/avatar.dart';
+import 'package:skana_pix/componentwidgets/novelcard.dart';
 import 'package:skana_pix/pixiv_dart_api.dart';
 import 'package:skana_pix/utils/translate.dart';
 import 'package:skana_pix/utils/widgetplugin.dart';
@@ -88,7 +89,7 @@ class _RecomNovelsPageState
                 ],
               ),
             ),
-            _buildSliverList(context,data),
+            _buildSliverList(context, data),
           ],
         ),
       ),
@@ -100,137 +101,10 @@ class _RecomNovelsPageState
     return SliverList(
         delegate: SliverChildBuilderDelegate((BuildContext context, int index) {
       Novel novel = novels[index];
-      return _buildItem(context, novel, index);
+      return NovelCard(novel);
     }, childCount: novels.length));
   }
 
-  Widget _buildItem(BuildContext context, Novel novel, int index) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 4.0),
-      child: InkWell(
-        onTap: () {
-          Navigator.of(context, rootNavigator: true).push(MaterialPageRoute(
-              builder: (BuildContext context) => NovelViewerPage(novels[index])));
-        },
-        child: Card(
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Expanded(
-                flex: 5,
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 8.0),
-                      child: PixivImage(
-                        novel.coverImageUrl,
-                        width: 80,
-                        height: 120,
-                        fit: BoxFit.cover,
-                      ).rounded(8.0),
-                    ),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Padding(
-                            padding: const EdgeInsets.only(top: 8.0, left: 8.0),
-                            child: Text(
-                              novel.title,
-                              overflow: TextOverflow.ellipsis,
-                              style: Theme.of(context).textTheme.bodyLarge,
-                              maxLines: 3,
-                            ),
-                          ),
-                          Padding(
-                            padding:
-                                const EdgeInsets.symmetric(horizontal: 8.0),
-                            child: Row(
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              children: [
-                                Text(
-                                  novel.author.name,
-                                  maxLines: 1,
-                                  style: Theme.of(context)
-                                      .textTheme
-                                      .bodySmall!
-                                      .copyWith(
-                                          color: Theme.of(context)
-                                              .colorScheme
-                                              .secondary),
-                                ),
-                                Padding(
-                                  padding: EdgeInsets.only(left: 8),
-                                  child: Row(
-                                    children: [
-                                      Icon(
-                                        Icons.article,
-                                        size: 12,
-                                        color: Theme.of(context)
-                                            .textTheme
-                                            .labelSmall!
-                                            .color,
-                                      ),
-                                      SizedBox(
-                                        width: 2,
-                                      ),
-                                      Text(
-                                        '${novel.length}',
-                                        style: Theme.of(context)
-                                            .textTheme
-                                            .labelSmall,
-                                      )
-                                    ],
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                          Padding(
-                            padding:
-                                const EdgeInsets.symmetric(horizontal: 8.0),
-                            child: Wrap(
-                              crossAxisAlignment: WrapCrossAlignment.center,
-                              spacing: 2, // gap between adjacent chips
-                              runSpacing: 0,
-                              children: [
-                                for (var f in novel.tags)
-                                  Text(
-                                    f.name,
-                                    style:
-                                        Theme.of(context).textTheme.bodySmall,
-                                  )
-                              ],
-                            ),
-                          ),
-                          Container(
-                            height: 8.0,
-                          )
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              Expanded(
-                flex: 1,
-                child: Column(
-                  mainAxisSize: MainAxisSize.max,
-                  children: [
-                    NovelBookmarkButton(novel: novel),
-                    Text('${novel.totalBookmarks}',
-                        style: Theme.of(context).textTheme.bodySmall)
-                  ],
-                ),
-              )
-            ],
-          ),
-        ),
-      ),
-    );
-  }
   Widget _buildFirstRow(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.only(top: 0.0),
@@ -271,7 +145,7 @@ class _RecomNovelsPageState
   }
 
   Widget _buidRankingRow(BuildContext context) {
-    var expectCardWidget = MediaQuery.of(context).size.width * 0.4;
+    var expectCardWidget = MediaQuery.of(context).size.width * 0.6;
     expectCardWidget = expectCardWidget > 244 ? 244 : expectCardWidget;
     final expectCardHeight = expectCardWidget + 40;
     return Container(
@@ -283,13 +157,183 @@ class _RecomNovelsPageState
                 return SizedBox(
                   width: expectCardWidget,
                   height: expectCardHeight,
-                  child: Container(),
+                  child: _buildRankingCard(
+                      context, tops[index], expectCardWidget, expectCardHeight),
                 );
               },
               itemCount: tops.length,
               scrollDirection: Axis.horizontal,
             )
           : Container(),
+    );
+  }
+
+  Widget _buildRankingCard(BuildContext context, Novel novel,
+      double expectwidth, double expectHeight) {
+    List<Tag> tags = novel.tags;
+    if (tags.length > 5) {
+      tags = tags.sublist(0, 5);
+    }
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 4.0),
+      child: Card(
+        clipBehavior: Clip.antiAlias,
+        margin: EdgeInsets.symmetric(horizontal: 8.0),
+        shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.all(Radius.circular(8.0))),
+        child: Hero(
+          tag: "novel_cover_image_${novel.image.hashCode}",
+          child: Material(
+              color: Colors.transparent,
+              child: InkWell(
+                  onTap: () {
+                    Navigator.of(context).push(
+                        MaterialPageRoute(builder: (BuildContext context) {
+                      return NovelViewerPage(novel);
+                    }));
+                  },
+                  child: Container(
+                    width: expectwidth,
+                    height: expectHeight,
+                    decoration: BoxDecoration(
+                      image: DecorationImage(
+                          colorFilter: ColorFilter.mode(
+                              Colors.black.withOpacity(0.3),
+                              BlendMode.colorBurn),
+                          fit: BoxFit.cover,
+                          image: PixivProvider.url(novel.coverImageUrl)),
+                    ),
+                    child: Container(
+                      child: Column(
+                        mainAxisSize: MainAxisSize.max,
+                        children: [
+                          const SizedBox(
+                            height: 4,
+                          ),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.end,
+                            children: [
+                              Wrap(
+                                crossAxisAlignment: WrapCrossAlignment.center,
+                                children: [
+                                  Icon(
+                                    Icons.remove_red_eye_outlined,
+                                    color: Colors.white,
+                                    size: 16,
+                                  ),
+                                  Text(
+                                    "${novel.totalViews} ",
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              SizedBox(
+                                width: 8,
+                              ),
+                              Icon(
+                                Icons.sticky_note_2_outlined,
+                                color: Colors.white,
+                                size: 16,
+                              ),
+                              Text(
+                                "${novel.length} ",
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                              const SizedBox(
+                                width: 4,
+                              ),
+                            ],
+                          ),
+                          Expanded(
+                            child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                children: [
+                                  Text(
+                                    "${novel.title}",
+                                    maxLines: 2,
+                                    textAlign: TextAlign.center,
+                                    overflow: TextOverflow.ellipsis,
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ).paddingHorizontal(8),
+                                  SizedBox(
+                                    height: 10,
+                                  ),
+                                  Wrap(
+                                    crossAxisAlignment:
+                                        WrapCrossAlignment.center,
+                                    alignment: WrapAlignment.center,
+                                    spacing: 2, // gap between adjacent chips
+                                    runSpacing: 0,
+                                    children: [
+                                      for (var f in tags)
+                                        Text(
+                                          "#${f.name} ",
+                                          textAlign: TextAlign.center,
+                                          style: TextStyle(
+                                            overflow: TextOverflow.ellipsis,
+                                            color: Colors.white,
+                                            fontSize: 12,
+                                            fontWeight: FontWeight.normal,
+                                          ),
+                                        ),
+                                      if (tags.length != novel.tags.length)
+                                        Text(
+                                          "...",
+                                          textAlign: TextAlign.center,
+                                          style: TextStyle(
+                                            color: Colors.white,
+                                            fontSize: 12,
+                                            fontWeight: FontWeight.w500,
+                                          ),
+                                        )
+                                    ],
+                                  ).paddingHorizontal(8),
+                                ]),
+                          ),
+                          Container(
+                            padding: const EdgeInsets.only(
+                                left: 8.0, right: 4.0, bottom: 4.0),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              children: [
+                                PainterAvatar(
+                                  url: novel.author.avatar,
+                                  id: novel.author.id,
+                                  size: Size(20, 20),
+                                ),
+                                Padding(
+                                  padding: const EdgeInsets.only(left: 6.0),
+                                  child: Text(
+                                    novel.author.name.atMost8,
+                                    style: const TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ))),
+        ),
+      ),
     );
   }
 
@@ -308,11 +352,11 @@ class _RecomNovelsPageState
   }
 
   @override
-  void reset(){
+  void reset() {
     tops.clear();
     novels.clear();
     super.reset();
-    if(parseTops()&& errors == null){
+    if (parseTops() && errors == null) {
       _easyRefreshController.finishRefresh();
     } else {
       _easyRefreshController.finishRefresh(IndicatorResult.fail);

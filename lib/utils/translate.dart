@@ -27,6 +27,13 @@ extension Translation on String {
               ?[this] ?? this;
 
   }
+
+  String get atMost8 {
+    if (length > 8) {
+      return "${substring(0, 8)}...";
+    }
+    return this;
+  }
 }
 
 String get copyInfoText => "${"Illust ID:".i18n} {illust_id}\n${"Title:".i18n} {title}\n${"User ID:".i18n} {user_id}\n${"User Name:".i18n} {user_name}\n${"Tags:".i18n} {tags}";
