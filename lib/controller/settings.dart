@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
@@ -17,6 +18,8 @@ class UserSetting {
   late SharedPreferences prefs;
   List<String> blockedTags = [];
   List<String> blockedUsers = [];
+  List<String> blockedCommentUsers = [];
+  List<String> blockedNovelUsers = [];
   bool hideR18 = false;
   bool feedAIBadge = true;
   bool longPressSaveConfirm = true;
@@ -25,6 +28,8 @@ class UserSetting {
   int saveChoice = 0;//0:all 1:ToDir 2:ToGallery
   List<String> bookmarkedTags = [];
   List<String> blockedComments = [];
+  List<String> blockedNovels = [];
+  List<String> blockedNovelTags = [];
 
   Future<void> saveDefaults() async {
     await prefs.setString('darkMode', darkMode);
@@ -38,6 +43,8 @@ class UserSetting {
     await prefs.setString('proxy', proxy);
     await prefs.setStringList('blockedTags', blockedTags);
     await prefs.setStringList('blockedUsers', blockedUsers);
+    await prefs.setStringList('blockedCommentUsers', blockedCommentUsers);
+    await prefs.setStringList('blockedNovelUsers', blockedNovelUsers);
     await prefs.setBool('hideR18', hideR18);
     await prefs.setBool('feedAIBadge', feedAIBadge);
     await prefs.setBool('longPressSaveConfirm', longPressSaveConfirm);
@@ -46,6 +53,8 @@ class UserSetting {
     await prefs.setInt('saveChoice', saveChoice);
     await prefs.setStringList('bookmarkedTags', bookmarkedTags);
     await prefs.setStringList('blockedComments', blockedComments);
+    await prefs.setStringList('blockedNovels', blockedNovels);
+    await prefs.setStringList('blockedNovelTags', blockedNovelTags);
   }
 
   Future<void> init() async {
@@ -67,6 +76,8 @@ class UserSetting {
     proxy = prefs.getString('proxy') ?? '';
     blockedTags = prefs.getStringList('blockedTags') ?? [];
     blockedUsers = prefs.getStringList('blockedUsers') ?? [];
+    blockedCommentUsers = prefs.getStringList('blockedCommentUsers') ?? [];
+    blockedNovelUsers = prefs.getStringList('blockedNovelUsers') ?? [];
     hideR18 = prefs.getBool('hideR18') ?? false;
     feedAIBadge = prefs.getBool('feedAIBadge') ?? true;
     longPressSaveConfirm = prefs.getBool('longPressSaveConfirm') ?? true;
@@ -75,6 +86,8 @@ class UserSetting {
     saveChoice = prefs.getInt('saveChoice') ?? 0;
     bookmarkedTags = prefs.getStringList('bookmarkedTags') ?? [];
     blockedComments = prefs.getStringList('blockedComments') ?? [];
+    blockedNovels = prefs.getStringList('blockedNovels') ?? [];
+    blockedNovelTags = prefs.getStringList('blockedNovelTags') ?? [];
   }
 
   void set(String key, dynamic value) {
@@ -123,6 +136,14 @@ class UserSetting {
         blockedUsers = value;
         prefs.setStringList('blockedUsers', blockedUsers);
         break;
+      case 'blockedCommentUsers':
+        blockedCommentUsers = value;
+        prefs.setStringList('blockedCommentUsers', blockedCommentUsers);
+        break;
+      case 'blockedNovelUsers':
+        blockedNovelUsers = value;
+        prefs.setStringList('blockedNovelUsers', blockedNovelUsers);
+        break;
       case 'hideR18':
         hideR18 = value;
         prefs.setBool('hideR18', hideR18);
@@ -155,7 +176,47 @@ class UserSetting {
         blockedComments = value;
         prefs.setStringList('blockedComments', blockedComments);
         break;
+      case 'blockedNovels':
+        blockedNovels = value;
+        prefs.setStringList('blockedNovels', blockedNovels);
+        break;
+      case 'blockedNovelTags':
+        blockedNovelTags = value;
+        prefs.setStringList('blockedNovelTags', blockedNovelTags);
+        break;
     }
+  }
+
+  String toJson(){
+    return json.encode(getMap());
+  }
+
+  Map<String,dynamic> getMap() {
+    return {
+      'darkMode': darkMode,
+      'language': language,
+      'maxParallelDownload': maxParallelDownload,
+      'downloadPath': downloadPath,
+      'downloadSubPath': downloadSubPath,
+      'showOriginal': showOriginal,
+      'showOriginalOnWifi': showOriginalOnWifi,
+      'checkUpdate': checkUpdate,
+      'proxy': proxy,
+      'blockedTags': blockedTags,
+      'blockedUsers': blockedUsers,
+      'blockedCommentUsers': blockedCommentUsers,
+      'blockedNovelUsers': blockedNovelUsers,
+      'hideR18': hideR18,
+      'feedAIBadge': feedAIBadge,
+      'longPressSaveConfirm': longPressSaveConfirm,
+      'firstLongPressSave': firstLongPressSave,
+      'blockedIllusts': blockedIllusts,
+      'saveChoice': saveChoice,
+      'bookmarkedTags': bookmarkedTags,
+      'blockedComments': blockedComments,
+      'blockedNovels': blockedNovels,
+      'blockedNovelTags': blockedNovelTags,
+    };
   }
 
   ThemeMode get themeMode {
@@ -232,6 +293,22 @@ class UserSetting {
     }
     set('blockedUsers', blockedUsers);
   }
+  void addBlockedCommentUsers(List<String> users) {
+    for (var user in users) {
+      if (!blockedCommentUsers.contains(user)) {
+        blockedCommentUsers.add(user);
+      }
+    }
+    set('blockedCommentUsers', blockedCommentUsers);
+  }
+  void addBlockedNovelUsers(List<String> users) {
+    for (var user in users) {
+      if (!blockedNovelUsers.contains(user)) {
+        blockedNovelUsers.add(user);
+      }
+    }
+    set('blockedNovelUsers', blockedNovelUsers);
+  }
   void addBlockedComments(List<String> comments) {
     for (var comment in comments) {
       if (!blockedComments.contains(comment)) {
@@ -248,6 +325,22 @@ class UserSetting {
     }
     set('blockedIllusts', blockedIllusts);
   }
+  void addBlockedNovels(List<String> novels) {
+    for (var novel in novels) {
+      if (!blockedNovels.contains(novel)) {
+        blockedNovels.add(novel);
+      }
+    }
+    set('blockedNovels', blockedNovels);
+  }
+  void addBlockedNovelTags(List<String> tags) {
+    for (var tag in tags) {
+      if (!blockedNovelTags.contains(tag)) {
+        blockedNovelTags.add(tag);
+      }
+    }
+    set('blockedNovelTags', blockedNovelTags);
+  }
 
   void clearBlockedTags() {
     blockedTags.clear();
@@ -258,7 +351,14 @@ class UserSetting {
     blockedUsers.clear();
     set('blockedUsers', blockedUsers);
   }
-
+  void clearBlockedCommentUsers() {
+    blockedCommentUsers.clear();
+    set('blockedCommentUsers', blockedCommentUsers);
+  }
+  void clearBlockedNovelUsers() {
+    blockedNovelUsers.clear();
+    set('blockedNovelUsers', blockedNovelUsers);
+  }
   void clearBlockedIllusts() {
     blockedIllusts.clear();
     set('blockedIllusts', blockedIllusts);
@@ -272,28 +372,44 @@ class UserSetting {
     bookmarkedTags.clear();
     set('bookmarkedTags', bookmarkedTags);
   }
-
+  void clearBlockedNovels() {
+    blockedNovels.clear();
+    set('blockedNovels', blockedNovels);
+  }
+  void clearBlockedNovelTags() {
+    blockedNovelTags.clear();
+    set('blockedNovelTags', blockedNovelTags);
+  }
   void removeBlockedTags(List<String> tags) {
     for (var tag in tags) {
       blockedTags.remove(tag);
     }
     set('blockedTags', blockedTags);
   }
-
   void removeBookmarkedTags(List<String> tags) {
     for (var tag in tags) {
       bookmarkedTags.remove(tag);
     }
     set('bookmarkedTags', bookmarkedTags);
   }
-
   void removeBlockedUsers(List<String> users) {
     for (var user in users) {
       blockedUsers.remove(user);
     }
     set('blockedUsers', blockedUsers);
   }
-
+  void removeBlockedCommentUsers(List<String> users) {
+    for (var user in users) {
+      blockedCommentUsers.remove(user);
+    }
+    set('blockedCommentUsers', blockedCommentUsers);
+  }
+  void removeBlockedNovelUsers(List<String> users) {
+    for (var user in users) {
+      blockedNovelUsers.remove(user);
+    }
+    set('blockedNovelUsers', blockedNovelUsers);
+  }
   void removeBlockedComments(List<String> comments) {
     for (var comment in comments) {
       blockedComments.remove(comment);
@@ -306,6 +422,20 @@ class UserSetting {
       blockedIllusts.remove(illust);
     }
     set('blockedIllusts', blockedIllusts);
+  }
+
+  void removeBlockedNovels(List<String> novels) {
+    for (var novel in novels) {
+      blockedNovels.remove(novel);
+    }
+    set('blockedNovels', blockedNovels);
+  }
+
+  void removeBlockedNovelTags(List<String> tags) {
+    for (var tag in tags) {
+      blockedNovelTags.remove(tag);
+    }
+    set('blockedNovelTags', blockedNovelTags);
   }
 }
 

@@ -19,9 +19,11 @@ typedef UpdateFavoriteFunc = void Function(bool v);
 
 class IllustCard extends StatefulWidget {
   const IllustCard(this.illusts, this.showMangaBadage,
-      {this.initialPage = 0, this.type = 0, super.key});
+      {this.initialPage = 0, this.type = 0, this.useSquare = false, super.key});
 
   final showMangaBadage;
+
+  final bool useSquare;
 
   final List<Illust> illusts;
 
@@ -152,7 +154,7 @@ class _IllustCardState extends State<IllustCard> {
   }
 
   Widget buildInkWell(BuildContext context) {
-    var tooLong = illust.height.toDouble() / illust.width.toDouble() > 3;
+    var tooLong = (illust.height.toDouble() / illust.width.toDouble() > 3)||widget.useSquare;
     var radio =
         (tooLong) ? 1.0 : illust.width.toDouble() / illust.height.toDouble();
     return Card(

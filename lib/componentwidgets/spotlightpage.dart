@@ -12,7 +12,8 @@ import 'headerfooter.dart';
 import 'spotlightcard.dart';
 
 class SpotlightPage extends StatefulWidget {
-  const SpotlightPage({super.key});
+  final int type;
+  const SpotlightPage(this.type,{super.key});
 
   @override
   _SpotlightPageState createState() => _SpotlightPageState();
@@ -104,7 +105,6 @@ class SpotlightStoreBase {
   final EasyRefreshController? _controller;
 
   SpotlightStoreBase(this._controller);
-
   bool _lock = false;
 
   Future<bool> fetch() async {

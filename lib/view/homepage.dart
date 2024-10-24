@@ -7,8 +7,10 @@ import 'package:persistent_bottom_nav_bar/persistent_bottom_nav_bar.dart';
 
 import 'package:flutter/material.dart';
 
+import 'feedpage.dart';
 import 'loginpage.dart';
 import 'mainscreen.dart';
+import 'searchpage.dart';
 import 'settingscreen.dart';
 
 class HomePage extends StatefulWidget {
@@ -35,7 +37,7 @@ class _HomePageState extends State<HomePage> {
   final NavBarStyle _navBarStyle = NavBarStyle.style6;
 
   List<Widget> _buildScreens() {
-    return [MainScreen(), SpotlightPage(), SettingScreen()];
+    return [MainScreen(), FeedPage(), SearchPage(), SettingScreen()];
   }
 
   void jumpTab() {
@@ -62,13 +64,21 @@ class _HomePageState extends State<HomePage> {
         //title: ("Feed"),
         activeColorPrimary: DynamicData.themeData.primaryColor,
         inactiveColorPrimary: DynamicData.inActiveNavColor,
-        //scrollController: DynamicData.recommendMangaScrollController,
+        scrollController: DynamicData.feedScrollController,
         routeAndNavigatorSettings: RouteAndNavigatorSettings(
           initialRoute: "/",
-          routes: {
-            "/first": (final context) => const MainScreen2(),
-            "/second": (final context) => const MainScreen3(),
-          },
+        ),
+        iconSize: 26.0,
+      ),
+      PersistentBottomNavBarItem(
+        icon: Icon(Icons.search),
+        inactiveIcon: Icon(Icons.search),
+        //title: ("search"),
+        activeColorPrimary: DynamicData.themeData.primaryColor,
+        inactiveColorPrimary: DynamicData.inActiveNavColor,
+        scrollController: DynamicData.searchScrollController,
+        routeAndNavigatorSettings: RouteAndNavigatorSettings(
+          initialRoute: "/",
         ),
         iconSize: 26.0,
       ),
@@ -78,13 +88,9 @@ class _HomePageState extends State<HomePage> {
         //title: ("Users"),
         activeColorPrimary: DynamicData.themeData.primaryColor,
         inactiveColorPrimary: DynamicData.inActiveNavColor,
-        //scrollController: DynamicData.recommendMangaScrollController,
+        scrollController: DynamicData.settingScrollController,
         routeAndNavigatorSettings: RouteAndNavigatorSettings(
           initialRoute: "/",
-          routes: {
-            "/first": (final context) => const MainScreen2(),
-            "/second": (final context) => const MainScreen3(),
-          },
         ),
         iconSize: 26.0,
       ),

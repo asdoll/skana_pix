@@ -132,6 +132,7 @@
         "Related users": "相关用户",
         "Replace with '-p${index}' if the work have more than one images, otherwise replace with blank.": "替换为'-p${index}'如果作品有多张图片, 否则替换为空白",
         "Recommendation": "推荐",
+        "Recommend": "推荐",
         "Novel": "小说",
         "Novels": "小说",
         "Reading Settings": "阅读设置",
@@ -191,6 +192,7 @@
         "Ok": "确定",
         "Block in?": "屏蔽于?",
         "Block More": "屏蔽更多",
+        "More": "更多",
         "Multi-choice Save": "多选保存",
         "Copy Info": "复制信息",
         "Copied to clipboard" : "已复制到剪贴板",
@@ -211,7 +213,8 @@
         "Failed": "加载失败",
         "Successed": "加载成功",
         "Failed to load Pixivision articles": "加载Pixivision文章失败",
-        "Illust": "插画"
+        "Illust": "插画",
+        "Failed to load Ranking": "加载排行榜失败"
     },
     "zh_TW": {
         "Search": "搜索",
@@ -345,6 +348,7 @@
         "Related users": "相關用戶",
         "Replace with '-p${index}' if the work have more than one images, otherwise replace with blank.": "替換為'-p${index}'如果作品有多張圖片, 否則替換為空白",
         "Recommendation": "推薦",
+        "Recommend": "推薦",
         "Novel": "小說",
         "Novels": "小說",
         "Reading Settings": "閱讀設置",
@@ -404,6 +408,7 @@
         "Ok": "確定",
         "Block in?": "屏蔽在?",
         "Block More": "屏蔽更多",
+        "More": "更多",
         "Block+": "屏蔽+",
         "Multi-choice Save": "多選保存",
         "Copy Info": "複製信息",
@@ -425,6 +430,7 @@
         "Failed": "加載失敗",
         "Successed": "加載成功",
         "Failed to load Pixivision articles": "加載Pixivision文章失敗",
-        "Illust": "插畫"
+        "Illust": "插畫",
+        "Failed to load Ranking": "加載排行榜失敗"
     }
 }

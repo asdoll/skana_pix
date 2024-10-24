@@ -33,6 +33,10 @@ extension WidgetExtension on Widget{
     return Padding(padding: EdgeInsets.all(padding), child: this);
   }
 
+  Widget rounded(double radius){
+    return ClipRRect(borderRadius: BorderRadius.circular(radius), child: this);
+  }
+
   Widget toCenter(){
     return Center(child: this);
   }

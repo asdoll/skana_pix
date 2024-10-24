@@ -163,7 +163,7 @@ class _CommentPageState extends State<CommentPage> {
     if (settings.blockedComments.contains(comment.id.toString())) {
       return true;
     }
-    if (settings.blockedUsers.contains(comment.uid)) {
+    if (settings.blockedCommentUsers.contains(comment.uid)) {
       return true;
     }
     return false;
@@ -511,7 +511,7 @@ class _CommentPageState extends State<CommentPage> {
                               title: Text("Block User".i18n),
                               onTap: () async {
                                 Navigator.of(context).pop();
-                                settings.addBlockedUsers([comment.uid]);
+                                settings.addBlockedCommentUsers([comment.uid]);
                               },
                             ),
                             ListTile(
@@ -556,6 +556,10 @@ class _CommentPageState extends State<CommentPage> {
     return res;
   }
 
+  List<Comment> filterComments(List<Comment> comments) {
+    return comments.where((element) => !commentHateByUser(element)).toList();
+  } 
+
   nextPage() {
     if (isLoading) return;
     isLoading = true;
@@ -563,7 +567,7 @@ class _CommentPageState extends State<CommentPage> {
       isLoading = false;
       if (value.success) {
         setState(() {
-          comments.addAll(value.data);
+          comments.addAll(filterComments(value.data));
         });
         easyRefreshController.finishLoad();
         return true;
@@ -596,7 +600,7 @@ class _CommentPageState extends State<CommentPage> {
     loadData().then((value) {
       if (value.success) {
         setState(() {
-          comments = value.data;
+          comments = filterComments(value.data);
         });
         easyRefreshController.finishRefresh();
         return true;

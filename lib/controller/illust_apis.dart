@@ -6,7 +6,7 @@ extension IllustExt on ApiClient {
     if (res.success) {
       return Res(
           (res.data["illusts"] as List).map((e) => Illust.fromJson(e)).toList(),
-          subData: recommendationUrl);
+          subData: res.data["next_url"]);
     } else {
       return Res.error(res.errorMessage);
     }
@@ -123,10 +123,18 @@ extension IllustExt on ApiClient {
     }
   }
 
-  /// mode: day, week, month, day_male, day_female, week_original, week_rookie, day_manga, week_manga, month_manga, day_r18_manga, day_r18
-  Future<Res<List<Illust>>> getRanking(String mode, [String? nextUrl]) async {
+  String toRequestDate(DateTime dateTime) {
+    return "${dateTime.year}-${dateTime.month}-${dateTime.day}";
+  }
+
+  /// mode: day, week, month, day_male, day_female, week_original, week_rookie, day_manga, week_manga, month_manga, day_r18_manga, day_r18, week_r18, week_r18g, week_rookie_manga
+  Future<Res<List<Illust>>> getRanking(String mode, [DateTime? date,String? nextUrl]) async {
+    var link = "/v1/illust/ranking?filter=for_android&mode=$mode";
+    if (date != null) {
+      link += "&date=${toRequestDate(date)}";
+    }
     var res = await apiGet(
-        nextUrl ?? "/v1/illust/ranking?filter=for_android&mode=$mode");
+        nextUrl ?? link);
     if (res.success) {
       return Res(
           (res.data["illusts"] as List).map((e) => Illust.fromJson(e)).toList(),

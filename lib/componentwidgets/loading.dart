@@ -108,6 +108,8 @@ abstract class MultiPageLoadingState<T extends StatefulWidget, S extends Object>
 
   int _page = 1;
 
+  String? nexturl;
+
   Future<Res<List<S>>> loadData(int page);
 
   Widget? buildFrame(BuildContext context, Widget child) => null;
@@ -117,27 +119,32 @@ abstract class MultiPageLoadingState<T extends StatefulWidget, S extends Object>
   bool get isLoading => _isLoading || _isFirstLoading;
 
   bool get isFirstLoading => _isFirstLoading;
+  
+  String? get errors => _error;
 
-  void nextPage() {
+  nextPage() {
     if (_isLoading) return;
     _isLoading = true;
     loadData(_page).then((value) {
       _isLoading = false;
       if (value.success) {
         _page++;
+        nexturl = value.subData;
         setState(() {
           _data!.addAll(value.data);
         });
+        return true;
       } else {
         var message = value.errorMessage ??
             "Network Error. Please refresh to try again.".i18n;
         if (message == "No more data") {
-          return;
+          return false;
         }
         if (message.length > 45) {
           message = "${message.substring(0, 20)}...";
         }
         BotToast.showText(text:message);
+        return false;
       }
     });
   }
@@ -148,6 +155,7 @@ abstract class MultiPageLoadingState<T extends StatefulWidget, S extends Object>
       _isLoading = false;
       _data = null;
       _error = null;
+      nexturl = null;
       _page = 1;
     });
     firstLoad();
@@ -157,6 +165,7 @@ abstract class MultiPageLoadingState<T extends StatefulWidget, S extends Object>
     loadData(_page).then((value) {
       if (value.success) {
         _page++;
+        nexturl = value.subData;
         setState(() {
           _isFirstLoading = false;
           _data = value.data;

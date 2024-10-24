@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:skana_pix/pixiv_dart_api.dart';
 
-
 class SettingScreen extends StatefulWidget {
   const SettingScreen({super.key});
 
@@ -10,6 +9,7 @@ class SettingScreen extends StatefulWidget {
 }
 
 class _SettingscreenState extends State<SettingScreen> {
+  String setting = "";
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -18,21 +18,34 @@ class _SettingscreenState extends State<SettingScreen> {
       ),
       body: Center(
         child: Column(
-          children: <Widget> [ElevatedButton(
-          onPressed: () {
-            moveUserData();
-          },
-          child: const Text("remove login data"),
+          children: <Widget>[
+            ElevatedButton(
+              onPressed: () {
+                moveUserData();
+              },
+              child: const Text("remove login data"),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                putBackUserData();
+              },
+              child: const Text("put back login data"),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                getSettings();
+              },
+              child: const Text("settings"),
+            ),
+            Text(setting),
+          ],
         ),
-        ElevatedButton(
-          onPressed: () {
-            putBackUserData();
-          },
-          child: const Text("put back login data"),
-        ),
-      ],
-      ),
       ),
     );
+  }
+
+  void getSettings() {
+    setting = settings.toJson();
+    setState(() {});
   }
 }

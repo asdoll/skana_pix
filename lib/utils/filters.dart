@@ -11,7 +11,7 @@ List<Illust> checkIllusts(List<Illust> illusts) {
     if (settings.blockedTags.isEmpty) {
       return false;
     }
-    if (settings.blockedTags.contains("user:${illust.author.id}")) {
+    if (settings.blockedUsers.contains(illust.author.id.toString())) {
       return true;
     }
     for (var tag in illust.tags) {
@@ -22,4 +22,27 @@ List<Illust> checkIllusts(List<Illust> illusts) {
     return false;
   });
   return illusts;
+}
+List<Novel> checkNovels(List<Novel> novels) {
+  novels.removeWhere((novel) {
+    if (settings.blockedNovels.contains(novel.id.toString())) {
+      return true;
+    }
+    if (novel.isMuted) {
+      return true;
+    }
+    if (settings.blockedNovelTags.isEmpty) {
+      return false;
+    }
+    if (settings.blockedNovelUsers.contains(novel.author.id.toString())) {
+      return true;
+    }
+    for (var tag in novel.tags) {
+      if ((settings.blockedNovelTags as List).contains(tag.name)) {
+        return true;
+      }
+    }
+    return false;
+  });
+  return novels;
 }

@@ -45,5 +45,8 @@ class DynamicData {
   static GlobalKey<NavigatorState>? mainNavigatorKey;
 
   static final recommendScrollController = ScrollController();
+  static final feedScrollController = ScrollController();
+  static final searchScrollController = ScrollController();
+  static final settingScrollController = ScrollController();
 }
 

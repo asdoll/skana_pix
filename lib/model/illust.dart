@@ -10,6 +10,11 @@ class IllustImage {
   final String original;
 
   const IllustImage(this.squareMedium, this.medium, this.large, this.original);
+  IllustImage.fromJson(Map<String, dynamic> json)
+      : squareMedium = json['square_medium']??"",
+        medium = json['medium']?? "",
+        large = json['large']?? "",
+        original = json['original']?? "";
 }
 
 class Illust {

@@ -27,7 +27,7 @@ extension NovelExt on ApiClient {
   }
 
   /// mode: day, day_male, day_female, week_rookie, week, week_ai
-  Future<Res<List<Novel>>> getNovelRanking(String mode, DateTime? date) {
+  Future<Res<List<Novel>>> getNovelRanking(String mode, [DateTime? date]) {
     var url = "/v1/novel/ranking?mode=$mode";
     if (date != null) {
       url += "&date=${date.year}-${date.month}-${date.day}";
@@ -40,10 +40,10 @@ extension NovelExt on ApiClient {
         "/v1/user/bookmarks/novel?user_id=$uid&restrict=public");
   }
 
-  Future<Res<bool>> favoriteNovel(String id) async {
+  Future<Res<bool>> favoriteNovel(String id, [String restrict = "public"]) async {
     var res = await apiPost("/v2/novel/bookmark/add", data: {
       "novel_id": id,
-      "restrict": "public",
+      "restrict": restrict,
     });
     if (res.error) {
       return Res.fromErrorRes(res);
