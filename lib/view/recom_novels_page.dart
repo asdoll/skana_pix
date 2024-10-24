@@ -187,7 +187,7 @@ class _RecomNovelsPageState
               color: Colors.transparent,
               child: InkWell(
                   onTap: () {
-                    Navigator.of(context).push(
+                    Navigator.of(context, rootNavigator: true).push(
                         MaterialPageRoute(builder: (BuildContext context) {
                       return NovelViewerPage(novel);
                     }));
@@ -304,27 +304,34 @@ class _RecomNovelsPageState
                                 ]),
                           ),
                           Container(
-                            padding: const EdgeInsets.only(
-                                left: 8.0, right: 4.0, bottom: 4.0),
+                            padding:
+                                const EdgeInsets.only(left: 8.0, right: 4.0),
                             child: Row(
-                              mainAxisAlignment: MainAxisAlignment.start,
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
-                                PainterAvatar(
-                                  url: novel.author.avatar,
-                                  id: novel.author.id,
-                                  size: Size(20, 20),
-                                ),
-                                Padding(
-                                  padding: const EdgeInsets.only(left: 6.0),
-                                  child: Text(
-                                    novel.author.name.atMost8,
-                                    style: const TextStyle(
-                                      color: Colors.white,
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.w600,
-                                    ),
-                                  ),
-                                ),
+                                Wrap(
+                                    crossAxisAlignment:
+                                        WrapCrossAlignment.center,
+                                    children: [
+                                      PainterAvatar(
+                                        url: novel.author.avatar,
+                                        id: novel.author.id,
+                                        size: Size(16, 16),
+                                      ),
+                                      Padding(
+                                        padding:
+                                            const EdgeInsets.only(left: 6.0),
+                                        child: Text(
+                                          novel.author.name.atMost8,
+                                          style: const TextStyle(
+                                            color: Colors.white,
+                                            fontSize: 14,
+                                            fontWeight: FontWeight.w600,
+                                          ),
+                                        ),
+                                      ),
+                                    ]),
+                                NovelBookmarkButton(novel: novel),
                               ],
                             ),
                           ),
