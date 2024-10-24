@@ -30,7 +30,7 @@ class _NovelViewerPageState extends State<NovelViewerPage> {
 
     // int lineNumber = textHeight ~/ lineHeight;
     int lineNumberPerPage =
-        (MediaQuery.of(context).size.height - kToolbarHeight) ~/ lineHeight;
+        (MediaQuery.of(context).size.height - kToolbarHeight * 2) ~/ lineHeight;
     // int pageNum = (lineNumber / lineNumberPerPage).ceil();
     double actualPageHeight = lineNumberPerPage * lineHeight;
     while (true) {
@@ -61,19 +61,43 @@ class _NovelViewerPageState extends State<NovelViewerPage> {
       }
     }
 
+    var _first = false;
     return Scaffold(
-        appBar: AppBar(
-          title: Text('Novel Viewer'),
-        ),
-        body: Container(
-          width: width + 20,
-          padding: EdgeInsets.symmetric(horizontal: 10),
-          child: Text.rich(
-            TextSpan(
-              text: bookData.substring(0, int.parse(pageConfig[0])),
+      appBar: AppBar(
+        toolbarHeight: kToolbarHeight,
+      ),
+      body: Stack(
+        children: [
+          GestureDetector(
+            onTap: () => setState(() {
+              if (_first) {
+                _first = false;
+              } else {
+                _first = true;
+              }
+            }),
+            child: Container(
+              width: width + 20,
+              padding: EdgeInsets.symmetric(horizontal: 10),
+              child: Text.rich(
+                TextSpan(
+                  text: bookData.substring(0, int.parse(pageConfig[0])),
+                ),
+                style: TextStyle(fontSize: 19),
+              ),
             ),
-            style: TextStyle(fontSize: 19),
           ),
-        ));
+          if (_first)
+            Positioned(
+              width: MediaQuery.of(context).size.width,
+              height: 40,
+              top: 0,
+              child: ColoredBox(
+                color: Colors.red,
+              ),
+            ),
+        ],
+      ),
+    );
   }
 }

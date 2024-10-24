@@ -67,6 +67,7 @@ dependencies:
   mobx: ^2.3.3+2
   flutter_mobx: ^2.2.1+1
   flutter_launcher_icons: ^0.14.1
+  sliding_top_panel: ^0.0.7
 
 
 dev_dependencies:

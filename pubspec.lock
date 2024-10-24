@@ -965,6 +965,14 @@ packages:
     description: flutter
     source: sdk
     version: "0.0.99"
+  sliding_top_panel:
+    dependency: "direct main"
+    description:
+      name: sliding_top_panel
+      sha256: d777bb643ffb0e9db86066fd4415637bc3cdb681e16976c8c2242441d3592a05
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.0.7"
   source_span:
     dependency: transitive
     description:
