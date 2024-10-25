@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:persistent_bottom_nav_bar/persistent_bottom_nav_bar.dart';
 import 'package:skana_pix/utils/translate.dart';
 import 'package:skana_pix/view/defaults.dart';
 
@@ -35,7 +34,8 @@ class _MainScreenState extends State<MainScreen> {
         length: 3,
         child: Scaffold(
           appBar: PreferredSize(
-            preferredSize: const Size.fromHeight(32.0), // here the desired height
+            preferredSize:
+                const Size.fromHeight(32.0), // here the desired height
             child: AppBar(
               toolbarHeight: 0.0,
               bottom: TabBar(

@@ -2,12 +2,14 @@ import 'package:bot_toast/bot_toast.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:mobx/mobx.dart';
-import 'package:skana_pix/model/novel.dart';
+import 'package:share_plus/share_plus.dart';
 import 'package:skana_pix/pixiv_dart_api.dart';
 import 'package:skana_pix/utils/translate.dart';
 import 'package:skana_pix/utils/widgetplugin.dart';
 import '../view/defaults.dart';
+import 'avatar.dart';
 import 'commentpage.dart';
+import 'followbutton.dart';
 import 'novelresult.dart';
 import 'novelseries.dart';
 import 'pixivimage.dart';
@@ -26,6 +28,7 @@ class _NovelViewerPageState extends State<NovelViewerPage> {
   bool _isBottomBarVisible = true;
   bool _isAppBarVisible = true;
   late NovelStore _novelStore;
+  // ignore: unused_field
   String _selectedText = "";
   late int nowPosition;
   late PageController _pageController;
@@ -97,7 +100,9 @@ class _NovelViewerPageState extends State<NovelViewerPage> {
                   controller: _pageController,
                   //physics: NeverScrollableScrollPhysics(),
                   itemBuilder: (BuildContext context, int index) {
-                    if (index == 0) return _buildFirstView(context);
+                    if (index == 0)
+                      return SingleChildScrollView(
+                          child: _buildFirstView(context));
                     final f = _novelStore.pageConfig[index - 1];
                     return Container(
                       width: _novelStore.pageWidth,
@@ -185,12 +190,24 @@ class _NovelViewerPageState extends State<NovelViewerPage> {
               backgroundColor: Theme.of(context).colorScheme.surfaceContainer,
               leading: const BackButton(),
               title: Text(
-                widget.novel.title,
+                widget.novel.title.atMost8,
                 style: const TextStyle(
                   fontSize: 20,
                   overflow: TextOverflow.ellipsis,
                 ),
               ),
+              actions: [
+                IconButton(
+                    icon: Icon(Icons.bookmark),
+                    onPressed: () {
+                      // _saveNovelBookMark();
+                    }),
+                IconButton(
+                    icon: Icon(Icons.share),
+                    onPressed: () {
+                      _shareNovel();
+                    }),
+              ],
             ),
           ),
         ),
@@ -220,6 +237,40 @@ class _NovelViewerPageState extends State<NovelViewerPage> {
             child: Text(
               "${widget.novel.title}",
               style: Theme.of(context).textTheme.titleMedium,
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.only(
+                left: 8.0, right: 8.0, top: 8.0, bottom: 8),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Wrap(crossAxisAlignment: WrapCrossAlignment.center, children: [
+                  PainterAvatar(
+                    url: widget.novel.author.avatar,
+                    id: widget.novel.author.id,
+                    size: Size(16, 16),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.only(left: 6.0),
+                    child: Text(
+                      widget.novel.author.name.atMost8,
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 14,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
+                ]),
+                const SizedBox(width: 8),
+                UserFollowButton(
+                  followed: widget.novel.author.isFollowed,
+                  onPressed: () async {
+                    follow();
+                  },
+                ),
+              ],
             ),
           ),
           if (widget.novel.seriesId != null)
@@ -291,6 +342,31 @@ class _NovelViewerPageState extends State<NovelViewerPage> {
         ],
       ),
     );
+  }
+
+  bool isFollowing = false;
+
+  void follow() async {
+    if (isFollowing) return;
+    setState(() {
+      isFollowing = true;
+    });
+    var method = widget.novel.author.isFollowed ? "delete" : "add";
+    var res = await followUser(widget.novel.author.id.toString(), method);
+    if (res.error) {
+      if (mounted) {
+        BotToast.showText(text: "Network Error".i18n);
+      }
+    } else {
+      widget.novel.author.isFollowed = !widget.novel.author.isFollowed;
+    }
+    setState(() {
+      isFollowing = false;
+    });
+    // UserInfoPage.followCallbacks[widget.illust.author.id.toString()]
+    //     ?.call(widget.illust.author.isFollowed);
+    // UserPreviewWidget.followCallbacks[widget.illust.author.id.toString()]
+    //     ?.call(widget.illust.author.isFollowed);
   }
 
   Widget buildRow(BuildContext context, Tag f) {
@@ -446,6 +522,10 @@ class _NovelViewerPageState extends State<NovelViewerPage> {
       ),
     );
   }
+
+  void _shareNovel() {
+    Share.share("https://www.pixiv.net/novel/show.php?id=${widget.novel.id}");
+  }
 }
 
 class NovelStore {
@@ -482,14 +562,10 @@ class NovelStore {
     var width = pageWidth - linePaddingHorizontal * 2;
     textPainter.layout(maxWidth: width);
     double lineHeight = textPainter.preferredLineHeight;
-    BotToast.showText(text: "lineHeight:$lineHeight");
     int lineNumberPerPage = (pageHeight - paddingVertical * 2.5) ~/ lineHeight;
     lineNumberPerPage = lineNumberPerPage - 1;
     // int pageNum = (lineNumber / lineNumberPerPage).ceil();
     double actualPageHeight = lineNumberPerPage * lineHeight;
-    BotToast.showText(
-        text:
-            "prefer:${(pageHeight - paddingVertical * 2)},actualPageHeight:$actualPageHeight");
     while (true) {
       textPainter = TextPainter(
         textAlign: TextAlign.start,

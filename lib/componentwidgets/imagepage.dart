@@ -195,10 +195,10 @@ class _ImagePageState extends State<ImagePage> {
                             file.createSync(recursive: true);
                           }
 
-                          saveUrl(widget.urls[currentPage],context: context);
+                          saveUrl(widget.urls[currentPage], context: context);
                         }),
                     onLongPress: () async {
-                      saveUrl(widget.urls[currentPage],context: context);
+                      saveUrl(widget.urls[currentPage], context: context);
                     }),
                 AnimatedOpacity(
                   opacity: shareShow ? 1 : 0.5,
@@ -231,7 +231,7 @@ class _ImagePageState extends State<ImagePage> {
                                 sharePositionOrigin:
                                     box!.localToGlobal(Offset.zero) & box.size);
                           } else {
-                              BotToast.showText(text: "can not find image cache");
+                            BotToast.showText(text: "can not find image cache");
                           }
                         });
                   }),
@@ -288,6 +288,7 @@ class _ImagePageState extends State<ImagePage> {
     if (url.startsWith("file://")) {
       return FileImage(File(url.replaceFirst("file://", "")));
     } else if (url.startsWith("novel:")) {
+      // ignore: unused_local_variable
       var ids = url.split(':').last.split('/');
       throw UnimplementedError();
     }

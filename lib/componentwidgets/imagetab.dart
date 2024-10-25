@@ -2,10 +2,8 @@ import 'dart:ui';
 
 import 'package:bot_toast/bot_toast.dart';
 import 'package:flutter/material.dart';
-import 'package:persistent_bottom_nav_bar/persistent_bottom_nav_bar.dart';
 import 'package:skana_pix/componentwidgets/loading.dart';
 import 'package:skana_pix/pixiv_dart_api.dart';
-import 'package:skana_pix/utils/navigation.dart';
 import 'package:skana_pix/utils/translate.dart';
 import 'package:blur/blur.dart';
 

@@ -1,9 +1,7 @@
 import 'package:bot_toast/bot_toast.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:persistent_bottom_nav_bar/persistent_bottom_nav_bar.dart';
 import 'package:skana_pix/pixiv_dart_api.dart';
-import 'package:skana_pix/utils/navigation.dart';
 import 'package:skana_pix/utils/translate.dart';
 
 import 'avatar.dart';
@@ -28,6 +26,7 @@ class _IllustDetailContentState extends State<IllustDetailContent> {
   late Illust _illust;
 
   late FocusNode _focusNode;
+  // ignore: unused_field
   String _selectedText = "";
 
   @override
@@ -440,10 +439,10 @@ class _IllustDetailContentState extends State<IllustDetailContent> {
 
   Future<void> _push2UserPage(BuildContext context, Illust illust) async {
     await Navigator.of(context).push(MaterialPageRoute(
-                      builder: (BuildContext context) => UserPage(
-          id: illust.author.id,
-          heroTag: hashCode.toString(),
-        )));
+        builder: (BuildContext context) => UserPage(
+              id: illust.author.id,
+              heroTag: hashCode.toString(),
+            )));
   }
 
   Widget _buildNameAvatar(BuildContext context, Illust illust) {

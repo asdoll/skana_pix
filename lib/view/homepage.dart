@@ -1,7 +1,5 @@
 import 'package:flutter/services.dart';
 import 'package:skana_pix/pixiv_dart_api.dart';
-
-import '../componentwidgets/spotlightpage.dart';
 import 'defaults.dart';
 import 'package:persistent_bottom_nav_bar/persistent_bottom_nav_bar.dart';
 

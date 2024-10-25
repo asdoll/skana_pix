@@ -10,7 +10,6 @@ import 'package:mobx/mobx.dart';
 import 'package:skana_pix/componentwidgets/nullhero.dart';
 import 'package:skana_pix/pixiv_dart_api.dart';
 import 'package:skana_pix/utils/widgetplugin.dart';
-import 'package:skana_pix/view/defaults.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 
 import 'avatar.dart';

@@ -3,7 +3,6 @@ import 'package:easy_refresh/easy_refresh.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:persistent_bottom_nav_bar/persistent_bottom_nav_bar.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:skana_pix/componentwidgets/headerfooter.dart';
 import 'package:skana_pix/componentwidgets/imagedetail.dart';
@@ -414,7 +413,7 @@ class _IllustPageState extends State<IllustPage> {
     //}
 
     return Hero(
-        tag: widget.heroTag ?? hashCode.toString()+index.toString(),
+        tag: widget.heroTag ?? hashCode.toString() + index.toString(),
         child: Center(
           child: image,
         ));
