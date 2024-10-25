@@ -117,11 +117,12 @@ class _IllustCardState extends State<IllustCard> {
   }
 
   Future _buildTap(BuildContext context) {
-    return context.to(() => ImageListPage(
-          illusts: illusts,
-          initialPage: page,
-          nextUrl: nextUrl,
-        ));
+    return Navigator.of(context).push(MaterialPageRoute(
+        builder: (BuildContext context) => ImageListPage(
+              illusts: illusts,
+              initialPage: page,
+              nextUrl: nextUrl,
+            )));
   }
 
   Widget cardText() {
@@ -154,7 +155,8 @@ class _IllustCardState extends State<IllustCard> {
   }
 
   Widget buildInkWell(BuildContext context) {
-    var tooLong = (illust.height.toDouble() / illust.width.toDouble() > 3)||widget.useSquare;
+    var tooLong = (illust.height.toDouble() / illust.width.toDouble() > 3) ||
+        widget.useSquare;
     var radio =
         (tooLong) ? 1.0 : illust.width.toDouble() / illust.height.toDouble();
     return Card(
@@ -301,15 +303,9 @@ class _IllustCardState extends State<IllustCard> {
   }
 
   Future _buildInkTap(BuildContext context, String heroTag) {
-    return PersistentNavBarNavigator.pushNewScreen(
-      context,
-      screen: ImageListPage(initialPage: page, illusts: illusts, nextUrl: nextUrl),
-      withNavBar: false, // OPTIONAL VALUE. True by default.
-      pageTransitionAnimation: PageTransitionAnimation.scale,
-      // customPageRoute: AppPageRoute(
-      //     builder: (context) =>
-      //         ImagePage(illust.images.map((e) => e.large).toList())),
-    );
+    return Navigator.of(context, rootNavigator: true).push(MaterialPageRoute(
+        builder: (BuildContext context) => ImageListPage(
+            initialPage: page, illusts: illusts, nextUrl: nextUrl)));
   }
 
   Widget _buildBottom(BuildContext context) {

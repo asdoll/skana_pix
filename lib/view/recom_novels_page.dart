@@ -188,9 +188,9 @@ class _RecomNovelsPageState
               child: InkWell(
                   onTap: () {
                     Navigator.of(context, rootNavigator: true).push(
-                        MaterialPageRoute(builder: (BuildContext context) {
-                      return NovelViewerPage(novel);
-                    }));
+                        MaterialPageRoute(
+                            builder: (BuildContext context) =>
+                                NovelViewerPage(novel)));
                   },
                   child: Container(
                     width: expectwidth,

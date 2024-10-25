@@ -31,6 +31,7 @@ class ImageListPage extends StatefulWidget {
       {required this.illusts,
       required this.initialPage,
       this.nextUrl,
+      this.heroTag,
       super.key});
 
   final List<Illust> illusts;
@@ -38,6 +39,8 @@ class ImageListPage extends StatefulWidget {
   final int initialPage;
 
   final String? nextUrl;
+
+  final String? heroTag;
 
   static var cachedHistoryIds = <int>{};
 
@@ -111,8 +114,9 @@ class _ImageListPageState extends State<ImageListPage> {
               if (index == illusts.length) {
                 return buildLast();
               }
+              String? tag = widget.initialPage == index ? widget.heroTag : null;
               return IllustPage(illusts[index],
-                  nextPage: nextPage, previousPage: previousPage);
+                  heroTag: tag, nextPage: nextPage, previousPage: previousPage);
             },
             onPageChanged: (value) => setState(() {
               page = value;
@@ -178,13 +182,16 @@ class _ImageListPageState extends State<ImageListPage> {
 }
 
 class IllustPage extends StatefulWidget {
-  const IllustPage(this.illust, {this.nextPage, this.previousPage, super.key});
+  const IllustPage(this.illust,
+      {this.nextPage, this.previousPage, this.heroTag, super.key});
 
   final Illust illust;
 
   final void Function()? nextPage;
 
   final void Function()? previousPage;
+
+  final String? heroTag;
 
   static Map<String, UpdateFollowCallback> followCallbacks = {};
 
@@ -344,10 +351,11 @@ class _IllustPageState extends State<IllustPage> {
                   SliverChildBuilderDelegate((BuildContext context, int index) {
                 return InkWell(
                   onTap: () {
-                    PersistentNavBarNavigator.pushNewScreen(context,
-                        screen: ImageListPage(illusts: related,
+                    Navigator.of(context).push(MaterialPageRoute(
+                        builder: (BuildContext context) => ImageListPage(
+                            illusts: related,
                             initialPage: index,
-                            nextUrl: nextUrl));
+                            nextUrl: nextUrl)));
                   },
                   child: PixivImage(
                     related[index].images.first.squareMedium,
@@ -387,9 +395,9 @@ class _IllustPageState extends State<IllustPage> {
         width: imageWidth,
         height: imageHeight,
         child: GestureDetector(
-            onTap: () => PersistentNavBarNavigator.pushNewScreen(context,
-                screen: ImagePage(
-                    widget.illust.images.map((e) => e.large).toList())),
+            onTap: () => Navigator.of(context).push(MaterialPageRoute(
+                builder: (BuildContext context) => ImagePage(
+                    widget.illust.images.map((e) => e.large).toList()))),
             child: PixivImage(
               imageUrl,
               width: width,
@@ -405,9 +413,11 @@ class _IllustPageState extends State<IllustPage> {
     // );
     //}
 
-    return Center(
-      child: image,
-    );
+    return Hero(
+        tag: widget.heroTag ?? hashCode.toString()+index.toString(),
+        child: Center(
+          child: image,
+        ));
   }
 
   Widget _buildAppbar() {
@@ -649,12 +659,13 @@ class _IllustPageState extends State<IllustPage> {
                                 });
                               },
                               onLongPress: () {
-                                PersistentNavBarNavigator.pushNewScreen(context,
-                                    screen: ImagePage(
-                                        illust.images
-                                            .map((e) => e.large)
-                                            .toList(),
-                                        initialPage: index));
+                                Navigator.of(context).push(MaterialPageRoute(
+                                    builder: (BuildContext context) =>
+                                        ImagePage(
+                                            illust.images
+                                                .map((e) => e.large)
+                                                .toList(),
+                                            initialPage: index)));
                               },
                               child: Stack(
                                 children: [
@@ -807,11 +818,11 @@ class _IllustPageState extends State<IllustPage> {
   }
 
   Future<void> _push2UserPage(BuildContext context, Illust illust) async {
-    await PersistentNavBarNavigator.pushNewScreen(context,
-        screen: UserPage(
-          id: illust.author.id,
-          heroTag: hashCode.toString(),
-        ));
+    await Navigator.of(context).push(MaterialPageRoute(
+        builder: (BuildContext context) => UserPage(
+              id: illust.author.id,
+              heroTag: hashCode.toString(),
+            )));
   }
 
   String? nextUrl;

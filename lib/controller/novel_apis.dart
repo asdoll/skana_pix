@@ -61,7 +61,7 @@ extension NovelExt on ApiClient {
     return const Res(true);
   }
 
-  Future<Res<NovelContent>> getNovelContent(String id) async {
+  Future<Res<String>> getNovelContent(String id) async {
     var res = await apiGetPlain(
         "/webview/v2/novel?id=$id&font=default&font_size=16.0px&line_height=1.75&color=%23101010&background_color=%23EFEFEF&margin_top=56px&margin_bottom=48px&theme=light&use_block=true&viewer_version=20221031_ai");
     if (res.error) {
@@ -91,7 +91,7 @@ extension NovelExt on ApiClient {
       if (resNovel.error) {
         return Res.fromErrorRes(res);
       }
-      return Res(NovelContent.fromJson(json['text'], resNovel.data));
+      return Res(json['text']);
     } catch (e, s) {
       Log.error(
           "Data Convert", "Failed to analyze html novel content: \n$e\n$s");
@@ -154,8 +154,8 @@ extension NovelExt on ApiClient {
     if (res.error) {
       return Res.fromErrorRes(res);
     }
-    Savers.writeText('${BasePath.downloadNovelPath}test.log',
-        Novel.fromJson(res.data["novel"]).toString());
+    // Savers.writeText('${BasePath.downloadNovelPath}test.log',
+    //     Novel.fromJson(res.data["novel"]).toString());
     return Res(Novel.fromJson(res.data["novel"]));
   }
 }

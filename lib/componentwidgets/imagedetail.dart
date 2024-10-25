@@ -294,7 +294,8 @@ class _IllustDetailContentState extends State<IllustDetailContent> {
         padding: EdgeInsets.only(left: 16.0, right: 16.0),
         child: InkWell(
           onTap: () {
-            context.to(() => CommentPage(id: data.id));
+            Navigator.of(context).push(MaterialPageRoute(
+                builder: (BuildContext context) => CommentPage(id: data.id)));
           },
           child: Center(
             child: Padding(
@@ -438,11 +439,11 @@ class _IllustDetailContentState extends State<IllustDetailContent> {
   }
 
   Future<void> _push2UserPage(BuildContext context, Illust illust) async {
-    await PersistentNavBarNavigator.pushNewScreen(context,
-        screen: UserPage(
+    await Navigator.of(context).push(MaterialPageRoute(
+                      builder: (BuildContext context) => UserPage(
           id: illust.author.id,
           heroTag: hashCode.toString(),
-        ));
+        )));
   }
 
   Widget _buildNameAvatar(BuildContext context, Illust illust) {

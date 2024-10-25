@@ -281,25 +281,27 @@ class _CommentPageState extends State<CommentPage> {
                                               width: 100,
                                             ),
                                           ),
-                                        if (comment.hasReplies == true)
-                                          Padding(
-                                            padding: const EdgeInsets.only(
-                                                right: 4.0),
-                                            child: ActionChip(
-                                              label: Text("View Replies".i18n),
-                                              onPressed: () async {
-                                                PersistentNavBarNavigator
-                                                    .pushNewScreen(context,
-                                                        screen: CommentPage(
-                                                          id: widget.id,
-                                                          isReplay: true,
-                                                          pId: comment.id,
-                                                          type: widget.type,
-                                                          name: comment.name,
-                                                        ));
-                                              },
-                                            ),
-                                          ),
+                                        // if (comment.hasReplies == true)
+                                        //   Padding(
+                                        //     padding: const EdgeInsets.only(
+                                        //         right: 4.0),
+                                        //     child: ActionChip(
+                                        //       label: Text("View Replies".i18n),
+                                        //       onPressed: () async {
+                                        //         Navigator.of(context).push(
+                                        //             MaterialPageRoute(
+                                        //                 builder: (context) =>
+                                        //                     CommentPage(
+                                        //                       id: widget.id,
+                                        //                       isReplay: true,
+                                        //                       pId: comment.id,
+                                        //                       type: widget.type,
+                                        //                       name:
+                                        //                           comment.name,
+                                        //                     )));
+                                        //       },
+                                        //     ),
+                                        //   ),
                                         Padding(
                                           padding:
                                               const EdgeInsets.only(top: 8.0),
@@ -558,7 +560,7 @@ class _CommentPageState extends State<CommentPage> {
 
   List<Comment> filterComments(List<Comment> comments) {
     return comments.where((element) => !commentHateByUser(element)).toList();
-  } 
+  }
 
   nextPage() {
     if (isLoading) return;

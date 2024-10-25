@@ -152,14 +152,12 @@ class _RecomImagesPageState
                       color: Colors.transparent,
                       child: InkWell(
                         onTap: () {
-                          Navigator.of(context).push(MaterialPageRoute(
-                              builder: (BuildContext context) {
-                            return SoupPage(
+                          Navigator.of(context,rootNavigator: true).push(MaterialPageRoute(
+                              builder: (BuildContext context) => SoupPage(
                               url: spotlight.articleUrl,
                               spotlight: spotlight,
                               heroTag: 'spotlight_image_${spotlight.hashCode}',
-                            );
-                          }));
+                            )));
                         },
                         child: Container(
                             width: expectCardWidget,
@@ -281,10 +279,8 @@ class _RecomImagesPageState
                 style: Theme.of(context).textTheme.bodySmall,
               ),
               onPressed: () {
-                Navigator.of(context)
-                    .push(MaterialPageRoute(builder: (BuildContext context) {
-                  return SpotlightPage(widget.type);
-                }));
+                Navigator.of(context,rootNavigator: true)
+                    .push(MaterialPageRoute(builder: (BuildContext context)=> SpotlightPage(widget.type)));
               },
             ),
           )

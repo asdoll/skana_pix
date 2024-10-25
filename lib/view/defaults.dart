@@ -25,7 +25,7 @@ class DynamicData {
     useMaterial3: true,
   );
 
-  static ThemeData get themes => 
+  static ThemeData get themes =>
       (SchedulerBinding.instance.platformDispatcher.platformBrightness ==
               Brightness.dark)
           ? themeData
@@ -35,10 +35,19 @@ class DynamicData {
       SchedulerBinding.instance.platformDispatcher.platformBrightness ==
       Brightness.dark;
 
+  static double widthScreen = WidgetsBinding
+          .instance.platformDispatcher.views.first.physicalSize.width /
+      WidgetsBinding.instance.platformDispatcher.views.first.devicePixelRatio;
+
+  static double heightScreen = WidgetsBinding
+          .instance.platformDispatcher.views.first.physicalSize.height /
+      WidgetsBinding.instance.platformDispatcher.views.first.devicePixelRatio;
+
   static bool get isMobile => Platform.isAndroid || Platform.isIOS;
   static bool get isIOS => Platform.isIOS;
   static bool get isAndroid => Platform.isAndroid;
-  static bool get isDesktop => Platform.isWindows || Platform.isMacOS || Platform.isLinux;
+  static bool get isDesktop =>
+      Platform.isWindows || Platform.isMacOS || Platform.isLinux;
 
   static final rootNavigatorKey = GlobalKey<NavigatorState>();
 
@@ -49,4 +58,3 @@ class DynamicData {
   static final searchScrollController = ScrollController();
   static final settingScrollController = ScrollController();
 }
-

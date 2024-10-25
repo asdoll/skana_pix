@@ -76,8 +76,7 @@ class NovelContent {
   final String text;
   final List<String> images;
 
-  NovelContent.fromJson(Map<String, dynamic> json, Novel info)
+  NovelContent.fromJson(this.text, Novel info)
       : novel = info,
-        text = json["text"],
-        images = Parser.parseImgsInNovel(json["text"]);
+        images = Parser.parseImgsInNovel(text);
 }

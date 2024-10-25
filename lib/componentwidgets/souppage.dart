@@ -58,6 +58,7 @@ class _SoupPageState extends State<SoupPage> {
                     pinned: true,
                     expandedHeight: 200.0,
                     flexibleSpace: FlexibleSpaceBar(
+                      titlePadding: EdgeInsets.symmetric(horizontal: 10),
                       centerTitle: true,
                       title: Stack(
                         children: <Widget>[

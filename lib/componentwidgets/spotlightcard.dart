@@ -16,9 +16,8 @@ class SpotlightCard extends StatelessWidget {
       padding: EdgeInsets.all(4.0),
       child: GestureDetector(
         onTap: () async {
-          PersistentNavBarNavigator.pushNewScreen(context,
-              screen: Material(
-                  child: SoupPage(
+          Navigator.of(context,rootNavigator: true).push(MaterialPageRoute(
+                              builder: (BuildContext context) => SoupPage(
                       url: spotlight.articleUrl, spotlight: spotlight)));
         },
         child: Container(
