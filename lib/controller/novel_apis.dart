@@ -40,7 +40,8 @@ extension NovelExt on ApiClient {
         "/v1/user/bookmarks/novel?user_id=$uid&restrict=public");
   }
 
-  Future<Res<bool>> favoriteNovel(String id, [String restrict = "public"]) async {
+  Future<Res<bool>> favoriteNovel(String id,
+      [String restrict = "public"]) async {
     var res = await apiPost("/v2/novel/bookmark/add", data: {
       "novel_id": id,
       "restrict": restrict,
@@ -126,7 +127,7 @@ extension NovelExt on ApiClient {
 
   Future<Res<List<Comment>>> getNovelComments(String id,
       [String? nextUrl]) async {
-    var res = await apiGet(nextUrl ?? "/v1/novel/comments?novel_id=$id");
+    var res = await apiGet(nextUrl ?? "/v3/novel/comments?novel_id=$id");
     if (res.error) {
       return Res.fromErrorRes(res);
     }
@@ -135,12 +136,17 @@ extension NovelExt on ApiClient {
         subData: res.data["next_url"]);
   }
 
-  Future<Res<bool>> commentNovel(String id, String comment,{String? parentId}) async {
+  Future<Res<bool>> commentNovel(String id, String comment,
+      {String? parentId}) async {
     Map<String, String> data;
-    if(parentId != null&& parentId.isNotEmpty) {
-        data = {"novel_id": id, "comment": comment,"parent_comment_id": parentId};
+    if (parentId != null && parentId.isNotEmpty) {
+      data = {
+        "novel_id": id,
+        "comment": comment,
+        "parent_comment_id": parentId
+      };
     } else {
-        data = {"novel_id": id, "comment": comment};
+      data = {"novel_id": id, "comment": comment};
     }
     var res = await apiPost("/v1/novel/comment/add", data: data);
     if (res.error) {

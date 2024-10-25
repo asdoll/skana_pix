@@ -50,10 +50,15 @@ class _SoupPageState extends State<SoupPage> {
               return [
                 if (widget.spotlight != null)
                   SliverAppBar(
-                    leading: const DecoratedIcon(
-                      icon: Icon(Icons.arrow_back),
-                      decoration:
-                          IconDecoration(border: IconBorder(width: 1.5)),
+                    leading: IconButton(
+                      icon: DecoratedIcon(
+                        icon: Icon(Icons.arrow_back),
+                        decoration:
+                            IconDecoration(border: IconBorder(width: 1.5)),
+                      ),
+                      onPressed: () {
+                        Navigator.maybePop(context);
+                      },
                     ),
                     pinned: true,
                     expandedHeight: 200.0,

@@ -29,6 +29,7 @@ class _NovelViewerPageState extends State<NovelViewerPage> {
   String _selectedText = "";
   late int nowPosition;
   late PageController _pageController;
+  late double fontsize;
 
   _isShow() {
     setState(() {
@@ -40,9 +41,11 @@ class _NovelViewerPageState extends State<NovelViewerPage> {
   @override
   void initState() {
     super.initState();
+    fontsize = settings.fontSize;
     _novelStore = NovelStore(
-        widget.novel, DynamicData.widthScreen, DynamicData.heightScreen);
-    _novelStore.init();
+        widget.novel, DynamicData.heightScreen, DynamicData.widthScreen,
+        fontSize: fontsize);
+    _novelStore.fetch();
     nowPosition = 0;
     _pageController = PageController(initialPage: nowPosition);
   }
@@ -73,8 +76,8 @@ class _NovelViewerPageState extends State<NovelViewerPage> {
                 _pageController.animateToPage(result,
                     duration: Duration(milliseconds: 200),
                     curve: Curves.easeInOut);
-                if (result >= _novelStore.pageConfig.length)
-                  result = _novelStore.pageConfig.length - 1;
+                if (result >= _novelStore.pageConfig.length + 1)
+                  result = _novelStore.pageConfig.length;
                 if (result < 0) result = 0;
                 setState(() {
                   nowPosition = result;
@@ -83,25 +86,33 @@ class _NovelViewerPageState extends State<NovelViewerPage> {
             },
             child: Observer(
               builder: (_) {
+                if (_novelStore.errorMessage != null) {
+                  return _buildFailPage(context);
+                }
+                if (_novelStore.pageConfig.isEmpty &&
+                    _novelStore.errorMessage == null) {
+                  return const Center(child: CircularProgressIndicator());
+                }
                 return PageView.builder(
                   controller: _pageController,
-                  physics: NeverScrollableScrollPhysics(),
+                  //physics: NeverScrollableScrollPhysics(),
                   itemBuilder: (BuildContext context, int index) {
-                    final f = _novelStore.pageConfig[index];
+                    if (index == 0) return _buildFirstView(context);
+                    final f = _novelStore.pageConfig[index - 1];
                     return Container(
-                      padding: EdgeInsets.symmetric(
-                          horizontal: _novelStore.linePaddingHorizontal,
-                          vertical: _novelStore.paddingVertical),
-                      child: SelectableHtml(
-                        data: _novelStore.stringContent.substring(
-                            index == 0
-                                ? 0
-                                : int.parse(_novelStore.pageConfig[index - 1]),
-                            int.parse(f)),
+                      width: _novelStore.pageWidth,
+                      height: _novelStore.pageHeight,
+                      padding: EdgeInsets.only(
+                          left: _novelStore.linePaddingHorizontal,
+                          right: _novelStore.linePaddingHorizontal,
+                          top: _novelStore.paddingVertical * 1.5),
+                      child: Text(
+                        f,
+                        style: TextStyle(fontSize: fontsize),
                       ),
                     );
                   },
-                  itemCount: _novelStore.pageConfig.length,
+                  itemCount: _novelStore.pageConfig.length + 1,
                 );
               },
             ),
@@ -174,8 +185,11 @@ class _NovelViewerPageState extends State<NovelViewerPage> {
               backgroundColor: Theme.of(context).colorScheme.surfaceContainer,
               leading: const BackButton(),
               title: Text(
-                "this is title",
-                style: const TextStyle(fontSize: 20),
+                widget.novel.title,
+                style: const TextStyle(
+                  fontSize: 20,
+                  overflow: TextOverflow.ellipsis,
+                ),
               ),
             ),
           ),
@@ -184,7 +198,7 @@ class _NovelViewerPageState extends State<NovelViewerPage> {
     );
   }
 
-  Widget _buildHeader(BuildContext context) {
+  Widget _buildFirstView(BuildContext context) {
     return Padding(
       padding: EdgeInsets.only(top: MediaQuery.of(context).padding.top),
       child: Column(
@@ -400,7 +414,11 @@ class _NovelViewerPageState extends State<NovelViewerPage> {
                 IconButton(
                     icon: Icon(Icons.folder),
                     onPressed: () {
-                      // _openChapterList();
+                      _pageController
+                          .jumpToPage(_novelStore.pageConfig.length - 1);
+                      setState(() {
+                        nowPosition = _novelStore.pageConfig.length - 1;
+                      });
                     }),
                 IconButton(
                     icon: Icon(Icons.folder),
@@ -440,7 +458,7 @@ class NovelStore {
   final double pageWidth;
   late String stringContent;
   late ObservableList<String> pageConfig = ObservableList();
-  bool isError = false;
+  String? errorMessage;
   late TextPainter textPainter;
 
   NovelStore(this.novel, this.pageHeight, this.pageWidth,
@@ -449,77 +467,76 @@ class NovelStore {
       this.paddingVertical = kToolbarHeight,
       this.lineSpace = 0});
 
-  void init() {
-    fetch().then((value) {
-      if (!value) {
-        BotToast.showText(text: "Network error".i18n);
-        return;
-      } else {
-        BotToast.showText(text: stringContent.length.toString());
-        String tmp = stringContent;
-        textPainter = TextPainter(
-          textAlign: TextAlign.start,
-          textDirection: TextDirection.ltr,
-          text: TextSpan(
-            text: tmp,
-            style: TextStyle(fontSize: fontSize),
-          ),
-        );
-        var width = pageWidth - linePaddingHorizontal * 2;
-        textPainter.layout(maxWidth: width);
-        double lineHeight = textPainter.preferredLineHeight;
-        int lineNumberPerPage =
-            (pageHeight - paddingVertical * 2) ~/ lineHeight;
-        // int pageNum = (lineNumber / lineNumberPerPage).ceil();
-        double actualPageHeight = lineNumberPerPage * lineHeight;
-        while (true) {
-          textPainter = TextPainter(
-            textAlign: TextAlign.start,
-            textDirection: TextDirection.ltr,
-            text: TextSpan(
-              text: tmp,
-              style: TextStyle(fontSize: fontSize),
-            ),
-          );
-          textPainter.layout(maxWidth: width);
+  Future<List<String>> parse(String content) async {
+    List<int> result = [];
+    List<String> resultString = [];
+    String tmp = stringContent;
+    textPainter = TextPainter(
+      textAlign: TextAlign.start,
+      textDirection: TextDirection.ltr,
+      text: TextSpan(
+        text: tmp,
+        style: TextStyle(fontSize: fontSize),
+      ),
+    );
+    var width = pageWidth - linePaddingHorizontal * 2;
+    textPainter.layout(maxWidth: width);
+    double lineHeight = textPainter.preferredLineHeight;
+    BotToast.showText(text: "lineHeight:$lineHeight");
+    int lineNumberPerPage = (pageHeight - paddingVertical * 2.5) ~/ lineHeight;
+    lineNumberPerPage = lineNumberPerPage - 1;
+    // int pageNum = (lineNumber / lineNumberPerPage).ceil();
+    double actualPageHeight = lineNumberPerPage * lineHeight;
+    BotToast.showText(
+        text:
+            "prefer:${(pageHeight - paddingVertical * 2)},actualPageHeight:$actualPageHeight");
+    while (true) {
+      textPainter = TextPainter(
+        textAlign: TextAlign.start,
+        textDirection: TextDirection.ltr,
+        text: TextSpan(
+          text: tmp,
+          style: TextStyle(fontSize: fontSize),
+        ),
+      );
+      textPainter.layout(maxWidth: width);
 
-          var end = textPainter
-              .getPositionForOffset(Offset(width, actualPageHeight))
-              .offset;
+      var end = textPainter
+          .getPositionForOffset(Offset(width, actualPageHeight))
+          .offset;
 
-          if (end == 0) {
-            break;
-          }
-
-          pageConfig.add(end.toString());
-
-          BotToast.showText(text: "add page $end");
-
-          tmp = tmp.substring(end, tmp.length);
-
-          while (tmp.startsWith("\n")) {
-            tmp = tmp.substring(1);
-          }
-        }
+      if (end == 0) {
+        break;
       }
-    });
+
+      result.add(end);
+      resultString.add(tmp.substring(0, end));
+
+      tmp = tmp.substring(end, tmp.length);
+      while (tmp.startsWith("\n")) {
+        tmp = tmp.substring(1);
+      }
+    }
+    return resultString;
   }
 
-  Future<Res<String>> loadData() =>
-      ConnectManager().apiClient.getNovelContent(novel.id.toString());
-
-  bool fetch() {
-    loadData().then((value) {
-      if (value.success) {
-        stringContent = value.data;
-        BotToast.showText(text: stringContent.length.toString());
-        isError = false;
-        return true;
-      } else {
-        BotToast.showText(text: "Network error".i18n);
-        isError = true;
-        return false;
+  Future<void> fetch() async {
+    errorMessage = null;
+    try {
+      Res<String> response =
+          await ConnectManager().apiClient.getNovelContent(novel.id.toString());
+      if (response.error) {
+        throw BadResponseException(response.errMsg);
       }
-    });
+      stringContent = response.data;
+      List<String> result = await parse(stringContent);
+      if (result.isEmpty) {
+        throw BadResponseException("No content");
+      }
+      pageConfig.addAll(result);
+    } catch (e) {
+      loggerError(e.toString());
+      errorMessage = e.toString();
+    }
   }
 }
