@@ -118,6 +118,18 @@ extension NovelExt on ApiClient {
         subData: res.data["next_url"]);
   }
 
+  Future<Res<List<Novel>>> getNovelFollowing(String restrict,
+      [String? nextUrl]) async {
+    var res = await apiGet(nextUrl ?? "/v1/novel/follow?restrict=$restrict");
+    if (res.success) {
+      return Res(
+          (res.data["novels"] as List).map((e) => Novel.fromJson(e)).toList(),
+          subData: res.data["next_url"]);
+    } else {
+      return Res.error(res.errorMessage);
+    }
+  }
+
   Future<Res<List<Comment>>> getNovelComments(String id,
       [String? nextUrl]) async {
     var res = await apiGet(nextUrl ?? "/v3/novel/comments?novel_id=$id");
