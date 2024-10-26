@@ -7,10 +7,9 @@ import 'package:skana_pix/pixiv_dart_api.dart';
 import 'package:skana_pix/utils/translate.dart';
 import 'package:skana_pix/view/defaults.dart';
 
+import '../model/worktypes.dart';
 import 'avatar.dart';
 import 'commentemoji.dart';
-
-enum CommentArtWorkType { ILLUST, NOVEL }
 
 final emojisMap = {
   '(normal)': '101.png',
@@ -58,7 +57,7 @@ class CommentPage extends StatefulWidget {
   final bool isReplay;
   final int? pId;
   final String? name;
-  final CommentArtWorkType type;
+  final ArtworkType type;
 
   const CommentPage(
       {Key? key,
@@ -66,7 +65,7 @@ class CommentPage extends StatefulWidget {
       this.isReplay = false,
       this.pId,
       this.name,
-      this.type = CommentArtWorkType.ILLUST})
+      this.type = ArtworkType.ILLUST})
       : super(key: key);
 
   @override
@@ -400,7 +399,7 @@ class _CommentPageState extends State<CommentPage> {
                                                         : parentCommentId
                                                             .toString();
                                                 if (widget.type ==
-                                                    CommentArtWorkType.ILLUST) {
+                                                    ArtworkType.ILLUST) {
                                                   res = await commentIt(
                                                       widget.id.toString(), txt,
                                                       parentId: pp.toString());
@@ -417,7 +416,7 @@ class _CommentPageState extends State<CommentPage> {
                                                         .callRefresh();
                                                   }
                                                 } else if (widget.type ==
-                                                    CommentArtWorkType.NOVEL) {
+                                                    ArtworkType.NOVEL) {
                                                   res = await commentNovel(
                                                       widget.id.toString(), txt,
                                                       parentId: pp.toString());
@@ -541,7 +540,7 @@ class _CommentPageState extends State<CommentPage> {
     if (nextUrl == "end") {
       return Res.error("No more data");
     }
-    Res<List<Comment>> res = widget.type == CommentArtWorkType.NOVEL
+    Res<List<Comment>> res = widget.type == ArtworkType.NOVEL
         ? await getNovelComments(widget.id.toString(), nextUrl)
         : await getComments(widget.id.toString(), nextUrl);
     if (!res.error) {

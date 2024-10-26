@@ -5,6 +5,7 @@ import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:mobx/mobx.dart';
 import 'package:skana_pix/componentwidgets/avatar.dart';
 import 'package:skana_pix/componentwidgets/novelcard.dart';
+import 'package:skana_pix/model/worktypes.dart';
 import 'package:skana_pix/pixiv_dart_api.dart';
 import 'package:skana_pix/utils/translate.dart';
 import 'package:skana_pix/utils/widgetplugin.dart';
@@ -134,7 +135,7 @@ class _RecomNovelsPageState
               onPressed: () {
                 Navigator.of(context)
                     .push(MaterialPageRoute(builder: (BuildContext context) {
-                  return RankingPage(2);
+                  return RankingPage(ArtworkType.NOVEL);
                 }));
               },
             ),

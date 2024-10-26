@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 
+import '../model/worktypes.dart';
+
 class RankingPage extends StatelessWidget {
-  final int type;
+  final ArtworkType type;
   RankingPage(this.type, {super.key});
 
   @override

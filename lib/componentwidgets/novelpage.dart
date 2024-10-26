@@ -1,15 +1,22 @@
+import 'dart:io';
+import 'dart:math';
+
 import 'package:bot_toast/bot_toast.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:mobx/mobx.dart';
+import 'package:path/path.dart';
 import 'package:share_plus/share_plus.dart';
+import 'package:skana_pix/componentwidgets/userpage.dart';
 import 'package:skana_pix/pixiv_dart_api.dart';
 import 'package:skana_pix/utils/translate.dart';
 import 'package:skana_pix/utils/widgetplugin.dart';
+import '../model/worktypes.dart';
 import '../view/defaults.dart';
 import 'avatar.dart';
 import 'commentpage.dart';
 import 'followbutton.dart';
+import 'loading.dart';
 import 'novelresult.dart';
 import 'novelseries.dart';
 import 'pixivimage.dart';
@@ -25,8 +32,8 @@ class NovelViewerPage extends StatefulWidget {
 }
 
 class _NovelViewerPageState extends State<NovelViewerPage> {
-  bool _isBottomBarVisible = true;
-  bool _isAppBarVisible = true;
+  bool _isBottomBarVisible = false;
+  bool _isAppBarVisible = false;
   late NovelStore _novelStore;
   // ignore: unused_field
   String _selectedText = "";
@@ -110,7 +117,7 @@ class _NovelViewerPageState extends State<NovelViewerPage> {
                       padding: EdgeInsets.only(
                           left: _novelStore.linePaddingHorizontal,
                           right: _novelStore.linePaddingHorizontal,
-                          top: _novelStore.paddingVertical * 1.5),
+                          top: _novelStore.paddingVertical * 1.2),
                       child: Text(
                         f,
                         style: TextStyle(fontSize: fontsize),
@@ -118,8 +125,24 @@ class _NovelViewerPageState extends State<NovelViewerPage> {
                     );
                   },
                   itemCount: _novelStore.pageConfig.length + 1,
+                  onPageChanged: (index) {
+                    setState(() {
+                      nowPosition = index;
+                    });
+                  },
                 );
               },
+            ),
+          ),
+          Container(
+            alignment: Alignment.topRight,
+            child: Padding(
+              padding:
+                  const EdgeInsets.only(top: kToolbarHeight / 2, right: 8.0),
+              child: Text(
+                "${nowPosition + 1}/${_novelStore.pageConfig.length + 1}",
+                style: Theme.of(context).textTheme.labelSmall,
+              ),
             ),
           ),
           if (_isAppBarVisible)
@@ -132,7 +155,7 @@ class _NovelViewerPageState extends State<NovelViewerPage> {
       ),
       bottomNavigationBar: _buildBottmAppBar(
         context,
-        height: 100,
+        height: kBottomNavigationBarHeight,
         minHeight: 0,
         duration: Duration(milliseconds: 200),
         isBottomBarVisible: _isBottomBarVisible,
@@ -203,10 +226,11 @@ class _NovelViewerPageState extends State<NovelViewerPage> {
                       // _saveNovelBookMark();
                     }),
                 IconButton(
-                    icon: Icon(Icons.share),
-                    onPressed: () {
-                      _shareNovel();
-                    }),
+                  icon: Icon(Icons.more_vert),
+                  onPressed: () {
+                    _showMessage(context);
+                  },
+                ),
               ],
             ),
           ),
@@ -336,7 +360,7 @@ class _NovelViewerPageState extends State<NovelViewerPage> {
               onPressed: () {
                 Navigator.of(context).push(MaterialPageRoute(
                     builder: (BuildContext context) => CommentPage(
-                        id: widget.novel.id, type: CommentArtWorkType.NOVEL)));
+                        id: widget.novel.id, type: ArtworkType.NOVEL)));
               },
               child: Text("Show comments".i18n)),
         ],
@@ -459,6 +483,148 @@ class _NovelViewerPageState extends State<NovelViewerPage> {
     );
   }
 
+  Future _showMessage(BuildContext context) {
+    return showModalBottomSheet(
+        context: context,
+        shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.vertical(top: Radius.circular(16.0))),
+        builder: (context) {
+          return SafeArea(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: <Widget>[
+                ListTile(
+                  subtitle: Text(
+                    widget.novel.author.name,
+                    maxLines: 2,
+                  ),
+                  title: Text(
+                    widget.novel.title,
+                    maxLines: 2,
+                  ),
+                  leading: PainterAvatar(
+                    url: widget.novel.author.avatar,
+                    id: widget.novel.author.id,
+                    onTap: () {
+                      Navigator.of(context)
+                          .push(MaterialPageRoute(builder: (context) {
+                        return UserPage(
+                          id: widget.novel.author.id,
+                          type: ArtworkType.NOVEL,
+                        );
+                      }));
+                    },
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                  child: Text('Previous'.i18n),
+                ),
+                buildListTile(
+                    _novelStore.novelWebResponse!.seriesNavigation?.prevNovel,
+                    context),
+                Divider(),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                  child: Text('Next'.i18n),
+                ),
+                buildListTile(
+                    _novelStore.novelWebResponse!.seriesNavigation?.nextNovel,
+                    context),
+                if (DynamicData.isAndroid)
+                  ListTile(
+                    title: Text("Export".i18n),
+                    leading: Icon(Icons.folder_zip),
+                    onTap: () {
+                      _export(context);
+                    },
+                  ),
+                ListTile(
+                  title: Text("Settings".i18n),
+                  leading: Icon(
+                    Icons.settings,
+                  ),
+                  onTap: () {
+                    Navigator.of(context).pop();
+                    _showSettings(context);
+                  },
+                ),
+                ListTile(
+                  title: Text("Share".i18n),
+                  leading: Icon(
+                    Icons.share,
+                  ),
+                  onTap: () {
+                    Navigator.of(context).pop();
+                    Share.share(
+                        "https://www.pixiv.net/novel/show.php?id=${widget.novel.id}");
+                  },
+                ),
+              ],
+            ),
+          );
+        });
+  }
+
+  Widget buildListTile(SimpleNovel? relNovel, BuildContext context) {
+    if (relNovel == null)
+      return ListTile(
+        title: Text("no more"),
+      );
+    return ListTile(
+      title: Text(relNovel.title, maxLines: 2, overflow: TextOverflow.ellipsis),
+      onTap: () {
+        Navigator.of(context, rootNavigator: true).pushReplacement(
+            MaterialPageRoute(
+                builder: (BuildContext context) =>
+                    NovelPageLite(relNovel.id.toString())));
+      },
+    );
+  }
+
+  Future<void> _showSettings(BuildContext context) async {
+    await showModalBottomSheet(
+        context: context,
+        shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.vertical(
+            top: Radius.circular(16),
+          ),
+        ),
+        builder: (context) {
+          return StatefulBuilder(builder: (context, setB) {
+            return SafeArea(
+                child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Row(
+                  mainAxisSize: MainAxisSize.max,
+                  children: [
+                    Container(
+                      child: Icon(Icons.text_fields),
+                      margin: EdgeInsets.only(left: 16),
+                    ),
+                    Container(
+                      child: Text(fontsize.toInt().toString()),
+                      margin: EdgeInsets.only(left: 16),
+                    ),
+                    Expanded(
+                        child: Slider(
+                            value: fontsize / 32,
+                            onChanged: (v) {
+                              setB(() {
+                                fontsize = v * 32;
+                                settings.set("fontSize", fontsize);
+                              });
+                            })),
+                  ],
+                )
+              ],
+            ));
+          });
+        });
+  }
+
   _buildBottmAppBar(BuildContext context,
       {required double height,
       required double minHeight,
@@ -483,48 +649,66 @@ class _NovelViewerPageState extends State<NovelViewerPage> {
         opacity: isBottomBarVisible ? 1 : 0,
         duration: duration,
         child: BottomAppBar(
-          child: SingleChildScrollView(
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
-              children: [
-                IconButton(
-                    icon: Icon(Icons.folder),
-                    onPressed: () {
-                      _pageController
-                          .jumpToPage(_novelStore.pageConfig.length - 1);
-                      setState(() {
-                        nowPosition = _novelStore.pageConfig.length - 1;
-                      });
-                    }),
-                IconButton(
-                    icon: Icon(Icons.folder),
-                    onPressed: () {
-                      // _openBookmarkList();
-                    }),
-                IconButton(
-                    icon: Icon(Icons.folder),
-                    onPressed: () {
-                      // _openSetting();
-                    }),
-                // _buildBottomAppBarItem(
-                //     icon: isDark ? Icons.nightlight : Icons.wb_sunny,
-                //     text: isDark ? "夜间" : "白天",
-                //     onPressed: _themeStyleProvider.switchTheme),
-                IconButton(
-                    icon: Icon(Icons.folder),
-                    onPressed: () {
-                      BotToast.showText(text: "Coming soon".i18n);
-                    }),
-              ],
-            ),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: [
+              IconButton(
+                icon: Icon(Icons.arrow_back_ios_rounded),
+                onPressed: (nowPosition == 0)
+                    ? null
+                    : () {
+                        _pageController.jumpToPage(nowPosition - 1);
+                        setState(() {
+                          nowPosition--;
+                        });
+                      },
+              ),
+              Slider(
+                  value: max(0, nowPosition.toDouble()),
+                  max: _novelStore.pageConfig.length.toDouble(),
+                  divisions: max(_novelStore.pageConfig.length, 1),
+                  min: min(0, _novelStore.pageConfig.length.toDouble()),
+                  label:
+                      "${nowPosition + 1}/${_novelStore.pageConfig.length + 1}",
+                  onChanged: (v) {
+                    if (v >= _novelStore.pageConfig.length + 1)
+                      v = _novelStore.pageConfig.length.toDouble();
+                    if (v < 0) v = 0;
+                    _pageController.jumpToPage(v.toInt());
+                    setState(() {
+                      nowPosition = v.toInt();
+                    });
+                  }),
+              IconButton(
+                  icon: Icon(Icons.arrow_forward_ios_rounded),
+                  onPressed: (nowPosition == _novelStore.pageConfig.length)
+                      ? null
+                      : () {
+                          _pageController.jumpToPage(nowPosition + 1);
+                          setState(() {
+                            nowPosition++;
+                          });
+                        }),
+            ],
           ),
         ),
       ),
     );
   }
 
-  void _shareNovel() {
-    Share.share("https://www.pixiv.net/novel/show.php?id=${widget.novel.id}");
+  void _export(BuildContext context) async {
+    if (_novelStore.stringContent.isEmpty) return;
+    String targetPath =
+        join(BasePath.cachePath, "share_cache", "${widget.novel.title}.txt");
+    File file = File(targetPath);
+    if (!file.existsSync()) {
+      file.createSync(recursive: true);
+    }
+    await file.writeAsString(_novelStore.stringContent);
+    final box = context.findRenderObject() as RenderBox?;
+    Share.shareXFiles([XFile(targetPath)],
+        sharePositionOrigin: box!.localToGlobal(Offset.zero) & box.size);
+    logger("path: $targetPath");
   }
 }
 
@@ -540,6 +724,7 @@ class NovelStore {
   late ObservableList<String> pageConfig = ObservableList();
   String? errorMessage;
   late TextPainter textPainter;
+  NovelWebResponse? novelWebResponse;
 
   NovelStore(this.novel, this.pageHeight, this.pageWidth,
       {this.fontSize = 20,
@@ -599,12 +784,13 @@ class NovelStore {
   Future<void> fetch() async {
     errorMessage = null;
     try {
-      Res<String> response =
+      Res<NovelWebResponse> response =
           await ConnectManager().apiClient.getNovelContent(novel.id.toString());
       if (response.error) {
         throw BadResponseException(response.errMsg);
       }
-      stringContent = response.data;
+      novelWebResponse = response.data;
+      stringContent = novelWebResponse!.text;
       List<String> result = await parse(stringContent);
       if (result.isEmpty) {
         throw BadResponseException("No content");
@@ -614,5 +800,24 @@ class NovelStore {
       loggerError(e.toString());
       errorMessage = e.toString();
     }
+  }
+}
+
+class NovelPageLite extends StatefulWidget {
+  final String id;
+  const NovelPageLite(this.id, {super.key});
+  @override
+  _NovelPageLiteState createState() => _NovelPageLiteState();
+}
+
+class _NovelPageLiteState extends LoadingState<NovelPageLite, Novel> {
+  @override
+  Widget buildContent(BuildContext context, Novel data) {
+    return NovelViewerPage(data);
+  }
+
+  @override
+  Future<Res<Novel>> loadData() {
+    return getNovelById(widget.id);
   }
 }

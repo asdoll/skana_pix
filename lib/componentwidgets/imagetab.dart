@@ -3,6 +3,7 @@ import 'dart:ui';
 import 'package:bot_toast/bot_toast.dart';
 import 'package:flutter/material.dart';
 import 'package:skana_pix/componentwidgets/loading.dart';
+import 'package:skana_pix/model/worktypes.dart';
 import 'package:skana_pix/pixiv_dart_api.dart';
 import 'package:skana_pix/utils/translate.dart';
 import 'package:blur/blur.dart';
@@ -17,7 +18,10 @@ typedef UpdateFavoriteFunc = void Function(bool v);
 
 class IllustCard extends StatefulWidget {
   const IllustCard(this.illusts, this.showMangaBadage,
-      {this.initialPage = 0, this.type = 0, this.useSquare = false, super.key});
+      {this.initialPage = 0,
+      this.type = ArtworkType.ILLUST,
+      this.useSquare = false,
+      super.key});
 
   final showMangaBadage;
 
@@ -29,7 +33,7 @@ class IllustCard extends StatefulWidget {
 
   final int initialPage;
 
-  final int type;
+  final ArtworkType type;
 
   @override
   _IllustCardState createState() => _IllustCardState();
@@ -41,8 +45,9 @@ class _IllustCardState extends State<IllustCard> {
   late String tag;
   late int page = 0;
   Illust get illust => illusts[page];
-  String get nextUrl =>
-      illusts.length < 2 ? "end" : (widget.type == 0 ? "illust" : "manga");
+  String get nextUrl => illusts.length < 2
+      ? "end"
+      : (widget.type == ArtworkType.ILLUST ? "illust" : "manga");
 
   @override
   void initState() {

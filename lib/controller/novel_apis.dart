@@ -62,37 +62,29 @@ extension NovelExt on ApiClient {
     return const Res(true);
   }
 
-  Future<Res<String>> getNovelContent(String id) async {
-    var res = await apiGetPlain(
-        "/webview/v2/novel?id=$id&font=default&font_size=16.0px&line_height=1.75&color=%23101010&background_color=%23EFEFEF&margin_top=56px&margin_bottom=48px&theme=light&use_block=true&viewer_version=20221031_ai");
+  String? _parseHtml(String html) {
+    var document = parse(html);
+    final scriptElement = document.querySelector('script')!;
+    String scriptContent = scriptElement.innerHtml;
+    final novelRegex = RegExp(r'novel: ({.*?}),\n\s*isOwnWork');
+    final match = novelRegex.firstMatch(scriptContent);
+    if (match != null) {
+      final novelJsonString = match.group(1);
+      return novelJsonString;
+    }
+    return null;
+  }
+
+  Future<Res<NovelWebResponse>> getNovelContent(String id) async {
+    var res = await apiGetPlain("/webview/v2/novel?id=$id");
     if (res.error) {
       return Res.fromErrorRes(res);
     }
     try {
-      var html = res.data;
-      int start = html.indexOf("novel:");
-      while (html[start] != '{') {
-        start++;
-      }
-      int leftCount = 0;
-      int end = start;
-      for (end = start; end < html.length; end++) {
-        if (html[end] == '{') {
-          leftCount++;
-        } else if (html[end] == '}') {
-          leftCount--;
-        }
-        if (leftCount == 0) {
-          end++;
-          break;
-        }
-      }
-      var json = jsonDecode(html.substring(start, end));
-      var resNovel = await getNovelById(id);
-      if (resNovel.error) {
-        return Res.fromErrorRes(res);
-      }
-      return Res(json['text']);
+      String json = _parseHtml(res.data)!;
+      NovelWebResponse novelTextResponse =
+          NovelWebResponse.fromJson(jsonDecode(json));
+      return Res(novelTextResponse);
     } catch (e, s) {
       Log.error(
           "Data Convert", "Failed to analyze html novel content: \n$e\n$s");

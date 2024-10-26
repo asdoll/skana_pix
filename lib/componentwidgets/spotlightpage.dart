@@ -7,12 +7,13 @@ import 'package:waterfall_flow/waterfall_flow.dart';
 
 import 'package:flutter_mobx/flutter_mobx.dart';
 
+import '../model/worktypes.dart';
 import 'headerfooter.dart';
 import 'spotlightcard.dart';
 
 class SpotlightPage extends StatefulWidget {
-  final int type;
-  const SpotlightPage(this.type,{super.key});
+  final ArtworkType type;
+  const SpotlightPage(this.type, {super.key});
 
   @override
   _SpotlightPageState createState() => _SpotlightPageState();

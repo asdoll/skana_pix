@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:skana_pix/utils/translate.dart';
 import 'package:skana_pix/view/defaults.dart';
 
+import '../model/worktypes.dart';
 import 'recom_images_page.dart';
 import 'recom_novels_page.dart';
 
@@ -21,8 +22,8 @@ class _MainScreenState extends State<MainScreen> {
   @override
   Widget build(BuildContext context) {
     List<Widget> tabs = [
-      RecomImagesPage(0),
-      RecomImagesPage(1),
+      RecomImagesPage(ArtworkType.ILLUST),
+      RecomImagesPage(ArtworkType.MANGA),
       RecomNovelsPage(),
     ];
     return MaterialApp(

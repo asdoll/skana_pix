@@ -7,6 +7,7 @@ import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:mobx/mobx.dart';
 import 'package:skana_pix/componentwidgets/headerfooter.dart';
 import 'package:skana_pix/componentwidgets/spotlightpage.dart';
+import 'package:skana_pix/model/worktypes.dart';
 import 'package:skana_pix/pixiv_dart_api.dart';
 import 'package:skana_pix/utils/translate.dart';
 import 'package:skana_pix/view/defaults.dart';
@@ -20,7 +21,7 @@ import '../componentwidgets/souppage.dart';
 import '../utils/filters.dart';
 
 class RecomImagesPage extends StatefulWidget {
-  final int type;
+  final ArtworkType type;
 
   RecomImagesPage(this.type, {super.key});
   @override
@@ -77,11 +78,11 @@ class _RecomImagesPageState
             SliverToBoxAdapter(
               child: _buidRankingRow(context),
             ),
-            if (widget.type == 0)
+            if (widget.type == ArtworkType.ILLUST)
               SliverToBoxAdapter(
                 child: _buildPixivisionRow(context),
               ),
-            if (widget.type == 0)
+            if (widget.type == ArtworkType.ILLUST)
               SliverToBoxAdapter(
                 child: _buidTagSpotlightRow(context),
               ),
@@ -152,12 +153,14 @@ class _RecomImagesPageState
                       color: Colors.transparent,
                       child: InkWell(
                         onTap: () {
-                          Navigator.of(context,rootNavigator: true).push(MaterialPageRoute(
-                              builder: (BuildContext context) => SoupPage(
-                              url: spotlight.articleUrl,
-                              spotlight: spotlight,
-                              heroTag: 'spotlight_image_${spotlight.hashCode}',
-                            )));
+                          Navigator.of(context, rootNavigator: true)
+                              .push(MaterialPageRoute(
+                                  builder: (BuildContext context) => SoupPage(
+                                        url: spotlight.articleUrl,
+                                        spotlight: spotlight,
+                                        heroTag:
+                                            'spotlight_image_${spotlight.hashCode}',
+                                      )));
                         },
                         child: Container(
                             width: expectCardWidget,
@@ -279,8 +282,10 @@ class _RecomImagesPageState
                 style: Theme.of(context).textTheme.bodySmall,
               ),
               onPressed: () {
-                Navigator.of(context,rootNavigator: true)
-                    .push(MaterialPageRoute(builder: (BuildContext context)=> SpotlightPage(widget.type)));
+                Navigator.of(context, rootNavigator: true).push(
+                    MaterialPageRoute(
+                        builder: (BuildContext context) =>
+                            SpotlightPage(widget.type)));
               },
             ),
           )
@@ -301,17 +306,20 @@ class _RecomImagesPageState
               child: Text(
                 "Ranking".i18n,
                 style: TextStyle(
-                    fontWeight: FontWeight.w600,
-                    fontSize: 24.0,
-                    overflow: TextOverflow.clip,
-                    ),
+                  fontWeight: FontWeight.w600,
+                  fontSize: 24.0,
+                  overflow: TextOverflow.clip,
+                ),
               ),
             ),
           ),
           Padding(
             padding: EdgeInsets.all(4.0),
             child: TextButton(
-              child: Text("More".i18n,style: Theme.of(context).textTheme.bodySmall,),
+              child: Text(
+                "More".i18n,
+                style: Theme.of(context).textTheme.bodySmall,
+              ),
               onPressed: () {
                 Navigator.of(context)
                     .push(MaterialPageRoute(builder: (BuildContext context) {
@@ -367,11 +375,13 @@ class _RecomImagesPageState
   }
 
   Future<Res<List<Illust>>> loadTops() {
-    return widget.type == 0 ? getRanking("day") : getRanking("day_manga");
+    return widget.type == ArtworkType.ILLUST
+        ? getRanking("day")
+        : getRanking("day_manga");
   }
 
   parseSpotlightArticles() {
-    if (widget.type == 1) {
+    if (widget.type == ArtworkType.MANGA) {
       return true;
     }
     loadSpotlightArticles().then((value) {
@@ -392,9 +402,13 @@ class _RecomImagesPageState
 
   @override
   Future<Res<List<Illust>>> loadData(page) {
-    if(nexturl!=null){
-      return widget.type == 0 ? getIllustsWithNextUrl(nexturl) : getIllustsWithNextUrl(nexturl);
+    if (nexturl != null) {
+      return widget.type == ArtworkType.ILLUST
+          ? getIllustsWithNextUrl(nexturl)
+          : getIllustsWithNextUrl(nexturl);
     }
-    return widget.type == 0 ? getRecommendedIllusts() : getRecommendedMangas();
+    return widget.type == ArtworkType.ILLUST
+        ? getRecommendedIllusts()
+        : getRecommendedMangas();
   }
 }

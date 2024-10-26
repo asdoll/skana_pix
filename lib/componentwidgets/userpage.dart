@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:skana_pix/model/worktypes.dart';
 
 class UserPage extends StatefulWidget {
-  const UserPage({Key? key, String? heroTag, required int id}) : super(key: key);
+  final ArtworkType type;
+  const UserPage(
+      {Key? key, String? heroTag, required int id, required this.type})
+      : super(key: key);
 
   @override
   _UserPageState createState() => _UserPageState();
@@ -13,5 +17,4 @@ class _UserPageState extends State<UserPage> {
     // TODO: implement build
     throw UnimplementedError();
   }
-  
 }

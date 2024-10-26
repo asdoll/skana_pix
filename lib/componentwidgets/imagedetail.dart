@@ -1,6 +1,7 @@
 import 'package:bot_toast/bot_toast.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:skana_pix/model/worktypes.dart';
 import 'package:skana_pix/pixiv_dart_api.dart';
 import 'package:skana_pix/utils/translate.dart';
 
@@ -442,6 +443,9 @@ class _IllustDetailContentState extends State<IllustDetailContent> {
         builder: (BuildContext context) => UserPage(
               id: illust.author.id,
               heroTag: hashCode.toString(),
+              type: illust.type == "illust"
+                  ? ArtworkType.ILLUST
+                  : ArtworkType.MANGA,
             )));
   }
 

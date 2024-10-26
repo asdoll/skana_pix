@@ -1,6 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:skana_pix/controller/caches.dart';
+import 'package:skana_pix/model/worktypes.dart';
 
 import 'userpage.dart';
 
@@ -9,9 +10,15 @@ class PainterAvatar extends StatefulWidget {
   final int id;
   final GestureTapCallback? onTap;
   final Size? size;
+  final ArtworkType type;
 
   const PainterAvatar(
-      {Key? key, required this.url, required this.id, this.onTap, this.size})
+      {Key? key,
+      required this.url,
+      required this.id,
+      this.onTap,
+      this.size,
+      this.type = ArtworkType.ALL})
       : super(key: key);
 
   @override
@@ -22,7 +29,10 @@ class _PainterAvatarState extends State<PainterAvatar> {
   void pushToUserPage() {
     Navigator.of(context, rootNavigator: true)
         .push(MaterialPageRoute(builder: (_) {
-      return UserPage(id: widget.id);
+      return UserPage(
+        id: widget.id,
+        type: widget.type,
+      );
     }));
   }
 

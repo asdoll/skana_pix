@@ -13,6 +13,7 @@ import 'package:skana_pix/utils/widgetplugin.dart';
 import 'package:skana_pix/view/defaults.dart';
 
 import '../controller/histories.dart';
+import '../model/worktypes.dart';
 import '../utils/filters.dart';
 import 'avatar.dart';
 import 'backarea.dart';
@@ -821,6 +822,9 @@ class _IllustPageState extends State<IllustPage> {
         builder: (BuildContext context) => UserPage(
               id: illust.author.id,
               heroTag: hashCode.toString(),
+              type: illust.type == "illust"
+                  ? ArtworkType.ILLUST
+                  : ArtworkType.MANGA,
             )));
   }
 
