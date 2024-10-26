@@ -8,7 +8,7 @@ import 'pixivimage.dart';
 
 class NovelCard extends StatefulWidget {
   final Novel novel;
-  const NovelCard(this.novel,{super.key});
+  const NovelCard(this.novel, {super.key});
 
   @override
   State<NovelCard> createState() => _NovelCardState();
@@ -24,8 +24,7 @@ class _NovelCardState extends State<NovelCard> {
         child: InkWell(
           onTap: () {
             Navigator.of(context, rootNavigator: true).push(MaterialPageRoute(
-                builder: (BuildContext context) =>
-                    NovelViewerPage(novel)));
+                builder: (BuildContext context) => NovelViewerPage(novel)));
           },
           child: Card(
             child: Row(
@@ -135,7 +134,7 @@ class _NovelCardState extends State<NovelCard> {
                   child: Column(
                     mainAxisSize: MainAxisSize.max,
                     children: [
-                      NovelBookmarkButton(novel: novel),
+                      NovelBookmarkButton(novel: novel, colorMode: ""),
                       Text('${novel.totalBookmarks}',
                           style: Theme.of(context).textTheme.bodySmall)
                     ],

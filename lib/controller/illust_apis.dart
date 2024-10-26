@@ -128,13 +128,13 @@ extension IllustExt on ApiClient {
   }
 
   /// mode: day, week, month, day_male, day_female, week_original, week_rookie, day_manga, week_manga, month_manga, day_r18_manga, day_r18, week_r18, week_r18g, week_rookie_manga
-  Future<Res<List<Illust>>> getRanking(String mode, [DateTime? date,String? nextUrl]) async {
+  Future<Res<List<Illust>>> getRanking(String mode,
+      [String? date, String? nextUrl]) async {
     var link = "/v1/illust/ranking?filter=for_android&mode=$mode";
     if (date != null) {
-      link += "&date=${toRequestDate(date)}";
+      link += "&date=$date";
     }
-    var res = await apiGet(
-        nextUrl ?? link);
+    var res = await apiGet(nextUrl ?? link);
     if (res.success) {
       return Res(
           (res.data["illusts"] as List).map((e) => Illust.fromJson(e)).toList(),
@@ -157,12 +157,17 @@ extension IllustExt on ApiClient {
     }
   }
 
-  Future<Res<bool>> comment(String id, String content, {String? parentId}) async {
+  Future<Res<bool>> comment(String id, String content,
+      {String? parentId}) async {
     Map<String, String> data;
-    if(parentId != null && parentId.isNotEmpty) {
-        data = {"illust_id": id, "comment": content,"parent_comment_id": parentId};
+    if (parentId != null && parentId.isNotEmpty) {
+      data = {
+        "illust_id": id,
+        "comment": content,
+        "parent_comment_id": parentId
+      };
     } else {
-        data = {"illust_id": id, "comment": content};
+      data = {"illust_id": id, "comment": content};
     }
     var res = await apiPost("/v1/illust/comment/add", data: data);
     if (res.success) {
@@ -197,9 +202,9 @@ extension IllustExt on ApiClient {
     var res =
         await apiGet("/v2/illust/related?filter=for_android&illust_id=$id");
     if (res.success) {
-      return Res((res.data["illusts"] as List)
-          .map((e) => Illust.fromJson(e))
-          .toList(),subData: res.data["next_url"]);
+      return Res(
+          (res.data["illusts"] as List).map((e) => Illust.fromJson(e)).toList(),
+          subData: res.data["next_url"]);
     } else {
       return Res.error(res.errorMessage);
     }
@@ -219,7 +224,8 @@ extension IllustExt on ApiClient {
   }
 
   Future<SpotlightResponse> getSpotlightArticles(String category) async {
-    var res = await apiGet("/v1/spotlight/articles?filter=for_android?category=$category");
+    var res = await apiGet(
+        "/v1/spotlight/articles?filter=for_android?category=$category");
     if (res.success) {
       return SpotlightResponse.fromJson(res.data);
     } else {

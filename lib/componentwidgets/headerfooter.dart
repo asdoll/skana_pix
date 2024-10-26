@@ -19,6 +19,7 @@ class DefaultHeaderFooter {
         processingText: "Loading".i18n,
         failedText: "Failed".i18n,
         showMessage: false,
-        processedText: "Successed".i18n);
+        processedText: "Successed".i18n,
+        noMoreText: "No more".i18n);
   }
 }

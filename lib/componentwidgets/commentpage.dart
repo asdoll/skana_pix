@@ -538,6 +538,7 @@ class _CommentPageState extends State<CommentPage> {
 
   Future<Res<List<Comment>>> loadData() async {
     if (nextUrl == "end") {
+      easyRefreshController.finishLoad(IndicatorResult.noMore);
       return Res.error("No more data");
     }
     Res<List<Comment>> res = widget.type == ArtworkType.NOVEL

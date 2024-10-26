@@ -1,10 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:skana_pix/pixiv_dart_api.dart';
+import 'package:skana_pix/view/defaults.dart';
 
 class NovelBookmarkButton extends StatefulWidget {
   final Novel novel;
+  final String colorMode;
 
-  const NovelBookmarkButton({Key? key, required this.novel}) : super(key: key);
+  const NovelBookmarkButton(
+      {Key? key, required this.novel, required this.colorMode})
+      : super(key: key);
 
   @override
   _NovelBookmarkButtonState createState() => _NovelBookmarkButtonState();
@@ -12,15 +16,19 @@ class NovelBookmarkButton extends StatefulWidget {
 
 class _NovelBookmarkButtonState extends State<NovelBookmarkButton> {
   bool isBookmarking = false;
+  bool isLight = false;
   @override
   Widget build(BuildContext context) {
+    if (widget.colorMode == "light") {
+      isLight = true;
+    }
     return InkWell(
       onLongPress: () async {
         if (!widget.novel.isBookmarked) {
           try {
             setState(() {
               isBookmarking = true;
-              });
+            });
             await favoriteNovel(widget.novel.id.toString(), "private");
             setState(() {
               isBookmarking = false;
@@ -31,7 +39,7 @@ class _NovelBookmarkButtonState extends State<NovelBookmarkButton> {
           try {
             setState(() {
               isBookmarking = true;
-              });
+            });
             await deleteFavoriteNovel(widget.novel.id.toString());
             setState(() {
               isBookmarking = false;
@@ -43,17 +51,20 @@ class _NovelBookmarkButtonState extends State<NovelBookmarkButton> {
       child: IconButton(
         icon: isBookmarking
             ? Icon(Icons.favorite_outlined,
-                color: Theme.of(context).textTheme.bodySmall!.color)
+                color: isLight
+                    ? DynamicData.darkTheme.textTheme.bodySmall!.color
+                    : Theme.of(context).textTheme.bodySmall!.color)
             : widget.novel.isBookmarked
-                ? Icon(Icons.favorite_outlined,
-                    color: Colors.red)
+                ? Icon(Icons.favorite_outlined, color: Colors.red)
                 : Icon(Icons.favorite_outline,
-                    color: Theme.of(context).textTheme.bodySmall!.color),
+                    color: isLight
+                        ? DynamicData.darkTheme.textTheme.bodySmall!.color
+                        : Theme.of(context).textTheme.bodySmall!.color),
         onPressed: () async {
           if (!widget.novel.isBookmarked) {
             try {
               setState(() {
-              isBookmarking = true;
+                isBookmarking = true;
               });
               await favoriteNovel(widget.novel.id.toString(), "public");
               setState(() {
@@ -64,7 +75,7 @@ class _NovelBookmarkButtonState extends State<NovelBookmarkButton> {
           } else {
             try {
               setState(() {
-              isBookmarking = true;
+                isBookmarking = true;
               });
               await deleteFavoriteNovel(widget.novel.id.toString());
               setState(() {

@@ -133,7 +133,7 @@ class _RecomNovelsPageState
                 style: Theme.of(context).textTheme.bodySmall,
               ),
               onPressed: () {
-                Navigator.of(context)
+                Navigator.of(context, rootNavigator: true)
                     .push(MaterialPageRoute(builder: (BuildContext context) {
                   return RankingPage(ArtworkType.NOVEL);
                 }));
@@ -194,152 +194,159 @@ class _RecomNovelsPageState
                                 NovelViewerPage(novel)));
                   },
                   child: Container(
-                    width: expectwidth,
-                    height: expectHeight,
-                    decoration: BoxDecoration(
-                      image: DecorationImage(
-                          colorFilter: ColorFilter.mode(
-                              Colors.black.withOpacity(0.3),
-                              BlendMode.colorBurn),
-                          fit: BoxFit.cover,
-                          image: PixivProvider.url(novel.coverImageUrl)),
-                    ),
-                    child: Container(
-                      child: Column(
-                        mainAxisSize: MainAxisSize.max,
-                        children: [
-                          const SizedBox(
-                            height: 4,
-                          ),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.end,
+                      width: expectwidth,
+                      height: expectHeight,
+                      child: Stack(children: [
+                        PixivImage(novel.coverImageUrl,
+                            fit: BoxFit.cover,
+                            width: expectwidth,
+                            height: expectHeight),
+                        Container(
+                          height: expectHeight,
+                          width: expectwidth,
+                          color: Colors.black.withOpacity(0.5),
+                        ),
+                        Container(
+                          child: Column(
+                            mainAxisSize: MainAxisSize.max,
                             children: [
-                              Wrap(
-                                crossAxisAlignment: WrapCrossAlignment.center,
+                              const SizedBox(
+                                height: 4,
+                              ),
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.end,
                                 children: [
+                                  Wrap(
+                                    crossAxisAlignment:
+                                        WrapCrossAlignment.center,
+                                    children: [
+                                      Icon(
+                                        Icons.remove_red_eye_outlined,
+                                        color: Colors.white,
+                                        size: 16,
+                                      ),
+                                      Text(
+                                        "${novel.totalViews} ",
+                                        style: TextStyle(
+                                          color: Colors.white,
+                                          fontSize: 12,
+                                          fontWeight: FontWeight.w500,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  SizedBox(
+                                    width: 8,
+                                  ),
                                   Icon(
-                                    Icons.remove_red_eye_outlined,
+                                    Icons.sticky_note_2_outlined,
                                     color: Colors.white,
                                     size: 16,
                                   ),
                                   Text(
-                                    "${novel.totalViews} ",
+                                    "${novel.length} ",
                                     style: TextStyle(
                                       color: Colors.white,
                                       fontSize: 12,
                                       fontWeight: FontWeight.w500,
                                     ),
                                   ),
+                                  const SizedBox(
+                                    width: 4,
+                                  ),
                                 ],
                               ),
-                              SizedBox(
-                                width: 8,
+                              Expanded(
+                                child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.center,
+                                    children: [
+                                      Text(
+                                        "${novel.title}",
+                                        maxLines: 2,
+                                        textAlign: TextAlign.center,
+                                        overflow: TextOverflow.ellipsis,
+                                        style: TextStyle(
+                                          color: Colors.white,
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.w600,
+                                        ),
+                                      ).paddingHorizontal(8),
+                                      SizedBox(
+                                        height: 10,
+                                      ),
+                                      Wrap(
+                                        crossAxisAlignment:
+                                            WrapCrossAlignment.center,
+                                        alignment: WrapAlignment.center,
+                                        spacing:
+                                            2, // gap between adjacent chips
+                                        runSpacing: 0,
+                                        children: [
+                                          for (var f in tags)
+                                            Text(
+                                              "#${f.name} ",
+                                              textAlign: TextAlign.center,
+                                              style: TextStyle(
+                                                overflow: TextOverflow.ellipsis,
+                                                color: Colors.white,
+                                                fontSize: 12,
+                                                fontWeight: FontWeight.normal,
+                                              ),
+                                            ),
+                                          if (tags.length != novel.tags.length)
+                                            Text(
+                                              "...",
+                                              textAlign: TextAlign.center,
+                                              style: TextStyle(
+                                                color: Colors.white,
+                                                fontSize: 12,
+                                                fontWeight: FontWeight.w500,
+                                              ),
+                                            )
+                                        ],
+                                      ).paddingHorizontal(8),
+                                    ]),
                               ),
-                              Icon(
-                                Icons.sticky_note_2_outlined,
-                                color: Colors.white,
-                                size: 16,
-                              ),
-                              Text(
-                                "${novel.length} ",
-                                style: TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 12,
-                                  fontWeight: FontWeight.w500,
+                              Container(
+                                padding: const EdgeInsets.only(
+                                    left: 8.0, right: 4.0),
+                                child: Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Wrap(
+                                        crossAxisAlignment:
+                                            WrapCrossAlignment.center,
+                                        children: [
+                                          PainterAvatar(
+                                            url: novel.author.avatar,
+                                            id: novel.author.id,
+                                            size: Size(16, 16),
+                                          ),
+                                          Padding(
+                                            padding: const EdgeInsets.only(
+                                                left: 6.0),
+                                            child: Text(
+                                              novel.author.name.atMost8,
+                                              style: const TextStyle(
+                                                color: Colors.white,
+                                                fontSize: 14,
+                                                fontWeight: FontWeight.w600,
+                                              ),
+                                            ),
+                                          ),
+                                        ]),
+                                    NovelBookmarkButton(
+                                        novel: novel, colorMode: "light"),
+                                  ],
                                 ),
-                              ),
-                              const SizedBox(
-                                width: 4,
                               ),
                             ],
                           ),
-                          Expanded(
-                            child: Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                crossAxisAlignment: CrossAxisAlignment.center,
-                                children: [
-                                  Text(
-                                    "${novel.title}",
-                                    maxLines: 2,
-                                    textAlign: TextAlign.center,
-                                    overflow: TextOverflow.ellipsis,
-                                    style: TextStyle(
-                                      color: Colors.white,
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.w600,
-                                    ),
-                                  ).paddingHorizontal(8),
-                                  SizedBox(
-                                    height: 10,
-                                  ),
-                                  Wrap(
-                                    crossAxisAlignment:
-                                        WrapCrossAlignment.center,
-                                    alignment: WrapAlignment.center,
-                                    spacing: 2, // gap between adjacent chips
-                                    runSpacing: 0,
-                                    children: [
-                                      for (var f in tags)
-                                        Text(
-                                          "#${f.name} ",
-                                          textAlign: TextAlign.center,
-                                          style: TextStyle(
-                                            overflow: TextOverflow.ellipsis,
-                                            color: Colors.white,
-                                            fontSize: 12,
-                                            fontWeight: FontWeight.normal,
-                                          ),
-                                        ),
-                                      if (tags.length != novel.tags.length)
-                                        Text(
-                                          "...",
-                                          textAlign: TextAlign.center,
-                                          style: TextStyle(
-                                            color: Colors.white,
-                                            fontSize: 12,
-                                            fontWeight: FontWeight.w500,
-                                          ),
-                                        )
-                                    ],
-                                  ).paddingHorizontal(8),
-                                ]),
-                          ),
-                          Container(
-                            padding:
-                                const EdgeInsets.only(left: 8.0, right: 4.0),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Wrap(
-                                    crossAxisAlignment:
-                                        WrapCrossAlignment.center,
-                                    children: [
-                                      PainterAvatar(
-                                        url: novel.author.avatar,
-                                        id: novel.author.id,
-                                        size: Size(16, 16),
-                                      ),
-                                      Padding(
-                                        padding:
-                                            const EdgeInsets.only(left: 6.0),
-                                        child: Text(
-                                          novel.author.name.atMost8,
-                                          style: const TextStyle(
-                                            color: Colors.white,
-                                            fontSize: 14,
-                                            fontWeight: FontWeight.w600,
-                                          ),
-                                        ),
-                                      ),
-                                    ]),
-                                NovelBookmarkButton(novel: novel),
-                              ],
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ))),
+                        ),
+                      ])))),
         ),
       ),
     );

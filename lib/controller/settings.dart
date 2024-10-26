@@ -242,6 +242,14 @@ class UserSetting {
 
   String get locale => getLocale();
 
+  Locale LocaleObj() {
+    List<String> loc = getLocale().split('_');
+    if (loc.length != 2) {
+      return Locale('en', 'US');
+    }
+    return Locale(loc[0], loc[1]);
+  }
+
   String getLocale() {
     if (language == 'system') {
       var locale = PlatformDispatcher.instance.locale;

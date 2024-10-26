@@ -119,8 +119,10 @@ abstract class MultiPageLoadingState<T extends StatefulWidget, S extends Object>
   bool get isLoading => _isLoading || _isFirstLoading;
 
   bool get isFirstLoading => _isFirstLoading;
-  
+
   String? get errors => _error;
+
+  List<S>? get datas => _data;
 
   nextPage() {
     if (_isLoading) return;
@@ -143,7 +145,7 @@ abstract class MultiPageLoadingState<T extends StatefulWidget, S extends Object>
         if (message.length > 45) {
           message = "${message.substring(0, 20)}...";
         }
-        BotToast.showText(text:message);
+        BotToast.showText(text: message);
         return false;
       }
     });
@@ -162,6 +164,7 @@ abstract class MultiPageLoadingState<T extends StatefulWidget, S extends Object>
   }
 
   void firstLoad() {
+    nexturl = null;
     loadData(_page).then((value) {
       if (value.success) {
         _page++;

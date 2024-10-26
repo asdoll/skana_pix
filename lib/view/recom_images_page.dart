@@ -321,7 +321,7 @@ class _RecomImagesPageState
                 style: Theme.of(context).textTheme.bodySmall,
               ),
               onPressed: () {
-                Navigator.of(context)
+                Navigator.of(context, rootNavigator: true)
                     .push(MaterialPageRoute(builder: (BuildContext context) {
                   return RankingPage(widget.type);
                 }));

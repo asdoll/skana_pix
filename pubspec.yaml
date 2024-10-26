@@ -68,6 +68,7 @@ dependencies:
   flutter_mobx: ^2.2.1+1
   flutter_launcher_icons: ^0.14.1
   sliding_top_panel: ^0.0.7
+  date_picker_plus: ^4.1.0
 
 
 dev_dependencies:

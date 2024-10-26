@@ -27,12 +27,13 @@ extension NovelExt on ApiClient {
   }
 
   /// mode: day, day_male, day_female, week_rookie, week, week_ai
-  Future<Res<List<Novel>>> getNovelRanking(String mode, [DateTime? date]) {
+  Future<Res<List<Novel>>> getNovelRanking(String mode,
+      [String? date, String? nextUrl]) {
     var url = "/v1/novel/ranking?mode=$mode";
     if (date != null) {
-      url += "&date=${date.year}-${date.month}-${date.day}";
+      url += "&date=$date";
     }
-    return getNovelsWithNextUrl(url);
+    return getNovelsWithNextUrl(nextUrl ?? url);
   }
 
   Future<Res<List<Novel>>> getBookmarkedNovels(String uid) {

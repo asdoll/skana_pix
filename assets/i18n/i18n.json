@@ -217,7 +217,18 @@
         "Successed": "加载成功",
         "Failed to load Pixivision articles": "加载Pixivision文章失败",
         "Illust": "插画",
-        "Failed to load Ranking": "加载排行榜失败"
+        "Failed to load Ranking": "加载排行榜失败",
+        "No more": "没有更多了",
+        "Daily AI": "每日AI",
+        "Daily R18 AI": "每日R18 AI",
+        "Daily R18": "每日R18",
+        "Weekly R18": "每周R18",
+        "Weekly R18G": "每周R18G",
+        "Rookies Manga": "新人漫画",
+        "Daily R18 Manga": "每日R18漫画",
+        "Weekly R18 Manga": "每周R18漫画",
+        "Weekly AI": "每周AI",
+        "Weekly AI R18": "每周AI R18"
     },
     "zh_TW": {
         "Search": "搜索",
@@ -437,6 +448,18 @@
         "Successed": "加載成功",
         "Failed to load Pixivision articles": "加載Pixivision文章失敗",
         "Illust": "插畫",
-        "Failed to load Ranking": "加載排行榜失敗"
+        "Failed to load Ranking": "加載排行榜失敗",
+        "No more": "沒有更多了",
+        "Daily AI": "每日AI",
+        "Daily R18 AI": "每日R18 AI",
+        "Daily R18": "每日R18",
+        "Weekly R18": "每周R18",
+        "Weekly R18G": "每周R18G",
+        "Rookies Manga": "新人漫畫",
+        "Daily R18 Manga": "每日R18漫畫",
+        "Weekly R18 Manga": "每周R18漫畫",
+        "Weekly AI": "每周AI",
+        "Weekly AI R18": "每周AI R18"
+
     }
 }

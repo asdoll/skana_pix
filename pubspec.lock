@@ -201,6 +201,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.0.8"
+  date_picker_plus:
+    dependency: "direct main"
+    description:
+      name: date_picker_plus
+      sha256: "9b22c94f86c76b20ebe46fa3e54544266400556a8ec9ad5508868ef3180ee513"
+      url: "https://pub.dev"
+    source: hosted
+    version: "4.1.0"
   dbus:
     dependency: transitive
     description:
