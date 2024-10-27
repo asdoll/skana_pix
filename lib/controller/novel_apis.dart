@@ -130,6 +130,17 @@ extension NovelExt on ApiClient {
     }
   }
 
+  Future<Res<List<TrendingTag>>> getHotNovelTags() async {
+    var res = await apiGet(
+        "/v1/trending-tags/novel?filter=for_android&include_translated_tag_results=true");
+    if (res.error) {
+      return Res.fromErrorRes(res);
+    } else {
+      return Res(List.from(res.data["trend_tags"].map((e) => TrendingTag(
+          Tag(e["tag"], e["translated_name"]), Illust.fromJson(e["illust"])))));
+    }
+  }
+
   Future<Res<List<Comment>>> getNovelComments(String id,
       [String? nextUrl]) async {
     var res = await apiGet(nextUrl ?? "/v3/novel/comments?novel_id=$id");

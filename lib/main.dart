@@ -40,7 +40,7 @@ class MyApp extends StatelessWidget {
       theme: DynamicData.themeData,
       darkTheme: DynamicData.darkTheme,
       themeMode: settings.themeMode,
-      home: const HomePage(title: 'Skana_pix'),
+      home: const HomePage(),
       navigatorKey: DynamicData.rootNavigatorKey,
     );
   }

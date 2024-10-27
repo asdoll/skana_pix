@@ -241,4 +241,18 @@ extension IllustExt on ApiClient {
       return SpotlightResponse(spotlightArticles: [], nextUrl: "error");
     }
   }
+
+  Future<Res<List<Tag>>> getSearchAutoCompleteKeywords(String word) async {
+    var res = await apiGet(
+      "/v2/search/autocomplete?merge_plain_keyword_results=true",
+      query: {"word": word},
+    );
+    if (res.success) {
+      return Res((res.data["tags"] as List)
+          .map((e) => Tag(e["name"], e["translated_name"]))
+          .toList());
+    } else {
+      return Res.error(res.errorMessage);
+    }
+  }
 }

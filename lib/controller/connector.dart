@@ -93,6 +93,7 @@ Function get batchIllustRequest =>
 Function get getUserBookmarks => ConnectManager().apiClient.getUserBookmarks;
 Function get addBookmark => ConnectManager().apiClient.addBookmark;
 Function get getHotTags => ConnectManager().apiClient.getHotTags;
+Function get getHotNovelTags => ConnectManager().apiClient.getHotNovelTags;
 Function get searchIt => ConnectManager().apiClient.search;
 Function get getUserIllusts => ConnectManager().apiClient.getUserIllusts;
 Function get getFollowingArtworks =>

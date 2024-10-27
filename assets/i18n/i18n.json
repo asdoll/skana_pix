@@ -14,6 +14,7 @@
         "Mangas": "漫画",
         "Users": "用户",
         "Search artwork": "搜索作品",
+        "Search Illust or Manga": "搜索插画或漫画",
         "Search Settings": "搜索设置",
         "Match": "匹配",
         "Favorite number": "收藏数",
@@ -228,7 +229,10 @@
         "Daily R18 Manga": "每日R18漫画",
         "Weekly R18 Manga": "每周R18漫画",
         "Weekly AI": "每周AI",
-        "Weekly AI R18": "每周AI R18"
+        "Weekly AI R18": "每周AI R18",
+        "Illust•Manga": "插画•漫画",
+        "Key in keywords": "输入关键字",
+        "Enter keywords or paste links": "输入关键字或粘贴链接"
     },
     "zh_TW": {
         "Search": "搜索",
@@ -245,6 +249,7 @@
         "Mangas": "漫畫",
         "Users": "用戶",
         "Search artwork": "搜索作品",
+        "Search Illust or Manga": "搜索插畫或漫畫",
         "Search Settings": "搜索設置",
         "Match": "匹配",
         "Favorite number": "收藏數",
@@ -459,7 +464,9 @@
         "Daily R18 Manga": "每日R18漫畫",
         "Weekly R18 Manga": "每周R18漫畫",
         "Weekly AI": "每周AI",
-        "Weekly AI R18": "每周AI R18"
-
+        "Weekly AI R18": "每周AI R18",
+        "Illust•Manga": "插畫•漫畫",
+        "Key in keywords": "輸入關鍵字",
+        "Enter keywords or paste links": "輸入關鍵字或粘貼鏈接"
     }
 }
