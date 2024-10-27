@@ -39,7 +39,7 @@ class _PainterCardState extends State<PainterCard> {
     _works.sort((a, b) => b.createDate.compareTo(a.createDate));
     return InkWell(
       onTap: () async {
-        final result = await Navigator.of(context, rootNavigator: true)
+        await Navigator.of(context, rootNavigator: true)
             .push(MaterialPageRoute(builder: (BuildContext context) {
           return UserPage(
             id: _user.id,
@@ -153,23 +153,22 @@ class _PainterCardState extends State<PainterCard> {
             child: Center(child: Text(_user.name)),
           ),
           Spacer(),
-          if (_user.isFollowed != null)
-            UserFollowButton(
-              followed: _user.isFollowed!,
-              onPressed: () async {
-                try {
-                  var method = _user.isFollowed ? "delete" : "add";
-                  Res<bool> res = await followUser(_user.id.toString(), method);
-                  if (res.success) {
-                    setState(() {
-                      _user.isFollowed = !_user.isFollowed;
-                    });
-                  } else {
-                    BotToast.showText(text: "Network Error".i18n);
-                  }
-                } catch (e) {}
-              },
-            )
+          UserFollowButton(
+            followed: _user.isFollowed,
+            onPressed: () async {
+              try {
+                var method = _user.isFollowed ? "delete" : "add";
+                Res<bool> res = await followUser(_user.id.toString(), method);
+                if (res.success) {
+                  setState(() {
+                    _user.isFollowed = !_user.isFollowed;
+                  });
+                } else {
+                  BotToast.showText(text: "Network Error".i18n);
+                }
+              } catch (e) {}
+            },
+          )
         ],
       ),
     );

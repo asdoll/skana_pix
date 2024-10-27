@@ -7,6 +7,7 @@ import 'package:skana_pix/componentwidgets/userpage.dart';
 import 'package:skana_pix/model/worktypes.dart';
 import 'package:skana_pix/pixiv_dart_api.dart';
 import 'package:skana_pix/utils/translate.dart';
+import 'package:skana_pix/utils/widgetplugin.dart';
 
 import '../utils/leaders.dart';
 import 'searchresult.dart';
@@ -27,6 +28,7 @@ class _SearchSuggestionPageState extends State<SearchSuggestionPage> {
   FocusNode focusNode = FocusNode();
   final tagGroup = [];
   bool idV = false;
+  late ArtworkType type;
 
   @override
   void initState() {
@@ -39,6 +41,7 @@ class _SearchSuggestionPageState extends State<SearchSuggestionPage> {
         .map((e) => e.trim())
         .takeWhile((value) => value.isNotEmpty);
     if (tags.length > 1) tagGroup.addAll(tags);
+    type = widget.type;
     super.initState();
   }
 
@@ -180,7 +183,36 @@ class _SearchSuggestionPageState extends State<SearchSuggestionPage> {
           onPressed: () {
             _filter.clear();
           },
-        )
+        ),
+        DropdownButton(
+          value: type,
+          iconSize: 0,
+          items: [
+            DropdownMenuItem(
+                value: ArtworkType.ILLUST,
+                child: Text(
+                  "Artwork".i18n,
+                  style: TextStyle(fontSize: 16),
+                )),
+            DropdownMenuItem(
+                value: ArtworkType.NOVEL,
+                child: Text(
+                  "Novel".i18n,
+                  style: TextStyle(fontSize: 16),
+                )),
+            DropdownMenuItem(
+                value: ArtworkType.ALL,
+                child: Text(
+                  "User".i18n,
+                  style: TextStyle(fontSize: 16),
+                )),
+          ],
+          onChanged: (ArtworkType? value) {
+            setState(() {
+              type = value!;
+            });
+          },
+        ).paddingRight(10),
       ],
     );
   }
@@ -234,7 +266,7 @@ class _SearchSuggestionPageState extends State<SearchSuggestionPage> {
         },
         decoration: InputDecoration(
           border: InputBorder.none,
-          hintText: "Enter keywords or paste links".i18n,
+          hintText: "Enter keywords or links".i18n,
         ));
   }
 }
