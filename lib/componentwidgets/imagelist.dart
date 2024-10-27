@@ -19,6 +19,7 @@ import 'avatar.dart';
 import 'backarea.dart';
 import 'followbutton.dart';
 import 'imagepage.dart';
+import 'imagetab.dart';
 import 'pixivimage.dart';
 import 'staricon.dart';
 import 'userpage.dart';
@@ -268,6 +269,7 @@ class _IllustPageState extends State<IllustPage> {
             onPressed: likes,
             child: StarIcon(
               state: likeState(),
+              illust: widget.illust,
             )),
       ),
       body: ColoredBox(
@@ -615,6 +617,10 @@ class _IllustPageState extends State<IllustPage> {
       BotToast.showText(text: "Network Error".i18n);
     } else {
       widget.illust.isBookmarked = !widget.illust.isBookmarked;
+      StarIcon.favoriteCallbacks[widget.illust.id.toString()]
+          ?.call(widget.illust.isBookmarked);
+      IllustCard.favoriteCallbacks[widget.illust.id.toString()]
+          ?.call(widget.illust.isBookmarked);
     }
     setState(() {
       isBookmarking = false;

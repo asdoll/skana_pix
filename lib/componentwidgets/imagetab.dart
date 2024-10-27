@@ -341,7 +341,7 @@ class _IllustCardState extends State<IllustCard> {
           Align(
             alignment: Alignment.centerRight,
             child: GestureDetector(
-              child: StarIcon(state: likeState()),
+              child: StarIcon(state: likeState(), illust: illust),
               onTap: likes,
               // onLongPress: () async {
               //   final result = await showModalBottomSheet(
@@ -393,6 +393,10 @@ class _IllustCardState extends State<IllustCard> {
       BotToast.showText(text: "Network Error".i18n);
     } else {
       illust.isBookmarked = !illust.isBookmarked;
+      StarIcon.favoriteCallbacks[illust.id.toString()]
+          ?.call(illust.isBookmarked);
+      IllustCard.favoriteCallbacks[illust.id.toString()]
+          ?.call(illust.isBookmarked);
     }
     setState(() {
       isBookmarking = false;

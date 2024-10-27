@@ -7,6 +7,7 @@ import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:mobx/mobx.dart';
 import 'package:path/path.dart';
 import 'package:share_plus/share_plus.dart';
+import 'package:skana_pix/componentwidgets/novelbookmark.dart';
 import 'package:skana_pix/componentwidgets/userpage.dart';
 import 'package:skana_pix/pixiv_dart_api.dart';
 import 'package:skana_pix/utils/translate.dart';
@@ -220,11 +221,7 @@ class _NovelViewerPageState extends State<NovelViewerPage> {
                 ),
               ),
               actions: [
-                IconButton(
-                    icon: Icon(Icons.bookmark),
-                    onPressed: () {
-                      // _saveNovelBookMark();
-                    }),
+                NovelBookmarkButton(novel: widget.novel, colorMode: "default"),
                 IconButton(
                   icon: Icon(Icons.more_vert),
                   onPressed: () {

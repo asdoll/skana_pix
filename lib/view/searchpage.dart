@@ -1,16 +1,19 @@
 import 'dart:math';
 
 import 'package:bot_toast/bot_toast.dart';
+import 'package:easy_refresh/easy_refresh.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:mobx/mobx.dart';
 import 'package:skana_pix/componentwidgets/imagetab.dart';
 import 'package:skana_pix/pixiv_dart_api.dart';
 import 'package:skana_pix/utils/translate.dart';
+import 'package:waterfall_flow/waterfall_flow.dart';
 
 import '../componentwidgets/pixivimage.dart';
 import '../componentwidgets/searchbar.dart';
 import '../componentwidgets/searchresult.dart';
+import '../componentwidgets/usercard.dart';
 import '../model/worktypes.dart';
 import 'defaults.dart';
 
@@ -99,9 +102,137 @@ class SearchRecommmendUserPage extends StatefulWidget {
 }
 
 class _SearchRecommmendUserPageState extends State<SearchRecommmendUserPage> {
+  late EasyRefreshController _refreshController;
+  ObservableList<UserPreview> users = ObservableList();
+  bool isLoading = false;
+  bool isError = false;
+
+  @override
+  void initState() {
+    _refreshController = EasyRefreshController(
+        controlFinishLoad: true, controlFinishRefresh: true);
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    _refreshController.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Container();
+    return Observer(builder: (context) {
+      return Scaffold(
+        appBar: AppBar(
+          toolbarHeight: 0.0,
+        ),
+        body: EasyRefresh(
+          controller: _refreshController,
+          onRefresh: () => firstLoad(),
+          onLoad: () => nextPage(),
+          refreshOnStart: users.isEmpty,
+          child: _buildList(),
+        ),
+      );
+    });
+  }
+
+  Widget _buildList() {
+    return WaterfallFlow.builder(
+      gridDelegate: SliverWaterfallFlowDelegateWithMaxCrossAxisExtent(
+        maxCrossAxisExtent: 600,
+      ),
+      itemCount: users.length,
+      itemBuilder: (context, index) {
+        final data = users[index];
+        return PainterCard(
+          user: data,
+        );
+      },
+    );
+  }
+
+  String? nextUrl;
+
+  Future<Res<List<UserPreview>>> loadData() async {
+    if (nextUrl == "end") {
+      _refreshController.finishLoad(IndicatorResult.noMore);
+      return Res.error("No more data");
+    }
+    Res<List<UserPreview>> res =
+        await ConnectManager().apiClient.getRecommendationUsers(nextUrl);
+    if (!res.error) {
+      nextUrl = res.subData;
+      nextUrl ??= "end";
+    }
+    if (nextUrl == "end") {
+      _refreshController.finishLoad(IndicatorResult.noMore);
+    } else {
+      _refreshController.finishLoad();
+    }
+    return res;
+  }
+
+  nextPage() {
+    if (isLoading) return;
+    isLoading = true;
+    loadData().then((value) {
+      isLoading = false;
+      if (value.success) {
+        setState(() {
+          users.addAll(value.data);
+        });
+        _refreshController.finishLoad();
+        return true;
+      } else {
+        var message = value.errorMessage ??
+            "Network Error. Please refresh to try again.".i18n;
+        if (message == "No more data") {}
+        if (message.length > 45) {
+          message = "${message.substring(0, 20)}...";
+        }
+        isError = true;
+        BotToast.showText(text: message);
+        _refreshController.finishLoad(IndicatorResult.fail);
+        return false;
+      }
+    });
+  }
+
+  reset() {
+    setState(() {
+      nextUrl = null;
+      isLoading = false;
+    });
+    firstLoad();
+    return true;
+  }
+
+  firstLoad() {
+    nextUrl = null;
+    loadData().then((value) {
+      if (value.success) {
+        setState(() {
+          users.clear();
+          users.addAll(value.data);
+        });
+        _refreshController.finishRefresh();
+        return true;
+      } else {
+        setState(() {
+          if (value.errorMessage != null &&
+              value.errorMessage!.contains("timeout")) {
+            isError = true;
+            BotToast.showText(
+                text: "Network Error. Please refresh to try again.".i18n);
+          }
+        });
+        _refreshController.finishRefresh(IndicatorResult.fail);
+        return false;
+      }
+    });
+    return false;
   }
 }
 

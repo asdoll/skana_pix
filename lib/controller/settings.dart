@@ -31,6 +31,7 @@ class UserSetting {
   List<String> blockedNovels = [];
   List<String> blockedNovelTags = [];
   double fontSize = 20.0;
+  String awPrefer = 'illust';
 
   Future<void> saveDefaults() async {
     await prefs.setString('darkMode', darkMode);
@@ -57,6 +58,7 @@ class UserSetting {
     await prefs.setStringList('blockedNovels', blockedNovels);
     await prefs.setStringList('blockedNovelTags', blockedNovelTags);
     await prefs.setDouble('fontSize', fontSize);
+    await prefs.setString('awPrefer', awPrefer);
   }
 
   Future<void> init() async {
@@ -91,6 +93,7 @@ class UserSetting {
     blockedNovels = prefs.getStringList('blockedNovels') ?? [];
     blockedNovelTags = prefs.getStringList('blockedNovelTags') ?? [];
     fontSize = prefs.getDouble('fontSize') ?? 20.0;
+    awPrefer = prefs.getString('awPrefer') ?? 'illust';
   }
 
   void set(String key, dynamic value) {
@@ -191,6 +194,10 @@ class UserSetting {
         fontSize = value;
         prefs.setDouble('fontSize', fontSize);
         break;
+      case 'awPrefer':
+        awPrefer = value;
+        prefs.setString('awPrefer', awPrefer);
+        break;
     }
   }
 
@@ -224,6 +231,7 @@ class UserSetting {
       'blockedNovels': blockedNovels,
       'blockedNovelTags': blockedNovelTags,
       'fontSize': fontSize,
+      'awPrefer': awPrefer,
     };
   }
 

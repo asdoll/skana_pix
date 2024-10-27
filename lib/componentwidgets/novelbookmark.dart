@@ -2,9 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:skana_pix/pixiv_dart_api.dart';
 import 'package:skana_pix/view/defaults.dart';
 
+typedef UpdateFavoriteFunc = void Function(bool v);
+
 class NovelBookmarkButton extends StatefulWidget {
   final Novel novel;
   final String colorMode;
+
+  static Map<String, UpdateFavoriteFunc> favoriteCallbacks = {};
 
   const NovelBookmarkButton(
       {Key? key, required this.novel, required this.colorMode})
@@ -17,6 +21,23 @@ class NovelBookmarkButton extends StatefulWidget {
 class _NovelBookmarkButtonState extends State<NovelBookmarkButton> {
   bool isBookmarking = false;
   bool isLight = false;
+
+  @override
+  void initState() {
+    NovelBookmarkButton.favoriteCallbacks[widget.novel.id.toString()] = (v) {
+      setState(() {
+        widget.novel.isBookmarked = v;
+      });
+    };
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    NovelBookmarkButton.favoriteCallbacks.remove(widget.novel.id.toString());
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     if (widget.colorMode == "light") {
@@ -47,6 +68,8 @@ class _NovelBookmarkButtonState extends State<NovelBookmarkButton> {
             });
           } catch (e) {}
         }
+        NovelBookmarkButton.favoriteCallbacks[widget.novel.id.toString()]
+            ?.call(widget.novel.isBookmarked);
       },
       child: IconButton(
         icon: isBookmarking
@@ -84,6 +107,8 @@ class _NovelBookmarkButtonState extends State<NovelBookmarkButton> {
               });
             } catch (e) {}
           }
+          NovelBookmarkButton.favoriteCallbacks[widget.novel.id.toString()]
+              ?.call(widget.novel.isBookmarked);
         },
       ),
     );

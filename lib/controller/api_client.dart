@@ -355,8 +355,10 @@ class ApiClient extends BaseClient {
     }
   }
 
-  Future<Res<List<UserPreview>>> getRecommendationUsers() async {
-    var res = await apiGet("/v1/user/recommended?filter=for_android");
+  Future<Res<List<UserPreview>>> getRecommendationUsers(
+      [String? nextUrl]) async {
+    var path = nextUrl ?? "/v1/user/recommended?filter=for_android";
+    var res = await apiGet(path);
     if (res.success) {
       return Res(
           (res.data["user_previews"] as List)

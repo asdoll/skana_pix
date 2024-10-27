@@ -1,4 +1,5 @@
 import 'illust.dart' show Illust;
+import 'novel.dart';
 
 class Author {
   final int id;
@@ -22,10 +23,11 @@ class UserPreview {
   final String avatar;
   bool isFollowed;
   final bool isBlocking;
-  final List<Illust> artworks;
+  final List<Illust> illusts;
+  final List<Novel> novels;
 
   UserPreview(this.id, this.name, this.account, this.avatar, this.isFollowed,
-      this.isBlocking, this.artworks);
+      this.isBlocking, this.illusts, this.novels);
 
   UserPreview.fromJson(Map<String, dynamic> json)
       : id = json['user']['id'],
@@ -34,11 +36,13 @@ class UserPreview {
         avatar = json['user']['profile_image_urls']['medium'],
         isFollowed = json['user']['is_followed'],
         isBlocking = json['user']['is_access_blocking_user'] ?? false,
-        artworks =
-            (json['illusts'] as List).map((e) => Illust.fromJson(e)).toList();
+        illusts =
+            (json['illusts'] as List).map((e) => Illust.fromJson(e)).toList(),
+        novels =
+            (json['novels'] as List).map((e) => Novel.fromJson(e)).toList();
 
   @override
   String toString() {
-    return 'UserPreview{id: $id, name: $name, account: $account, avatar: $avatar, isFollowed: $isFollowed, isBlocking: $isBlocking, artworks: $artworks}';
+    return 'UserPreview{id: $id, name: $name, account: $account, avatar: $avatar, isFollowed: $isFollowed, isBlocking: $isBlocking, illusts: $illusts}';
   }
 }
