@@ -42,6 +42,8 @@ class ApiClient extends BaseClient {
 
   String get accessToken => account.accessToken;
 
+  bool get isPremium => account.user.isPremium;
+
   int errorCount = 0;
 
   Map<String, String> get headers {

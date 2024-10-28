@@ -134,6 +134,7 @@
         "Replace with '-p${index}' if the work have more than one images, otherwise replace with blank.": "替换为'-p${index}'如果作品有多张图片, 否则替换为空白",
         "Recommendation": "推荐",
         "Recommend": "推荐",
+        "Recommended Tags": "推荐标签",
         "Novel": "小说",
         "Novels": "小说",
         "Reading Settings": "阅读设置",
@@ -219,6 +220,7 @@
         "Failed to load Pixivision articles": "加载Pixivision文章失败",
         "Illust": "插画",
         "Failed to load Ranking": "加载排行榜失败",
+        "Failed to load": "加载失败",
         "No more": "没有更多了",
         "Daily AI": "每日AI",
         "Daily R18 AI": "每日R18 AI",
@@ -232,7 +234,15 @@
         "Weekly AI R18": "每周AI R18",
         "Illust•Manga": "插画•漫画",
         "Key in keywords": "输入关键字",
-        "Enter keywords or links": "输入关键字或链接"
+        "Enter keywords or links": "输入关键字或链接",
+        "Filter": "筛选",
+        "Apply": "应用",
+        "Clear search history": "清除搜索历史",
+        "Clean history?" : "清除历史记录?",
+        "Details": "详情",
+        "Follow privately": "悄悄关注",
+        "Nickname": "昵称",
+        "Total My Pixiv users":"好P友"
     },
     "zh_TW": {
         "Search": "搜索",
@@ -368,6 +378,7 @@
         "Replace with '-p${index}' if the work have more than one images, otherwise replace with blank.": "替換為'-p${index}'如果作品有多張圖片, 否則替換為空白",
         "Recommendation": "推薦",
         "Recommend": "推薦",
+        "Recommended Tags": "推薦標籤",
         "Novel": "小說",
         "Novels": "小說",
         "Reading Settings": "閱讀設置",
@@ -454,6 +465,7 @@
         "Failed to load Pixivision articles": "加載Pixivision文章失敗",
         "Illust": "插畫",
         "Failed to load Ranking": "加載排行榜失敗",
+        "Failed to load": "加載失敗",
         "No more": "沒有更多了",
         "Daily AI": "每日AI",
         "Daily R18 AI": "每日R18 AI",
@@ -467,6 +479,14 @@
         "Weekly AI R18": "每周AI R18",
         "Illust•Manga": "插畫•漫畫",
         "Key in keywords": "輸入關鍵字",
-        "Enter keywords or links": "輸入關鍵字或鏈接"
+        "Enter keywords or links": "輸入關鍵字或鏈接",
+        "Filter": "篩選",
+        "Apply": "應用",
+        "Clear search history": "清除搜索歷史",
+        "Clean history?" : "清除歷史記錄?",
+        "Details": "詳情",
+        "Follow privately": "私密關注",
+        "Nickname": "昵稱",
+        "Total My Pixiv users":"好P友"
     }
 }

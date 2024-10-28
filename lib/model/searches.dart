@@ -1,21 +1,26 @@
-enum KeywordMatchType {
-  tagsPartialMatches("Tags partial match"),
-  tagsExactMatch("Tags exact match"),
-  titleOrDescriptionSearch("Title or description search");
+List<String> search_target = [
+  "partial_match_for_tags",
+  "exact_match_for_tags",
+  "title_and_caption"
+];
+List<String> search_target_name = [
+  "Tags partial match",
+  "Tags exact match",
+  "Title or description search"
+];
 
-  final String text;
-
-  const KeywordMatchType(this.text);
-
-  @override
-  toString() => text;
-
-  String toParam() => switch (this) {
-        KeywordMatchType.tagsPartialMatches => "partial_match_for_tags",
-        KeywordMatchType.tagsExactMatch => "exact_match_for_tags",
-        KeywordMatchType.titleOrDescriptionSearch => "title_and_caption"
-      };
-}
+List<String> search_target_novel = [
+    "partial_match_for_tags",
+    "exact_match_for_tags",
+    "text",
+    "keyword"
+  ];
+List<String> search_target_name_novel = [
+  "Tags partial match",
+  "Tags exact match",
+  "Text",
+  "Keyword"
+];
 
 enum FavoriteNumber {
   unlimited(-1),
@@ -40,46 +45,21 @@ enum FavoriteNumber {
       this == FavoriteNumber.unlimited ? "" : " ${number}users入り";
 }
 
-enum SearchSort {
-  newToOld,
-  oldToNew,
-  popular,
-  popularMale,
-  popularFemale;
+List<String> search_sort = [
+  "date_desc",
+  "date_asc",
+  "popular_desc",
+  "popular_male_desc",
+  "popular_female_desc",
+];
 
-  bool get isPremium => false;//appdata.account?.user.isPremium == true;
-
-  static List<SearchSort> get availableValues => [
-        SearchSort.newToOld,
-        SearchSort.oldToNew,
-        SearchSort.popular,
-        //if (appdata.account?.user.isPremium == true) SearchSort.popularMale,
-        //if (appdata.account?.user.isPremium == true) SearchSort.popularFemale
-      ];
-
-  @override
-  toString() {
-    if (this == SearchSort.popular) {
-      return isPremium ? "Popular" : "Popular(limited)";
-    } else if (this == SearchSort.newToOld) {
-      return "New to old";
-    } else if (this == SearchSort.oldToNew) {
-      return "Old to new";
-    } else if (this == SearchSort.popularMale) {
-      return "Popular(Male)";
-    } else {
-      return "Popular(Female)";
-    }
-  }
-
-  String toParam() => switch (this) {
-        SearchSort.newToOld => "date_desc",
-        SearchSort.oldToNew => "date_asc",
-        SearchSort.popular => "popular_desc",
-        SearchSort.popularMale => "popular_male_desc",
-        SearchSort.popularFemale => "popular_female_desc",
-      };
-}
+List<String> search_sort_name = [
+  "Popular",
+  "New to old",
+  "Old to new",
+  "Popular(Male)",
+  "Popular(Female)",
+];
 
 enum AgeLimit {
   unlimited("Unlimited"),
@@ -101,10 +81,42 @@ enum AgeLimit {
 }
 
 class SearchOptions {
-  KeywordMatchType matchType = KeywordMatchType.tagsPartialMatches;
-  FavoriteNumber favoriteNumber = FavoriteNumber.unlimited;
-  SearchSort sort = SearchSort.newToOld;
+  String searchTarget = search_target[0];
+  String searchTargetNovel = search_target_novel[0];
+  int favoriteNumber = 0;
+  String selectSort = search_sort[0];
   DateTime? startTime;
   DateTime? endTime;
   AgeLimit ageLimit = AgeLimit.unlimited;
+  List<int> premiumNum = [];
+  bool searchAI = true;
 }
+
+List<List<int>> premiumStarNum = [
+  [],
+  [10000],
+  [50000, 99999],
+  [10000, 49999],
+  [5000, 9999],
+  [1000, 4999],
+  [500, 999],
+  [300, 499],
+  [100, 299],
+  [50, 99],
+  [30, 49],
+  [10, 29],
+];
+
+List<int> starNum = [
+  0,
+  100,
+  250,
+  500,
+  1000,
+  5000,
+  7500,
+  10000,
+  20000,
+  30000,
+  50000,
+];

@@ -4,12 +4,14 @@ import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:mobx/mobx.dart';
 import 'package:skana_pix/componentwidgets/imagetab.dart';
 import 'package:skana_pix/componentwidgets/userpage.dart';
+import 'package:skana_pix/componentwidgets/usersearch.dart';
 import 'package:skana_pix/model/worktypes.dart';
 import 'package:skana_pix/pixiv_dart_api.dart';
 import 'package:skana_pix/utils/translate.dart';
 import 'package:skana_pix/utils/widgetplugin.dart';
 
 import '../utils/leaders.dart';
+import 'novelresult.dart';
 import 'searchresult.dart';
 import 'souppage.dart';
 
@@ -149,6 +151,20 @@ class _SearchSuggestionPageState extends State<SearchSuggestionPage> {
                               FocusScope.of(context).unfocus();
                               Navigator.of(context, rootNavigator: true)
                                   .push(MaterialPageRoute(builder: (context) {
+                                if (type == ArtworkType.NOVEL) {
+                                  return NovelResultPage(
+                                    word: tags[index].name,
+                                    translatedName:
+                                        tags[index].translatedName ?? "",
+                                  );
+                                }
+                                if (type == ArtworkType.ALL) {
+                                  return UserResultPage(
+                                    word: tags[index].name,
+                                    translatedName:
+                                        tags[index].translatedName ?? "",
+                                  );
+                                }
                                 return ResultPage(
                                   word: tags[index].name,
                                   translatedName:
@@ -259,10 +275,22 @@ class _SearchSuggestionPageState extends State<SearchSuggestionPage> {
         onSubmitted: (s) {
           var word = s.trim();
           if (word.isEmpty) return;
-          Navigator.of(context, rootNavigator: true).push(MaterialPageRoute(
-              builder: (context) => ResultPage(
-                    word: word,
-                  )));
+          Navigator.of(context, rootNavigator: true)
+              .push(MaterialPageRoute(builder: (context) {
+            if (type == ArtworkType.NOVEL) {
+              return NovelResultPage(
+                word: word,
+              );
+            }
+            if (type == ArtworkType.ALL) {
+              return UserResultPage(
+                word: word,
+              );
+            }
+            return ResultPage(
+              word: word,
+            );
+          }));
         },
         decoration: InputDecoration(
           border: InputBorder.none,

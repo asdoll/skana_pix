@@ -721,7 +721,7 @@ class _IllustPageState extends State<IllustPage> {
                       leading: Icon(Icons.save),
                       title: Text("Save".i18n),
                       onTap: () {
-                        Navigator.of(context).pop("OK");
+                        Navigator.of(context).pop("Ok");
                       },
                     ),
                   ],

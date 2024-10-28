@@ -67,17 +67,22 @@ extension IllustExt on ApiClient {
   Future<Res<List<Illust>>> search(
       String keyword, SearchOptions options) async {
     String path = "";
-    final encodedKeyword = Uri.encodeComponent(keyword +
-        options.favoriteNumber.toParam() +
-        options.ageLimit.toParam());
-    if (options.sort == SearchSort.popular && !options.sort.isPremium) {
+    String fn =
+        options.favoriteNumber == 0 ? "" : " ${options.favoriteNumber}users入り";
+    final encodedKeyword = Uri.encodeComponent(keyword + fn);
+    if (options.selectSort == search_sort[2] && !isPremium) {
       path =
-          "/v1/search/popular-preview/illust?filter=for_android&include_translated_tag_results=true&merge_plain_keyword_results=true&word=$encodedKeyword&search_target=${options.matchType.toParam()}";
+          "/v1/search/popular-preview/illust?filter=for_android&include_translated_tag_results=true&merge_plain_keyword_results=true&word=$encodedKeyword&search_target=${options.searchTarget}&search_ai_type=${options.searchAI?"1":"0"}";
     } else {
       path =
-          "/v1/search/illust?filter=for_android&include_translated_tag_results=true&merge_plain_keyword_results=true&word=$encodedKeyword&sort=${options.sort.toParam()}&search_target=${options.matchType.toParam()}";
+          "/v1/search/illust?filter=for_android&include_translated_tag_results=true&merge_plain_keyword_results=true&word=$encodedKeyword&sort=${options.selectSort}&search_target=${options.searchTarget}&search_ai_type=${options.searchAI?"1":"0"}";
     }
-
+    if(options.startTime != null) {
+      path += "&start_date=${toRequestDate(options.startTime!)}";
+    }
+    if(options.endTime != null) {
+      path += "&end_date=${toRequestDate(options.endTime!)}";
+    }
     var res = await apiGet(path);
     if (res.success) {
       return Res(
@@ -86,6 +91,13 @@ extension IllustExt on ApiClient {
     } else {
       return Res.error(res.errorMessage);
     }
+  }
+
+  String? getFormatDate(DateTime? dateTime) {
+    if (dateTime == null) {
+      return null;
+    } else
+      return "${dateTime.year}-${dateTime.month}-${dateTime.day}";
   }
 
   Future<Res<List<Illust>>> getIllustsWithNextUrl(String nextUrl) async {
@@ -99,8 +111,8 @@ extension IllustExt on ApiClient {
     }
   }
 
-  Future<Res<List<Illust>>> getUserIllusts(String uid, String? type) async {
-    var res = await apiGet(
+  Future<Res<List<Illust>>> getUserIllusts(String uid, String? type, [String? nextUrl]) async {
+    var res = await apiGet(nextUrl??
         "/v1/user/illusts?filter=for_android&user_id=$uid${type != null ? "&type=$type" : ""}");
     if (res.success) {
       return Res(

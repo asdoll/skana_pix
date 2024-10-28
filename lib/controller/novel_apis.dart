@@ -16,13 +16,23 @@ extension NovelExt on ApiClient {
   }
 
   Future<Res<List<Novel>>> searchNovels(String keyword, SearchOptions options) {
+    String fn =
+        options.favoriteNumber == 0 ? "" : " ${options.favoriteNumber}users入り";
+    final encodedKeyword = Uri.encodeComponent(keyword + fn);
     var url = "/v1/search/novel?"
         "include_translated_tag_results=true&"
         "merge_plain_keyword_results=true&"
-        "word=${Uri.encodeComponent(keyword)}&"
-        "sort=${options.sort.toParam()}&"
-        "search_target=${options.matchType.toParam()}&"
-        "search_ai_type=0";
+        "word=$encodedKeyword&"
+        "sort=${options.selectSort}&"
+        "search_target=${options.searchTarget}&"
+        "search_ai_type=${options.searchAI ? "1" : "0"}";
+
+    if (options.startTime != null) {
+      url += "&start_date=${toRequestDate(options.startTime!)}";
+    }
+    if (options.endTime != null) {
+      url += "&end_date=${toRequestDate(options.endTime!)}";
+    }
     return getNovelsWithNextUrl(url);
   }
 
@@ -36,8 +46,8 @@ extension NovelExt on ApiClient {
     return getNovelsWithNextUrl(nextUrl ?? url);
   }
 
-  Future<Res<List<Novel>>> getBookmarkedNovels(String uid) {
-    return getNovelsWithNextUrl(
+  Future<Res<List<Novel>>> getBookmarkedNovels(String uid, [String? nextUrl]) {
+    return getNovelsWithNextUrl(nextUrl??
         "/v1/user/bookmarks/novel?user_id=$uid&restrict=public");
   }
 
@@ -104,8 +114,8 @@ extension NovelExt on ApiClient {
         (res.data["novels"] as List).map((e) => Novel.fromJson(e)).toList());
   }
 
-  Future<Res<List<Novel>>> getUserNovels(String uid) {
-    return getNovelsWithNextUrl("/v1/user/novels?user_id=$uid");
+  Future<Res<List<Novel>>> getUserNovels(String uid, [String? nextUrl]) {
+    return getNovelsWithNextUrl(nextUrl ?? "/v1/user/novels?user_id=$uid");
   }
 
   Future<Res<List<Novel>>> getNovelSeries(String id, [String? nextUrl]) async {

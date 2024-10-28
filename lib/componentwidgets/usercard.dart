@@ -26,6 +26,14 @@ class _PainterCardState extends State<PainterCard> {
   late List<dynamic> _works = [];
 
   @override
+  void initState() {
+    super.initState();
+    _works.addAll(_user.illusts);
+    _works.addAll(_user.novels);
+    _works.sort((a, b) => b.createDate.compareTo(a.createDate));
+  }
+
+  @override
   void didUpdateWidget(covariant PainterCard oldWidget) {
     super.didUpdateWidget(oldWidget);
     type = widget.type;
@@ -34,9 +42,6 @@ class _PainterCardState extends State<PainterCard> {
 
   @override
   Widget build(BuildContext context) {
-    _works.addAll(_user.illusts);
-    _works.addAll(_user.novels);
-    _works.sort((a, b) => b.createDate.compareTo(a.createDate));
     return InkWell(
       onTap: () async {
         await Navigator.of(context, rootNavigator: true)
