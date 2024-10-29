@@ -47,8 +47,8 @@ extension NovelExt on ApiClient {
   }
 
   Future<Res<List<Novel>>> getBookmarkedNovels(String uid, [String? nextUrl]) {
-    return getNovelsWithNextUrl(nextUrl??
-        "/v1/user/bookmarks/novel?user_id=$uid&restrict=public");
+    return getNovelsWithNextUrl(
+        nextUrl ?? "/v1/user/bookmarks/novel?user_id=$uid&restrict=public");
   }
 
   Future<Res<bool>> favoriteNovel(String id,
@@ -116,6 +116,19 @@ extension NovelExt on ApiClient {
 
   Future<Res<List<Novel>>> getUserNovels(String uid, [String? nextUrl]) {
     return getNovelsWithNextUrl(nextUrl ?? "/v1/user/novels?user_id=$uid");
+  }
+
+  Future<Res<List<Novel>>> getUserBookmarksNovel(String uid,
+      [String? nextUrl]) async {
+    var res = await apiGet(
+        nextUrl ?? "$bookmarkNovelUrl?user_id=$uid&restrict=public");
+    if (res.success) {
+      return Res(
+          (res.data["novels"] as List).map((e) => Novel.fromJson(e)).toList(),
+          subData: res.data["next_url"]);
+    } else {
+      return Res.error(res.errorMessage);
+    }
   }
 
   Future<Res<List<Novel>>> getNovelSeries(String id, [String? nextUrl]) async {

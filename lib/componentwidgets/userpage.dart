@@ -9,16 +9,19 @@ import 'package:mobx/mobx.dart';
 import 'package:path/path.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:skana_pix/componentwidgets/userdetail.dart';
+import 'package:skana_pix/componentwidgets/userworks.dart';
 import 'package:skana_pix/controller/caches.dart';
 import 'package:skana_pix/model/worktypes.dart';
 import 'package:skana_pix/pixiv_dart_api.dart';
 import 'package:skana_pix/utils/translate.dart';
+import 'package:skana_pix/utils/widgetplugin.dart';
 
 import 'avatar.dart';
 import 'backarea.dart';
 import 'followbutton.dart';
 import 'followlist.dart';
 import 'nullhero.dart';
+import 'userbookmarks.dart';
 
 class UserPage extends StatefulWidget {
   final ArtworkType type;
@@ -39,6 +42,7 @@ class _UserPageState extends State<UserPage> with TickerProviderStateMixin {
   UserDetails? userDetail;
   bool isMuted = false;
   bool isError = false;
+  ArtworkType get type => widget.type == ArtworkType.ALL ? ArtworkType.ILLUST : widget.type;
 
   String restrict = 'public';
 
@@ -79,7 +83,9 @@ class _UserPageState extends State<UserPage> with TickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
-    return Observer(builder: (_) {
+    return Observer(
+      warnWhenNoObservables: false,
+      builder: (_) {
       if (isMuted) {
         return Scaffold(
           appBar: AppBar(
@@ -160,10 +166,10 @@ class _UserPageState extends State<UserPage> with TickerProviderStateMixin {
         body: NestedScrollView(
           controller: _scrollController,
           body: TabBarView(controller: _tabController, children: [
+            WorksPage(id:userDetail!.id, type:type, portal: '/works-${userDetail!.id}'),
+            BookmarksPage(id:userDetail!.id, type:type, portal: '/bookmarks-${userDetail!.id}'),
             UserDetailPage(userDetail!),
-            UserDetailPage(userDetail!),
-            UserDetailPage(userDetail!),
-          ]),
+          ]).paddingTop(102 + MediaQuery.of(context).padding.top),
           headerSliverBuilder:
               (BuildContext context, bool? innerBoxIsScrolled) {
             return _HeaderSlivers(innerBoxIsScrolled, context);
@@ -545,6 +551,7 @@ class _UserPageState extends State<UserPage> with TickerProviderStateMixin {
   Container _buildAvatarFollow(BuildContext context) {
     return Container(
       child: Observer(
+        warnWhenNoObservables: false,
         builder: (_) => Row(
           mainAxisSize: MainAxisSize.max,
           mainAxisAlignment: MainAxisAlignment.spaceBetween,

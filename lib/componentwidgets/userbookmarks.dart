@@ -14,30 +14,30 @@ import 'package:waterfall_flow/waterfall_flow.dart';
 import 'imagetab.dart';
 import 'novelcard.dart';
 
-class WorksPage extends StatefulWidget {
+class BookmarksPage extends StatefulWidget {
   final int id;
   final String portal;
   final ArtworkType type;
 
-  const WorksPage(
-      {Key? key, required this.id, required this.portal, required this.type})
+  const BookmarksPage(
+      {Key? key,
+      required this.id,
+      required this.portal,
+      required this.type})
       : super(key: key);
 
   @override
-  _WorksPageState createState() => _WorksPageState();
+  _BookmarksPageState createState() => _BookmarksPageState();
 }
 
-class _WorksPageState extends State<WorksPage> with TickerProviderStateMixin {
+class _BookmarksPageState extends State<BookmarksPage> with TickerProviderStateMixin {
   late TabController _tabController;
-
   int get initialIndex {
     switch (widget.type) {
       case ArtworkType.ILLUST:
         return 0;
-      case ArtworkType.MANGA:
-        return 1;
       case ArtworkType.NOVEL:
-        return 2;
+        return 1;
       default:
         return 0;
     }
@@ -46,7 +46,7 @@ class _WorksPageState extends State<WorksPage> with TickerProviderStateMixin {
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 3, initialIndex: initialIndex, vsync: this);
+    _tabController = TabController(length: 2,initialIndex: initialIndex,vsync: this);
   }
 
   @override
@@ -60,25 +60,19 @@ class _WorksPageState extends State<WorksPage> with TickerProviderStateMixin {
     return Column(
       children: [
         TabBar.secondary(controller: _tabController, tabs: [
-          Tab(text: "Illust".i18n),
-          Tab(text: "Manga".i18n),
+          Tab(text: "Artwork".i18n),
           Tab(text: "Novel".i18n),
         ]),
         Expanded(
           child: TabBarView(
             controller: _tabController,
             children: [
-              WorkContent(
+              BookmarkContent(
                 id: widget.id,
                 portal: widget.portal,
                 type: ArtworkType.ILLUST,
               ),
-              WorkContent(
-                id: widget.id,
-                portal: widget.portal,
-                type: ArtworkType.MANGA,
-              ),
-              WorkContent(
+              BookmarkContent(
                 id: widget.id,
                 portal: widget.portal,
                 type: ArtworkType.NOVEL,
@@ -198,32 +192,29 @@ class SliverChipDelegate extends SliverPersistentHeaderDelegate {
   }
 }
 
-class WorkContent extends StatefulWidget {
+class BookmarkContent extends StatefulWidget {
   final int id;
   final String portal;
   final ArtworkType type;
 
-  const WorkContent(
+  const BookmarkContent(
       {Key? key, required this.id, required this.portal, required this.type})
       : super(key: key);
 
   @override
-  _WorkContentState createState() => _WorkContentState();
+  _BookmarkContentState createState() => _BookmarkContentState();
 }
 
-class _WorkContentState extends State<WorkContent> {
+class _BookmarkContentState extends State<BookmarkContent> {
   late EasyRefreshController _easyRefreshController;
 
   bool isError = false;
   ObservableList<Illust> illusts = ObservableList();
-  ObservableList<Illust> manga = ObservableList();
   ObservableList<Novel> novels = ObservableList();
   get data {
     switch (widget.type) {
       case ArtworkType.ILLUST:
         return illusts;
-      case ArtworkType.MANGA:
-        return manga;
       case ArtworkType.NOVEL:
         return novels;
       default:
@@ -250,10 +241,10 @@ class _WorkContentState extends State<WorkContent> {
   @override
   Widget build(BuildContext context) {
     return Observer(
-        warnWhenNoObservables: false,
-        builder: (_) {
-          return _buildContent(context);
-        });
+      warnWhenNoObservables: false,
+      builder: (_) {
+      return _buildContent(context);
+    });
   }
 
   Widget _buildContent(context) {
@@ -360,19 +351,10 @@ class _WorkContentState extends State<WorkContent> {
         return NovelCard(novels[index]);
       }, childCount: novels.length);
     }
-    if (widget.type == ArtworkType.MANGA) {
-      return SliverChildBuilderDelegate((BuildContext context, int index) {
-        return IllustCard(
-          manga,
-          false,
-          initialPage: index,
-        );
-      }, childCount: manga.length);
-    }
     return SliverChildBuilderDelegate((BuildContext context, int index) {
       return IllustCard(
         illusts,
-        false,
+        true,
         initialPage: index,
       );
     }, childCount: illusts.length);
@@ -382,7 +364,6 @@ class _WorkContentState extends State<WorkContent> {
 
   reset() {
     illusts.clear();
-    manga.clear();
     novels.clear();
     nextUrl = null;
     isError = false;
@@ -402,20 +383,6 @@ class _WorkContentState extends State<WorkContent> {
           setState(() {
             illusts.clear();
             illusts.addAll(value.data);
-            nextUrl = value.subData;
-            nextUrl ??= "end";
-          });
-        } else {
-          isError = true;
-        }
-      });
-    }
-    if (widget.type == ArtworkType.MANGA) {
-      loadManga().then((value) {
-        if (value.success) {
-          setState(() {
-            manga.clear();
-            manga.addAll(value.data);
             nextUrl = value.subData;
             nextUrl ??= "end";
           });
@@ -470,19 +437,6 @@ class _WorkContentState extends State<WorkContent> {
         }
       });
     }
-    if (widget.type == ArtworkType.MANGA) {
-      loadManga().then((value) {
-        if (value.success) {
-          setState(() {
-            manga.addAll(value.data);
-            nextUrl = value.subData;
-            nextUrl ??= "end";
-          });
-        } else {
-          isError = true;
-        }
-      });
-    }
     if (widget.type == ArtworkType.NOVEL) {
       loadNovel().then((value) {
         if (value.success) {
@@ -509,18 +463,12 @@ class _WorkContentState extends State<WorkContent> {
   Future<Res<List<Illust>>> loadIllust() async {
     return ConnectManager()
         .apiClient
-        .getUserIllusts(widget.id.toString(), "illust", nextUrl);
-  }
-
-  Future<Res<List<Illust>>> loadManga() async {
-    return ConnectManager()
-        .apiClient
-        .getUserIllusts(widget.id.toString(), "manga", nextUrl);
+        .getUserBookmarks(widget.id.toString(), nextUrl);
   }
 
   Future<Res<List<Novel>>> loadNovel() async {
     return ConnectManager()
         .apiClient
-        .getUserNovels(widget.id.toString(), nextUrl);
+        .getUserBookmarksNovel(widget.id.toString(), nextUrl);
   }
 }
