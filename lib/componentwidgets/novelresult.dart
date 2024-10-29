@@ -1,6 +1,7 @@
 import 'package:bot_toast/bot_toast.dart';
 import 'package:easy_refresh/easy_refresh.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:mobx/mobx.dart';
@@ -16,7 +17,8 @@ class NovelResultPage extends StatefulWidget {
   final String word;
   final String translatedName;
 
-  const NovelResultPage({Key? key, required this.word, this.translatedName = ''})
+  const NovelResultPage(
+      {Key? key, required this.word, this.translatedName = ''})
       : super(key: key);
 
   @override
@@ -24,7 +26,7 @@ class NovelResultPage extends StatefulWidget {
 }
 
 class _NovelResultPageState extends State<NovelResultPage> {
- late ScrollController _scrollController;
+  late ScrollController _scrollController;
   late ObservableList<Novel> novels;
   late EasyRefreshController easyRefreshController;
 
@@ -393,7 +395,9 @@ class _NovelResultPageState extends State<NovelResultPage> {
     if (nextUrl != null) {
       res = await ConnectManager().apiClient.getNovelsWithNextUrl(nextUrl!);
     } else {
-      res = await ConnectManager().apiClient.searchNovels(widget.word, searchOptions);
+      res = await ConnectManager()
+          .apiClient
+          .searchNovels(widget.word, searchOptions);
     }
     if (!res.error) {
       nextUrl = res.subData;

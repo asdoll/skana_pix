@@ -13,6 +13,7 @@
         "Artworks": "作品",
         "Mangas": "漫画",
         "Users": "用户",
+        "User": "用户",
         "Search artwork": "搜索作品",
         "Search Illust or Manga": "搜索插画或漫画",
         "Search Settings": "搜索设置",
@@ -20,8 +21,8 @@
         "Favorite number": "收藏数",
         "Sort": "排序",
         "Age limit": "年龄限制",
-        "Search novel": "搜索小说",
-        "Search user": "搜索用户",
+        "Search Novel": "搜索小说",
+        "Search User": "搜索用户",
         "Artwork ID": "作品ID",
         "Artist ID": "画师ID",
         "Novel ID": "小说ID",
@@ -257,7 +258,8 @@
         "Favorite Tags": "收藏标签",
         "Block List": "屏蔽列表",
         "App Data": "应用数据",
-        "Clear All Cache": "清除全部缓存"
+        "Clear All Cache": "清除全部缓存",
+        "Recommended Users": "推荐用户"
     },
     "zh_TW": {
         "Search": "搜索",
@@ -273,6 +275,7 @@
         "Artworks": "作品",
         "Mangas": "漫畫",
         "Users": "用戶",
+        "User": "用戶",
         "Search artwork": "搜索作品",
         "Search Illust or Manga": "搜索插畫或漫畫",
         "Search Settings": "搜索設置",
@@ -280,8 +283,8 @@
         "Favorite number": "收藏數",
         "Sort": "排序",
         "Age limit": "年齡限制",
-        "Search novel": "搜索小說",
-        "Search user": "搜索用戶",
+        "Search Novel": "搜索小說",
+        "Search User": "搜索用戶",
         "Artwork ID": "作品ID",
         "Artist ID": "畫師ID",
         "Novel ID": "小說ID",
@@ -517,6 +520,7 @@
         "Favorite Tags": "收藏標籤",
         "Block List": "屏蔽列表",
         "App Data": "應用數據",
-        "Clear All Cache": "清除全部緩存"
+        "Clear All Cache": "清除全部緩存",
+        "Recommended Users": "推薦用戶"
     }
 }

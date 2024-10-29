@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:bot_toast/bot_toast.dart';
 import 'package:flutter/material.dart';
 import 'package:skana_pix/pixiv_dart_api.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 
 import 'utils/applinks.dart';
 import 'utils/translate.dart';
@@ -42,6 +43,19 @@ class MyApp extends StatelessWidget {
       themeMode: settings.themeMode,
       home: const HomePage(),
       navigatorKey: DynamicData.rootNavigatorKey,
+      localizationsDelegates: const [
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+      ],
+      supportedLocales: [
+        const Locale('en', 'US'),
+        const Locale('zh', 'CN'),
+        const Locale('zh', 'TW'),
+      ],
     );
   }
 }

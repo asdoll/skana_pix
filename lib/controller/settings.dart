@@ -290,7 +290,6 @@ class UserSetting {
     }
   }
 
-
   void setThemeMode(int i) {
     switch (i) {
       case 0:
@@ -591,7 +590,7 @@ class UserSetting {
     }
   }
 
-  void deleteHistoryTag(ArtworkType? type,String tag){
+  void deleteHistoryTag(ArtworkType? type, String tag) {
     switch (type) {
       case ArtworkType.ILLUST:
       case ArtworkType.MANGA:
@@ -652,7 +651,6 @@ class UserSetting {
         return historyUserTag;
     }
   }
-
 }
 
 var settings = UserSetting();

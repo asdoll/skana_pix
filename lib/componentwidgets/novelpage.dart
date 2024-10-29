@@ -41,6 +41,7 @@ class _NovelViewerPageState extends State<NovelViewerPage> {
   late int nowPosition;
   late PageController _pageController;
   late double fontsize;
+  late double lineSpace;
 
   _isShow() {
     setState(() {
@@ -53,9 +54,10 @@ class _NovelViewerPageState extends State<NovelViewerPage> {
   void initState() {
     super.initState();
     fontsize = settings.fontSize;
+    lineSpace = 2;
     _novelStore = NovelStore(
         widget.novel, DynamicData.heightScreen, DynamicData.widthScreen,
-        fontSize: fontsize);
+        fontSize: fontsize, lineSpace: lineSpace);
     _novelStore.fetch();
     nowPosition = 0;
     _pageController = PageController(initialPage: nowPosition);
@@ -74,7 +76,33 @@ class _NovelViewerPageState extends State<NovelViewerPage> {
         children: [
           GestureDetector(
             behavior: HitTestBehavior.opaque,
-            onTap: _isShow,
+            onTapDown: (details) {
+              if (details.globalPosition.dx < 100) {
+                int result = nowPosition;
+                result--;
+                _pageController.animateToPage(result,
+                    duration: Duration(milliseconds: 100),
+                    curve: Curves.easeInOut);
+                if (result < 0) result = 0;
+                setState(() {
+                  nowPosition = result;
+                });
+              } else if (details.globalPosition.dx >
+                  DynamicData.widthScreen - 100) {
+                int result = nowPosition;
+                result++;
+                _pageController.animateToPage(result,
+                    duration: Duration(milliseconds: 100),
+                    curve: Curves.easeInOut);
+                if (result >= _novelStore.pageConfig.length + 1)
+                  result = _novelStore.pageConfig.length;
+                setState(() {
+                  nowPosition = result;
+                });
+              } else {
+                _isShow();
+              }
+            },
             onHorizontalDragEnd: (DragEndDetails detail) {
               final pixelsPerSecond = detail.velocity.pixelsPerSecond;
               if (pixelsPerSecond.dy.abs() > pixelsPerSecond.dx.abs()) return;
@@ -121,7 +149,7 @@ class _NovelViewerPageState extends State<NovelViewerPage> {
                           top: _novelStore.paddingVertical * 1.2),
                       child: Text(
                         f,
-                        style: TextStyle(fontSize: fontsize),
+                        style: TextStyle(fontSize: fontsize, height: lineSpace),
                       ),
                     );
                   },
@@ -721,12 +749,28 @@ class NovelStore {
   String? errorMessage;
   late TextPainter textPainter;
   NovelWebResponse? novelWebResponse;
+  TextSpan? textSpan;
 
   NovelStore(this.novel, this.pageHeight, this.pageWidth,
       {this.fontSize = 20,
       this.linePaddingHorizontal = 10,
       this.paddingVertical = kToolbarHeight,
-      this.lineSpace = 0});
+      this.lineSpace = 4});
+
+  Future<void> textProcessing(String text) async {
+    var result;
+    final textList = text.split('\n');
+    for (var i = 0; i < textList.length; i++) {
+      String item = textList[i];
+      if (item.isEmpty) {
+        continue;
+      }
+      result.add(TextSpan(
+          text: item, style: TextStyle(fontSize: fontSize, height: lineSpace)));
+      result.add(const TextSpan(text: '\n', style: TextStyle(fontSize: 0.001)));
+    }
+    textSpan = TextSpan(children: result);
+  }
 
   Future<List<String>> parse(String content) async {
     List<int> result = [];
@@ -737,7 +781,7 @@ class NovelStore {
       textDirection: TextDirection.ltr,
       text: TextSpan(
         text: tmp,
-        style: TextStyle(fontSize: fontSize),
+        style: TextStyle(fontSize: fontSize, height: lineSpace),
       ),
     );
     var width = pageWidth - linePaddingHorizontal * 2;
@@ -753,7 +797,7 @@ class NovelStore {
         textDirection: TextDirection.ltr,
         text: TextSpan(
           text: tmp,
-          style: TextStyle(fontSize: fontSize),
+          style: TextStyle(fontSize: fontSize, height: lineSpace),
         ),
       );
       textPainter.layout(maxWidth: width);
