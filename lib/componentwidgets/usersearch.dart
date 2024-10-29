@@ -36,7 +36,7 @@ class _UserResultPageState extends State<UserResultPage> {
         controlFinishLoad: true, controlFinishRefresh: true);
     users = ObservableList<UserPreview>();
     firstLoad();
-    settings.addHistory(widget.word, null);
+    settings.addHistoryTag(widget.word, null);
     super.initState();
   }
 

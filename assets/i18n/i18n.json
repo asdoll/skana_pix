@@ -242,7 +242,22 @@
         "Details": "详情",
         "Follow privately": "悄悄关注",
         "Nickname": "昵称",
-        "Total My Pixiv users":"好P友"
+        "Total My Pixiv users":"好P友",
+        "My Pixiv":"好P友",
+        "Pick A Color": "选择颜色",
+        "16 radix RGB": "16进制RGB",
+        "Color": "颜色",
+        "Skin": "皮肤",
+        "System": "系统",
+        "Light": "浅色",
+        "Dark": "深色",
+        "Dynamic Color": "动态颜色",
+        "Seed Color": "种子颜色",
+        "Preference Settings": "偏好设置",
+        "Favorite Tags": "收藏标签",
+        "Block List": "屏蔽列表",
+        "App Data": "应用数据",
+        "Clear All Cache": "清除全部缓存"
     },
     "zh_TW": {
         "Search": "搜索",
@@ -487,6 +502,21 @@
         "Details": "詳情",
         "Follow privately": "私密關注",
         "Nickname": "昵稱",
-        "Total My Pixiv users":"好P友"
+        "Total My Pixiv users":"好P友",
+        "My Pixiv":"好P友",
+        "Pick A Color": "選擇顏色",
+        "16 radix RGB": "16進制RGB",
+        "Color": "顏色",
+        "Skin": "皮膚",
+        "System": "系統",
+        "Light": "淺色",
+        "Dark": "深色",
+        "Dynamic Color": "動態顏色",
+        "Seed Color": "種子顏色",
+        "Preference Settings": "偏好設置",
+        "Favorite Tags": "收藏標籤",
+        "Block List": "屏蔽列表",
+        "App Data": "應用數據",
+        "Clear All Cache": "清除全部緩存"
     }
 }

@@ -14,7 +14,6 @@ import '../model/worktypes.dart';
 import 'imagetab.dart';
 import 'loading.dart';
 import 'novelcard.dart';
-import 'package:date_picker_plus/date_picker_plus.dart';
 
 class RankingPage extends StatefulWidget {
   final ArtworkType type;
@@ -25,7 +24,7 @@ class RankingPage extends StatefulWidget {
 }
 
 class _RankingPageState extends State<RankingPage>
-    with AutomaticKeepAliveClientMixin {
+    with AutomaticKeepAliveClientMixin, SingleTickerProviderStateMixin {
   late DateTime nowDate;
   String? dateTime;
   List<String> get modeList => widget.type == ArtworkType.ILLUST
@@ -33,6 +32,7 @@ class _RankingPageState extends State<RankingPage>
       : widget.type == ArtworkType.MANGA
           ? modeMange
           : modeNovel;
+  late TabController _tabController;
 
   @override
   void dispose() {
@@ -41,6 +41,7 @@ class _RankingPageState extends State<RankingPage>
 
   @override
   void initState() {
+    _tabController = TabController(length: modeList.length, vsync: this);
     nowDate = DateTime.now();
     super.initState();
   }
@@ -60,60 +61,48 @@ class _RankingPageState extends State<RankingPage>
     for (String i in modeList) {
       titles.add(rankTagsMap[i]!.i18n);
     }
-    return DefaultTabController(
-      length: titles.length,
-      child: Column(
-        children: <Widget>[
-          AnimatedContainer(
-            duration: Duration(milliseconds: 400),
-            height: kToolbarHeight + MediaQuery.of(context).padding.top,
-            child: AppBar(
-              automaticallyImplyLeading: true,
-              title: TabBar(
-                onTap: (i) => setState(() {
-                  index = i;
-                }),
-                tabAlignment: TabAlignment.start,
-                indicatorSize: TabBarIndicatorSize.label,
-                isScrollable: true,
-                tabs: <Widget>[
-                  for (var i in titles)
-                    Tab(
-                      text: i,
-                    ),
-                ],
-              ),
-              // actions: <Widget>[
-              //   Visibility(
-              //     visible: true,
-              //     child: IconButton(
-              //       icon: Icon(Icons.date_range),
-              //       onPressed: () async {
-              //         await _showTimePicker(context);
-              //       },
-              //     ),
-              //   ),
-              // ],
+    return Column(
+      children: <Widget>[
+        AnimatedContainer(
+          duration: Duration(milliseconds: 400),
+          height: kToolbarHeight + MediaQuery.of(context).padding.top,
+          child: AppBar(
+            automaticallyImplyLeading: true,
+            title: TabBar(
+              controller: _tabController,
+              onTap: (i) => setState(() {
+                index = i;
+              }),
+              tabAlignment: TabAlignment.start,
+              indicatorSize: TabBarIndicatorSize.label,
+              isScrollable: true,
+              tabs: <Widget>[
+                for (var i in titles)
+                  Tab(
+                    text: i,
+                  ),
+              ],
             ),
+            actions: <Widget>[],
           ),
-          Expanded(
-            child: TabBarView(children: [
-              if (widget.type == ArtworkType.ILLUST)
-                for (var element in modeList)
-                  _OneRankingIllustPage(element, widget.type, dateTime,
-                      key: Key(element)),
-              if (widget.type == ArtworkType.MANGA)
-                for (var element in modeList)
-                  _OneRankingIllustPage(element, widget.type, dateTime,
-                      key: Key(element)),
-              if (widget.type == ArtworkType.NOVEL)
-                for (var element in modeList)
-                  _OneRankingNovelPage(element, widget.type, dateTime,
-                      key: Key(element)),
-            ]),
-          )
-        ],
-      ),
+        ),
+        Expanded(
+          child: TabBarView(controller: _tabController, children: [
+            if (widget.type == ArtworkType.ILLUST)
+              for (var element in modeList)
+                _OneRankingIllustPage(element, widget.type, dateTime,
+                    key: Key(element)),
+            if (widget.type == ArtworkType.MANGA)
+              for (var element in modeList)
+                _OneRankingIllustPage(element, widget.type, dateTime,
+                    key: Key(element)),
+            if (widget.type == ArtworkType.NOVEL)
+              for (var element in modeList)
+                _OneRankingNovelPage(element, widget.type, dateTime,
+                    key: Key(element)),
+          ]),
+        )
+      ],
     );
   }
 
@@ -167,23 +156,6 @@ class _RankingPageState extends State<RankingPage>
 
   List<String> _rankFilters = [];
 
-  Future _showTimePicker(BuildContext context) async {
-    var nowdate = DateTime.now();
-    showDatePickerDialog(
-            context: context,
-            initialDate: nowDateTime,
-            minDate: DateTime(2007, 8),
-            //pixiv于2007年9月10日由上谷隆宏等人首次推出第一个测试版...
-            maxDate: nowdate)
-        .then((date) {
-      if (date == null) return;
-      nowDateTime = date;
-      setState(() {
-        this.dateTime = toRequestDate(date);
-      });
-    });
-  }
-
   @override
   bool get wantKeepAlive => true;
 }
@@ -204,6 +176,7 @@ class _OneRankingIllustPageState
     extends MultiPageLoadingState<_OneRankingIllustPage, Illust> {
   late EasyRefreshController _refreshController;
   late ScrollController _scrollController;
+  String? dateTime;
 
   @override
   void initState() {
@@ -213,28 +186,93 @@ class _OneRankingIllustPageState
   }
 
   @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.end,
+          children: [
+            Visibility(
+              visible: true,
+              child: IconButton(
+                icon: Icon(Icons.date_range),
+                onPressed: () async {
+                  await _showTimePicker(context);
+                },
+              ),
+            ),
+          ],
+        ),
+        builds(context)
+      ],
+    );
+  }
+
+  Widget builds(BuildContext context) {
+    Widget child;
+
+    if (isLoading) {
+      child = buildLoading(context);
+    } else if (errors != null) {
+      child = buildError(context, errors!);
+    } else {
+      child = buildContent(context, datas!);
+    }
+
+    return buildFrame(context, child) ?? child;
+  }
+
+  String? toRequestDate(DateTime dateTime) {
+    return "${dateTime.year}-${dateTime.month}-${dateTime.day}";
+  }
+
+  DateTime nowDateTime = DateTime.now();
+
+  Future _showTimePicker(BuildContext context) async {
+    var nowdate = DateTime.now();
+    showDatePicker(
+            context: context,
+            initialDate: nowDateTime,
+            firstDate: DateTime(2007, 8),
+            //pixiv于2007年9月10日由上谷隆宏等人首次推出第一个测试版...
+            lastDate: nowdate)
+        .then((date) {
+      if (date == null) return;
+      nowDateTime = date;
+      dateTime = toRequestDate(date);
+      reset();
+    });
+  }
+
+  @override
   Widget buildContent(BuildContext context, final List<Illust> data) {
-    return EasyRefresh.builder(
-      controller: _refreshController,
-      header: DefaultHeaderFooter.header(context),
-      footer: DefaultHeaderFooter.footer(context),
-      scrollController: _scrollController,
-      onRefresh: () {
-        firstLoad();
-      },
-      onLoad: () {
-        nextPage();
-      },
-      childBuilder: (context, physics) => WaterfallFlow.builder(
-        physics: physics,
-        controller: _scrollController,
-        padding: EdgeInsets.all(5.0),
-        itemCount: data.length,
-        itemBuilder: (context, index) {
-          return IllustCard(data, false,
-              initialPage: index, type: widget.awType);
+    return Container(
+      width: MediaQuery.of(context).size.width,
+      height: MediaQuery.of(context).size.height -
+          kToolbarHeight * 2 -
+          MediaQuery.of(context).padding.top,
+      child: EasyRefresh.builder(
+        controller: _refreshController,
+        header: DefaultHeaderFooter.header(context),
+        footer: DefaultHeaderFooter.footer(context),
+        scrollController: _scrollController,
+        onRefresh: () {
+          firstLoad();
         },
-        gridDelegate: _buildGridDelegate(context),
+        onLoad: () {
+          nextPage();
+        },
+        childBuilder: (context, physics) => WaterfallFlow.builder(
+          physics: physics,
+          controller: _scrollController,
+          padding: EdgeInsets.all(5.0),
+          itemCount: data.length,
+          itemBuilder: (context, index) {
+            return IllustCard(data, false,
+                initialPage: index, type: widget.awType);
+          },
+          gridDelegate: _buildGridDelegate(context),
+        ),
       ),
     );
   }
@@ -253,7 +291,7 @@ class _OneRankingIllustPageState
     if (nexturl == "end") {
       return Res.error("No more data");
     }
-    var res = await getRanking(widget.type, widget.dateTime, nexturl);
+    var res = await getRanking(widget.type, dateTime, nexturl);
     if (!res.error) {
       nexturl = res.subData;
       nexturl ??= "end";
@@ -278,6 +316,7 @@ class _OneRankingNovelPageState extends State<_OneRankingNovelPage> {
   late EasyRefreshController _refreshController;
   ObservableList<Novel> novels = ObservableList();
   bool _isFirstLoading = true;
+  String? dateTime;
 
   bool _isLoading = false;
 
@@ -359,6 +398,28 @@ class _OneRankingNovelPageState extends State<_OneRankingNovelPage> {
     });
   }
 
+  String? toRequestDate(DateTime dateTime) {
+    return "${dateTime.year}-${dateTime.month}-${dateTime.day}";
+  }
+
+  DateTime nowDateTime = DateTime.now();
+
+  Future _showTimePicker(BuildContext context) async {
+    var nowdate = DateTime.now();
+    showDatePicker(
+            context: context,
+            initialDate: nowDateTime,
+            firstDate: DateTime(2007, 8),
+            //pixiv于2007年9月10日由上谷隆宏等人首次推出第一个测试版...
+            lastDate: nowdate)
+        .then((date) {
+      if (date == null) return;
+      nowDateTime = date;
+      dateTime = toRequestDate(date);
+      reset();
+    });
+  }
+
   @override
   void initState() {
     _refreshController = EasyRefreshController(
@@ -403,27 +464,51 @@ class _OneRankingNovelPageState extends State<_OneRankingNovelPage> {
       child = buildContent(context);
     }
 
-    return Scaffold(
-      body: child,
+    return Material(
+      child: Column(
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: [
+              Visibility(
+                visible: true,
+                child: IconButton(
+                  icon: Icon(Icons.date_range),
+                  onPressed: () async {
+                    await _showTimePicker(context);
+                  },
+                ),
+              ),
+            ],
+          ),
+          child,
+        ],
+      ),
     );
   }
 
   Widget buildContent(BuildContext context) {
-    return EasyRefresh(
-      onLoad: () => nextPage(),
-      onRefresh: () => reset(),
-      refreshOnStart: false,
-      controller: _refreshController,
-      header: DefaultHeaderFooter.header(context),
-      child: Observer(builder: (context) {
-        return ListView.builder(
-            padding: EdgeInsets.all(0),
-            itemBuilder: (context, index) {
-              Novel novel = novels[index];
-              return NovelCard(novel);
-            },
-            itemCount: novels.length);
-      }),
+    return Container(
+      width: MediaQuery.of(context).size.width,
+      height: MediaQuery.of(context).size.height -
+          kToolbarHeight * 2 -
+          MediaQuery.of(context).padding.top,
+      child: EasyRefresh(
+        onLoad: () => nextPage(),
+        onRefresh: () => reset(),
+        refreshOnStart: false,
+        controller: _refreshController,
+        header: DefaultHeaderFooter.header(context),
+        child: Observer(builder: (context) {
+          return ListView.builder(
+              padding: EdgeInsets.all(0),
+              itemBuilder: (context, index) {
+                Novel novel = novels[index];
+                return NovelCard(novel);
+              },
+              itemCount: novels.length);
+        }),
+      ),
     );
   }
 
@@ -436,7 +521,7 @@ class _OneRankingNovelPageState extends State<_OneRankingNovelPage> {
     }
     var res = await ConnectManager()
         .apiClient
-        .getNovelRanking(widget.type, widget.dateTime, nextUrl);
+        .getNovelRanking(widget.type, dateTime, nextUrl);
     if (!res.error) {
       nextUrl = res.subData;
       nextUrl ??= "end";

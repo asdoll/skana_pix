@@ -1,3 +1,5 @@
+import 'package:flutter/material.dart';
+
 class Parser {
   static List<String> parseImgsInNovel(String content) {
     var reg = RegExp(r'\[pixivimage.{0,15}\]');
@@ -10,5 +12,9 @@ class Parser {
       imgs.add(match.replaceAll(regPre, '').replaceAll(regEnd, ''));
     }
     return imgs;
+  }
+
+  static Color stringToColor(String color) {
+    return Color(int.parse(color, radix: 16) + 0xFF000000);
   }
 }

@@ -33,7 +33,7 @@ class _HomePageState extends State<HomePage> {
   final NavBarStyle _navBarStyle = NavBarStyle.style6;
 
   List<Widget> _buildScreens() {
-    return [MainScreen(), FeedPage(), SearchPage(), SettingScreen()];
+    return [MainScreen(), FeedPage(), SearchPage(), SettingPage()];
   }
 
   void jumpTab() {

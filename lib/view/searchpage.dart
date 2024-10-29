@@ -10,7 +10,6 @@ import 'package:skana_pix/componentwidgets/imagetab.dart';
 import 'package:skana_pix/componentwidgets/usersearch.dart';
 import 'package:skana_pix/pixiv_dart_api.dart';
 import 'package:skana_pix/utils/translate.dart';
-import 'package:waterfall_flow/waterfall_flow.dart';
 
 import '../componentwidgets/novelresult.dart';
 import '../componentwidgets/pixivimage.dart';
@@ -35,11 +34,8 @@ class _SearchPageState extends State<SearchPage> {
       SearchRecommendPage(ArtworkType.NOVEL),
       SearchRecommmendUserPage(),
     ];
-    return MaterialApp(
-      theme: DynamicData.themeData,
-      darkTheme: DynamicData.darkTheme,
-      themeMode: ThemeMode.system,
-      home: DefaultTabController(
+    return Material(
+      child: DefaultTabController(
         initialIndex: 0,
         length: 3,
         child: Scaffold(
@@ -115,7 +111,7 @@ class _SearchRecommmendUserPageState extends State<SearchRecommmendUserPage> {
   void initState() {
     _refreshController = EasyRefreshController(
         controlFinishLoad: true, controlFinishRefresh: true);
-    tagHistory.addAll(settings.getHistory(null).reversed);
+    tagHistory.addAll(settings.getHistoryTag(null).reversed);
     super.initState();
   }
 
@@ -244,7 +240,7 @@ class _SearchRecommmendUserPageState extends State<SearchRecommmendUserPage> {
                                   child: Text("Cancel".i18n)),
                               TextButton(
                                   onPressed: () {
-                                    settings.clearHistory(null);
+                                    settings.clearHistoryTag(null);
                                     reset();
                                     Navigator.of(context).pop();
                                   },
@@ -316,7 +312,7 @@ class _SearchRecommmendUserPageState extends State<SearchRecommmendUserPage> {
                 actions: [
                   TextButton(
                       onPressed: () {
-                        settings.deleteHistory(null, f);
+                        settings.deleteHistoryTag(null, f);
                         reset();
                         Navigator.of(context).pop();
                       },
@@ -397,8 +393,9 @@ class _SearchRecommmendUserPageState extends State<SearchRecommmendUserPage> {
     setState(() {
       nextUrl = null;
       isLoading = false;
+      users.clear();
       tagHistory.clear();
-      tagHistory.addAll(settings.getHistory(null).reversed);
+      tagHistory.addAll(settings.getHistoryTag(null).reversed);
     });
     firstLoad();
     return true;
@@ -453,7 +450,7 @@ class _SearchRecommendPageState extends State<SearchRecommendPage> {
     super.initState();
     _refreshController = EasyRefreshController(
         controlFinishLoad: true, controlFinishRefresh: true);
-    tagHistory.addAll(settings.getHistory(widget.type).reversed);
+    tagHistory.addAll(settings.getHistoryTag(widget.type).reversed);
     _refresh();
   }
 
@@ -588,7 +585,7 @@ class _SearchRecommendPageState extends State<SearchRecommendPage> {
                                   child: Text("Cancel".i18n)),
                               TextButton(
                                   onPressed: () {
-                                    settings.clearHistory(widget.type);
+                                    settings.clearHistoryTag(widget.type);
                                     _refresh();
                                     Navigator.of(context).pop();
                                   },
@@ -738,7 +735,7 @@ class _SearchRecommendPageState extends State<SearchRecommendPage> {
                 actions: [
                   TextButton(
                       onPressed: () {
-                        settings.deleteHistory(widget.type, f);
+                        settings.deleteHistoryTag(widget.type, f);
                         _refresh();
                         Navigator.of(context).pop();
                       },
@@ -771,7 +768,7 @@ class _SearchRecommendPageState extends State<SearchRecommendPage> {
   _refresh() {
     setState(() {
       tagHistory.clear();
-      tagHistory.addAll(settings.getHistory(widget.type).reversed);
+      tagHistory.addAll(settings.getHistoryTag(widget.type).reversed);
     });
     return loadData().then((value) {
       if (value.success) {

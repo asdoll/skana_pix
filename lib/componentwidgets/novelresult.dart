@@ -37,7 +37,7 @@ class _NovelResultPageState extends State<NovelResultPage> {
         controlFinishLoad: true, controlFinishRefresh: true);
     novels = ObservableList<Novel>();
     firstLoad();
-    settings.addHistory(widget.word, ArtworkType.NOVEL);
+    settings.addHistoryTag(widget.word, ArtworkType.NOVEL);
     super.initState();
   }
 

@@ -42,7 +42,7 @@ class _ResultPageState extends State<ResultPage> {
         controlFinishLoad: true, controlFinishRefresh: true);
     illusts = ObservableList<Illust>();
     firstLoad();
-    settings.addHistory(widget.word, ArtworkType.ILLUST);
+    settings.addHistoryTag(widget.word, ArtworkType.ILLUST);
     super.initState();
   }
 

@@ -58,3 +58,9 @@ class DynamicData {
   static final searchScrollController = ScrollController();
   static final settingScrollController = ScrollController();
 }
+
+class Constants{
+  static const String appName = 'SkanaPix';
+  static const String appVersion = '1.0.0';
+  static const isGooglePlay = bool.fromEnvironment("IS_GOOGLEPLAY", defaultValue: false);
+}

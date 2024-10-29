@@ -2,13 +2,14 @@ import 'dart:convert';
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
-import 'package:mobx/src/api/observable_collections.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:skana_pix/model/worktypes.dart';
 import 'package:skana_pix/pixiv_dart_api.dart';
 
 class UserSetting {
   String darkMode = 'system';
+  bool isAMOLED = false;
+  bool useDynamicColor = false;
   String language = 'system';
   int maxParallelDownload = 4;
   String downloadPath = '';
@@ -34,12 +35,15 @@ class UserSetting {
   List<String> blockedNovelTags = [];
   double fontSize = 20.0;
   String awPrefer = 'illust';
-  List<String> historyIllust = [];
-  List<String> historyNovel = [];
-  List<String> historyUser = [];
+  List<String> historyIllustTag = [];
+  List<String> historyNovelTag = [];
+  List<String> historyUserTag = [];
+  int seedColor = 0xFF536DFE;
 
   Future<void> saveDefaults() async {
     await prefs.setString('darkMode', darkMode);
+    await prefs.setBool('isAMOLED', isAMOLED);
+    await prefs.setBool('useDynamicColor', useDynamicColor);
     await prefs.setString('language', language);
     await prefs.setInt('maxParallelDownload', maxParallelDownload);
     await prefs.setString('downloadPath', downloadPath);
@@ -64,9 +68,9 @@ class UserSetting {
     await prefs.setStringList('blockedNovelTags', blockedNovelTags);
     await prefs.setDouble('fontSize', fontSize);
     await prefs.setString('awPrefer', awPrefer);
-    await prefs.setStringList('historyIllust', historyIllust);
-    await prefs.setStringList('historyNovel', historyNovel);
-    await prefs.setStringList('historyUser', historyUser);
+    await prefs.setStringList('historyIllustTag', historyIllustTag);
+    await prefs.setStringList('historyNovelTag', historyNovelTag);
+    await prefs.setStringList('historyUserTag', historyUserTag);
   }
 
   Future<void> init() async {
@@ -77,6 +81,8 @@ class UserSetting {
       return;
     }
     darkMode = prefs.getString('darkMode') ?? 'system';
+    isAMOLED = prefs.getBool('isAMOLED') ?? false;
+    useDynamicColor = prefs.getBool('useDynamicColor') ?? false;
     language = prefs.getString('language') ?? 'system';
     maxParallelDownload = prefs.getInt('maxParallelDownload') ?? 4;
     downloadPath = prefs.getString('downloadPath') ?? '';
@@ -102,9 +108,9 @@ class UserSetting {
     blockedNovelTags = prefs.getStringList('blockedNovelTags') ?? [];
     fontSize = prefs.getDouble('fontSize') ?? 20.0;
     awPrefer = prefs.getString('awPrefer') ?? 'illust';
-    historyIllust = prefs.getStringList('historyIllust') ?? [];
-    historyNovel = prefs.getStringList('historyNovel') ?? [];
-    historyUser = prefs.getStringList('historyUser') ?? [];
+    historyIllustTag = prefs.getStringList('historyIllustTag') ?? [];
+    historyNovelTag = prefs.getStringList('historyNovelTag') ?? [];
+    historyUserTag = prefs.getStringList('historyUserTag') ?? [];
   }
 
   void set(String key, dynamic value) {
@@ -112,6 +118,14 @@ class UserSetting {
       case 'darkMode':
         darkMode = value;
         prefs.setString('darkMode', darkMode);
+        break;
+      case 'isAMOLED':
+        isAMOLED = value;
+        prefs.setBool('isAMOLED', isAMOLED);
+        break;
+      case 'useDynamicColor':
+        useDynamicColor = value;
+        prefs.setBool('useDynamicColor', useDynamicColor);
         break;
       case 'language':
         language = value;
@@ -209,17 +223,17 @@ class UserSetting {
         awPrefer = value;
         prefs.setString('awPrefer', awPrefer);
         break;
-      case 'historyIllust':
-        historyIllust = value;
-        prefs.setStringList('historyIllust', historyIllust);
+      case 'historyIllustTag':
+        historyIllustTag = value;
+        prefs.setStringList('historyIllustTag', historyIllustTag);
         break;
-      case 'historyNovel':
-        historyNovel = value;
-        prefs.setStringList('historyNovel', historyNovel);
+      case 'historyNovelTag':
+        historyNovelTag = value;
+        prefs.setStringList('historyNovelTag', historyNovelTag);
         break;
-      case 'historyUser':
-        historyUser = value;
-        prefs.setStringList('historyUser', historyUser);
+      case 'historyUserTag':
+        historyUserTag = value;
+        prefs.setStringList('historyUserTag', historyUserTag);
         break;
     }
   }
@@ -231,6 +245,8 @@ class UserSetting {
   Map<String, dynamic> getMap() {
     return {
       'darkMode': darkMode,
+      'isAMOLED': isAMOLED,
+      'useDynamicColor': useDynamicColor,
       'language': language,
       'maxParallelDownload': maxParallelDownload,
       'downloadPath': downloadPath,
@@ -255,9 +271,9 @@ class UserSetting {
       'blockedNovelTags': blockedNovelTags,
       'fontSize': fontSize,
       'awPrefer': awPrefer,
-      'historyIllust': historyIllust,
-      'historyNovel': historyNovel,
-      'historyUser': historyUser,
+      'historyIllustTag': historyIllustTag,
+      'historyNovelTag': historyNovelTag,
+      'historyUserTag': historyUserTag,
     };
   }
 
@@ -271,6 +287,21 @@ class UserSetting {
         return ThemeMode.dark;
       default:
         return ThemeMode.system;
+    }
+  }
+
+
+  void setThemeMode(int i) {
+    switch (i) {
+      case 0:
+        set('darkMode', 'system');
+        break;
+      case 1:
+        set('darkMode', 'light');
+        break;
+      case 2:
+        set('darkMode', 'dark');
+        break;
     }
   }
 
@@ -507,120 +538,121 @@ class UserSetting {
     set('blockedNovelTags', blockedNovelTags);
   }
 
-  void addHistory(String id, ArtworkType? type) {
+  void addHistoryTag(String id, ArtworkType? type) {
     switch (type) {
       case ArtworkType.ILLUST:
       case ArtworkType.MANGA:
-        if (historyIllust.contains(id)) {
-          historyIllust.remove(id);
+        if (historyIllustTag.contains(id)) {
+          historyIllustTag.remove(id);
         }
-        if (historyIllust.length > 40) {
-          historyIllust.removeAt(0);
+        if (historyIllustTag.length > 40) {
+          historyIllustTag.removeAt(0);
         }
-        historyIllust.add(id);
-        set('historyIllust', historyIllust);
+        historyIllustTag.add(id);
+        set('historyIllustTag', historyIllustTag);
         break;
       case ArtworkType.NOVEL:
-        if (historyNovel.contains(id)) {
-          historyNovel.remove(id);
+        if (historyNovelTag.contains(id)) {
+          historyNovelTag.remove(id);
         }
-        if (historyNovel.length > 40) {
-          historyNovel.removeAt(0);
+        if (historyNovelTag.length > 40) {
+          historyNovelTag.removeAt(0);
         }
-        historyNovel.add(id);
-        set('historyNovel', historyNovel);
+        historyNovelTag.add(id);
+        set('historyNovelTag', historyNovelTag);
         break;
       case ArtworkType.ALL:
-        if (historyIllust.contains(id)) {
-          historyIllust.remove(id);
+        if (historyIllustTag.contains(id)) {
+          historyIllustTag.remove(id);
         }
-        if (historyIllust.length > 40) {
-          historyIllust.removeAt(0);
+        if (historyIllustTag.length > 40) {
+          historyIllustTag.removeAt(0);
         }
-        historyIllust.add(id);
-        set('historyIllust', historyIllust);
-        if (historyNovel.contains(id)) {
-          historyNovel.remove(id);
+        historyIllustTag.add(id);
+        set('historyIllustTag', historyIllustTag);
+        if (historyNovelTag.contains(id)) {
+          historyNovelTag.remove(id);
         }
-        if (historyNovel.length > 40) {
-          historyNovel.removeAt(0);
+        if (historyNovelTag.length > 40) {
+          historyNovelTag.removeAt(0);
         }
-        historyNovel.add(id);
-        set('historyNovel', historyNovel);
+        historyNovelTag.add(id);
+        set('historyNovelTag', historyNovelTag);
       case null:
-        if (historyUser.contains(id)) {
-          historyUser.remove(id);
+        if (historyUserTag.contains(id)) {
+          historyUserTag.remove(id);
         }
-        if (historyUser.length > 40) {
-          historyUser.removeAt(0);
+        if (historyUserTag.length > 40) {
+          historyUserTag.removeAt(0);
         }
-        historyUser.add(id);
-        set('historyUser', historyUser);
+        historyUserTag.add(id);
+        set('historyUserTag', historyUserTag);
         break;
     }
   }
 
-  void deleteHistory(ArtworkType? type,String tag){
+  void deleteHistoryTag(ArtworkType? type,String tag){
     switch (type) {
       case ArtworkType.ILLUST:
       case ArtworkType.MANGA:
-        historyIllust.remove(tag);
-        set('historyIllust', historyIllust);
+        historyIllustTag.remove(tag);
+        set('historyIllustTag', historyIllustTag);
         break;
       case ArtworkType.NOVEL:
-        historyNovel.remove(tag);
-        set('historyNovel', historyNovel);
+        historyNovelTag.remove(tag);
+        set('historyNovelTag', historyNovelTag);
         break;
       case ArtworkType.ALL:
-        historyIllust.remove(tag);
-        set('historyIllust', historyIllust);
-        historyNovel.remove(tag);
-        set('historyNovel', historyNovel);
+        historyIllustTag.remove(tag);
+        set('historyIllustTag', historyIllustTag);
+        historyNovelTag.remove(tag);
+        set('historyNovelTag', historyNovelTag);
         break;
       case null:
-        historyUser.remove(tag);
-        set('historyUser', historyUser);
+        historyUserTag.remove(tag);
+        set('historyUserTag', historyUserTag);
         break;
     }
   }
 
-  void clearHistory(ArtworkType? type) {
+  void clearHistoryTag(ArtworkType? type) {
     switch (type) {
       case ArtworkType.ILLUST:
       case ArtworkType.MANGA:
-        historyIllust.clear();
-        set('historyIllust', historyIllust);
+        historyIllustTag.clear();
+        set('historyIllustTag', historyIllustTag);
         break;
       case ArtworkType.NOVEL:
-        historyNovel.clear();
-        set('historyNovel', historyNovel);
+        historyNovelTag.clear();
+        set('historyNovelTag', historyNovelTag);
         break;
       case ArtworkType.ALL:
-        historyIllust.clear();
-        set('historyIllust', historyIllust);
-        historyNovel.clear();
-        set('historyNovel', historyNovel);
+        historyIllustTag.clear();
+        set('historyIllustTag', historyIllustTag);
+        historyNovelTag.clear();
+        set('historyNovelTag', historyNovelTag);
         break;
       case null:
-        historyUser.clear();
-        set('historyUser', historyUser);
+        historyUserTag.clear();
+        set('historyUserTag', historyUserTag);
         break;
     }
   }
 
-  List<String> getHistory(ArtworkType? type) {
+  List<String> getHistoryTag(ArtworkType? type) {
     switch (type) {
       case ArtworkType.ILLUST:
       case ArtworkType.MANGA:
-        return historyIllust;
+        return historyIllustTag;
       case ArtworkType.NOVEL:
-        return historyNovel;
+        return historyNovelTag;
       case ArtworkType.ALL:
-        return historyIllust + historyNovel;
+        return historyIllustTag + historyNovelTag;
       case null:
-        return historyUser;
+        return historyUserTag;
     }
   }
+
 }
 
 var settings = UserSetting();

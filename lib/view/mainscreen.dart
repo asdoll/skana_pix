@@ -26,11 +26,8 @@ class _MainScreenState extends State<MainScreen> {
       RecomImagesPage(ArtworkType.MANGA),
       RecomNovelsPage(),
     ];
-    return MaterialApp(
-      theme: DynamicData.themeData,
-      darkTheme: DynamicData.darkTheme,
-      themeMode: ThemeMode.system,
-      home: DefaultTabController(
+    return Material(
+      child: DefaultTabController(
         initialIndex: 0,
         length: 3,
         child: Scaffold(
