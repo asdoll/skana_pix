@@ -1,4 +1,4 @@
-package com.example.skana_pix
+package com.skanaone.skana_pix
 
 import io.flutter.embedding.android.FlutterActivity
 
