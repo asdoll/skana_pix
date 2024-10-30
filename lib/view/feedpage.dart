@@ -2,11 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:skana_pix/componentwidgets/avatar.dart';
 import 'package:skana_pix/pixiv_dart_api.dart';
 import 'package:skana_pix/utils/translate.dart';
-import 'package:skana_pix/view/settingscreen.dart';
 
 import '../componentwidgets/feedillust.dart';
 import '../componentwidgets/feednovel.dart';
-import 'defaults.dart';
 
 class FeedPage extends StatefulWidget {
   @override
@@ -20,7 +18,10 @@ class _FeedPageState extends State<FeedPage>
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 2, vsync: this);
+    _tabController = TabController(
+        initialIndex: (settings.awPrefer == "novel" ? 1 : 0),
+        length: 2,
+        vsync: this);
   }
 
   @override

@@ -64,7 +64,9 @@ class _IllustCardState extends State<IllustCard> {
 
   @override
   void dispose() {
-    IllustCard.favoriteCallbacks.remove(illust.id.toString());
+    if (illusts.length > page) {
+      IllustCard.favoriteCallbacks.remove(illust.id.toString());
+    }
     super.dispose();
   }
 
@@ -182,7 +184,8 @@ class _IllustCardState extends State<IllustCard> {
                             children: [
                               if (settings.feedAIBadge && illust.isAi)
                                 _buildAIBadge(),
-                              _buildVisibility()
+                              _buildVisibility(),
+                              if (illust.isUgoira) _buildUgoiraBadge(),
                             ],
                           )),
                     ],
@@ -218,7 +221,8 @@ class _IllustCardState extends State<IllustCard> {
                             children: [
                               if (settings.feedAIBadge && illust.isAi)
                                 _buildAIBadge(),
-                              _buildR18Badge()
+                              _buildR18Badge(),
+                              if (illust.isUgoira) _buildUgoiraBadge(),
                             ],
                           )),
                     ],
@@ -238,32 +242,57 @@ class _IllustCardState extends State<IllustCard> {
   }
 
   Widget _buildAIBadge() {
-    return Container(
-      decoration: BoxDecoration(
-        color: Colors.black26,
-        borderRadius: BorderRadius.all(Radius.circular(4.0)),
-      ),
-      child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 2.0, horizontal: 2.0),
-        child: Text(
-          "AI",
-          style: TextStyle(color: Colors.white),
+    return Padding(
+      padding: EdgeInsets.all(4.0),
+      child: Container(
+        decoration: const BoxDecoration(
+          color: Colors.black26,
+          borderRadius: BorderRadius.all(Radius.circular(4.0)),
+        ),
+        child: const Padding(
+          padding: EdgeInsets.symmetric(vertical: 2.0, horizontal: 2.0),
+          child: Text(
+            "AI",
+            style: TextStyle(color: Colors.white),
+          ),
         ),
       ),
     );
   }
 
   Widget _buildR18Badge() {
-    return Container(
-      decoration: BoxDecoration(
-        color: Colors.black26,
-        borderRadius: BorderRadius.all(Radius.circular(4.0)),
+    return Padding(
+      padding: EdgeInsets.all(4.0),
+      child: Container(
+        decoration: const BoxDecoration(
+          color: Colors.black26,
+          borderRadius: BorderRadius.all(Radius.circular(4.0)),
+        ),
+        child: const Padding(
+          padding: EdgeInsets.symmetric(vertical: 2.0, horizontal: 2.0),
+          child: Text(
+            "R18",
+            style: TextStyle(color: Colors.white),
+          ),
+        ),
       ),
-      child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 2.0, horizontal: 2.0),
-        child: Text(
-          "R18",
-          style: TextStyle(color: Colors.white),
+    );
+  }
+
+  Widget _buildUgoiraBadge() {
+    return Padding(
+      padding: EdgeInsets.all(4.0),
+      child: Container(
+        decoration: const BoxDecoration(
+          color: Colors.black26,
+          borderRadius: BorderRadius.all(Radius.circular(4.0)),
+        ),
+        child: const Padding(
+          padding: EdgeInsets.symmetric(vertical: 2.0, horizontal: 2.0),
+          child: Text(
+            "ugoira",
+            style: TextStyle(color: Colors.white),
+          ),
         ),
       ),
     );
@@ -412,14 +441,14 @@ class _IllustCardState extends State<IllustCard> {
         child: Padding(
           padding: EdgeInsets.all(4.0),
           child: Container(
+            decoration: const BoxDecoration(
+              color: Colors.black26,
+              borderRadius: BorderRadius.all(Radius.circular(4.0)),
+            ),
             child: Padding(
               padding:
                   const EdgeInsets.symmetric(vertical: 2.0, horizontal: 2.0),
               child: cardText(),
-            ),
-            decoration: BoxDecoration(
-              color: Colors.black26,
-              borderRadius: BorderRadius.all(Radius.circular(4.0)),
             ),
           ),
         ),

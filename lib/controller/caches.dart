@@ -13,4 +13,17 @@ class ImagesCacheManager extends CacheManager with ImageCacheManager {
   ));
 }
 
+class ThisDownloadManager extends CacheManager {
+  static const key = 'ThisDownloadManager';
+  ThisDownloadManager():super(
+    Config(
+      key,
+      repo: JsonCacheInfoRepository(databaseName: key),
+      fileSystem: IOFileSystem(key),
+      fileService: DioFileService(),
+  ));
+}
+
+ThisDownloadManager thisDownloadManager = ThisDownloadManager();
+
 ImagesCacheManager imagesCacheManager = ImagesCacheManager();

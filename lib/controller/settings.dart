@@ -30,6 +30,7 @@ class UserSetting {
   List<String> blockedIllusts = [];
   int saveChoice = 0; //0:all 1:ToDir 2:ToGallery
   List<String> bookmarkedTags = [];
+  List<String> bookmarkedNovelTags = [];
   List<String> blockedComments = [];
   List<String> blockedNovels = [];
   List<String> blockedNovelTags = [];
@@ -71,6 +72,7 @@ class UserSetting {
     await prefs.setStringList('historyIllustTag', historyIllustTag);
     await prefs.setStringList('historyNovelTag', historyNovelTag);
     await prefs.setStringList('historyUserTag', historyUserTag);
+    await prefs.setStringList('bookmarkedNovelTags', bookmarkedNovelTags);
   }
 
   Future<void> init() async {
@@ -111,6 +113,7 @@ class UserSetting {
     historyIllustTag = prefs.getStringList('historyIllustTag') ?? [];
     historyNovelTag = prefs.getStringList('historyNovelTag') ?? [];
     historyUserTag = prefs.getStringList('historyUserTag') ?? [];
+    bookmarkedNovelTags = prefs.getStringList('bookmarkedNovelTags') ?? [];
   }
 
   void set(String key, dynamic value) {
@@ -235,6 +238,10 @@ class UserSetting {
         historyUserTag = value;
         prefs.setStringList('historyUserTag', historyUserTag);
         break;
+      case 'bookmarkedNovelTags':
+        bookmarkedNovelTags = value;
+        prefs.setStringList('bookmarkedNovelTags', bookmarkedNovelTags);
+        break;
     }
   }
 
@@ -274,6 +281,7 @@ class UserSetting {
       'historyIllustTag': historyIllustTag,
       'historyNovelTag': historyNovelTag,
       'historyUserTag': historyUserTag,
+      'bookmarkedNovelTags': bookmarkedNovelTags,
     };
   }
 
@@ -429,6 +437,15 @@ class UserSetting {
     set('blockedNovelTags', blockedNovelTags);
   }
 
+  void addBookmarkedNovelTags(List<String> tags) {
+    for (var tag in tags) {
+      if (!bookmarkedNovelTags.contains(tag)) {
+        bookmarkedNovelTags.add(tag);
+      }
+    }
+    set('bookmarkedNovelTags', bookmarkedNovelTags);
+  }
+
   void clearBlockedTags() {
     blockedTags.clear();
     set('blockedTags', blockedTags);
@@ -472,6 +489,11 @@ class UserSetting {
   void clearBlockedNovelTags() {
     blockedNovelTags.clear();
     set('blockedNovelTags', blockedNovelTags);
+  }
+
+  void clearBookmarkedNovelTags() {
+    bookmarkedNovelTags.clear();
+    set('bookmarkedNovelTags', bookmarkedNovelTags);
   }
 
   void removeBlockedTags(List<String> tags) {
@@ -535,6 +557,13 @@ class UserSetting {
       blockedNovelTags.remove(tag);
     }
     set('blockedNovelTags', blockedNovelTags);
+  }
+
+  void removeBookmarkedNovelTags(List<String> tags) {
+    for (var tag in tags) {
+      bookmarkedNovelTags.remove(tag);
+    }
+    set('bookmarkedNovelTags', bookmarkedNovelTags);
   }
 
   void addHistoryTag(String id, ArtworkType? type) {

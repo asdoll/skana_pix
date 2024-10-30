@@ -5,6 +5,8 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 
+import '../controller/settings.dart';
+
 class DynamicData {
   static var activeNavColor = Colors.indigoAccent;
   static var inActiveNavColor = CupertinoColors.systemGrey;
@@ -31,9 +33,9 @@ class DynamicData {
           ? themeData
           : darkTheme;
 
-  static bool get isDarkMode =>
+  static bool get isDarkMode => settings.themeMode == ThemeMode.system ?
       SchedulerBinding.instance.platformDispatcher.platformBrightness ==
-      Brightness.dark;
+      Brightness.dark : settings.themeMode == ThemeMode.dark;
 
   static double widthScreen = WidgetsBinding
           .instance.platformDispatcher.views.first.physicalSize.width /

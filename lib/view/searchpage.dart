@@ -27,6 +27,14 @@ class SearchPage extends StatefulWidget {
 class _SearchPageState extends State<SearchPage> {
   int _selectedIndex = 0;
 
+  int getInitialIndex() => (settings.awPrefer == "novel")? 1 : 0;
+
+  @override
+  void initState() {
+    super.initState();
+    _selectedIndex = getInitialIndex();
+  }
+
   @override
   Widget build(BuildContext context) {
     List<Widget> tabs = [
@@ -36,7 +44,7 @@ class _SearchPageState extends State<SearchPage> {
     ];
     return Material(
       child: DefaultTabController(
-        initialIndex: 0,
+        initialIndex: getInitialIndex(),
         length: 3,
         child: Scaffold(
           appBar: PreferredSize(
@@ -751,9 +759,9 @@ class _SearchRecommendPageState extends State<SearchRecommendPage> {
       },
       onTap: () {
         Navigator.of(context, rootNavigator: true).push(MaterialPageRoute(
-            builder: (context) => NovelResultPage(
+            builder: (context) => (widget.type == ArtworkType.NOVEL) ?NovelResultPage(
                   word: f,
-                )));
+                ):ResultPage(word: f)));
       },
       child: Chip(
         padding: EdgeInsets.all(0.0),

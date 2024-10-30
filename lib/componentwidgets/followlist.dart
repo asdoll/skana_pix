@@ -16,12 +16,16 @@ class FollowList extends StatefulWidget {
   final int id;
   final bool isNovel;
   final bool isMyPixiv;
+  final bool setAppBar;
+  final bool isMe;
 
   FollowList(
       {Key? key,
       required this.id,
       this.isNovel = false,
-      this.isMyPixiv = false})
+      this.isMyPixiv = false,
+      this.setAppBar = false,
+      this.isMe = false})
       : super(key: key);
 
   @override
@@ -54,23 +58,38 @@ class _FollowListState extends State<FollowList>
   @override
   Widget build(BuildContext context) {
     super.build(context);
-    return Observer(builder: (_) {
-      return EasyRefresh(
-        controller: easyRefreshController,
-        header: DefaultHeaderFooter.header(context),
-        onLoad: () => nextPage(),
-        onRefresh: () => firstLoad(),
-        refreshOnStart: true,
-        child: CustomScrollView(
-          slivers: [
-            _buildList(),
-          ],
-        ),
-      );
-    });
+    return Scaffold(
+      appBar: widget.setAppBar
+          ? AppBar(
+              title: Text(widget.isMyPixiv
+                  ? "My Pixiv".i18n
+                  : widget.isMe
+                      ? "My Follow".i18n
+                      : "Following".i18n),
+            )
+          : null,
+      body: Observer(builder: (_) {
+        return EasyRefresh(
+          controller: easyRefreshController,
+          header: DefaultHeaderFooter.header(context),
+          onLoad: () => nextPage(),
+          onRefresh: () => firstLoad(),
+          refreshOnStart: true,
+          child: CustomScrollView(
+            slivers: [
+              if (widget.isMe && !widget.isMyPixiv)
+                SliverToBoxAdapter(
+                  child: _buildMyPage(context),
+                ),
+              _buildList(context),
+            ],
+          ),
+        );
+      }),
+    );
   }
 
-  Widget _buildList() {
+  Widget _buildList(BuildContext context) {
     return SliverWaterfallFlow(
       delegate: SliverChildBuilderDelegate((context, index) {
         final data = users[index];
@@ -78,8 +97,40 @@ class _FollowListState extends State<FollowList>
           user: data,
         );
       }, childCount: users.length),
-      gridDelegate: SliverWaterfallFlowDelegateWithMaxCrossAxisExtent(
+      gridDelegate: const SliverWaterfallFlowDelegateWithMaxCrossAxisExtent(
           maxCrossAxisExtent: 600),
+    );
+  }
+
+  List<bool> isSelected = [true, false];
+
+  Widget _buildMyPage(BuildContext context) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        ToggleButtons(
+            isSelected: isSelected,
+            onPressed: (index) {
+              setState(() {
+                for (int i = 0; i < isSelected.length; i++) {
+                  isSelected[i] = i == index;
+                  if (isSelected[i]) {
+                    restrict = i == 0 ? 'public' : 'private';
+                  }
+                }
+                reset();
+              });
+            },
+            borderRadius: const BorderRadius.all(Radius.circular(8)),
+            constraints: const BoxConstraints(
+              minHeight: 40.0,
+              minWidth: 80.0,
+            ),
+            children: [
+              Text("Public".i18n),
+              Text("Private".i18n),
+            ]),
+      ],
     );
   }
 
@@ -99,6 +150,13 @@ class _FollowListState extends State<FollowList>
         });
       }
     });
+  }
+
+  void reset() {
+    users.clear();
+    nextUrl = null;
+
+    firstLoad();
   }
 
   void firstLoad() {
@@ -133,7 +191,7 @@ class _FollowListState extends State<FollowList>
     Res<List<UserPreview>> res = widget.isMyPixiv
         ? await ConnectManager()
             .apiClient
-            .getMypixiv(widget.id.toString(), restrict, nextUrl)
+            .getMypixiv(widget.id.toString(), nextUrl)
         : await ConnectManager()
             .apiClient
             .getFollowing(widget.id.toString(), restrict, nextUrl);

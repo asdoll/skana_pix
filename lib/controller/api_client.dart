@@ -342,7 +342,7 @@ class ApiClient extends BaseClient {
     }
   }
 
-  Future<Res<List<UserPreview>>> getMypixiv(String uid, String type,
+  Future<Res<List<UserPreview>>> getMypixiv(String uid,
       [String? nextUrl]) async {
     var path = nextUrl ?? "/v1/user/mypixiv?filter=for_android&user_id=$uid";
     var res = await apiGet(path);

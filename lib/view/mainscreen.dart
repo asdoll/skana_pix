@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:skana_pix/pixiv_dart_api.dart';
 import 'package:skana_pix/utils/translate.dart';
-import 'package:skana_pix/view/defaults.dart';
 
 import '../model/worktypes.dart';
 import 'recom_images_page.dart';
@@ -19,6 +19,13 @@ class _MainScreenState extends State<MainScreen> {
     super.initState();
   }
 
+  int getInitialIndex() {
+    if(settings.awPrefer == "illust")    return 0;
+    if(settings.awPrefer == "manga")    return 1;
+    if(settings.awPrefer == "novel")    return 2;
+    return 0;
+  }
+
   @override
   Widget build(BuildContext context) {
     List<Widget> tabs = [
@@ -28,29 +35,29 @@ class _MainScreenState extends State<MainScreen> {
     ];
     return Material(
       child: DefaultTabController(
-        initialIndex: 0,
+        initialIndex: getInitialIndex(),
         length: 3,
         child: Scaffold(
           appBar: PreferredSize(
             preferredSize:
-                const Size.fromHeight(32.0), // here the desired height
+                const Size.fromHeight(42.0), // here the desired height
             child: AppBar(
               toolbarHeight: 0.0,
               bottom: TabBar(
                 tabs: [
                   Container(
-                    height: 30.0,
+                    height: 40.0,
                     width: 80,
                     child: Tab(text: 'Illust'.i18n),
                   ),
                   Container(
-                    height: 30.0,
+                    height: 40.0,
                     width: 80,
                     // color: Colors.red,
                     child: Tab(text: 'Manga'.i18n),
                   ),
                   Container(
-                    height: 30.0,
+                    height: 40.0,
                     width: 80,
                     // color: Colors.red,
                     child: Tab(text: 'Novel'.i18n),

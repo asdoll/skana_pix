@@ -11,6 +11,7 @@ class PainterAvatar extends StatefulWidget {
   final GestureTapCallback? onTap;
   final Size? size;
   final ArtworkType type;
+  final bool isMe;
 
   const PainterAvatar(
       {Key? key,
@@ -18,7 +19,8 @@ class PainterAvatar extends StatefulWidget {
       required this.id,
       this.onTap,
       this.size,
-      this.type = ArtworkType.ALL})
+      this.type = ArtworkType.ALL,
+      this.isMe = false})
       : super(key: key);
 
   @override
@@ -32,6 +34,7 @@ class _PainterAvatarState extends State<PainterAvatar> {
       return UserPage(
         id: widget.id,
         type: widget.type,
+        isMe: widget.isMe,
       );
     }));
   }

@@ -5,6 +5,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
+import 'package:icon_decoration/icon_decoration.dart';
 import 'package:mobx/mobx.dart';
 import 'package:path/path.dart';
 import 'package:share_plus/share_plus.dart';
@@ -27,8 +28,13 @@ class UserPage extends StatefulWidget {
   final ArtworkType type;
   final String? heroTag;
   final int id;
+  final bool isMe;
   const UserPage(
-      {Key? key, required this.id, this.heroTag, this.type = ArtworkType.ALL})
+      {Key? key,
+      required this.id,
+      this.heroTag,
+      this.type = ArtworkType.ALL,
+      this.isMe = false})
       : super(key: key);
 
   @override
@@ -42,7 +48,8 @@ class _UserPageState extends State<UserPage> with TickerProviderStateMixin {
   UserDetails? userDetail;
   bool isMuted = false;
   bool isError = false;
-  ArtworkType get type => widget.type == ArtworkType.ALL ? ArtworkType.ILLUST : widget.type;
+  ArtworkType get type =>
+      widget.type == ArtworkType.ALL ? ArtworkType.ILLUST : widget.type;
 
   String restrict = 'public';
 
@@ -84,80 +91,80 @@ class _UserPageState extends State<UserPage> with TickerProviderStateMixin {
   @override
   Widget build(BuildContext context) {
     return Observer(
-      warnWhenNoObservables: false,
-      builder: (_) {
-      if (isMuted) {
-        return Scaffold(
-          appBar: AppBar(
-            backgroundColor: Colors.transparent,
-            elevation: 0.0,
-          ),
-          extendBodyBehindAppBar: true,
-          extendBody: true,
-          body: Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: <Widget>[
-                Text('X_X'),
-                Text('${widget.id}'),
-                FilledButton.tonal(
-                    onPressed: () {
-                      settings.removeBlockedUsers([widget.id.toString()]);
-                      setState(() {
-                        isMuted = false;
-                      });
-                    },
-                    child: Text("Unblock".i18n)),
-              ],
-            ),
-          ),
-        );
-      }
-
-      if (isError && userDetail == null) {
-        return Scaffold(
-          appBar: AppBar(),
-          body: Container(
-              child: Center(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              mainAxisAlignment: MainAxisAlignment.center,
-              mainAxisSize: MainAxisSize.max,
-              children: <Widget>[
-                Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Text(
-                    "Network Error".i18n,
-                  ),
+        warnWhenNoObservables: false,
+        builder: (_) {
+          if (isMuted) {
+            return Scaffold(
+              appBar: AppBar(
+                backgroundColor: Colors.transparent,
+                elevation: 0.0,
+              ),
+              extendBodyBehindAppBar: true,
+              extendBody: true,
+              body: Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: <Widget>[
+                    Text('X_X'),
+                    Text('${widget.id}'),
+                    FilledButton.tonal(
+                        onPressed: () {
+                          settings.removeBlockedUsers([widget.id.toString()]);
+                          setState(() {
+                            isMuted = false;
+                          });
+                        },
+                        child: Text("Unblock".i18n)),
+                  ],
                 ),
-                Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: MaterialButton(
-                    color: Theme.of(context).colorScheme.primary,
-                    onPressed: () {
-                      firstLoad();
-                    },
-                    child: Text("Retry".i18n),
-                  ),
-                )
-              ],
-            ),
-          )),
-        );
-      }
-      if (userDetail == null) {
-        return Scaffold(
-          appBar: AppBar(),
-          body: Container(
-              child: Center(
-            child: CircularProgressIndicator(
-              color: Theme.of(context).colorScheme.primary,
-            ),
-          )),
-        );
-      }
-      return _buildBody(context);
-    });
+              ),
+            );
+          }
+
+          if (isError && userDetail == null) {
+            return Scaffold(
+              appBar: AppBar(),
+              body: Container(
+                  child: Center(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  mainAxisSize: MainAxisSize.max,
+                  children: <Widget>[
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Text(
+                        "Network Error".i18n,
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: MaterialButton(
+                        color: Theme.of(context).colorScheme.primary,
+                        onPressed: () {
+                          firstLoad();
+                        },
+                        child: Text("Retry".i18n),
+                      ),
+                    )
+                  ],
+                ),
+              )),
+            );
+          }
+          if (userDetail == null) {
+            return Scaffold(
+              appBar: AppBar(),
+              body: Container(
+                  child: Center(
+                child: CircularProgressIndicator(
+                  color: Theme.of(context).colorScheme.primary,
+                ),
+              )),
+            );
+          }
+          return _buildBody(context);
+        });
   }
 
   Widget _buildBody(BuildContext context) {
@@ -166,8 +173,14 @@ class _UserPageState extends State<UserPage> with TickerProviderStateMixin {
         body: NestedScrollView(
           controller: _scrollController,
           body: TabBarView(controller: _tabController, children: [
-            WorksPage(id:userDetail!.id, type:type, portal: '/works-${userDetail!.id}'),
-            BookmarksPage(id:userDetail!.id, type:type, portal: '/bookmarks-${userDetail!.id}'),
+            WorksPage(
+                id: userDetail!.id,
+                type: type,
+                portal: '/works-${userDetail!.id}'),
+            BookmarksPage(
+                id: userDetail!.id,
+                type: type,
+                portal: '/bookmarks-${userDetail!.id}'),
             UserDetailPage(userDetail!),
           ]).paddingTop(102 + MediaQuery.of(context).padding.top),
           headerSliverBuilder:
@@ -196,7 +209,10 @@ class _UserPageState extends State<UserPage> with TickerProviderStateMixin {
           actions: <Widget>[
             Builder(builder: (context) {
               return IconButton(
-                  icon: Icon(Icons.share),
+                  icon: const DecoratedIcon(
+                    icon: Icon(Icons.share),
+                    decoration: IconDecoration(border: IconBorder(width: 1.5)),
+                  ),
                   onPressed: () {
                     final box = context.findRenderObject() as RenderBox?;
                     final pos = box != null
@@ -369,15 +385,19 @@ class _UserPageState extends State<UserPage> with TickerProviderStateMixin {
 
   PopupMenuButton<int> _buildPopMenu(BuildContext context) {
     return PopupMenuButton<int>(
+      icon: const DecoratedIcon(
+        icon: Icon(Icons.more_vert),
+        decoration: IconDecoration(border: IconBorder(width: 1.5)),
+      ),
       onSelected: (index) async {
         switch (index) {
           case 0:
-            UserFollowButton(
-              followed: userDetail!.isFollowed,
-              onPressed: () async {
-                follow("private");
-              },
-            );
+            if (widget.isMe) {
+              BotToast.showText(text: "You can't follow yourself".i18n);
+              return;
+            }
+            follow("private");
+            
             break;
           case 1:
             {
@@ -414,8 +434,7 @@ class _UserPageState extends State<UserPage> with TickerProviderStateMixin {
           case 2:
             {
               Clipboard.setData(ClipboardData(
-                  text:
-                      'painter:${userDetail?.name ?? ''}\npid:${widget.id}'));
+                  text: 'painter:${userDetail?.name ?? ''}\npid:${widget.id}'));
               BotToast.showText(text: "Copied to clipboard".i18n);
               break;
             }
@@ -475,8 +494,7 @@ class _UserPageState extends State<UserPage> with TickerProviderStateMixin {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
               NullHero(
-                tag: userDetail?.name ??
-                    "" + widget.heroTag.toString(),
+                tag: userDetail?.name ?? "" + widget.heroTag.toString(),
                 child: Text(
                   userDetail?.name ?? "",
                   style: Theme.of(context).textTheme.titleLarge,
@@ -612,6 +630,11 @@ class _UserPageState extends State<UserPage> with TickerProviderStateMixin {
                       child: UserFollowButton(
                         followed: userDetail!.isFollowed,
                         onPressed: () async {
+                          if (widget.isMe) {
+                            BotToast.showText(
+                                text: "You can't follow yourself".i18n);
+                            return;
+                          }
                           follow("public");
                         },
                       ),
@@ -679,13 +702,20 @@ class _UserPageState extends State<UserPage> with TickerProviderStateMixin {
       isFollowing = true;
     });
     var method = userDetail!.isFollowed ? "delete" : "add";
-    var res =
-        await followUser(userDetail!.id.toString(), method, type);
+    var res = await followUser(userDetail!.id.toString(), method, type);
     if (res.error) {
       if (mounted) {
         BotToast.showText(text: "Network Error".i18n);
       }
     } else {
+      if (method == "add" && type == "private") {
+        BotToast.showText(text: "Followed privately".i18n);
+      } else {
+        BotToast.showText(
+            text: userDetail!.isFollowed
+                ? "Unfollowed".i18n
+                : "Followed".i18n);
+      }
       userDetail!.isFollowed = !userDetail!.isFollowed;
     }
     setState(() {

@@ -3,6 +3,7 @@ import 'dart:math';
 
 import 'package:bot_toast/bot_toast.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:mobx/mobx.dart';
 import 'package:path/path.dart';
@@ -352,7 +353,7 @@ class _NovelViewerPageState extends State<NovelViewerPage> {
               child: Wrap(
                 crossAxisAlignment: WrapCrossAlignment.center,
                 spacing: 2,
-                runSpacing: 0,
+                runSpacing: 1,
                 children: [
                   if (widget.novel.isAi)
                     Text("AI-generated".i18n,
@@ -420,7 +421,7 @@ class _NovelViewerPageState extends State<NovelViewerPage> {
   Widget buildRow(BuildContext context, Tag f) {
     return GestureDetector(
       onLongPress: () async {
-        //_longPressTag(context, f);
+        _longPressTag(context, f);
       },
       onTap: () {
         Navigator.of(context).push(MaterialPageRoute(builder: (context) {
@@ -430,24 +431,92 @@ class _NovelViewerPageState extends State<NovelViewerPage> {
           );
         }));
       },
-      child: RichText(
-          textAlign: TextAlign.center,
-          text: TextSpan(
-              text: "#${f.name}",
-              children: [
-                TextSpan(
-                  text: " ",
-                  style: Theme.of(context).textTheme.bodySmall,
-                ),
-                TextSpan(
-                    text: "${f.translatedName ?? "~"}",
-                    style: Theme.of(context).textTheme.bodySmall)
-              ],
-              style: Theme.of(context)
-                  .textTheme
-                  .bodySmall!
-                  .copyWith(color: Theme.of(context).colorScheme.secondary))),
+      child: Container(
+        height: 22,
+        padding: const EdgeInsets.symmetric(horizontal: 14),
+        decoration: BoxDecoration(
+          color: Theme.of(context).colorScheme.secondaryContainer,
+          borderRadius: const BorderRadius.all(Radius.circular(12.5)),
+        ),
+        child: RichText(
+            textAlign: TextAlign.center,
+            text: TextSpan(
+                text: "#${f.name}",
+                children: [
+                  TextSpan(
+                    text: " ",
+                    style: Theme.of(context).textTheme.bodySmall,
+                  ),
+                  TextSpan(
+                      text: "${f.translatedName ?? "~"}",
+                      style: Theme.of(context).textTheme.bodySmall)
+                ],
+                style: Theme.of(context)
+                    .textTheme
+                    .bodySmall!
+                    .copyWith(color: Theme.of(context).colorScheme.secondary))),
+      ),
     );
+  }
+
+  Future _longPressTag(BuildContext context, Tag f) async {
+    switch (await showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return SimpleDialog(
+            title: RichText(
+              text: TextSpan(children: [
+                TextSpan(
+                    text: f.name,
+                    style: Theme.of(context).textTheme.bodyLarge!.copyWith(
+                        color: Theme.of(context).colorScheme.primary)),
+                if (f.translatedName != null)
+                  TextSpan(
+                      text: "\n${"${f.translatedName}"}",
+                      style: Theme.of(context).textTheme.bodyLarge!)
+              ]),
+            ),
+            children: <Widget>[
+              SimpleDialogOption(
+                onPressed: () {
+                  Navigator.pop(context, 0);
+                },
+                child: Text("Block".i18n),
+              ),
+              SimpleDialogOption(
+                onPressed: () {
+                  Navigator.pop(context, 1);
+                },
+                child: Text("Bookmark".i18n),
+              ),
+              SimpleDialogOption(
+                onPressed: () {
+                  Navigator.pop(context, 2);
+                },
+                child: Text("Copy".i18n),
+              ),
+            ],
+          );
+        })) {
+      case 0:
+        {
+          settings.addBlockedNovelTags([f.name]);
+        }
+        break;
+      case 1:
+        {
+          settings.addBookmarkedNovelTags([f.name]);
+        }
+        break;
+      case 2:
+        {
+          await Clipboard.setData(ClipboardData(text: f.name));
+          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+            duration: Duration(seconds: 1),
+            content: Text("Copied to clipboard".i18n),
+          ));
+        }
+    }
   }
 
   AdaptiveTextSelectionToolbar _buildSelectionMenu(

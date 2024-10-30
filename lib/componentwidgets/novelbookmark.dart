@@ -1,5 +1,7 @@
+import 'package:bot_toast/bot_toast.dart';
 import 'package:flutter/material.dart';
 import 'package:skana_pix/pixiv_dart_api.dart';
+import 'package:skana_pix/utils/translate.dart';
 import 'package:skana_pix/view/defaults.dart';
 
 typedef UpdateFavoriteFunc = void Function(bool v);
@@ -55,6 +57,7 @@ class _NovelBookmarkButtonState extends State<NovelBookmarkButton> {
               isBookmarking = false;
               widget.novel.isBookmarked = true;
             });
+            BotToast.showText(text: "Bookmarked privately".i18n);
           } catch (e) {}
         } else {
           try {

@@ -22,6 +22,7 @@ import 'imagepage.dart';
 import 'imagetab.dart';
 import 'pixivimage.dart';
 import 'staricon.dart';
+import 'ugoira.dart';
 import 'userpage.dart';
 import 'package:icon_decoration/icon_decoration.dart';
 
@@ -262,7 +263,7 @@ class _IllustPageState extends State<IllustPage> {
       extendBodyBehindAppBar: true,
       floatingActionButton: GestureDetector(
         onLongPress: () {
-          // _showBookMarkTag();
+          likes("private");
         },
         child: FloatingActionButton(
             heroTag: widget.illust.id,
@@ -392,28 +393,27 @@ class _IllustPageState extends State<IllustPage> {
         ? widget.illust.images[index].original
         : widget.illust.images[index].medium;
 
-    //if (!widget.illust.isUgoira) {
-    image = SizedBox(
+    if (!widget.illust.isUgoira) {
+      image = SizedBox(
+          width: imageWidth,
+          height: imageHeight,
+          child: GestureDetector(
+              onTap: () => Navigator.of(context).push(MaterialPageRoute(
+                  builder: (BuildContext context) => ImagePage(
+                      widget.illust.images.map((e) => e.large).toList()))),
+              child: PixivImage(
+                imageUrl,
+                width: width,
+                height: height,
+              )));
+    } else {
+      image = UgoiraWidget(
+        id: widget.illust.id.toString(),
+        previewImage: PixivProvider.url(widget.illust.images[index].large),
         width: imageWidth,
         height: imageHeight,
-        child: GestureDetector(
-            onTap: () => Navigator.of(context).push(MaterialPageRoute(
-                builder: (BuildContext context) => ImagePage(
-                    widget.illust.images.map((e) => e.large).toList()))),
-            child: PixivImage(
-              imageUrl,
-              width: width,
-              height: height,
-            )));
-    //} else {
-    //TODO: UgoiraWidget
-    // image = UgoiraWidget(
-    //   id: widget.illust.id.toString(),
-    //   previewImage: CachedImageProvider(widget.illust.images[index].large),
-    //   width: imageWidth,
-    //   height: imageHeight,
-    // );
-    //}
+      );
+    }
 
     return Hero(
         tag: widget.heroTag ?? hashCode.toString() + index.toString(),
@@ -621,6 +621,9 @@ class _IllustPageState extends State<IllustPage> {
           ?.call(widget.illust.isBookmarked);
       IllustCard.favoriteCallbacks[widget.illust.id.toString()]
           ?.call(widget.illust.isBookmarked);
+      if (type == "private") {
+        BotToast.showText(text: "Bookmarked privately".i18n);
+      }
     }
     setState(() {
       isBookmarking = false;

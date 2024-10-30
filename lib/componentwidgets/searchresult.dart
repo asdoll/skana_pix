@@ -64,6 +64,10 @@ class _ResultPageState extends State<ResultPage> {
           overflow: TextOverflow.ellipsis,
         ),
         actions: <Widget>[
+          Padding(
+            padding: const EdgeInsets.all(4.0),
+            child: _buildToggle(),
+          ),
           InkWell(
               child: Padding(
                 padding: const EdgeInsets.all(4.0),
@@ -307,6 +311,62 @@ class _ResultPageState extends State<ResultPage> {
     );
   }
 
+  String searchType = "all";
+
+  Widget _buildToggle() {
+    return PopupMenuButton(
+      initialValue: searchType,
+      child: Icon(
+        Icons.library_add_check_outlined,
+      ),
+      shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.all(Radius.circular(16.0))),
+      itemBuilder: (context) {
+        return [
+          PopupMenuItem(
+            child: Text("All".i18n),
+            value: "all",
+            onTap: () {
+              setState(() {
+                searchType = "all";
+                _changeQueryParams();
+              });
+            },
+          ),
+          PopupMenuItem(
+            child: Text("Illust".i18n),
+            value: "illust",
+            onTap: () {
+              setState(() {
+                searchType = "illust";
+                _changeQueryParams();
+              });
+            },
+          ),
+          PopupMenuItem(
+            child: Text("Manga".i18n),
+            value: "manga",
+            onTap: () {
+              setState(() {
+                searchType = "manga";
+                _changeQueryParams();
+              });
+            },
+          ),
+        ];
+      },
+    );
+  }
+
+  List<Illust> filterIllusts(List<Illust> datas) {
+    if (searchType == "all") return datas;
+    datas.retainWhere((element) => element.type == searchType);
+    if (illusts.length < 10) {
+      nextPage();
+    }
+    return datas;
+  }
+
   Widget _buildStar() {
     return PopupMenuButton(
       initialValue: _starValue,
@@ -347,12 +407,18 @@ class _ResultPageState extends State<ResultPage> {
     );
   }
 
+  bool isLoading = false;
+
   void nextPage() {
+    if (isLoading) return;
+    isLoading = true;
     loadData().then((value) {
+      isLoading = false;
       if (value.success) {
         setState(() {
-          illusts.addAll(value.data);
+          illusts.addAll(filterIllusts(value.data));
         });
+        easyRefreshController.finishLoad();
       } else {
         setState(() {
           if (value.errorMessage != null &&
@@ -361,17 +427,21 @@ class _ResultPageState extends State<ResultPage> {
                 text: "Network Error. Please refresh to try again.".i18n);
           }
         });
+        easyRefreshController.finishLoad(IndicatorResult.fail);
       }
     });
   }
 
   void firstLoad() {
+    if (isLoading) return;
+    isLoading = true;
     nextUrl = null;
     loadData().then((value) {
+      isLoading = false;
       if (value.success) {
         setState(() {
           illusts.clear();
-          illusts.addAll(value.data);
+          illusts.addAll(filterIllusts(value.data));
         });
         easyRefreshController.finishRefresh();
       } else {
