@@ -14,20 +14,18 @@ import 'package:waterfall_flow/waterfall_flow.dart';
 import 'imagetab.dart';
 import 'novelcard.dart';
 
-class BookmarksPage extends StatefulWidget {
-  final int id;
+class MyBookmarksPage extends StatefulWidget {
   final String portal;
   final ArtworkType type;
 
-  const BookmarksPage(
-      {Key? key, required this.id, required this.portal, required this.type})
+  const MyBookmarksPage({Key? key, required this.portal, required this.type})
       : super(key: key);
 
   @override
-  _BookmarksPageState createState() => _BookmarksPageState();
+  _MyBookmarksPageState createState() => _MyBookmarksPageState();
 }
 
-class _BookmarksPageState extends State<BookmarksPage>
+class _MyBookmarksPageState extends State<MyBookmarksPage>
     with TickerProviderStateMixin {
   late TabController _tabController;
   int get initialIndex {
@@ -40,6 +38,8 @@ class _BookmarksPageState extends State<BookmarksPage>
         return 0;
     }
   }
+
+  final String id = ConnectManager().apiClient.userid;
 
   @override
   void initState() {
@@ -56,30 +56,35 @@ class _BookmarksPageState extends State<BookmarksPage>
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        TabBar.secondary(controller: _tabController, tabs: [
-          Tab(text: "Artwork".i18n),
-          Tab(text: "Novel".i18n),
-        ]),
-        Expanded(
-          child: TabBarView(
-            controller: _tabController,
-            children: [
-              BookmarkContent(
-                id: widget.id,
-                portal: widget.portal,
-                type: ArtworkType.ILLUST,
-              ),
-              BookmarkContent(
-                id: widget.id,
-                portal: widget.portal,
-                type: ArtworkType.NOVEL,
-              ),
-            ],
+    return Scaffold(
+      appBar: AppBar(
+        title: Text("My Bookmarks".i18n),
+      ),
+      body: Column(
+        children: [
+          TabBar.secondary(controller: _tabController, tabs: [
+            Tab(text: "Artwork".i18n),
+            Tab(text: "Novel".i18n),
+          ]),
+          Expanded(
+            child: TabBarView(
+              controller: _tabController,
+              children: [
+                MyBookmarkContent(
+                  id: id,
+                  portal: widget.portal,
+                  type: ArtworkType.ILLUST,
+                ),
+                MyBookmarkContent(
+                  id: id,
+                  portal: widget.portal,
+                  type: ArtworkType.NOVEL,
+                ),
+              ],
+            ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 }
@@ -191,21 +196,22 @@ class SliverChipDelegate extends SliverPersistentHeaderDelegate {
   }
 }
 
-class BookmarkContent extends StatefulWidget {
-  final int id;
+class MyBookmarkContent extends StatefulWidget {
+  final String id;
   final String portal;
   final ArtworkType type;
 
-  const BookmarkContent(
+  const MyBookmarkContent(
       {Key? key, required this.id, required this.portal, required this.type})
       : super(key: key);
 
   @override
-  _BookmarkContentState createState() => _BookmarkContentState();
+  _MyBookmarkContentState createState() => _MyBookmarkContentState();
 }
 
-class _BookmarkContentState extends State<BookmarkContent> {
+class _MyBookmarkContentState extends State<MyBookmarkContent> {
   late EasyRefreshController _easyRefreshController;
+  String restrict = 'public';
 
   bool isError = false;
   ObservableList<Illust> illusts = ObservableList();
@@ -239,11 +245,18 @@ class _BookmarkContentState extends State<BookmarkContent> {
 
   @override
   Widget build(BuildContext context) {
-    return Observer(
-        warnWhenNoObservables: false,
-        builder: (_) {
-          return _buildContent(context);
-        });
+    return Column(
+      children: [
+        _buildMyPage(context),
+        Expanded(
+          child: Observer(
+              warnWhenNoObservables: false,
+              builder: (_) {
+                return _buildContent(context);
+              }),
+        ),
+      ],
+    );
   }
 
   Widget _buildContent(context) {
@@ -277,6 +290,38 @@ class _BookmarkContentState extends State<BookmarkContent> {
               ))
         ],
       ),
+    );
+  }
+
+  List<bool> isSelected = [true, false];
+
+  Widget _buildMyPage(BuildContext context) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        ToggleButtons(
+            isSelected: isSelected,
+            onPressed: (index) {
+              setState(() {
+                for (int i = 0; i < isSelected.length; i++) {
+                  isSelected[i] = i == index;
+                  if (isSelected[i]) {
+                    restrict = i == 0 ? 'public' : 'private';
+                  }
+                }
+                reset();
+              });
+            },
+            borderRadius: const BorderRadius.all(Radius.circular(8)),
+            constraints: const BoxConstraints(
+              minHeight: 40.0,
+              minWidth: 80.0,
+            ),
+            children: [
+              Text("Public".i18n),
+              Text("Private".i18n),
+            ]),
+      ],
     );
   }
 
@@ -460,14 +505,10 @@ class _BookmarkContentState extends State<BookmarkContent> {
   String? nextUrl;
 
   Future<Res<List<Illust>>> loadIllust() async {
-    return ConnectManager()
-        .apiClient
-        .getUserBookmarks(widget.id.toString(), nextUrl);
+    return ConnectManager().apiClient.getBookmarkedIllusts(restrict, nextUrl);
   }
 
   Future<Res<List<Novel>>> loadNovel() async {
-    return ConnectManager()
-        .apiClient
-        .getUserBookmarksNovel(widget.id.toString(), nextUrl);
+    return ConnectManager().apiClient.getBookmarkedNovels(restrict, nextUrl);
   }
 }

@@ -10,6 +10,7 @@ import 'package:skana_pix/pixiv_dart_api.dart';
 import 'package:skana_pix/utils/translate.dart';
 import 'package:waterfall_flow/waterfall_flow.dart';
 
+import '../utils/filters.dart';
 import 'imagetab.dart';
 
 class ResultPage extends StatefulWidget {
@@ -359,12 +360,12 @@ class _ResultPageState extends State<ResultPage> {
   }
 
   List<Illust> filterIllusts(List<Illust> datas) {
-    if (searchType == "all") return datas;
+    if (searchType == "all") return checkIllusts(datas);
     datas.retainWhere((element) => element.type == searchType);
     if (illusts.length < 10) {
       nextPage();
     }
-    return datas;
+    return checkIllusts(datas);
   }
 
   Widget _buildStar() {

@@ -19,10 +19,14 @@ List<Illust> checkIllusts(List<Illust> illusts) {
         return true;
       }
     }
+    if (illust.isAi && settings.hideAI) {
+      return true;
+    }
     return false;
   });
   return illusts;
 }
+
 List<Novel> checkNovels(List<Novel> novels) {
   novels.removeWhere((novel) {
     if (settings.blockedNovels.contains(novel.id.toString())) {
@@ -41,6 +45,9 @@ List<Novel> checkNovels(List<Novel> novels) {
       if ((settings.blockedNovelTags as List).contains(tag.name)) {
         return true;
       }
+    }
+    if (novel.isAi && settings.hideAI) {
+      return true;
     }
     return false;
   });

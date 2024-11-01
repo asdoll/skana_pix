@@ -1,4 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:mobx/mobx.dart';
+import 'package:skana_pix/componentwidgets/about.dart';
+import 'package:skana_pix/model/author.dart';
+import 'package:skana_pix/model/user.dart';
 
 class BlockListPage extends StatefulWidget {
   @override
@@ -6,12 +10,18 @@ class BlockListPage extends StatefulWidget {
 }
 
 class _BlockListPageState extends State<BlockListPage> {
-  late TabController _tabController;
+  ObservableList<UserDetails> blockedUsers = ObservableList();
+  ObservableList<String> blockedTags = ObservableList();
+  ObservableList<String> blockedCommentUsers = ObservableList();
+  ObservableList<String> blockedNovelUsers = ObservableList();
+  ObservableList<String> blockedIllusts = ObservableList();
+  ObservableList<String> blockedNovels = ObservableList();
+  ObservableList<String> blockedNovelTags = ObservableList();
+  ObservableList<String> blockedNovelComments = ObservableList();
 
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 2, vsync: ScrollableState());
   }
 
   @override
@@ -20,15 +30,18 @@ class _BlockListPageState extends State<BlockListPage> {
       appBar: AppBar(
         title: Text('Blocked Users'),
       ),
-      body: ListView.builder(
-        itemCount: 10,
-        itemBuilder: (context, index) {
-          return ListTile(
-            title: Text('User $index'),
-            subtitle: Text('Blocked'),
-            trailing: Icon(Icons.block),
-          );
-        },
+      body: ListView(
+        children: [
+          ListTile(
+            title: Text('Blocked Users'),
+            subtitle: Text('0'),
+            onTap: () {
+              Navigator.of(context).push(MaterialPageRoute(builder: (context) {
+                return AboutPage(newVersion: true);
+              }));
+            },
+          ),
+        ],
       ),
     );
   }

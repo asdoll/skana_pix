@@ -155,7 +155,7 @@ class _PainterCardState extends State<PainterCard> {
           ),
           Padding(
             padding: const EdgeInsets.all(16.0),
-            child: Center(child: Text(_user.name)),
+            child: Center(child: Text(_user.name.atMost13)),
           ),
           Spacer(),
           UserFollowButton(

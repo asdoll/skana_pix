@@ -6,7 +6,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:icon_decoration/icon_decoration.dart';
-import 'package:mobx/mobx.dart';
 import 'package:path/path.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:skana_pix/componentwidgets/userdetail.dart';
@@ -397,7 +396,7 @@ class _UserPageState extends State<UserPage> with TickerProviderStateMixin {
               return;
             }
             follow("private");
-            
+
             break;
           case 1:
             {
@@ -712,9 +711,7 @@ class _UserPageState extends State<UserPage> with TickerProviderStateMixin {
         BotToast.showText(text: "Followed privately".i18n);
       } else {
         BotToast.showText(
-            text: userDetail!.isFollowed
-                ? "Unfollowed".i18n
-                : "Followed".i18n);
+            text: userDetail!.isFollowed ? "Unfollowed".i18n : "Followed".i18n);
       }
       userDetail!.isFollowed = !userDetail!.isFollowed;
     }
@@ -747,117 +744,6 @@ class _UserPageState extends State<UserPage> with TickerProviderStateMixin {
 
   Future<Res<UserDetails>> loadData() async {
     return ConnectManager().apiClient.getUserDetails(widget.id);
-  }
-}
-
-class UserStore {
-  final int id;
-  UserStore(this.id);
-  bool isLoading = false;
-  UserDetails? userDetail;
-  ObservableList<Illust> illusts = ObservableList();
-  ObservableList<Illust> mangas = ObservableList();
-  ObservableList<Illust> bookmarks = ObservableList();
-  ObservableList<Novel> novels = ObservableList();
-  ObservableList<Novel> novelbookmarks = ObservableList();
-  bool isError = false;
-  String? urlIllust;
-  String? urlIllustBM;
-  String? urlNovel;
-  String? urlNovelBM;
-  void fetch() async {
-    if (isLoading) return;
-    isLoading = true;
-    if (urlIllust != "end") {
-      ConnectManager()
-          .apiClient
-          .getUserIllusts(id.toString(), urlIllust)
-          .then((value) {
-        if (value.success) {
-          for (Illust illust in value.data) {
-            if (illust.type == "illust") {
-              illusts.add(illust);
-            } else {
-              mangas.add(illust);
-            }
-          }
-          if (value.subData != null) {
-            urlIllust = value.subData;
-          } else {
-            urlIllust = "end";
-          }
-        } else {
-          isError = true;
-        }
-      });
-    }
-    if (urlIllustBM != "end") {
-      ConnectManager()
-          .apiClient
-          .getUserBookmarks(id.toString(), urlIllustBM)
-          .then((value) {
-        if (value.success) {
-          bookmarks.addAll(value.data);
-          if (value.subData != null) {
-            urlIllustBM = value.subData;
-          } else {
-            urlIllustBM = "end";
-          }
-        } else {
-          isError = true;
-        }
-      });
-    }
-    if (urlNovel != "end") {
-      ConnectManager()
-          .apiClient
-          .getUserNovels(id.toString(), urlNovel)
-          .then((value) {
-        if (value.success) {
-          novels.addAll(value.data);
-          if (value.subData != null) {
-            urlNovel = value.subData;
-          } else {
-            urlNovel = "end";
-          }
-        } else {
-          isError = true;
-        }
-      });
-    }
-    if (urlNovelBM != "end") {
-      ConnectManager()
-          .apiClient
-          .getBookmarkedNovels(id.toString(), urlNovelBM)
-          .then((value) {
-        if (value.success) {
-          novelbookmarks.addAll(value.data);
-          if (value.subData != null) {
-            urlNovelBM = value.subData;
-          } else {
-            urlNovelBM = "end";
-          }
-        } else {
-          isError = true;
-        }
-      });
-    }
-    isLoading = false;
-  }
-
-  void reset() {
-    isLoading = false;
-    userDetail = null;
-    illusts.clear();
-    bookmarks.clear();
-    novels.clear();
-    novelbookmarks.clear();
-    isError = false;
-    urlIllust = null;
-    urlIllustBM = null;
-    urlNovel = null;
-    urlNovelBM = null;
-    fetch();
   }
 }
 

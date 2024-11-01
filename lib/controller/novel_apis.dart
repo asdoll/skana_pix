@@ -46,9 +46,10 @@ extension NovelExt on ApiClient {
     return getNovelsWithNextUrl(nextUrl ?? url);
   }
 
-  Future<Res<List<Novel>>> getBookmarkedNovels(String uid, [String? nextUrl]) {
-    return getNovelsWithNextUrl(
-        nextUrl ?? "/v1/user/bookmarks/novel?user_id=$uid&restrict=public");
+  Future<Res<List<Novel>>> getBookmarkedNovels(String restrict,
+      [String? nextUrl]) {
+    return getNovelsWithNextUrl(nextUrl ??
+        "/v1/user/bookmarks/novel?user_id=${account.user.id}&restrict=$restrict");
   }
 
   Future<Res<bool>> favoriteNovel(String id,

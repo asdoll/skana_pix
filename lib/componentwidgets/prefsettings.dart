@@ -30,7 +30,7 @@ class _PreferenceSettingsState extends State<PreferenceSettings> {
                   settings.set("language", newValue!);
                 });
               },
-              items:[
+              items: [
                 DropdownMenuItem(
                   value: 'system',
                   child: Text('System'.i18n),
@@ -86,13 +86,22 @@ class _PreferenceSettingsState extends State<PreferenceSettings> {
             value: settings.showOriginal,
           ),
           SwitchListTile(
-            title: Text("Hide R18 Image".i18n),
+            title: Text("Blur R18 Image".i18n),
             onChanged: (value) {
               setState(() {
                 settings.set("hideR18", value);
               });
             },
             value: settings.hideR18,
+          ),
+          SwitchListTile(
+            title: Text("Hide AI Image".i18n),
+            onChanged: (value) {
+              setState(() {
+                settings.set("hideAI", value);
+              });
+            },
+            value: settings.hideAI,
           ),
           SwitchListTile(
             title: Text("Show AI Badge".i18n),

@@ -267,14 +267,16 @@
         "You can't follow yourself": "不能关注自己",
         "Followed privately": "已悄悄关注",
         "Show Original in detail page": "在详情页显示原图",
-        "Hide R18 Image": "隐藏R18",
+        "Blur R18 Image": "模糊R18",
+        "Hide AI Image": "隐藏AI图片",
         "Show AI Badge": "显示AI标志",
         "Long press image card to save": "长按图片卡片保存",
         "Prefer types to display": "优先显示类型",
         "My Bookmarks": "我的收藏",
         "Download Manager": "下载管理",
         "My Follow": "我的关注",
-        "Scroll to load more.." : "滑动加载更多.."
+        "Scroll to load more.." : "滑动加载更多..",
+        "No bookmarked tags": "没有收藏标签"
     },
     "zh_TW": {
         "Search": "搜索",
@@ -544,13 +546,15 @@
         "You can't follow yourself": "不能關注自己",
         "Followed privately": "已私密關注",
         "Show Original in detail page": "在詳情頁顯示原圖",
-        "Hide R18 Image": "隱藏R18",
+        "Blur R18 Image": "模糊R18",
+        "Hide AI Image": "隱藏AI圖片",
         "Show AI Badge": "顯示AI標誌",
         "Long press image card to save": "長按圖片卡片保存",
         "Prefer types to display": "優先顯示類型",
         "My Bookmarks": "我的收藏",
         "Download Manager": "下載管理",
         "My Follow": "我的關注",
-        "Scroll to load more.." : "滑動加載更多.."
+        "Scroll to load more.." : "滑動加載更多..",
+        "No bookmarked tags": "沒有收藏標籤"
     }
 }

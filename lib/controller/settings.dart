@@ -24,6 +24,7 @@ class UserSetting {
   List<String> blockedCommentUsers = [];
   List<String> blockedNovelUsers = [];
   bool hideR18 = false;
+  bool hideAI = false;
   bool feedAIBadge = true;
   bool longPressSaveConfirm = true;
   bool firstLongPressSave = true;
@@ -58,6 +59,7 @@ class UserSetting {
     await prefs.setStringList('blockedCommentUsers', blockedCommentUsers);
     await prefs.setStringList('blockedNovelUsers', blockedNovelUsers);
     await prefs.setBool('hideR18', hideR18);
+    await prefs.setBool('hideAI', hideAI);
     await prefs.setBool('feedAIBadge', feedAIBadge);
     await prefs.setBool('longPressSaveConfirm', longPressSaveConfirm);
     await prefs.setBool('firstLongPressSave', firstLongPressSave);
@@ -99,6 +101,7 @@ class UserSetting {
     blockedCommentUsers = prefs.getStringList('blockedCommentUsers') ?? [];
     blockedNovelUsers = prefs.getStringList('blockedNovelUsers') ?? [];
     hideR18 = prefs.getBool('hideR18') ?? false;
+    hideAI = prefs.getBool('hideAI') ?? false;
     feedAIBadge = prefs.getBool('feedAIBadge') ?? true;
     longPressSaveConfirm = prefs.getBool('longPressSaveConfirm') ?? true;
     firstLongPressSave = prefs.getBool('firstLongPressSave') ?? true;
@@ -181,6 +184,10 @@ class UserSetting {
       case 'hideR18':
         hideR18 = value;
         prefs.setBool('hideR18', hideR18);
+        break;
+      case 'hideAI':
+        hideAI = value;
+        prefs.setBool('hideAI', hideAI);
         break;
       case 'feedAIBadge':
         feedAIBadge = value;
@@ -267,6 +274,7 @@ class UserSetting {
       'blockedCommentUsers': blockedCommentUsers,
       'blockedNovelUsers': blockedNovelUsers,
       'hideR18': hideR18,
+      'hideAI': hideAI,
       'feedAIBadge': feedAIBadge,
       'longPressSaveConfirm': longPressSaveConfirm,
       'firstLongPressSave': firstLongPressSave,

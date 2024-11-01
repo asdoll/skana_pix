@@ -8,6 +8,7 @@ import 'package:mobx/mobx.dart';
 import 'package:skana_pix/componentwidgets/novelcard.dart';
 import 'package:skana_pix/model/worktypes.dart';
 import 'package:skana_pix/pixiv_dart_api.dart';
+import 'package:skana_pix/utils/filters.dart';
 import 'package:skana_pix/utils/translate.dart';
 import 'package:waterfall_flow/waterfall_flow.dart';
 
@@ -348,7 +349,7 @@ class _NovelResultPageState extends State<NovelResultPage> {
     loadData().then((value) {
       if (value.success) {
         setState(() {
-          novels.addAll(value.data);
+          novels.addAll(checkNovels(value.data));
         });
       } else {
         setState(() {
@@ -368,7 +369,7 @@ class _NovelResultPageState extends State<NovelResultPage> {
       if (value.success) {
         setState(() {
           novels.clear();
-          novels.addAll(value.data);
+          novels.addAll(checkNovels(value.data));
         });
         easyRefreshController.finishRefresh();
       } else {

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:skana_pix/pixiv_dart_api.dart';
+import 'package:skana_pix/utils/translate.dart';
 import 'package:skana_pix/utils/widgetplugin.dart';
 
 import 'novelbookmark.dart';
@@ -66,7 +67,7 @@ class _NovelCardState extends State<NovelCard> {
                                 crossAxisAlignment: CrossAxisAlignment.center,
                                 children: [
                                   Text(
-                                    novel.author.name,
+                                    novel.author.name.atMost8,
                                     maxLines: 1,
                                     style: Theme.of(context)
                                         .textTheme

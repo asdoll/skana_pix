@@ -20,6 +20,7 @@ import '../componentwidgets/avatar.dart';
 import '../componentwidgets/booktagpage.dart';
 import '../componentwidgets/dataexport.dart';
 import '../componentwidgets/historypage.dart';
+import '../componentwidgets/mybookmarks.dart';
 import '../componentwidgets/themepage.dart';
 import '../utils/leaders.dart';
 import 'loginpage.dart';
@@ -169,9 +170,7 @@ class _SettingPageState extends State<SettingPage> {
                             title: Text("My Bookmarks".i18n),
                             onTap: () => Leader.pushWithScaffold(
                                 context,
-                                BookmarksPage(
-                                  id: int.parse(
-                                      ConnectManager().apiClient.userid),
+                                MyBookmarksPage(
                                   portal: 'mybookmark',
                                   type: ArtworkType.ALL,
                                 )),
