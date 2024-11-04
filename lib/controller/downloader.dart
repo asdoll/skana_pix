@@ -1,239 +1,241 @@
-import 'dart:async';
-import 'dart:io';
+// import 'dart:async';
+// import 'dart:io';
 
-import '../utils/io_extension.dart';
-import 'package:sqlite3/sqlite3.dart';
+// import 'package:dio/dio.dart';
+// import 'package:skana_pix/pixiv_dart_api.dart';
 
-import '../model/illust.dart';
-import 'PDio.dart';
-import 'bases.dart' show BasePath;
-import 'download_task.dart';
-import 'settings.dart';
+// import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 
-class DownloadedIllust {
-  final int illustId;
-  final String title;
-  final String author;
-  final int imageCount;
+// import 'download_task.dart';
 
-  DownloadedIllust({
-    required this.illustId,
-    required this.title,
-    required this.author,
-    required this.imageCount,
-  });
-}
+// import 'package:path/path.dart';
 
-class DownloadManager {
-  factory DownloadManager() => instance ??= DownloadManager._();
+// typedef DownloadedIllust = IllustHistory Function();
 
-  static DownloadManager? instance;
+// class DownloadManager {
+//   factory DownloadManager() => instance ??= DownloadManager._();
 
-  DownloadManager._() {
-    init();
-  }
+//   static DownloadManager? instance;
 
-  late Database _db;
+//   DownloadManager._() {
+//     init();
+//   }
 
-  int _currentBytes = 0;
-  int _bytesPerSecond = 0;
+//   late Database _db;
 
-  int get bytesPerSecond => _bytesPerSecond;
+//   int _currentBytes = 0;
+//   int _bytesPerSecond = 0;
 
-  Timer? _loop;
+//   int get bytesPerSecond => _bytesPerSecond;
 
-  static PDio dio = PDio();
+//   Timer? _loop;
 
-  var tasks = <DownloadIllustTask>[];
+//   Dio get dio => ConnectManager().apiClient.pDio;
 
-  void Function()? uiUpdateCallback;
+//   var taskIllust = <DownloadIllustTask>[];
 
-  void registerUiUpdater(void Function() callback) {
-    uiUpdateCallback = callback;
-  }
+//   void Function()? uiUpdateCallback;
 
-  void removeUiUpdater() {
-    uiUpdateCallback = null;
-  }
+//   void registerUiUpdater(void Function() callback) {
+//     uiUpdateCallback = callback;
+//   }
 
-  void init() {
-    _db = sqlite3.open(BasePath.downloadDbPath);
-    _db.execute('''
-      create table if not exists download (
-        illust_id integer primary key not null,
-        title text not null,
-        author text not null,
-        imageCount int not null
-      );
-    ''');
-    _db.execute('''
-      create table if not exists images (
-        illust_id integer not null,
-        image_index integer not null,
-        path text not null,
-        primary key (illust_id, image_index)
-      );
-    ''');
-  }
+//   void removeUiUpdater() {
+//     uiUpdateCallback = null;
+//   }
 
-  void saveInfo(Illust illust, List<String> imagePaths) {
-    _db.execute('''
-      insert into download (illust_id, title, author, imageCount)
-      values (?, ?, ?, ?)
-    ''', [illust.id, illust.title, illust.author.name, imagePaths.length]);
-    for (var i = 0; i < imagePaths.length; i++) {
-      _db.execute('''
-        insert into images (illust_id, image_index, path)
-        values (?, ?, ?)
-      ''', [illust.id, i, imagePaths[i]]);
-    }
-  }
+//   void init() async {
+//     _db = await open('${BasePath.dataPath}/download.db');
+//     _db.execute('''
+//       create table if not exists download (
+//         illust_id integer primary key not null,
+//         title text not null,
+//         author text not null,
+//         imageCount int not null
+//       );
+//     ''');
+//     _db.execute('''
+//       create table if not exists images (
+//         illust_id integer not null,
+//         image_index integer not null,
+//         path text not null,
+//         primary key (illust_id, image_index)
+//       );
+//     ''');
+//   }
 
-  File? getImage(int illustId, int index) {
-    var res = _db.select('''
-      select * from images
-      where illust_id = ? and image_index = ?;
-    ''', [illustId, index]);
-    if (res.isEmpty) return null;
-    var file = File(res.first["path"] as String);
-    if (!file.existsSync()) return null;
-    return file;
-  }
+//   Future open() async {
+//     String databasesPath = (await getDatabasesPath());
+//     String path = join(databasesPath, 'illustpersist.db');
+//     db = await openDatabase(
+//       path,
+//       version: 1,
+//       onCreate: (Database db, int version) async {
+//         var batch = db.batch();
+//         _createTable(batch);
+//         await batch.commit();
+//       },
+//     );
+//   }
 
-  bool checkDownloaded(int illustId) {
-    var res = _db.select('''
-      select * from download
-      where illust_id = ?;
-    ''', [illustId]);
-    return res.isNotEmpty;
-  }
+//   void saveInfo(Illust illust, List<String> imagePaths) {
+//     _db.execute('''
+//       insert into download (illust_id, title, author, imageCount)
+//       values (?, ?, ?, ?)
+//     ''', [illust.id, illust.title, illust.author.name, imagePaths.length]);
+//     for (var i = 0; i < imagePaths.length; i++) {
+//       _db.execute('''
+//         insert into images (illust_id, image_index, path)
+//         values (?, ?, ?)
+//       ''', [illust.id, i, imagePaths[i]]);
+//     }
+//   }
 
-  bool checkDownloading(int illustId) {
-    return tasks.any((element) => element.illust.id == illustId);
-  }
+//   File? getImage(int illustId, int index) {
+//     var res = _db.select('''
+//       select * from images
+//       where illust_id = ? and image_index = ?;
+//     ''', [illustId, index]);
+//     if (res.isEmpty) return null;
+//     var file = File(res.first["path"] as String);
+//     if (!file.existsSync()) return null;
+//     return file;
+//   }
 
-  List<DownloadedIllust> listAll() {
-    var res = _db.select('''
-      select * from download;
-    ''');
-    return res
-        .map((e) => DownloadedIllust(
-              illustId: e["illust_id"] as int,
-              title: e["title"] as String,
-              author: e["author"] as String,
-              imageCount: e["imageCount"] as int,
-            ))
-        .toList();
-  }
+//   bool checkDownloaded(int illustId) {
+//     var res = _db.select('''
+//       select * from download
+//       where illust_id = ?;
+//     ''', [illustId]);
+//     return res.isNotEmpty;
+//   }
 
-  void addDownloadingTask(Illust illust) {
-    if (checkDownloading(illust.id) || checkDownloaded(illust.id)) return;
-    var task = DownloadIllustTask(illust, receiveBytesCallback: receiveBytes,
-        onCompleted: (task) {
-      saveInfo(illust, task.imagePaths);
-      tasks.remove(task);
-    });
-    tasks.add(task);
-    run();
-  }
+//   bool checkDownloading(int illustId) {
+//     return taskIllust.any((element) => element.illust.id == illustId);
+//   }
 
-  void receiveBytes(int bytes) {
-    _currentBytes += bytes;
-  }
+//   List<DownloadedIllust> listAll() {
+//     var res = _db.select('''
+//       select * from download;
+//     ''');
+//     return res
+//         .map((e) => DownloadedIllust(
+//               illustId: e["illust_id"] as int,
+//               title: e["title"] as String,
+//               author: e["author"] as String,
+//               imageCount: e["imageCount"] as int,
+//             ))
+//         .toList();
+//   }
 
-  int get maxConcurrentTasks => settings.maxParallelDownload;
+//   void addDownloadingTask(Illust illust) {
+//     if (checkDownloading(illust.id) || checkDownloaded(illust.id)) return;
+//     var task = DownloadIllustTask(illust, receiveBytesCallback: receiveBytes,
+//         onCompleted: (task) {
+//       saveInfo(illust, task.imagePaths);
+//       taskIllust.remove(task);
+//     });
+//     taskIllust.add(task);
+//     run();
+//   }
 
-  bool _paused = false;
+//   void receiveBytes(int bytes) {
+//     _currentBytes += bytes;
+//   }
 
-  bool get paused => _paused;
+//   int get maxConcurrentTasks => settings.maxParallelDownload;
 
-  void pause() {
-    _paused = true;
-    for (var task in tasks) {
-      task.pause();
-    }
-  }
+//   bool _paused = false;
 
-  void run() {
-    _loop ??= Timer.periodic(const Duration(seconds: 1), (timer) {
-      if (_paused) return;
-      _bytesPerSecond = _currentBytes;
-      _currentBytes = 0;
-      uiUpdateCallback?.call();
-      for (int i = 0; i < maxConcurrentTasks; i++) {
-        var task = tasks.elementAtOrNull(i);
-        if (task != null && task.stop && task.error == null) {
-          task.start();
-        }
-      }
-      if (tasks.isEmpty) {
-        timer.cancel();
-        _loop = null;
-        _currentBytes = 0;
-        _bytesPerSecond = 0;
-      }
-    });
-  }
+//   bool get paused => _paused;
 
-  void delete(DownloadedIllust illust) {
-    _db.execute('''
-      delete from download
-      where illust_id = ?;
-    ''', [illust.illustId]);
-    var images = _db.select('''
-      select * from images
-      where illust_id = ?;
-    ''', [illust.illustId]);
-    for (var image in images) {
-      File(image["path"] as String).deleteIgnoreError();
-    }
-    _db.execute('''
-      delete from images
-      where illust_id = ?;
-    ''', [illust.illustId]);
-  }
+//   void pause() {
+//     _paused = true;
+//     for (var task in taskIllust) {
+//       task.pause();
+//     }
+//   }
 
-  List<String> getImagePaths(int illustId) {
-    var res = _db.select('''
-      select * from images
-      where illust_id = ?;
-    ''', [illustId]);
-    return res.map((e) => e["path"] as String).toList();
-  }
+//   void run() {
+//     _loop ??= Timer.periodic(const Duration(seconds: 1), (timer) {
+//       if (_paused) return;
+//       _bytesPerSecond = _currentBytes;
+//       _currentBytes = 0;
+//       uiUpdateCallback?.call();
+//       for (int i = 0; i < maxConcurrentTasks; i++) {
+//         var task = taskIllust.elementAtOrNull(i);
+//         if (task != null && task.stop && task.error == null) {
+//           task.start();
+//         }
+//       }
+//       if (taskIllust.isEmpty) {
+//         timer.cancel();
+//         _loop = null;
+//         _currentBytes = 0;
+//         _bytesPerSecond = 0;
+//       }
+//     });
+//   }
 
-  Future<void> batchDownload(List<Illust> illusts, int maxCount) async {
-    int i = 0;
-    for (var illust in illusts) {
-      if (i > maxCount) return;
-      addDownloadingTask(illust);
-      i++;
-    }
-  }
+//   void delete(DownloadedIllust illust) {
+//     _db.execute('''
+//       delete from download
+//       where illust_id = ?;
+//     ''', [illust.illustId]);
+//     var images = _db.select('''
+//       select * from images
+//       where illust_id = ?;
+//     ''', [illust.illustId]);
+//     for (var image in images) {
+//       File(image["path"] as String).deleteIgnoreError();
+//     }
+//     _db.execute('''
+//       delete from images
+//       where illust_id = ?;
+//     ''', [illust.illustId]);
+//   }
 
-  Future<void> checkAndClearInvalidItems() async {
-    var illusts = listAll();
-    var shouldDelete = <DownloadedIllust>[];
-    for (var item in illusts) {
-      var paths = getImagePaths(item.illustId);
-      var validPaths = <String>[];
-      for (var path in paths) {
-        if (await File(path).exists()) {
-          validPaths.add(path);
-        }
-      }
-      if (validPaths.isEmpty) {
-        shouldDelete.add(item);
-      }
-    }
-    for (var item in shouldDelete) {
-      delete(item);
-    }
-  }
+//   List<String> getImagePaths(int illustId) {
+//     var res = _db.select('''
+//       select * from images
+//       where illust_id = ?;
+//     ''', [illustId]);
+//     return res.map((e) => e["path"] as String).toList();
+//   }
 
-  void resume() {
-    _paused = false;
-  }
-}
+//   Future<void> batchDownload(List<Illust> illusts, int maxCount) async {
+//     int i = 0;
+//     for (var illust in illusts) {
+//       if (i > maxCount) return;
+//       addDownloadingTask(illust);
+//       i++;
+//     }
+//   }
 
-Function get downloaded => DownloadManager().checkDownloaded;
-Function get downloading => DownloadManager().checkDownloading;
+//   Future<void> checkAndClearInvalidItems() async {
+//     var illusts = listAll();
+//     var shouldDelete = <DownloadedIllust>[];
+//     for (var item in illusts) {
+//       var paths = getImagePaths(item.illustId);
+//       var validPaths = <String>[];
+//       for (var path in paths) {
+//         if (await File(path).exists()) {
+//           validPaths.add(path);
+//         }
+//       }
+//       if (validPaths.isEmpty) {
+//         shouldDelete.add(item);
+//       }
+//     }
+//     for (var item in shouldDelete) {
+//       delete(item);
+//     }
+//   }
+
+//   void resume() {
+//     _paused = false;
+//   }
+// }
+
+// Function get downloaded => DownloadManager().checkDownloaded;
+// Function get downloading => DownloadManager().checkDownloading;

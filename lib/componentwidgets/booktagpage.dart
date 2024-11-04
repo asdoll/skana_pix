@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:mobx/mobx.dart';
 import 'package:skana_pix/utils/translate.dart';
-import 'package:skana_pix/utils/widgetplugin.dart';
 
 import '../model/worktypes.dart';
 import '../pixiv_dart_api.dart';

@@ -6,6 +6,15 @@ class Tag {
 
   const Tag(this.name, this.translatedName);
 
+  Tag.fromJson(Map<String, dynamic> json)
+      : name = json['name'],
+        translatedName = json['translated_name'];
+
+  Map<String, dynamic> toJson() => {
+        'name': name,
+        'translatedName': translatedName ?? "",
+      };
+
   @override
   String toString() {
     return "$name${translatedName == null ? "" : "($translatedName)"}";

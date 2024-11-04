@@ -112,6 +112,8 @@ class _NovelCardState extends State<NovelCard> {
                                 spacing: 2, // gap between adjacent chips
                                 runSpacing: 0,
                                 children: [
+                                  if(novel.tags.isEmpty)
+                                    Container(),
                                   for (var f in novel.tags)
                                     Text(
                                       f.name,

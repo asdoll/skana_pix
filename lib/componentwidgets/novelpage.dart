@@ -10,6 +10,7 @@ import 'package:path/path.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:skana_pix/componentwidgets/novelbookmark.dart';
 import 'package:skana_pix/componentwidgets/userpage.dart';
+import 'package:skana_pix/controller/histories.dart';
 import 'package:skana_pix/pixiv_dart_api.dart';
 import 'package:skana_pix/utils/translate.dart';
 import 'package:skana_pix/utils/widgetplugin.dart';
@@ -56,6 +57,7 @@ class _NovelViewerPageState extends State<NovelViewerPage> {
     super.initState();
     fontsize = settings.fontSize;
     lineSpace = 2;
+    historyManager.addNovel(widget.novel);
     _novelStore = NovelStore(
         widget.novel, DynamicData.heightScreen, DynamicData.widthScreen,
         fontSize: fontsize, lineSpace: lineSpace);

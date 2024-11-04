@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:mobx/mobx.dart';
 import 'package:skana_pix/componentwidgets/about.dart';
-import 'package:skana_pix/model/author.dart';
 import 'package:skana_pix/model/user.dart';
 
 class BlockListPage extends StatefulWidget {

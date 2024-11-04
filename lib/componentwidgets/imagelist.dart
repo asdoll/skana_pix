@@ -1,18 +1,17 @@
 import 'package:bot_toast/bot_toast.dart';
 import 'package:easy_refresh/easy_refresh.dart';
-import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:skana_pix/componentwidgets/headerfooter.dart';
 import 'package:skana_pix/componentwidgets/imagedetail.dart';
+import 'package:skana_pix/controller/histories.dart';
 import 'package:skana_pix/pixiv_dart_api.dart';
 import 'package:skana_pix/utils/navigation.dart';
 import 'package:skana_pix/utils/translate.dart';
 import 'package:skana_pix/utils/widgetplugin.dart';
 import 'package:skana_pix/view/defaults.dart';
 
-import '../controller/histories.dart';
 import '../model/worktypes.dart';
 import '../utils/filters.dart';
 import 'avatar.dart';
@@ -65,6 +64,7 @@ class _ImageListPageState extends State<ImageListPage> {
   void initState() {
     illusts = List.from(widget.illusts);
     controller = PageController(initialPage: widget.initialPage);
+    historyManager.addIllust(illusts[widget.initialPage]);
     nextUrl = widget.nextUrl;
     if (nextUrl == "end") {
       nextUrl = null;
@@ -122,6 +122,7 @@ class _ImageListPageState extends State<ImageListPage> {
             },
             onPageChanged: (value) => setState(() {
               page = value;
+              historyManager.addIllust(illusts[value]);
             }),
           ),
         ),
@@ -241,7 +242,6 @@ class _IllustPageState extends State<IllustPage> {
         widget.illust.author.isFollowed = v;
       });
     };
-    HistoryManager().addHistory(widget.illust);
     if (user.isPremium) {
       ImageListPage.cachedHistoryIds.add(widget.illust.id);
     }
@@ -724,7 +724,7 @@ class _IllustPageState extends State<IllustPage> {
                       leading: Icon(Icons.save),
                       title: Text("Save".i18n),
                       onTap: () {
-                        Navigator.of(context).pop("Ok");
+                        Navigator.of(context).pop("OK");
                       },
                     ),
                   ],

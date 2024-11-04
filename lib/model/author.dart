@@ -10,6 +10,21 @@ class Author {
 
   Author(this.id, this.name, this.account, this.avatar, this.isFollowed);
 
+  Author.fromJson(Map<String, dynamic> json)
+      : id = json['id'],
+        name = json['name'],
+        account = json['account'],
+        avatar = json['profile_image_urls']['medium'],
+        isFollowed = json['is_followed'] ?? false;
+
+  Map<String, dynamic> toJson() => {
+        'id': id,
+        'name': name,
+        'account': account,
+        'avatar': avatar,
+        'isFollowed': isFollowed
+      };
+
   @override
   String toString() {
     return 'Author{id: $id, name: $name, account: $account, avatar: $avatar, isFollowed: $isFollowed}';

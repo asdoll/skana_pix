@@ -134,7 +134,7 @@ String getExtensionName(String url) {
   return '.jpg';
 }
 
-void saveUrl(String url, {BuildContext? context}) async {
+void saveUrl(String url, {String? filenm,BuildContext? context}) async {
   BotToast.showText(text: "Saved".i18n);
   if (DynamicData.isIOS && (await Permission.photosAddOnly.status.isDenied)) {
     if (await Permission.storage.request().isDenied && context != null) {
@@ -147,7 +147,7 @@ void saveUrl(String url, {BuildContext? context}) async {
   }
   var file = await imagesCacheManager.getSingleFile(url);
   if (file.existsSync()) {
-    var fileName = url.split('/').last;
+    var fileName = filenm ?? url.split('/').last;
     if (!fileName.contains('.')) {
       fileName += getExtensionName(url);
     }

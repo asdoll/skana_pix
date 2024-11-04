@@ -8,7 +8,6 @@ import 'package:skana_pix/pixiv_dart_api.dart';
 import 'package:skana_pix/utils/translate.dart';
 import 'package:waterfall_flow/waterfall_flow.dart';
 
-import 'imagetab.dart';
 
 class FeedNovel extends StatefulWidget {
   FeedNovel({super.key});

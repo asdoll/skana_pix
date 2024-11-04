@@ -276,7 +276,9 @@
         "Download Manager": "下载管理",
         "My Follow": "我的关注",
         "Scroll to load more.." : "滑动加载更多..",
-        "No bookmarked tags": "没有收藏标签"
+        "No bookmarked tags": "没有收藏标签",
+        "Saved": "已保存",
+        "Search Illusts or Authors": "搜索插画或作者"
     },
     "zh_TW": {
         "Search": "搜索",
@@ -555,6 +557,8 @@
         "Download Manager": "下載管理",
         "My Follow": "我的關注",
         "Scroll to load more.." : "滑動加載更多..",
-        "No bookmarked tags": "沒有收藏標籤"
+        "No bookmarked tags": "沒有收藏標籤",
+        "Saved": "已保存",
+        "Search Illusts or Authors": "搜索插畫或作者"
     }
 }

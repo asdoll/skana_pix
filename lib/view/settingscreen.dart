@@ -4,10 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:skana_pix/componentwidgets/blocklistpage.dart';
-import 'package:skana_pix/componentwidgets/downloadspage.dart';
 import 'package:skana_pix/componentwidgets/followlist.dart';
 import 'package:skana_pix/componentwidgets/prefsettings.dart';
-import 'package:skana_pix/componentwidgets/userbookmarks.dart';
 import 'package:skana_pix/model/worktypes.dart';
 import 'package:skana_pix/pixiv_dart_api.dart';
 import 'package:skana_pix/utils/translate.dart';
@@ -217,11 +215,11 @@ class _SettingPageState extends State<SettingPage> {
                 Divider(),
                 Column(
                   children: <Widget>[
-                    ListTile(
-                      leading: Icon(Icons.save_alt),
-                      title: Text("Download Manager".i18n),
-                      onTap: () => Leader.push(context, DownloadsPage()),
-                    ),
+                    // ListTile(
+                    //   leading: Icon(Icons.save_alt),
+                    //   title: Text("Download Manager".i18n),
+                    //   onTap: () => Leader.push(context, DownloadsPage()),
+                    // ),
                     ListTile(
                       leading: Icon(Icons.history),
                       title: Text("History".i18n),

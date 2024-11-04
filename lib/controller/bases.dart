@@ -38,5 +38,5 @@ class BasePath {
   static String get downloadPath => '$dataPath/downloads/';
   static String downloadSubPath = r"illust/${id}-p${index}.${ext}";
   static String get downloadNovelPath => "$downloadPath/novel/";
-  static String get downloadDbPath => "${dataPath}download.db";
+
 }

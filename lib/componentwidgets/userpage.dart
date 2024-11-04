@@ -1,4 +1,3 @@
-import 'dart:io';
 
 import 'package:bot_toast/bot_toast.dart';
 import 'package:cached_network_image/cached_network_image.dart';
@@ -6,7 +5,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:icon_decoration/icon_decoration.dart';
-import 'package:path/path.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:skana_pix/componentwidgets/userdetail.dart';
 import 'package:skana_pix/componentwidgets/userworks.dart';
@@ -647,13 +645,7 @@ class _UserPageState extends State<UserPage> with TickerProviderStateMixin {
 
   _saveUserBg(BuildContext context, String url) async {
     try {
-      final result = await imagesCacheManager.downloadFile(url, authHeaders: {
-        'referer': 'https://app-api.pixiv.net/',
-      });
-      final path = result.file.path;
-      final box = context.findRenderObject() as RenderBox?;
-      Share.shareXFiles([XFile(path)],
-          sharePositionOrigin: box!.localToGlobal(Offset.zero) & box.size);
+      saveUrl(url, context: context);
     } catch (e) {
       print(e);
     }
@@ -674,20 +666,7 @@ class _UserPageState extends State<UserPage> with TickerProviderStateMixin {
         .replaceAll("<", "");
     String fileName = "${replaceAll}_${userDetail!.id}.${meme}";
     try {
-      var file = await imagesCacheManager.getFileFromCache(url);
-      if (file != null) {
-        String targetPath = join(BasePath.cachePath, "share_cache", fileName);
-        File targetFile = File(targetPath);
-        if (!targetFile.existsSync()) {
-          targetFile.createSync(recursive: true);
-        }
-        file.file.copySync(targetPath);
-        final box = context.findRenderObject() as RenderBox?;
-        Share.shareXFiles([XFile(targetPath)],
-            sharePositionOrigin: box!.localToGlobal(Offset.zero) & box.size);
-      } else {
-        BotToast.showText(text: "can not find image cache");
-      }
+      saveUrl(url, filenm: fileName, context: context);
     } catch (e) {
       print(e);
     }

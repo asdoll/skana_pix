@@ -1,9 +1,11 @@
 import 'dart:async';
+import 'dart:io';
 
 import 'package:bot_toast/bot_toast.dart';
 import 'package:flutter/material.dart';
 import 'package:skana_pix/pixiv_dart_api.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 
 import 'utils/applinks.dart';
 import 'utils/translate.dart';
@@ -22,6 +24,10 @@ Future<void> main() async {
     await TranslateMap.init();
     await Log.init();
     handleLinks();
+    if (Platform.isWindows || Platform.isLinux) {
+      sqfliteFfiInit();
+      databaseFactory = databaseFactoryFfi;
+    }
     runApp(const MyApp());
   }, (e, s) {
     loggerError("Unhandled Exception: $e\n$s");
