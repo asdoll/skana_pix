@@ -2,7 +2,7 @@ import 'package:skana_pix/pixiv_dart_api.dart';
 
 List<Illust> checkIllusts(List<Illust> illusts) {
   illusts.removeWhere((illust) {
-    if (settings.blockedIllusts.contains(illust.id.toString())) {
+    if (settings.blockedIllusts.contains(illust.title)) {
       return true;
     }
     if (illust.isMuted) {
@@ -11,7 +11,7 @@ List<Illust> checkIllusts(List<Illust> illusts) {
     if (settings.blockedTags.isEmpty) {
       return false;
     }
-    if (settings.blockedUsers.contains(illust.author.id.toString())) {
+    if (settings.blockedUsers.contains(illust.author.name)) {
       return true;
     }
     for (var tag in illust.tags) {
@@ -29,7 +29,7 @@ List<Illust> checkIllusts(List<Illust> illusts) {
 
 List<Novel> checkNovels(List<Novel> novels) {
   novels.removeWhere((novel) {
-    if (settings.blockedNovels.contains(novel.id.toString())) {
+    if (settings.blockedNovels.contains(novel.title)) {
       return true;
     }
     if (novel.isMuted) {
@@ -38,7 +38,7 @@ List<Novel> checkNovels(List<Novel> novels) {
     if (settings.blockedNovelTags.isEmpty) {
       return false;
     }
-    if (settings.blockedNovelUsers.contains(novel.author.id.toString())) {
+    if (settings.blockedNovelUsers.contains(novel.author.name)) {
       return true;
     }
     for (var tag in novel.tags) {

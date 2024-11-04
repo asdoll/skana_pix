@@ -22,11 +22,14 @@ class HistoryPage extends StatefulWidget {
 class _HistoryPageState extends State<HistoryPage>
     with TickerProviderStateMixin {
   late TabController _tabController;
+  late int _tabIndex;
 
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 2, vsync: this);
+    _tabIndex = settings.awPrefer == "novel" ? 1 : 0;
+    _tabController =
+        TabController(initialIndex: _tabIndex, length: 2, vsync: this);
   }
 
   @override
@@ -145,7 +148,7 @@ class _IllustsHistoryState extends State<IllustsHistory> {
 
   Widget buildSearchbar(BuildContext context) {
     return AnimatedSearchBar(
-      label: "Search Illusts or Authors".i18n,
+      label: "Search Illusts or Pianters".i18n,
       searchDecoration: InputDecoration(
           labelText: 'Search'.i18n,
           alignLabelWithHint: true,
@@ -224,7 +227,11 @@ class _IllustsHistoryState extends State<IllustsHistory> {
                   },
                   child: Card(
                       margin: EdgeInsets.all(8),
-                      child: PixivImage(reIllust[index].pictureUrl)));
+                      shape: RoundedRectangleBorder(
+                          borderRadius:
+                              BorderRadius.all(Radius.circular(16.0))),
+                      child: PixivImage(reIllust[index].pictureUrl)
+                          .rounded(16.0)));
             });
       });
     }
@@ -346,8 +353,8 @@ class _NovelsHistoryState extends State<NovelsHistory> {
     setState(() {
       var tmp = novels
           .where((obj) =>
-              obj.title!.toLowerCase().contains(searchText.toLowerCase()) ||
-              obj.userName!.toLowerCase().contains(searchText.toLowerCase()))
+              obj.title.toLowerCase().contains(searchText.toLowerCase()) ||
+              obj.userName.toLowerCase().contains(searchText.toLowerCase()))
           .toList();
       filteredNovels.clear();
       filteredNovels.addAll(tmp);
@@ -365,48 +372,69 @@ class _NovelsHistoryState extends State<NovelsHistory> {
                 crossAxisCount: rowCount),
             itemBuilder: (context, index) {
               return GestureDetector(
-                  onTap: () {
-                    Navigator.of(context, rootNavigator: true).push(
-                        MaterialPageRoute(builder: (BuildContext context) {
-                      return NovelPageLite(
-                          reNovel[index].novelId.toString());
-                    }));
-                  },
-                  onLongPress: () async {
-                    final result = await showDialog(
-                        context: context,
-                        builder: (context) {
-                          return AlertDialog(
-                            title: Text("${"Delete".i18n}?"),
-                            actions: <Widget>[
-                              TextButton(
-                                child: Text("Cancel".i18n),
-                                onPressed: () {
-                                  Navigator.of(context).pop();
-                                },
-                              ),
-                              TextButton(
-                                child: Text("Ok".i18n),
-                                onPressed: () {
-                                  Navigator.of(context).pop("OK");
-                                },
-                              ),
-                            ],
-                          );
-                        });
-                    if (result == "OK") {
-                      historyManager.removeIllust(reNovel[index].novelId);
-                      setState(() {
-                        novels.removeWhere((element) =>
-                            element.novelId == reNovel[index].novelId);
-                        filteredNovels.removeWhere((element) =>
-                            element.novelId == reNovel[index].novelId);
+                onTap: () {
+                  Navigator.of(context, rootNavigator: true)
+                      .push(MaterialPageRoute(builder: (BuildContext context) {
+                    return NovelPageLite(reNovel[index].novelId.toString());
+                  }));
+                },
+                onLongPress: () async {
+                  final result = await showDialog(
+                      context: context,
+                      builder: (context) {
+                        return AlertDialog(
+                          title: Text("${"Delete".i18n}?"),
+                          actions: <Widget>[
+                            TextButton(
+                              child: Text("Cancel".i18n),
+                              onPressed: () {
+                                Navigator.of(context).pop();
+                              },
+                            ),
+                            TextButton(
+                              child: Text("Ok".i18n),
+                              onPressed: () {
+                                Navigator.of(context).pop("OK");
+                              },
+                            ),
+                          ],
+                        );
                       });
-                    }
-                  },
-                  child: Card(
-                      margin: EdgeInsets.all(8),
-                      child: PixivImage(reNovel[index].pictureUrl)));
+                  if (result == "OK") {
+                    historyManager.removeIllust(reNovel[index].novelId);
+                    setState(() {
+                      novels.removeWhere((element) =>
+                          element.novelId == reNovel[index].novelId);
+                      filteredNovels.removeWhere((element) =>
+                          element.novelId == reNovel[index].novelId);
+                    });
+                  }
+                },
+                child: Card(
+                  margin: EdgeInsets.all(8),
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.all(Radius.circular(16.0))),
+                  child: Stack(
+                    children: [
+                      PixivImage(reNovel[index].pictureUrl, fit: BoxFit.cover)
+                          .toCenter(),
+                      Opacity(
+                        opacity: 0.4,
+                        child: Container(
+                          decoration: BoxDecoration(color: Colors.black),
+                        ),
+                      ),
+                      Align(
+                        alignment: Alignment.bottomCenter,
+                        child: Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Text(reNovel[index].title),
+                        ),
+                      ),
+                    ],
+                  ).rounded(16.0),
+                ),
+              );
             });
       });
     }

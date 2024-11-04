@@ -1,4 +1,3 @@
-import 'package:bot_toast/bot_toast.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 
 import 'author.dart' show Author;
@@ -236,7 +235,9 @@ create table $novelHisTable (
           ctitle,
           cuser_name
         ],
-        orderBy: "$ctime DESC",limit: limit, offset: offset);
+        orderBy: "$ctime DESC",
+        limit: limit,
+        offset: offset);
 
     if (maps.isNotEmpty) {
       for (var f in maps) {

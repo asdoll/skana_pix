@@ -6,14 +6,11 @@ import 'package:file_selector/file_selector.dart';
 import 'package:flutter_file_dialog/flutter_file_dialog.dart';
 import 'package:intl/intl.dart';
 import 'package:skana_pix/controller/caches.dart';
-import 'package:skana_pix/model/illust.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:skana_pix/pixiv_dart_api.dart';
 import 'package:skana_pix/utils/translate.dart';
 import 'package:image_gallery_saver_plus/image_gallery_saver_plus.dart';
 import 'package:bot_toast/bot_toast.dart';
-
-import '../controller/bases.dart';
 import '../view/defaults.dart';
 
 extension FSExt on FileSystemEntity {
@@ -91,17 +88,10 @@ ThemeData getTheme(BuildContext context) {
   return isDarkMode(context) ? DynamicData.darkTheme : DynamicData.themeData;
 }
 
-void moveUserData() {
+void removeUserData() {
   var dataFile = File(BasePath.accountJsonPath);
   if (dataFile.existsSync()) {
-    dataFile.renameSync("${BasePath.dataPath}/account2.json");
-  }
-}
-
-void putBackUserData() {
-  var dataFile = File("${BasePath.dataPath}/account2.json");
-  if (dataFile.existsSync()) {
-    dataFile.renameSync(BasePath.accountJsonPath);
+    dataFile.deleteIfExists();
   }
 }
 
@@ -134,7 +124,7 @@ String getExtensionName(String url) {
   return '.jpg';
 }
 
-void saveUrl(String url, {String? filenm,BuildContext? context}) async {
+void saveUrl(String url, {String? filenm, BuildContext? context}) async {
   BotToast.showText(text: "Saved".i18n);
   if (DynamicData.isIOS && (await Permission.photosAddOnly.status.isDenied)) {
     if (await Permission.storage.request().isDenied && context != null) {

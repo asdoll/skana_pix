@@ -170,7 +170,9 @@ class _SettingPageState extends State<SettingPage> {
                                 context,
                                 MyBookmarksPage(
                                   portal: 'mybookmark',
-                                  type: ArtworkType.ALL,
+                                  type: settings.awPrefer == "novel"
+                                      ? ArtworkType.NOVEL
+                                      : ArtworkType.ILLUST,
                                 )),
                           ),
                           ListTile(
@@ -373,7 +375,7 @@ class _SettingPageState extends State<SettingPage> {
     switch (result) {
       case "OK":
         {
-          //accountStore.deleteAll();
+          ConnectManager().logout();
           DynamicData.rootNavigatorKey.currentState!.pushAndRemoveUntil(
               MaterialPageRoute(
                 builder: (context) => HomePage(),

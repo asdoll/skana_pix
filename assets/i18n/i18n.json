@@ -278,7 +278,17 @@
         "Scroll to load more.." : "滑动加载更多..",
         "No bookmarked tags": "没有收藏标签",
         "Saved": "已保存",
-        "Search Illusts or Authors": "搜索插画或作者"
+        "Search Illusts or Pianters": "搜索插画或作者",
+        "Search Novels or Authors": "搜索小说或作者",
+        "Tags": "标签",
+        "Tag": "标签",
+        "Novel Tag": "小说标签",
+        "Novel Tags": "小说标签",
+        "Pianters": "画师",
+        "Authors": "作者",
+        "Delete this tag?": "删除这个标签?",
+        "Delete this user?": "删除这个用户?",
+        "Commentors": "评论者"
     },
     "zh_TW": {
         "Search": "搜索",
@@ -559,6 +569,16 @@
         "Scroll to load more.." : "滑動加載更多..",
         "No bookmarked tags": "沒有收藏標籤",
         "Saved": "已保存",
-        "Search Illusts or Authors": "搜索插畫或作者"
+        "Search Illusts or Pianters": "搜索插畫或作者",
+        "Search Novels or Authors": "搜索小說或作者",
+        "Tags": "標籤",
+        "Tag": "標籤",
+        "Novel Tag": "小說標籤",
+        "Novel Tags": "小說標籤",
+        "Pianters": "畫師",
+        "Authors": "作者",
+        "Delete this tag?": "刪除這個標籤?",
+        "Delete this user?": "刪除這個用戶?",
+        "Commentors": "評論者"
     }
 }

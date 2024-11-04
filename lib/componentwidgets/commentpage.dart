@@ -157,10 +157,10 @@ class _CommentPageState extends State<CommentPage> {
   }
 
   bool commentHateByUser(Comment comment) {
-    if (settings.blockedComments.contains(comment.id.toString())) {
+    if (settings.blockedComments.contains(comment.comment)) {
       return true;
     }
-    if (settings.blockedCommentUsers.contains(comment.uid)) {
+    if (settings.blockedCommentUsers.contains(comment.name)) {
       return true;
     }
     return false;
@@ -510,15 +510,14 @@ class _CommentPageState extends State<CommentPage> {
                               title: Text("Block User".i18n),
                               onTap: () async {
                                 Navigator.of(context).pop();
-                                settings.addBlockedCommentUsers([comment.uid]);
+                                settings.addBlockedCommentUsers([comment.name]);
                               },
                             ),
                             ListTile(
                               title: Text("Block Comment".i18n),
                               onTap: () {
                                 Navigator.of(context).pop();
-                                settings.addBlockedComments(
-                                    [comment.id.toString()]);
+                                settings.addBlockedComments([comment.comment]);
                               },
                             ),
                             Container(

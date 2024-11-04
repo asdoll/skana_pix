@@ -47,6 +47,12 @@ class ConnectManager {
     }
   }
 
+  void logout() {
+    apiClient.account = Account.empty();
+    apiClient = ApiClient.empty();
+    removeUserData();
+  }
+
   static void updateFollow(String uid, bool isFollowed,
       Map<String, UpdateFollowCallback> followCallbacks) {
     followCallbacks.forEach((key, value) {

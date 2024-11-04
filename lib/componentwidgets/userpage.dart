@@ -1,4 +1,3 @@
-
 import 'package:bot_toast/bot_toast.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
@@ -72,7 +71,6 @@ class _UserPageState extends State<UserPage> with TickerProviderStateMixin {
       }
     });
     super.initState();
-    isMuted = settings.blockedUsers.contains(widget.id.toString());
     firstLoad();
   }
 
@@ -420,7 +418,7 @@ class _UserPageState extends State<UserPage> with TickerProviderStateMixin {
                     );
                   });
               if (result == "OK") {
-                settings.addBlockedUsers([widget.id.toString()]);
+                settings.addBlockedUsers([userDetail!.name]);
                 setState(() {
                   isMuted = true;
                 });
@@ -708,6 +706,7 @@ class _UserPageState extends State<UserPage> with TickerProviderStateMixin {
       if (value.success) {
         setState(() {
           userDetail = value.data;
+          isMuted = settings.blockedUsers.contains(userDetail!.name);
         });
       } else {
         setState(() {

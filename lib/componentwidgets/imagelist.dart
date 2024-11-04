@@ -586,9 +586,9 @@ class _IllustPageState extends State<IllustPage> {
 
   void blockIt() {
     if (widget.illust.isBlocked) {
-      settings.removeBlockedIllusts([widget.illust.id.toString()]);
+      settings.removeBlockedIllusts([widget.illust.title]);
     } else {
-      settings.addBlockedIllusts([widget.illust.id.toString()]);
+      settings.addBlockedIllusts([widget.illust.title]);
     }
   }
 
@@ -959,13 +959,13 @@ class __BlockingPageState extends State<_BlockingPage> {
                   trailing: FilledButton.tonal(
                           onPressed: () {
                             if (index == 0) {
-                              if (settings.blockedUsers.contains(
-                                  widget.illust.author.id.toString())) {
+                              if (settings.blockedUsers
+                                  .contains(widget.illust.author.name)) {
                                 settings.removeBlockedUsers(
-                                    [widget.illust.author.id.toString()]);
+                                    [widget.illust.author.name]);
                               } else {
                                 settings.addBlockedUsers(
-                                    [widget.illust.author.id.toString()]);
+                                    [widget.illust.author.name]);
                               }
                             } else {
                               if (settings.blockedTags.contains(
@@ -994,7 +994,7 @@ class __BlockingPageState extends State<_BlockingPage> {
 
   bool blockedTagOrUser(int index) {
     if (index == 0) {
-      return settings.blockedUsers.contains(widget.illust.author.id.toString());
+      return settings.blockedUsers.contains(widget.illust.author.name);
     }
     return settings.blockedTags.contains(widget.illust.tags[index - 1].name);
   }
