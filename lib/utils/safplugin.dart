@@ -1,7 +1,7 @@
 import 'package:flutter/services.dart';
 
 class SAFPlugin {
-  static const platform = const MethodChannel('com.skanaone.dev/saf');
+  static const platform = MethodChannel('com.skanaone.dev/saf');
 
   static Future<String?> createFile(String name, String type) async {
     final result = await platform

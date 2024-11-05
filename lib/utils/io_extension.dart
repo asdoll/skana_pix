@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 import 'dart:typed_data';
 
@@ -12,6 +13,7 @@ import 'package:skana_pix/utils/translate.dart';
 import 'package:image_gallery_saver_plus/image_gallery_saver_plus.dart';
 import 'package:bot_toast/bot_toast.dart';
 import '../view/defaults.dart';
+import 'safplugin.dart';
 
 extension FSExt on FileSystemEntity {
   Future<void> deleteIfExists() async {
@@ -201,4 +203,28 @@ String trimSize(String? s, [int length = 20]) {
     return "${s.substring(0, length)}...";
   }
   return s;
+}
+
+Future<void> importSettings() async {
+  final result = await SAFPlugin.openFile();
+  if (result == null) return;
+  final json = utf8.decode(result);
+  final decoder = JsonDecoder();
+  final map = decoder.convert(json);
+  settings.setFromMap(map);
+  BotToast.showText(text: "Imported".i18n);
+}
+
+Future<void> exportSettings() async {
+  final json = settings.toJson();
+  final result = await SAFPlugin.createFile("settings.json", "application/json");
+  BotToast.showText(text: result??"empty");
+  if (result == null) return;
+  await SAFPlugin.writeUri(result, utf8.encode(json));
+  BotToast.showText(text: "Exported".i18n);
+}
+
+Future<void> resetSettings() async {
+  settings.clearSettings();
+  BotToast.showText(text: "Reseted".i18n);
 }

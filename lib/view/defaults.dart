@@ -8,12 +8,12 @@ import 'package:flutter/scheduler.dart';
 import '../controller/settings.dart';
 
 class DynamicData {
-  static var activeNavColor = Colors.indigoAccent;
+  static var activeNavColor = Color(settings.seedColor);
   static var inActiveNavColor = CupertinoColors.systemGrey;
   static var themeData = ThemeData(
     brightness: Brightness.light,
     colorScheme: ColorScheme.fromSeed(
-      seedColor: Colors.indigoAccent,
+      seedColor: Color(settings.seedColor),
       brightness: Brightness.light,
     ),
     useMaterial3: true,
@@ -21,7 +21,7 @@ class DynamicData {
   static var darkTheme = ThemeData(
     brightness: Brightness.dark,
     colorScheme: ColorScheme.fromSeed(
-      seedColor: Colors.indigoAccent,
+      seedColor: Color(settings.seedColor),
       brightness: Brightness.dark,
     ),
     useMaterial3: true,

@@ -1,7 +1,9 @@
 import 'dart:convert';
 
+import 'package:bot_toast/bot_toast.dart';
 import 'package:flutter/services.dart';
 import 'package:skana_pix/pixiv_dart_api.dart';
+import 'package:skana_pix/utils/translate.dart';
 
 import '../utils/safplugin.dart';
 
@@ -95,9 +97,10 @@ class HistoryManager {
           userName: illustMap['user_name']);
       illustHistoryProvider.insert(illustHis);
     }
+    BotToast.showText(text: "Imported".i18n);
   }
 
-    Future<void> importNovelData() async {
+  Future<void> importNovelData() async {
     final result = await SAFPlugin.openFile();
     if (result == null) return;
     final json = utf8.decode(result);
@@ -114,11 +117,22 @@ class HistoryManager {
           userName: novelMap['user_name']);
       novelHistoryProvider.insert(noveHis);
     }
+    BotToast.showText(text: "Imported".i18n);
   }
 
   Future<void> exportIllustData() async {
     final uriStr =
-        await SAFPlugin.createFile("novelHistory.json", "application/json");
+        await SAFPlugin.createFile("IllustHis.json", "application/json");
+    if (uriStr == null) return;
+    await illustHistoryProvider.open();
+    final exportData = await illustHistoryProvider.getAllIllusts();
+    await SAFPlugin.writeUri(
+        uriStr, Uint8List.fromList(utf8.encode(jsonEncode(exportData))));
+  }
+
+  Future<void> exportNovelData() async {
+    final uriStr =
+        await SAFPlugin.createFile("NovelHis.json", "application/json");
     if (uriStr == null) return;
     await novelHistoryProvider.open();
     final exportData = await novelHistoryProvider.getAllNovels();

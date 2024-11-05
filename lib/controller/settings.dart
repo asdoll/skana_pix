@@ -1,12 +1,16 @@
 import 'dart:convert';
 import 'dart:ui';
 
+import 'package:bot_toast/bot_toast.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:skana_pix/model/worktypes.dart';
 import 'package:skana_pix/pixiv_dart_api.dart';
+import 'package:skana_pix/utils/translate.dart';
 
 class UserSetting {
+  late SharedPreferences prefs;
+
   String darkMode = 'system';
   bool isAMOLED = false;
   bool useDynamicColor = false;
@@ -18,7 +22,6 @@ class UserSetting {
   bool showOriginalOnWifi = false;
   bool checkUpdate = true;
   String proxy = '';
-  late SharedPreferences prefs;
   List<String> blockedTags = [];
   List<String> blockedUsers = [];
   List<String> blockedCommentUsers = [];
@@ -75,6 +78,7 @@ class UserSetting {
     await prefs.setStringList('historyNovelTag', historyNovelTag);
     await prefs.setStringList('historyUserTag', historyUserTag);
     await prefs.setStringList('bookmarkedNovelTags', bookmarkedNovelTags);
+    await prefs.setInt('seedColor', seedColor);
   }
 
   Future<void> init() async {
@@ -117,6 +121,44 @@ class UserSetting {
     historyNovelTag = prefs.getStringList('historyNovelTag') ?? [];
     historyUserTag = prefs.getStringList('historyUserTag') ?? [];
     bookmarkedNovelTags = prefs.getStringList('bookmarkedNovelTags') ?? [];
+    seedColor = prefs.getInt('seedColor') ?? 0xFF536DFE;
+  }
+
+  void setDefaults() {
+    darkMode = 'system';
+    isAMOLED = false;
+    useDynamicColor = false;
+    language = 'system';
+    maxParallelDownload = 4;
+    downloadPath = '';
+    downloadSubPath = r'/${id}-p${index}.${ext}';
+    showOriginal = false;
+    showOriginalOnWifi = false;
+    checkUpdate = true;
+    proxy = '';
+    blockedTags = [];
+    blockedUsers = [];
+    blockedCommentUsers = [];
+    blockedNovelUsers = [];
+    hideR18 = false;
+    hideAI = false;
+    feedAIBadge = true;
+    longPressSaveConfirm = true;
+    firstLongPressSave = true;
+    blockedIllusts = [];
+    saveChoice = 0;
+    bookmarkedTags = [];
+    blockedComments = [];
+    blockedNovels = [];
+    blockedNovelTags = [];
+    fontSize = 20.0;
+    awPrefer = 'illust';
+    historyIllustTag = [];
+    historyNovelTag = [];
+    historyUserTag = [];
+    bookmarkedNovelTags = [];
+    seedColor = 0xFF536DFE;
+    saveDefaults();
   }
 
   void set(String key, dynamic value) {
@@ -249,11 +291,15 @@ class UserSetting {
         bookmarkedNovelTags = value;
         prefs.setStringList('bookmarkedNovelTags', bookmarkedNovelTags);
         break;
+      case 'seedColor':
+        seedColor = value;
+        prefs.setInt('seedColor', seedColor);
+        break;
     }
   }
 
   String toJson() {
-    return json.encode(getMap());
+    return jsonEncode(getMap());
   }
 
   Map<String, dynamic> getMap() {
@@ -290,7 +336,51 @@ class UserSetting {
       'historyNovelTag': historyNovelTag,
       'historyUserTag': historyUserTag,
       'bookmarkedNovelTags': bookmarkedNovelTags,
+      'seedColor': seedColor,
     };
+  }
+
+  void setFromMap(Map<String, dynamic> map) {
+    darkMode = map['darkMode'] ?? 'system';
+    isAMOLED = map['isAMOLED'] ?? false;
+    useDynamicColor = map['useDynamicColor'] ?? false;
+    language = map['language'] ?? 'system';
+    maxParallelDownload = map['maxParallelDownload'] ?? 4;
+    downloadPath = map['downloadPath'] ?? '';
+    downloadSubPath = map['downloadSubPath'] ?? r'/${id}-p${index}.${ext}';
+    showOriginal = map['showOriginal'] ?? false;
+    showOriginalOnWifi = map['showOriginalOnWifi'] ?? false;
+    checkUpdate = map['checkUpdate'] ?? true;
+    proxy = map['proxy'] ?? '';
+    blockedTags = List<String>.from(map['blockedTags']);
+    blockedUsers = List<String>.from(map['blockedUsers']);
+    blockedCommentUsers = List<String>.from(map['blockedCommentUsers']);
+    blockedNovelUsers = List<String>.from(map['blockedNovelUsers']);
+    hideR18 = map['hideR18'] ?? false;
+    hideAI = map['hideAI'] ?? false;
+    feedAIBadge = map['feedAIBadge'] ?? true;
+    longPressSaveConfirm = map['longPressSaveConfirm'] ?? true;
+    firstLongPressSave = map['firstLongPressSave'] ?? true;
+    blockedIllusts = List<String>.from(map['blockedIllusts']);
+    saveChoice = map['saveChoice'] ?? 0;
+    bookmarkedTags = List<String>.from(map['bookmarkedTags']);
+    blockedComments = List<String>.from(map['blockedComments']);
+    blockedNovels = List<String>.from(map['blockedNovels']);
+    blockedNovelTags = List<String>.from(map['blockedNovelTags']);
+    fontSize = map['fontSize'] ?? 20.0;
+    awPrefer = map['awPrefer'] ?? 'illust';
+    historyIllustTag = List<String>.from(map['historyIllustTag']);
+    historyNovelTag = List<String>.from(map['historyNovelTag']);
+    historyUserTag = List<String>.from(map['historyUserTag']);
+    bookmarkedNovelTags = List<String>.from(map['bookmarkedNovelTags']);
+    seedColor = map['seedColor'] ?? 0xFF536DFE;
+    saveDefaults();
+    BotToast.showText(text: "Imported".i18n);
+  }
+
+  void clearSettings() {
+    prefs.clear();
+    setDefaults();
   }
 
   ThemeMode get themeMode {

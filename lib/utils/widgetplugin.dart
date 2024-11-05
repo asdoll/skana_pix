@@ -68,4 +68,8 @@ extension WidgetExtension on Widget{
   Widget fixHeight(double height){
     return SizedBox(height: height, child: this);
   }
+
+  Widget bgColor(Color color){
+    return Container(color: color, child: this);
+  }
 }

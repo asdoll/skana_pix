@@ -46,7 +46,7 @@ class _AboutPageState extends State<AboutPage> {
             ),
             SizedBox(height: 10),
             Text(
-                'Main UI design referenced and models are referenced from Pixez. Really thanks for their team.'),
+                'Main UI design referenced and models are referenced from Pixez. Some are referenced from Pixes. Really thanks for their teams.'),
             SizedBox(height: 10),
             Text(
                 'As a Pixiv novel user, I refered Pixiv official app and make novel and manga pages all at main page, and did minor changes of layouts.'),

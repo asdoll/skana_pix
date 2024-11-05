@@ -288,7 +288,20 @@
         "Authors": "作者",
         "Delete this tag?": "删除这个标签?",
         "Delete this user?": "删除这个用户?",
-        "Commentors": "评论者"
+        "Commentors": "评论者",
+        "Illusts": "插画",
+        "Import": "导入",
+        "Import settings,blocks and bookmarked tags": "导入设置,屏蔽和收藏标签",
+        "Import Illust History": "导入插画历史",
+        "Import Novel History": "导入小说历史",
+        "Export settings,blocks and bookmarked tags": "导出设置,屏蔽和收藏标签",
+        "Export Illust History": "导出插画历史",
+        "Export Novel History": "导出小说历史",
+        "Reset": "重置",
+        "Reset settings,blocks and bookmarked tags": "重置设置,屏蔽和收藏标签",
+        "Clear Illust History": "清除插画历史",
+        "Clear Novel History": "清除小说历史",
+        "Clear Cache": "清除缓存"
     },
     "zh_TW": {
         "Search": "搜索",
@@ -579,6 +592,20 @@
         "Authors": "作者",
         "Delete this tag?": "刪除這個標籤?",
         "Delete this user?": "刪除這個用戶?",
-        "Commentors": "評論者"
+        "Commentors": "評論者",
+        "Illusts": "插畫",
+        "Import": "導入",
+        "Import settings,blocks and bookmarked tags": "導入設置,屏蔽和收藏標籤",
+        "Import Illust History": "導入插畫歷史",
+        "Import Novel History": "導入小說歷史",
+        "Export settings,blocks and bookmarked tags": "導出設置,屏蔽和收藏標籤",
+        "Export Illust History": "導出插畫歷史",
+        "Export Novel History": "導出小說歷史",
+        "Reset": "重置",
+        "Reset settings,blocks and bookmarked tags": "重置設置,屏蔽和收藏標籤",
+        "Clear Illust History": "清除插畫歷史",
+        "Clear Novel History": "清除小說歷史",
+        "Clear Cache": "清除緩存"
+        
     }
 }

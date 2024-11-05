@@ -95,7 +95,9 @@ class _SettingPageState extends State<SettingPage> {
                     ),
                   ],
                 ),
-                Observer(builder: (context) {
+                Observer(
+                  warnWhenNoObservables: false,
+                  builder: (context) {
                   if (!ConnectManager().notLoggedIn) {
                     return SingleChildScrollView(
                       child: Column(
@@ -286,7 +288,9 @@ class _SettingPageState extends State<SettingPage> {
                     //           boardList: _boardList,
                     //         )),
                     //   ),
-                    Observer(builder: (context) {
+                    Observer(
+                      warnWhenNoObservables: false,
+                      builder: (context) {
                       if (!ConnectManager().notLoggedIn) {
                         return ListTile(
                           leading: Icon(Icons.arrow_back),
