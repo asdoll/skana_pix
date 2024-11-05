@@ -1,17 +1,18 @@
 import 'dart:io';
-import 'dart:math';
 
 import 'package:bot_toast/bot_toast.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
-import 'package:mobx/mobx.dart';
+import 'package:flutter_xlider/flutter_xlider.dart';
 import 'package:path/path.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:skana_pix/componentwidgets/novelbookmark.dart';
 import 'package:skana_pix/componentwidgets/userpage.dart';
 import 'package:skana_pix/controller/histories.dart';
 import 'package:skana_pix/pixiv_dart_api.dart';
+import 'package:skana_pix/utils/text_composition/text_composition.dart';
 import 'package:skana_pix/utils/translate.dart';
 import 'package:skana_pix/utils/widgetplugin.dart';
 import '../model/worktypes.dart';
@@ -35,162 +36,60 @@ class NovelViewerPage extends StatefulWidget {
 }
 
 class _NovelViewerPageState extends State<NovelViewerPage> {
-  bool _isBottomBarVisible = false;
-  bool _isAppBarVisible = false;
   late NovelStore _novelStore;
   // ignore: unused_field
   String _selectedText = "";
-  late int nowPosition;
-  late PageController _pageController;
-  late double fontsize;
-  late double lineSpace;
-
-  _isShow() {
-    setState(() {
-      _isAppBarVisible = !_isAppBarVisible;
-      _isBottomBarVisible = !_isBottomBarVisible;
-    });
-  }
+  late TextCompositionConfig config;
 
   @override
   void initState() {
     super.initState();
-    fontsize = settings.fontSize;
-    lineSpace = 2;
+    config = TextConfigManager.config;
     historyManager.addNovel(widget.novel);
-    _novelStore = NovelStore(
-        widget.novel, DynamicData.heightScreen, DynamicData.widthScreen,
-        fontSize: fontsize, lineSpace: lineSpace);
+    _novelStore = NovelStore(widget.novel);
     _novelStore.fetch();
-    nowPosition = 0;
-    _pageController = PageController(initialPage: nowPosition);
   }
 
   @override
   void dispose() {
-    _pageController.dispose();
+    TextConfigManager.config = config;
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Stack(
-        children: [
-          GestureDetector(
-            behavior: HitTestBehavior.opaque,
-            onTapDown: (details) {
-              if (details.globalPosition.dx < 100) {
-                int result = nowPosition;
-                result--;
-                _pageController.animateToPage(result,
-                    duration: Duration(milliseconds: 100),
-                    curve: Curves.easeInOut);
-                if (result < 0) result = 0;
-                setState(() {
-                  nowPosition = result;
-                });
-              } else if (details.globalPosition.dx >
-                  DynamicData.widthScreen - 100) {
-                int result = nowPosition;
-                result++;
-                _pageController.animateToPage(result,
-                    duration: Duration(milliseconds: 100),
-                    curve: Curves.easeInOut);
-                if (result >= _novelStore.pageConfig.length + 1)
-                  result = _novelStore.pageConfig.length;
-                setState(() {
-                  nowPosition = result;
-                });
-              } else {
-                _isShow();
-              }
-            },
-            onHorizontalDragEnd: (DragEndDetails detail) {
-              final pixelsPerSecond = detail.velocity.pixelsPerSecond;
-              if (pixelsPerSecond.dy.abs() > pixelsPerSecond.dx.abs()) return;
-              if (pixelsPerSecond.dx.abs() > _novelStore.pageWidth) {
-                int result = nowPosition;
-                if (pixelsPerSecond.dx < 0)
-                  result++;
-                else
-                  result--;
-                _pageController.animateToPage(result,
-                    duration: Duration(milliseconds: 200),
-                    curve: Curves.easeInOut);
-                if (result >= _novelStore.pageConfig.length + 1)
-                  result = _novelStore.pageConfig.length;
-                if (result < 0) result = 0;
-                setState(() {
-                  nowPosition = result;
-                });
-              }
-            },
-            child: Observer(
-              builder: (_) {
-                if (_novelStore.errorMessage != null) {
-                  return _buildFailPage(context);
-                }
-                if (_novelStore.pageConfig.isEmpty &&
-                    _novelStore.errorMessage == null) {
-                  return const Center(child: CircularProgressIndicator());
-                }
-                return PageView.builder(
-                  controller: _pageController,
-                  //physics: NeverScrollableScrollPhysics(),
-                  itemBuilder: (BuildContext context, int index) {
-                    if (index == 0)
-                      return SingleChildScrollView(
-                          child: _buildFirstView(context));
-                    final f = _novelStore.pageConfig[index - 1];
-                    return Container(
-                      width: _novelStore.pageWidth,
-                      height: _novelStore.pageHeight,
-                      padding: EdgeInsets.only(
-                          left: _novelStore.linePaddingHorizontal,
-                          right: _novelStore.linePaddingHorizontal,
-                          top: _novelStore.paddingVertical * 1.2),
-                      child: Text(
-                        f,
-                        style: TextStyle(fontSize: fontsize, height: lineSpace),
-                      ),
-                    );
-                  },
-                  itemCount: _novelStore.pageConfig.length + 1,
-                  onPageChanged: (index) {
-                    setState(() {
-                      nowPosition = index;
-                    });
-                  },
-                );
-              },
-            ),
-          ),
-          Container(
-            alignment: Alignment.topRight,
-            child: Padding(
-              padding:
-                  const EdgeInsets.only(top: kToolbarHeight / 2, right: 8.0),
-              child: Text(
-                "${nowPosition + 1}/${_novelStore.pageConfig.length + 1}",
-                style: Theme.of(context).textTheme.labelSmall,
-              ),
-            ),
-          ),
-          if (_isAppBarVisible)
-            _buildAppBar(context,
-                height: kToolbarHeight,
-                minHeight: 40,
-                duration: Duration(milliseconds: 200),
-                isAppBarVisible: _isAppBarVisible),
-        ],
-      ),
-      bottomNavigationBar: _buildBottmAppBar(
-        context,
-        height: kBottomNavigationBarHeight,
-        minHeight: 0,
-        duration: Duration(milliseconds: 200),
-        isBottomBarVisible: _isBottomBarVisible,
+      body: Observer(
+        builder: (_) {
+          return TextCompositionPage(
+            controller: TextComposition(
+                config: config,
+                loadChapter: (e) => _novelStore.fetch(),
+                chapters: [widget.novel.title],
+                percent: 0.0,
+                onSave: (TextCompositionConfig config, double percent) {
+                  // Global.prefs.setString(TextConfigKey, config);
+                  // searchItem.durContentIndex = (percent * NovelContentTotal).floor();
+                  //print("save config: $config");
+                  //print("save percent: $percent");
+                },
+                name: widget.novel.title,
+                menuBuilder: (textComposition) {
+                  return Container(
+                      child: Column(
+                    children: [
+                      _buildAppBar(context),
+                      Spacer(),
+                      _buildBottomRow(
+                          context,
+                          Theme.of(context).colorScheme.surfaceContainer,
+                          Theme.of(context).colorScheme.onSurface,
+                          textComposition),
+                    ],
+                  ));
+                }),
+          );
+        },
       ),
     );
   }
@@ -202,13 +101,11 @@ class _NovelViewerPageState extends State<NovelViewerPage> {
         mainAxisAlignment: MainAxisAlignment.center,
         crossAxisAlignment: CrossAxisAlignment.center,
         children: <Widget>[
-          Container(
-            child: Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Center(
-                child: Text(':(',
-                    style: Theme.of(context).textTheme.headlineMedium),
-              ),
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Center(
+              child:
+                  Text(":(", style: Theme.of(context).textTheme.headlineMedium),
             ),
           ),
           TextButton(
@@ -220,50 +117,246 @@ class _NovelViewerPageState extends State<NovelViewerPage> {
             padding: const EdgeInsets.all(16.0),
             child: Text('Network error'.i18n,
                 style: Theme.of(context).textTheme.labelSmall),
-          )
+          ),
         ],
       ),
     );
   }
 
-  _buildAppBar(BuildContext context,
-      {required double height,
-      required double minHeight,
-      required Duration duration,
-      required bool isAppBarVisible}) {
-    return PreferredSize(
-      preferredSize: Size.fromHeight(height),
-      child: AnimatedContainer(
-        curve: Curves.easeInOut,
-        height: _isAppBarVisible ? height * 1.5 : minHeight,
-        duration: duration,
-        child: AnimatedOpacity(
-          opacity: _isAppBarVisible ? 1.0 : 0.0,
-          duration: duration,
-          child: SingleChildScrollView(
-            child: AppBar(
-              backgroundColor: Theme.of(context).colorScheme.surfaceContainer,
-              leading: const BackButton(),
-              title: Text(
-                widget.novel.title.atMost8,
-                style: const TextStyle(
-                  fontSize: 20,
-                  overflow: TextOverflow.ellipsis,
+  _buildAppBar(BuildContext context) {
+    return AppBar(
+      backgroundColor: Theme.of(context).colorScheme.surfaceContainer,
+      leading: const BackButton(),
+      title: Text(
+        widget.novel.title.atMost8,
+        style: const TextStyle(
+          fontSize: 20,
+          overflow: TextOverflow.ellipsis,
+        ),
+      ),
+      actions: [
+        NovelBookmarkButton(novel: widget.novel, colorMode: "default"),
+        IconButton(
+            onPressed: () => buildShowModalBottomSheet(context),
+            icon: Icon(Icons.info_outline_rounded)),
+        IconButton(
+          icon: Icon(Icons.more_vert),
+          onPressed: () {
+            _showMessage(context);
+          },
+        ),
+      ],
+    );
+  }
+
+  Widget _buildBottomRow(BuildContext context, Color bgColor, Color color,
+      TextComposition composition) {
+    return Container(
+      width: double.infinity,
+      alignment: Alignment.bottomLeft,
+      decoration: BoxDecoration(color: bgColor),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.end,
+        children: [
+          Padding(
+            padding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+            child: Row(
+              children: <Widget>[
+                Text(
+                  "章节",
+                  style: TextStyle(color: color),
                 ),
-              ),
-              actions: [
-                NovelBookmarkButton(novel: widget.novel, colorMode: "default"),
-                IconButton(
-                  icon: Icon(Icons.more_vert),
-                  onPressed: () {
-                    _showMessage(context);
-                  },
+                SizedBox(width: 10),
+                Expanded(
+                  child: FlutterSlider(
+                    values: [
+                      0.0 +
+                          (composition.textPages[composition.currentIndex]?.number ??
+                              1)
+                    ],
+                    max: composition.textPages[composition.currentIndex]!.total*1.0,
+                    min: 1,
+                    step: FlutterSliderStep(step: 1),
+                    onDragCompleted: (handlerIndex, lowerValue, upperValue) {
+                      // provider.loadChapter((lowerValue as double).toInt() - 1);
+                      //BotToast.showText(text: "${(lowerValue as double).toInt() - 1}");
+                      composition.goToPage(composition.currentIndex + (lowerValue as double).toInt() - 1- composition.textPages[composition.currentIndex]!.number);
+                    },
+                    // disabled: provider.isLoading,
+                    handlerWidth: 6,
+                    handlerHeight: 14,
+                    handler: FlutterSliderHandler(
+                      decoration: BoxDecoration(),
+                      child: Container(
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(3),
+                          color: bgColor,
+                          border: Border.all(color: color.withOpacity(0.65), width: 1),
+                        ),
+                      ),
+                    ),
+                    trackBar: FlutterSliderTrackBar(
+                      inactiveTrackBar: BoxDecoration(
+                        borderRadius: BorderRadius.circular(20),
+                        color: color.withOpacity(0.5),
+                      ),
+                      activeTrackBar: BoxDecoration(
+                        borderRadius: BorderRadius.circular(4),
+                        color: Theme.of(context).primaryColor,
+                      ),
+                    ),
+                    touchSize: 30,
+                    tooltip: FlutterSliderTooltip(
+                      alwaysShowTooltip: true,
+                      disableAnimation: false,
+                      positionOffset: FlutterSliderTooltipPositionOffset(
+                       // left: -20,
+                        top: -40,
+                       // right: 80 - MediaQuery.of(context).size.width,
+                      ),
+                      custom: (value) {
+                        final index = (value as double).toInt();
+                        return Container(
+                          color: bgColor,
+                          padding: EdgeInsets.all(16),
+                          child: Row(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                "$index / ${composition.textPages[composition.currentIndex]!.total}",
+                                overflow: TextOverflow.ellipsis,
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontFamily: composition.config.fontFamily,
+                                  color: color.withOpacity(0.7),
+                                  fontSize: 18,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ).rounded(8.0);
+                      },
+                    ),
+                  ),
+                ),
+                SizedBox(width: 10),
+                Text(
+                  ' ',
+                  style: TextStyle(color: color),
                 ),
               ],
             ),
           ),
+          SafeArea(
+            top: false,
+            child: Padding(
+              padding: EdgeInsets.fromLTRB(16, 0, 16, 16),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  // InkWell(
+                  //   child: Column(
+                  //     children: [
+                  //       Icon(Icons.arrow_back, color: color, size: 28),
+                  //       Text("上一章", style: TextStyle(color: color))
+                  //     ],
+                  //   ),
+                  //   onTap: () => composition.gotoPreviousChapter(),
+                  // ),
+                  InkWell(
+                    child: Column(
+                      children: [
+                        Icon(Icons.arrow_back, color: color, size: 22),
+                        Text("退出", style: TextStyle(color: color))
+                      ],
+                    ),
+                    onTap: () => Navigator.of(context).pop(),
+                  ),
+                  InkWell(
+                    child: Column(
+                      children: [
+                        Icon(Icons.format_list_bulleted,
+                            color: color, size: 22),
+                        Text("目录", style: TextStyle(color: color))
+                      ],
+                    ),
+                    onTap: () {},
+                  ),
+                  InkWell(
+                    child: Column(
+                      children: [
+                        Icon(Icons.text_format, color: color, size: 22),
+                        Text("调节", style: TextStyle(color: color))
+                      ],
+                    ),
+                    onTap: () {
+                      showDialog(
+                        context: context,
+                        builder: (context) => AlertDialog(
+                          contentPadding: EdgeInsets.zero,
+                          content: Container(
+                            width: 520,
+                            child: configSettingBuilder(context, config,
+                                (Color color,
+                                    void Function(Color color) onChange) {
+                              showDialog(
+                                context: context,
+                                builder: (context) => AlertDialog(
+                                  title: Text("Pick A Color".i18n),
+                                  content: SingleChildScrollView(
+                                    child: ColorPicker(
+                                      pickerColor: color,
+                                      onColorChanged: onChange,
+                                      labelTypes: [],
+                                      pickerAreaHeightPercent: 0.8,
+                                      portraitOnly: true,
+                                      hexInputBar: true,
+                                    ),
+                                  ),
+                                ),
+                              );
+                            }, (e, ee) {}, (e, ee) {}),
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+                  // InkWell(
+                  //   child: Column(
+                  //     children: [
+                  //       Icon(Icons.arrow_forward, color: color, size: 28),
+                  //       Text("下一章", style: TextStyle(color: color))
+                  //     ],
+                  //   ),
+                  //   onTap: () => composition.gotoNextChapter(),
+                  // ),
+                ],
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Future buildShowModalBottomSheet(BuildContext context) {
+    return showModalBottomSheet(
+      isScrollControlled: false,
+      context: context,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(
+          top: Radius.circular(16),
         ),
       ),
+      builder: (_) {
+        return Container(
+          decoration: BoxDecoration(
+              borderRadius: BorderRadius.only(
+                  topLeft: Radius.circular(8.0),
+                  topRight: Radius.circular(8.0))),
+          child: SingleChildScrollView(child: _buildFirstView(context)),
+        );
+      },
     );
   }
 
@@ -273,7 +366,7 @@ class _NovelViewerPageState extends State<NovelViewerPage> {
       child: Column(
         children: [
           Container(
-            height: 100,
+            height: 20,
           ),
           Center(
             child: PixivImage(
@@ -367,6 +460,8 @@ class _NovelViewerPageState extends State<NovelViewerPage> {
           Padding(
             padding: const EdgeInsets.all(8.0),
             child: Card(
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8.0)),
               child: Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: SelectionArea(
@@ -379,8 +474,6 @@ class _NovelViewerPageState extends State<NovelViewerPage> {
                   child: SelectableHtml(data: widget.novel.caption),
                 ),
               ),
-              shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8.0)),
             ),
           ),
           TextButton(
@@ -636,16 +729,6 @@ class _NovelViewerPageState extends State<NovelViewerPage> {
                     },
                   ),
                 ListTile(
-                  title: Text("Settings".i18n),
-                  leading: Icon(
-                    Icons.settings,
-                  ),
-                  onTap: () {
-                    Navigator.of(context).pop();
-                    _showSettings(context);
-                  },
-                ),
-                ListTile(
                   title: Text("Share".i18n),
                   leading: Icon(
                     Icons.share,
@@ -665,7 +748,7 @@ class _NovelViewerPageState extends State<NovelViewerPage> {
   Widget buildListTile(SimpleNovel? relNovel, BuildContext context) {
     if (relNovel == null)
       return ListTile(
-        title: Text("no more"),
+        title: Text("No more".i18n),
       );
     return ListTile(
       title: Text(relNovel.title, maxLines: 2, overflow: TextOverflow.ellipsis),
@@ -675,119 +758,6 @@ class _NovelViewerPageState extends State<NovelViewerPage> {
                 builder: (BuildContext context) =>
                     NovelPageLite(relNovel.id.toString())));
       },
-    );
-  }
-
-  Future<void> _showSettings(BuildContext context) async {
-    await showModalBottomSheet(
-        context: context,
-        shape: const RoundedRectangleBorder(
-          borderRadius: BorderRadius.vertical(
-            top: Radius.circular(16),
-          ),
-        ),
-        builder: (context) {
-          return StatefulBuilder(builder: (context, setB) {
-            return SafeArea(
-                child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Row(
-                  mainAxisSize: MainAxisSize.max,
-                  children: [
-                    Container(
-                      child: Icon(Icons.text_fields),
-                      margin: EdgeInsets.only(left: 16),
-                    ),
-                    Container(
-                      child: Text(fontsize.toInt().toString()),
-                      margin: EdgeInsets.only(left: 16),
-                    ),
-                    Expanded(
-                        child: Slider(
-                            value: fontsize / 32,
-                            onChanged: (v) {
-                              setB(() {
-                                fontsize = v * 32;
-                                settings.set("fontSize", fontsize);
-                              });
-                            })),
-                  ],
-                )
-              ],
-            ));
-          });
-        });
-  }
-
-  _buildBottmAppBar(BuildContext context,
-      {required double height,
-      required double minHeight,
-      required Duration duration,
-      required bool isBottomBarVisible}) {
-    //bool isDark = _themeStyleProvider.theme.brightness != Brightness.dark;
-    return AnimatedContainer(
-      height: isBottomBarVisible ? height : minHeight,
-      duration: duration,
-      curve: Curves.easeInOut,
-      decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.surfaceContainer,
-        boxShadow: [
-          BoxShadow(
-            offset: const Offset(0, -1),
-            blurRadius: 10,
-            color: Colors.grey.withOpacity(0.1),
-          ),
-        ],
-      ),
-      child: AnimatedOpacity(
-        opacity: isBottomBarVisible ? 1 : 0,
-        duration: duration,
-        child: BottomAppBar(
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
-            children: [
-              IconButton(
-                icon: Icon(Icons.arrow_back_ios_rounded),
-                onPressed: (nowPosition == 0)
-                    ? null
-                    : () {
-                        _pageController.jumpToPage(nowPosition - 1);
-                        setState(() {
-                          nowPosition--;
-                        });
-                      },
-              ),
-              Slider(
-                  value: max(0, nowPosition.toDouble()),
-                  max: _novelStore.pageConfig.length.toDouble(),
-                  divisions: max(_novelStore.pageConfig.length, 1),
-                  min: min(0, _novelStore.pageConfig.length.toDouble()),
-                  label:
-                      "${nowPosition + 1}/${_novelStore.pageConfig.length + 1}",
-                  onChanged: (v) {
-                    if (v >= _novelStore.pageConfig.length + 1)
-                      v = _novelStore.pageConfig.length.toDouble();
-                    if (v < 0) v = 0;
-                    _pageController.jumpToPage(v.toInt());
-                    setState(() {
-                      nowPosition = v.toInt();
-                    });
-                  }),
-              IconButton(
-                  icon: Icon(Icons.arrow_forward_ios_rounded),
-                  onPressed: (nowPosition == _novelStore.pageConfig.length)
-                      ? null
-                      : () {
-                          _pageController.jumpToPage(nowPosition + 1);
-                          setState(() {
-                            nowPosition++;
-                          });
-                        }),
-            ],
-          ),
-        ),
-      ),
     );
   }
 
@@ -809,90 +779,15 @@ class _NovelViewerPageState extends State<NovelViewerPage> {
 
 class NovelStore {
   final Novel novel;
-  final double fontSize;
-  final double linePaddingHorizontal;
-  final double paddingVertical;
-  final double lineSpace;
-  final double pageHeight;
-  final double pageWidth;
   late String stringContent;
-  late ObservableList<String> pageConfig = ObservableList();
+  List<String> result = [];
   String? errorMessage;
-  late TextPainter textPainter;
   NovelWebResponse? novelWebResponse;
   TextSpan? textSpan;
 
-  NovelStore(this.novel, this.pageHeight, this.pageWidth,
-      {this.fontSize = 20,
-      this.linePaddingHorizontal = 10,
-      this.paddingVertical = kToolbarHeight,
-      this.lineSpace = 4});
+  NovelStore(this.novel);
 
-  Future<void> textProcessing(String text) async {
-    var result;
-    final textList = text.split('\n');
-    for (var i = 0; i < textList.length; i++) {
-      String item = textList[i];
-      if (item.isEmpty) {
-        continue;
-      }
-      result.add(TextSpan(
-          text: item, style: TextStyle(fontSize: fontSize, height: lineSpace)));
-      result.add(const TextSpan(text: '\n', style: TextStyle(fontSize: 0.001)));
-    }
-    textSpan = TextSpan(children: result);
-  }
-
-  Future<List<String>> parse(String content) async {
-    List<int> result = [];
-    List<String> resultString = [];
-    String tmp = stringContent;
-    textPainter = TextPainter(
-      textAlign: TextAlign.start,
-      textDirection: TextDirection.ltr,
-      text: TextSpan(
-        text: tmp,
-        style: TextStyle(fontSize: fontSize, height: lineSpace),
-      ),
-    );
-    var width = pageWidth - linePaddingHorizontal * 2;
-    textPainter.layout(maxWidth: width);
-    double lineHeight = textPainter.preferredLineHeight;
-    int lineNumberPerPage = (pageHeight - paddingVertical * 2.5) ~/ lineHeight;
-    lineNumberPerPage = lineNumberPerPage - 1;
-    // int pageNum = (lineNumber / lineNumberPerPage).ceil();
-    double actualPageHeight = lineNumberPerPage * lineHeight;
-    while (true) {
-      textPainter = TextPainter(
-        textAlign: TextAlign.start,
-        textDirection: TextDirection.ltr,
-        text: TextSpan(
-          text: tmp,
-          style: TextStyle(fontSize: fontSize, height: lineSpace),
-        ),
-      );
-      textPainter.layout(maxWidth: width);
-
-      var end = textPainter
-          .getPositionForOffset(Offset(width, actualPageHeight))
-          .offset;
-
-      if (end == 0) {
-        break;
-      }
-
-      result.add(end);
-      resultString.add(tmp.substring(0, end));
-
-      tmp = tmp.substring(end, tmp.length);
-      while (tmp.startsWith("\n")) {
-        tmp = tmp.substring(1);
-      }
-    }
-    return resultString;
-  }
-
-  Future<void> fetch() async {
+  Future<List<String>> fetch() async {
     errorMessage = null;
     try {
       Res<NovelWebResponse> response =
@@ -902,15 +797,16 @@ class NovelStore {
       }
       novelWebResponse = response.data;
       stringContent = novelWebResponse!.text;
-      List<String> result = await parse(stringContent);
+      result = stringContent.split(RegExp(r"\n\s*|\s{2,}"));
       if (result.isEmpty) {
         throw BadResponseException("No content");
       }
-      pageConfig.addAll(result);
+      return result;
     } catch (e) {
       loggerError(e.toString());
       errorMessage = e.toString();
     }
+    return result;
   }
 }
 

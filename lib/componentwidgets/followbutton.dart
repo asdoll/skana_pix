@@ -63,6 +63,7 @@ class _UserFollowButtonState extends State<UserFollowButton> {
             _loading = true;
             _onPressed().then((value) {
               _loading = false;
+              _followed = false;
             });
           });
         },
@@ -92,7 +93,10 @@ class _UserFollowButtonState extends State<UserFollowButton> {
     }
     return GestureDetector(
       onTap: () {
+        setState(() {
         _onPressed();
+        _followed = true;
+        });
       },
       child: Container(
         height: 32,

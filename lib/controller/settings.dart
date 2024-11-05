@@ -3,10 +3,13 @@ import 'dart:ui';
 
 import 'package:bot_toast/bot_toast.dart';
 import 'package:flutter/material.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:skana_pix/model/worktypes.dart';
 import 'package:skana_pix/pixiv_dart_api.dart';
 import 'package:skana_pix/utils/translate.dart';
+
+import '../utils/text_composition/text_composition.dart';
 
 class UserSetting {
   late SharedPreferences prefs;
@@ -38,7 +41,6 @@ class UserSetting {
   List<String> blockedComments = [];
   List<String> blockedNovels = [];
   List<String> blockedNovelTags = [];
-  double fontSize = 20.0;
   String awPrefer = 'illust';
   List<String> historyIllustTag = [];
   List<String> historyNovelTag = [];
@@ -72,7 +74,6 @@ class UserSetting {
     await prefs.setStringList('blockedComments', blockedComments);
     await prefs.setStringList('blockedNovels', blockedNovels);
     await prefs.setStringList('blockedNovelTags', blockedNovelTags);
-    await prefs.setDouble('fontSize', fontSize);
     await prefs.setString('awPrefer', awPrefer);
     await prefs.setStringList('historyIllustTag', historyIllustTag);
     await prefs.setStringList('historyNovelTag', historyNovelTag);
@@ -115,7 +116,6 @@ class UserSetting {
     blockedComments = prefs.getStringList('blockedComments') ?? [];
     blockedNovels = prefs.getStringList('blockedNovels') ?? [];
     blockedNovelTags = prefs.getStringList('blockedNovelTags') ?? [];
-    fontSize = prefs.getDouble('fontSize') ?? 20.0;
     awPrefer = prefs.getString('awPrefer') ?? 'illust';
     historyIllustTag = prefs.getStringList('historyIllustTag') ?? [];
     historyNovelTag = prefs.getStringList('historyNovelTag') ?? [];
@@ -151,7 +151,6 @@ class UserSetting {
     blockedComments = [];
     blockedNovels = [];
     blockedNovelTags = [];
-    fontSize = 20.0;
     awPrefer = 'illust';
     historyIllustTag = [];
     historyNovelTag = [];
@@ -267,10 +266,6 @@ class UserSetting {
         blockedNovelTags = value;
         prefs.setStringList('blockedNovelTags', blockedNovelTags);
         break;
-      case 'fontSize':
-        fontSize = value;
-        prefs.setDouble('fontSize', fontSize);
-        break;
       case 'awPrefer':
         awPrefer = value;
         prefs.setString('awPrefer', awPrefer);
@@ -330,7 +325,6 @@ class UserSetting {
       'blockedComments': blockedComments,
       'blockedNovels': blockedNovels,
       'blockedNovelTags': blockedNovelTags,
-      'fontSize': fontSize,
       'awPrefer': awPrefer,
       'historyIllustTag': historyIllustTag,
       'historyNovelTag': historyNovelTag,
@@ -367,7 +361,6 @@ class UserSetting {
     blockedComments = List<String>.from(map['blockedComments']);
     blockedNovels = List<String>.from(map['blockedNovels']);
     blockedNovelTags = List<String>.from(map['blockedNovelTags']);
-    fontSize = map['fontSize'] ?? 20.0;
     awPrefer = map['awPrefer'] ?? 'illust';
     historyIllustTag = List<String>.from(map['historyIllustTag']);
     historyNovelTag = List<String>.from(map['historyNovelTag']);
@@ -781,3 +774,13 @@ class UserSetting {
 }
 
 var settings = UserSetting();
+
+class TextConfigManager {
+  static final _box = Hive.box("textConfigData");
+  static TextCompositionConfig get config => TextCompositionConfig.fromJSON(_box.toMap().cast<String, dynamic>());
+  static set config(TextCompositionConfig config) => _box.putAll(config.toJSON());
+  static Future<void> init() async{
+    await Hive.initFlutter("textConfigData");
+    await Hive.openBox("textConfigData");
+  }
+}

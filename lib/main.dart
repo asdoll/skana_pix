@@ -19,6 +19,7 @@ Future<void> main() async {
       Log.error("Unhandled", "${details.exception}\n${details.stack}");
     };
     await settings.init();
+    await TextConfigManager.init();
     setSystemProxy();
     await ConnectManager().init();
     await TranslateMap.init();
