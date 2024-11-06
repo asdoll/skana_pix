@@ -59,6 +59,12 @@ class _NovelViewerPageState extends State<NovelViewerPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        toolbarHeight: 0.0,
+        systemOverlayStyle: SystemUiOverlayStyle.light.copyWith(
+            systemNavigationBarColor:
+                config.backgroundColor),
+      ),
       body: Observer(
         builder: (_) {
           return TextCompositionPage(
@@ -140,6 +146,37 @@ class _NovelViewerPageState extends State<NovelViewerPage> {
             onPressed: () => buildShowModalBottomSheet(context),
             icon: Icon(Icons.info_outline_rounded)),
         IconButton(
+          icon: Icon(Icons.settings),
+          onPressed: () => showDialog(
+            context: context,
+            builder: (context) => AlertDialog(
+              contentPadding: EdgeInsets.zero,
+              content: Container(
+                width: 520,
+                child: configSettingBuilder(context, config,
+                    (Color color, void Function(Color color) onChange) {
+                  showDialog(
+                    context: context,
+                    builder: (context) => AlertDialog(
+                      title: Text("Pick A Color".i18n),
+                      content: SingleChildScrollView(
+                        child: ColorPicker(
+                          pickerColor: color,
+                          onColorChanged: onChange,
+                          labelTypes: [],
+                          pickerAreaHeightPercent: 0.8,
+                          portraitOnly: true,
+                          hexInputBar: true,
+                        ),
+                      ),
+                    ),
+                  );
+                }, (e, ee) {}, (e, ee) {}),
+              ),
+            ),
+          ),
+        ),
+        IconButton(
           icon: Icon(Icons.more_vert),
           onPressed: () {
             _showMessage(context);
@@ -163,7 +200,7 @@ class _NovelViewerPageState extends State<NovelViewerPage> {
             child: Row(
               children: <Widget>[
                 Text(
-                  "章节",
+                  '   ',
                   style: TextStyle(color: color),
                 ),
                 SizedBox(width: 10),
@@ -171,16 +208,23 @@ class _NovelViewerPageState extends State<NovelViewerPage> {
                   child: FlutterSlider(
                     values: [
                       0.0 +
-                          (composition.textPages[composition.currentIndex]?.number ??
+                          (composition.textPages[composition.currentIndex]
+                                  ?.number ??
                               1)
                     ],
-                    max: composition.textPages[composition.currentIndex]!.total*1.0,
+                    max:
+                        composition.textPages[composition.currentIndex]!.total *
+                            1.0,
                     min: 1,
                     step: FlutterSliderStep(step: 1),
                     onDragCompleted: (handlerIndex, lowerValue, upperValue) {
                       // provider.loadChapter((lowerValue as double).toInt() - 1);
                       //BotToast.showText(text: "${(lowerValue as double).toInt() - 1}");
-                      composition.goToPage(composition.currentIndex + (lowerValue as double).toInt() - 1- composition.textPages[composition.currentIndex]!.number);
+                      composition.goToPage(composition.currentIndex +
+                          (lowerValue as double).toInt() -
+                          1 -
+                          composition
+                              .textPages[composition.currentIndex]!.number);
                     },
                     // disabled: provider.isLoading,
                     handlerWidth: 6,
@@ -191,7 +235,8 @@ class _NovelViewerPageState extends State<NovelViewerPage> {
                         decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(3),
                           color: bgColor,
-                          border: Border.all(color: color.withOpacity(0.65), width: 1),
+                          border: Border.all(
+                              color: color.withOpacity(0.65), width: 1),
                         ),
                       ),
                     ),
@@ -210,9 +255,9 @@ class _NovelViewerPageState extends State<NovelViewerPage> {
                       alwaysShowTooltip: true,
                       disableAnimation: false,
                       positionOffset: FlutterSliderTooltipPositionOffset(
-                       // left: -20,
+                        // left: -20,
                         top: -40,
-                       // right: 80 - MediaQuery.of(context).size.width,
+                        // right: 80 - MediaQuery.of(context).size.width,
                       ),
                       custom: (value) {
                         final index = (value as double).toInt();
@@ -241,7 +286,7 @@ class _NovelViewerPageState extends State<NovelViewerPage> {
                 ),
                 SizedBox(width: 10),
                 Text(
-                  ' ',
+                  '   ',
                   style: TextStyle(color: color),
                 ),
               ],
@@ -253,84 +298,103 @@ class _NovelViewerPageState extends State<NovelViewerPage> {
               padding: EdgeInsets.fromLTRB(16, 0, 16, 16),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  // InkWell(
-                  //   child: Column(
-                  //     children: [
-                  //       Icon(Icons.arrow_back, color: color, size: 28),
-                  //       Text("上一章", style: TextStyle(color: color))
-                  //     ],
-                  //   ),
-                  //   onTap: () => composition.gotoPreviousChapter(),
-                  // ),
-                  InkWell(
-                    child: Column(
-                      children: [
-                        Icon(Icons.arrow_back, color: color, size: 22),
-                        Text("退出", style: TextStyle(color: color))
-                      ],
-                    ),
-                    onTap: () => Navigator.of(context).pop(),
-                  ),
-                  InkWell(
-                    child: Column(
-                      children: [
-                        Icon(Icons.format_list_bulleted,
-                            color: color, size: 22),
-                        Text("目录", style: TextStyle(color: color))
-                      ],
-                    ),
-                    onTap: () {},
-                  ),
-                  InkWell(
-                    child: Column(
-                      children: [
-                        Icon(Icons.text_format, color: color, size: 22),
-                        Text("调节", style: TextStyle(color: color))
-                      ],
-                    ),
-                    onTap: () {
-                      showDialog(
-                        context: context,
-                        builder: (context) => AlertDialog(
-                          contentPadding: EdgeInsets.zero,
-                          content: Container(
-                            width: 520,
-                            child: configSettingBuilder(context, config,
-                                (Color color,
-                                    void Function(Color color) onChange) {
-                              showDialog(
-                                context: context,
-                                builder: (context) => AlertDialog(
-                                  title: Text("Pick A Color".i18n),
-                                  content: SingleChildScrollView(
-                                    child: ColorPicker(
-                                      pickerColor: color,
-                                      onColorChanged: onChange,
-                                      labelTypes: [],
-                                      pickerAreaHeightPercent: 0.8,
-                                      portraitOnly: true,
-                                      hexInputBar: true,
-                                    ),
-                                  ),
-                                ),
-                              );
-                            }, (e, ee) {}, (e, ee) {}),
+                children: (_novelStore.novelWebResponse!.seriesNavigation
+                                ?.prevNovel ==
+                            null &&
+                        _novelStore.novelWebResponse!.seriesNavigation
+                                ?.nextNovel ==
+                            null)
+                    ? []
+                    : [
+                        InkWell(
+                          child: Column(
+                            children: [
+                              Icon(Icons.library_books_rounded,
+                                  color: color, size: 20),
+                              if (_novelStore.novelWebResponse!.seriesNavigation
+                                      ?.prevNovel !=
+                                  null)
+                                Text("Previous".i18n,
+                                    style: TextStyle(color: color))
+                              else
+                                Text("NoMore".i18n,
+                                    style: TextStyle(color: color))
+                            ],
                           ),
+                          onTap: () {
+                            if (_novelStore.novelWebResponse!.seriesNavigation
+                                    ?.prevNovel ==
+                                null) return;
+                            Navigator.of(context, rootNavigator: true)
+                                .pushReplacement(MaterialPageRoute(
+                                    builder: (BuildContext context) =>
+                                        NovelPageLite(_novelStore
+                                            .novelWebResponse!
+                                            .seriesNavigation!
+                                            .prevNovel!
+                                            .id
+                                            .toString())));
+                          },
                         ),
-                      );
-                    },
-                  ),
-                  // InkWell(
-                  //   child: Column(
-                  //     children: [
-                  //       Icon(Icons.arrow_forward, color: color, size: 28),
-                  //       Text("下一章", style: TextStyle(color: color))
-                  //     ],
-                  //   ),
-                  //   onTap: () => composition.gotoNextChapter(),
-                  // ),
-                ],
+                        InkWell(
+                          child: Column(
+                            children: [
+                              Icon(Icons.library_books_rounded,
+                                  color: color, size: 20),
+                              if (_novelStore.novelWebResponse!.seriesNavigation
+                                      ?.nextNovel !=
+                                  null)
+                                Text("Next".i18n,
+                                    style: TextStyle(color: color))
+                              else
+                                Text("No more".i18n,
+                                    style: TextStyle(color: color))
+                            ],
+                          ),
+                          onTap: () {
+                            if (_novelStore.novelWebResponse!.seriesNavigation
+                                    ?.nextNovel ==
+                                null) return;
+                            Navigator.of(context, rootNavigator: true)
+                                .pushReplacement(MaterialPageRoute(
+                                    builder: (BuildContext context) =>
+                                        NovelPageLite(_novelStore
+                                            .novelWebResponse!
+                                            .seriesNavigation!
+                                            .nextNovel!
+                                            .id
+                                            .toString())));
+                          },
+                        ),
+                        // InkWell(
+                        //   child: Column(
+                        //     children: [
+                        //       Icon(Icons.arrow_back, color: color, size: 28),
+                        //       Text("上一章", style: TextStyle(color: color))
+                        //     ],
+                        //   ),
+                        //   onTap: () => composition.gotoPreviousChapter(),
+                        // ),
+                        // InkWell(
+                        //   child: Column(
+                        //     children: [
+                        //       Icon(Icons.format_list_bulleted,
+                        //           color: color, size: 20),
+                        //       Text("目录", style: TextStyle(color: color))
+                        //     ],
+                        //   ),
+                        //   onTap: () {},
+                        // ),
+                        // InkWell(
+                        //   child: Column(
+                        //     children: [
+                        //       Icon(Icons.arrow_forward, color: color, size: 28),
+                        //       Text("下一章", style: TextStyle(color: color))
+                        //     ],
+                        //   ),
+                        //   onTap: () => composition.gotoNextChapter(),
+                        // ),
+                      ],
               ),
             ),
           ),
@@ -427,9 +491,17 @@ class _NovelViewerPageState extends State<NovelViewerPage> {
                       builder: (BuildContext context) =>
                           NovelSeriesPage(widget.novel.seriesId!)));
                 },
-                child: Text(
-                  "Series:${widget.novel.seriesTitle}",
-                  style: Theme.of(context).textTheme.titleSmall,
+                child: Container(
+                  height: 22,
+                  padding: const EdgeInsets.symmetric(horizontal: 14),
+                  decoration: BoxDecoration(
+                    color: Theme.of(context).colorScheme.secondaryContainer,
+                    borderRadius: const BorderRadius.all(Radius.circular(12.5)),
+                  ),
+                  child: Text(
+                    "Series:${widget.novel.seriesTitle}",
+                    style: Theme.of(context).textTheme.titleSmall,
+                  ),
                 ),
               ),
             ),

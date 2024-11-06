@@ -121,6 +121,16 @@ class _PreferenceSettingsState extends State<PreferenceSettings> {
               });
             },
           ),
+          Divider(),
+          SwitchListTile(
+            title: Text("Enter novel page directly".i18n),
+            value: settings.novelDirectEntry,
+            onChanged: (value) {
+              setState(() {
+                settings.set("novelDirectEntry", value);
+              });
+            },
+          ),
         ],
       ),
     );

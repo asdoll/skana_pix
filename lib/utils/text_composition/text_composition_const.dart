@@ -3,6 +3,7 @@ import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:skana_pix/utils/translate.dart';
 import 'text_composition.dart';
 
 const indentation = "　";
@@ -156,21 +157,21 @@ Widget configSettingBuilder(
       actions: [
         TextButton(
           child: Text(
-            "取消",
+            "Cancel".i18n,
             style: TextStyle(color: Theme.of(context).hintColor),
           ),
           onPressed: () => Navigator.of(context).pop(),
         ),
         TextButton(
           child: Text(
-            "确定",
+            "Ok".i18n,
             style: TextStyle(color: Colors.red),
           ),
           onPressed: () {
             final s = (isInt ? RegExp("^\\d+\$") : RegExp("^\\d+(\\.\\d+)?\$"))
                 .stringMatch(controller.text);
             if (s == null || s.isEmpty) {
-              controller.text += isInt ? "只能输入整数" : "必须输入一个数";
+              controller.text += isInt ? "Only numbers are allowed".i18n : "Must enter a number".i18n;
               controller.selection =
                   TextSelection(baseOffset: 0, extentOffset: controller.text.length);
               return;
@@ -216,9 +217,9 @@ Widget configSettingBuilder(
     builder: (context, setState) {
       return ListView(
         children: [
-          ListTile(title: Text("（注意：部分效果需要重进正文页或者下一章才生效或者过几页才生效")),
+          ListTile(title: Text("Note: Some effects will only take effect after re-entering the main text page or the next chapter, or after a few pages.".i18n)),
           Divider(),
-          ListTile(title: Text("开关与选择", style: style)),
+          ListTile(title: Text("Switches and selections".i18n)),
           Divider(),
           SwitchListTile(
             value: config.showStatus,
@@ -230,65 +231,64 @@ Widget configSettingBuilder(
               }
               setState(() => config.showStatus = value);
             },
-            title: Text("显示状态栏"),
+            title: Text("Show status bar".i18n),
           ),
           SwitchListTile(
             value: config.showInfo,
             onChanged: (value) => setState(() => config.showInfo = value),
-            title: Text("显示底部"),
-            subtitle: Text("章节名（书名） 页数/总页数 百分比进度"),
+            title: Text("Show bottom".i18n),
+            subtitle: Text("Show book name, page number and progress".i18n),
           ),
           SwitchListTile(
             value: config.justifyHeight,
             onChanged: (value) => setState(() => config.justifyHeight = value),
-            title: Text("高度调整"),
-            subtitle: Text("底部对齐 最底行对齐到相同位置"),
+            title: Text("Height adjustment".i18n),
+            subtitle: Text("Align bottom: Align bottom line to the same position".i18n),
           ),
           SwitchListTile(
             value: config.oneHand,
             onChanged: (value) => setState(() => config.oneHand = value),
-            title: Text("单手模式"),
-            subtitle: Text("点击左侧也是向下翻页"),
+            title: Text("One-handed operation".i18n),
+            subtitle: Text("Clicking on left side also turns page down".i18n),
           ),
           SwitchListTile(
             value: config.underLine,
             onChanged: (value) => setState(() => config.underLine = value),
-            title: Text("文字底部横线"),
-            subtitle: Text("增加书籍仿真沉浸感"),
+            title: Text("Underlined text".i18n),
           ),
           SwitchListTile(
             value: config.animationStatus,
             onChanged: (value) => setState(() => config.animationStatus = value),
-            title: Text("状态栏动画"),
-            subtitle: Text("翻页动画可以越过状态栏"),
+            title: Text("Status bar animation".i18n),
+            subtitle: Text("Animation can across status bar".i18n),
           ),
           SwitchListTile(
             value: config.animationHighImage,
             onChanged: (value) => setState(() => config.animationHighImage = value),
-            title: Text("[仿真苹果] 高清模式"),
-            subtitle: Text("打开后截图质量更高 关闭会更流畅"),
+            title: Text("HD mode".i18n),
+            subtitle: Text("Increase screenshot quality when enabled. Smoother when disabled".i18n),
           ),
-          SwitchListTile(
-            value: config.animationWithImage,
-            onChanged: (value) => setState(() => config.animationWithImage = value),
-            title: Text("背景图跟随"),
-            subtitle: Text("开启随翻页动画移动，关闭则固定"),
-          ),
+          // SwitchListTile(
+          //   value: config.animationWithImage,
+          //   onChanged: (value) => setState(() => config.animationWithImage = value),
+          //   title: Text("背景图跟随"),
+          //   subtitle: Text("开启随翻页动画移动，关闭则固定"),
+          // ),
           ListTile(
-            subtitle: Text('翻页动画选择，宽屏试试双栏加翻转（-是横向 | 是纵向 +是自动）'),
+            subtitle: Text("Page-turning animation selection, try dual-column with flip on widescreen (- is horizontal | is vertical + is automatic)".i18n),
             title: Wrap(
               children: [
                 for (var pair in <String, AnimationType>{
-                  "仿真-": AnimationType.curl,
-                  "覆盖+": AnimationType.cover,
+                  "Curl-".i18n: AnimationType.curl,
+                  "Cover+".i18n: AnimationType.cover,
                   // "水平覆盖": AnimationType.coverHorizontal,
                   // "垂直覆盖": AnimationType.coverVertical,
-                  "翻转-": AnimationType.flip,
-                  "卷轴-": AnimationType.simulation,
+                  "Flip-".i18n: AnimationType.flip,
+                  "Simulate-".i18n: AnimationType.simulation,
                   // "卷轴半左": AnimationType.simulation2L,
                   // "卷轴半右": AnimationType.simulation2R,
-                  "滚动 |": AnimationType.scroll,
-                  "滑动+": AnimationType.slide,
+                  "Scroll|".i18n: AnimationType.scroll,
+                  "Slide+".i18n: AnimationType.slide,
                   // "滑动水平": AnimationType.slideHorizontal,
                   // "滑动垂直": AnimationType.slideVertical,
                 }.entries)
@@ -307,13 +307,13 @@ Widget configSettingBuilder(
             ),
           ),
           ListTile(
-            title: Text("动画时间（毫秒数）"),
+            title: Text("Animation duration(ms)".i18n),
             subtitle: Text(config.animationDuration.toString() + "(ms)"),
             onTap: () => showDialog(
               context: context,
               builder: (context) => showTextDialog(
                 context,
-                '动画时间（毫秒数）',
+                "Animation duration(ms)".i18n,
                 config.animationDuration.toString(),
                 (s) => setState(() => config.animationDuration = int.parse(s)),
                 true,
@@ -321,7 +321,7 @@ Widget configSettingBuilder(
             ),
           ),
           Divider(),
-          ListTile(title: Text("文字与排版", style: style)),
+          ListTile(title: Text("Text and layout".i18n, style: style)),
           Container(
             decoration: BoxDecoration(border: Border.all()),
             margin: EdgeInsets.symmetric(horizontal: 18),
@@ -356,20 +356,20 @@ Widget configSettingBuilder(
                     decoration: getDecoration(c.img, c.bg),
                     padding: EdgeInsets.all(4),
                     margin: EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-                    child: Text("文字", style: TextStyle(color: c.text)),
+                    child: Text("Text".i18n, style: TextStyle(color: c.text)),
                   ),
                 ),
             ],
           ),
           Divider(),
           ListTile(
-            title: Text("分栏数"),
-            subtitle: Text("${config.columns}（0为自动 宽度超过580时两栏）"),
+            title: Text("Columns".i18n),
+            subtitle: Text("${config.columns}${"(0 for automatic, 2 columns when width exceeds 580)".i18n}"),
             onTap: () => showDialog(
               context: context,
               builder: (context) => showTextDialog(
                 context,
-                '分栏数',
+                "Columns".i18n,
                 config.columns.toString(),
                 (s) => setState(() => config.columns = int.parse(s)),
                 true,
@@ -377,13 +377,13 @@ Widget configSettingBuilder(
             ),
           ),
           ListTile(
-            title: Text("段落缩进"),
+            title: Text("Paragraph indentation".i18n),
             subtitle: Text(config.indentation.toString()),
             onTap: () => showDialog(
               context: context,
               builder: (context) => showTextDialog(
                 context,
-                '段落缩进',
+                "Paragraph indentation".i18n,
                 config.indentation.toString(),
                 (s) => setState(() => config.indentation = int.parse(s)),
                 true,
@@ -391,32 +391,32 @@ Widget configSettingBuilder(
             ),
           ),
           ListTile(
-            title: Text("字色"),
+            title: Text("Font color".i18n),
             subtitle: Text(config.fontColor.value.toRadixString(16).toUpperCase()),
             onTap: () => onColor(
                 config.fontColor, (color) => setState(() => config.fontColor = color)),
           ),
           ListTile(
-            title: Text("字号"),
+            title: Text("Font size".i18n),
             subtitle: Text(config.fontSize.toStringAsFixed(1)),
             onTap: () => showDialog(
               context: context,
               builder: (context) => showTextDialog(
                 context,
-                '字号',
+                "Font size".i18n,
                 config.fontSize.toStringAsFixed(1),
                 (s) => setState(() => config.fontSize = double.parse(s)),
               ),
             ),
           ),
           ListTile(
-            title: Text("行高"),
+            title: Text("Line height".i18n),
             subtitle: Text(config.fontHeight.toStringAsFixed(1)),
             onTap: () => showDialog(
               context: context,
               builder: (context) => showTextDialog(
                 context,
-                '行高',
+                "Line height".i18n,
                 config.fontHeight.toStringAsFixed(1),
                 (s) => setState(() => config.fontHeight = double.parse(s)),
               ),
@@ -429,7 +429,7 @@ Widget configSettingBuilder(
           //       config.fontFamily, (font) => setState(() => config.fontFamily = font)),
           // ),
           ListTile(
-            title: Text("背景 纯色"),
+            title: Text("Background color".i18n),
             subtitle: Text(config.backgroundColor.value.toRadixString(16).toUpperCase()),
             onTap: () => onColor(
                 config.backgroundColor,
@@ -445,94 +445,94 @@ Widget configSettingBuilder(
           //       (background) => setState(() => config.background = background)),
           // ),
           Divider(),
-          ListTile(title: Text("边距", style: style)),
+          ListTile(title: Text("Margin".i18n, style: style)),
           Divider(),
           ListTile(
-            title: Text("上边距"),
+            title: Text("Upper margin".i18n),
             subtitle: Text(config.topPadding.toStringAsFixed(1)),
             onTap: () => showDialog(
               context: context,
               builder: (context) => showTextDialog(
                 context,
-                '上边距',
+                "Upper margin".i18n,
                 config.topPadding.toStringAsFixed(1),
                 (s) => setState(() => config.topPadding = double.parse(s)),
               ),
             ),
           ),
           ListTile(
-            title: Text("左边距"),
+            title: Text("Left margin".i18n),
             subtitle: Text(config.leftPadding.toStringAsFixed(1)),
             onTap: () => showDialog(
               context: context,
               builder: (context) => showTextDialog(
                 context,
-                '左边距',
+                "Left margin".i18n,
                 config.leftPadding.toStringAsFixed(1),
                 (s) => setState(() => config.leftPadding = double.parse(s)),
               ),
             ),
           ),
           ListTile(
-            title: Text("下边距"),
+            title: Text("Lower margin".i18n),
             subtitle: Text(config.bottomPadding.toStringAsFixed(1)),
             onTap: () => showDialog(
               context: context,
               builder: (context) => showTextDialog(
                 context,
-                '下边距',
+                "Lower margin".i18n,
                 config.bottomPadding.toStringAsFixed(1),
                 (s) => setState(() => config.bottomPadding = double.parse(s)),
               ),
             ),
           ),
           ListTile(
-            title: Text("右边距"),
+            title: Text("Right margin".i18n),
             subtitle: Text(config.rightPadding.toStringAsFixed(1)),
             onTap: () => showDialog(
               context: context,
               builder: (context) => showTextDialog(
                 context,
-                '右边距',
+                "Right margin".i18n,
                 config.rightPadding.toStringAsFixed(1),
                 (s) => setState(() => config.rightPadding = double.parse(s)),
               ),
             ),
           ),
           ListTile(
-            title: Text("标题与正文间距"),
+            title: Text("Spacing between title and text".i18n),
             subtitle: Text(config.titlePadding.toStringAsFixed(1)),
             onTap: () => showDialog(
               context: context,
               builder: (context) => showTextDialog(
                 context,
-                '标题与正文间距',
+                "Spacing between title and text".i18n,
                 config.titlePadding.toStringAsFixed(1),
                 (s) => setState(() => config.titlePadding = double.parse(s)),
               ),
             ),
           ),
           ListTile(
-            title: Text("段间距"),
+            title: Text("Paragraph spacing".i18n),
             subtitle: Text(config.paragraphPadding.toStringAsFixed(1)),
             onTap: () => showDialog(
               context: context,
               builder: (context) => showTextDialog(
                 context,
-                '段间距',
+                "Paragraph spacing".i18n,
                 config.paragraphPadding.toStringAsFixed(1),
                 (s) => setState(() => config.paragraphPadding = double.parse(s)),
               ),
             ),
           ),
           ListTile(
-            title: Text("分栏间距"),
+            title: Text("Column spacing".i18n),
             subtitle: Text(config.columnPadding.toStringAsFixed(1)),
             onTap: () => showDialog(
               context: context,
               builder: (context) => showTextDialog(
                 context,
-                '分栏间距',
+                "Column spacing".i18n,
                 config.columnPadding.toStringAsFixed(1),
                 (s) => setState(() => config.columnPadding = double.parse(s)),
               ),

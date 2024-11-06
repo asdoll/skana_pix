@@ -33,7 +33,12 @@ class _NovelCardState extends State<NovelCard> {
         padding: const EdgeInsets.symmetric(horizontal: 4.0),
         child: InkWell(
           onTap: () {
-            buildShowModalBottomSheet(context);
+            if (settings.novelDirectEntry) {
+              Navigator.of(context, rootNavigator: true).push(MaterialPageRoute(
+                  builder: (BuildContext context) => NovelViewerPage(novel)));
+            } else {
+              buildShowModalBottomSheet(context);
+            }
           },
           child: Card(
             child: Row(
@@ -256,9 +261,17 @@ class _NovelCardState extends State<NovelCard> {
                       builder: (BuildContext context) =>
                           NovelSeriesPage(widget.novel.seriesId!)));
                 },
-                child: Text(
-                  "Series:${widget.novel.seriesTitle}",
-                  style: Theme.of(context).textTheme.titleSmall,
+                child: Container(
+                  height: 22,
+                  padding: const EdgeInsets.symmetric(horizontal: 14),
+                  decoration: BoxDecoration(
+                    color: Theme.of(context).colorScheme.secondaryContainer,
+                    borderRadius: const BorderRadius.all(Radius.circular(12.5)),
+                  ),
+                  child: Text(
+                    "Series:${widget.novel.seriesTitle}",
+                    style: Theme.of(context).textTheme.titleSmall,
+                  ),
                 ),
               ),
             ),

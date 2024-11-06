@@ -46,6 +46,7 @@ class UserSetting {
   List<String> historyNovelTag = [];
   List<String> historyUserTag = [];
   int seedColor = 0xFF536DFE;
+  bool novelDirectEntry = false;
 
   Future<void> saveDefaults() async {
     await prefs.setString('darkMode', darkMode);
@@ -80,6 +81,7 @@ class UserSetting {
     await prefs.setStringList('historyUserTag', historyUserTag);
     await prefs.setStringList('bookmarkedNovelTags', bookmarkedNovelTags);
     await prefs.setInt('seedColor', seedColor);
+    await prefs.setBool('novelDirectEntry', novelDirectEntry);
   }
 
   Future<void> init() async {
@@ -122,6 +124,7 @@ class UserSetting {
     historyUserTag = prefs.getStringList('historyUserTag') ?? [];
     bookmarkedNovelTags = prefs.getStringList('bookmarkedNovelTags') ?? [];
     seedColor = prefs.getInt('seedColor') ?? 0xFF536DFE;
+    novelDirectEntry = prefs.getBool('novelDirectEntry') ?? false;
   }
 
   void setDefaults() {
@@ -157,6 +160,7 @@ class UserSetting {
     historyUserTag = [];
     bookmarkedNovelTags = [];
     seedColor = 0xFF536DFE;
+    novelDirectEntry = false;
     saveDefaults();
   }
 
@@ -290,6 +294,10 @@ class UserSetting {
         seedColor = value;
         prefs.setInt('seedColor', seedColor);
         break;
+      case 'novelDirectEntry':
+        novelDirectEntry = value;
+        prefs.setBool('novelDirectEntry', novelDirectEntry);
+        break;
     }
   }
 
@@ -331,6 +339,7 @@ class UserSetting {
       'historyUserTag': historyUserTag,
       'bookmarkedNovelTags': bookmarkedNovelTags,
       'seedColor': seedColor,
+      'novelDirectEntry': novelDirectEntry,
     };
   }
 
@@ -367,6 +376,7 @@ class UserSetting {
     historyUserTag = List<String>.from(map['historyUserTag']);
     bookmarkedNovelTags = List<String>.from(map['bookmarkedNovelTags']);
     seedColor = map['seedColor'] ?? 0xFF536DFE;
+    novelDirectEntry = map['novelDirectEntry'] ?? false;
     saveDefaults();
     BotToast.showText(text: "Imported".i18n);
   }
