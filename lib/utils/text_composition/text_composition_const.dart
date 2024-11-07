@@ -138,7 +138,7 @@ Widget configSettingBuilder(
   void Function(String fontFamily, void Function(String fontFamily) onChange)
       onFontFamily,
 ) {
-  final style = TextStyle(color: Theme.of(context).primaryColor);
+  final style = TextStyle(color: Theme.of(context).hintColor);
 
   AlertDialog showTextDialog(
     BuildContext context,
@@ -321,7 +321,7 @@ Widget configSettingBuilder(
             ),
           ),
           Divider(),
-          ListTile(title: Text("Text and layout".i18n, style: style)),
+          ListTile(title: Text("Text and layout".i18n)),
           Container(
             decoration: BoxDecoration(border: Border.all()),
             margin: EdgeInsets.symmetric(horizontal: 18),
@@ -445,7 +445,7 @@ Widget configSettingBuilder(
           //       (background) => setState(() => config.background = background)),
           // ),
           Divider(),
-          ListTile(title: Text("Margin".i18n, style: style)),
+          ListTile(title: Text("Margin".i18n)),
           Divider(),
           ListTile(
             title: Text("Upper margin".i18n),

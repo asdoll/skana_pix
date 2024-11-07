@@ -29,40 +29,60 @@ Future<void> main() async {
       sqfliteFfiInit();
       databaseFactory = databaseFactoryFfi;
     }
-    runApp(const MyApp());
+    runApp(MyApp());
   }, (e, s) {
     loggerError("Unhandled Exception: $e\n$s");
   });
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+  MyApp({super.key});
+  ThemeStuff appValueNotifier = ThemeStuff.instance;
+//   @override
+//   Widget build(BuildContext) {
+//     return AppWarp();
+//   }
+// }
 
-  // This widget is the root of your application.
+// class AppWarp extends StatefulWidget{
+//   const AppWarp({super.key});
+
+//   @override
+//   _AppWarpState createState() => _AppWarpState();
+// }
+
+// class _AppWarpState extends State<AppWarp> {
+
+//   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Skana_pix',
-      builder: BotToastInit(),
-      navigatorObservers: [BotToastNavigatorObserver()],
-      theme: DynamicData.themeData,
-      darkTheme: DynamicData.darkTheme,
-      themeMode: settings.themeMode,
-      home: const HomePage(),
-      navigatorKey: DynamicData.rootNavigatorKey,
-      localizationsDelegates: const [
-        GlobalMaterialLocalizations.delegate,
-        GlobalWidgetsLocalizations.delegate,
-        GlobalCupertinoLocalizations.delegate,
-        GlobalMaterialLocalizations.delegate,
-        GlobalWidgetsLocalizations.delegate,
-        GlobalCupertinoLocalizations.delegate,
-      ],
-      supportedLocales: [
-        const Locale('en', 'US'),
-        const Locale('zh', 'CN'),
-        const Locale('zh', 'TW'),
-      ],
+    return ValueListenableBuilder(
+      valueListenable: appValueNotifier.theme,
+      builder: (context, value, child) {
+        return MaterialApp(
+          title: 'Skana_pix',
+          builder: BotToastInit(),
+          navigatorObservers: [BotToastNavigatorObserver()],
+          theme: value.themeData,
+          darkTheme: value.darkTheme,
+          themeMode: value.themeMode,
+          home: const HomePage(),
+          navigatorKey: DynamicData.rootNavigatorKey,
+          localizationsDelegates: const [
+            GlobalMaterialLocalizations.delegate,
+            GlobalWidgetsLocalizations.delegate,
+            GlobalCupertinoLocalizations.delegate,
+            GlobalMaterialLocalizations.delegate,
+            GlobalWidgetsLocalizations.delegate,
+            GlobalCupertinoLocalizations.delegate,
+          ],
+          supportedLocales: [
+            const Locale('en', 'US'),
+            const Locale('zh', 'CN'),
+            const Locale('zh', 'TW'),
+          ],
+        );
+      },
     );
   }
 }

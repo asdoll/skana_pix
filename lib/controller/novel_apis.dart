@@ -132,13 +132,13 @@ extension NovelExt on ApiClient {
     }
   }
 
-  Future<Res<List<Novel>>> getNovelSeries(String id, [String? nextUrl]) async {
+  Future<Res<NovelSeriesResponse>> getNovelSeries(String id, [String? nextUrl]) async {
     var res = await apiGet(nextUrl ?? "/v2/novel/series?series_id=$id");
     if (res.error) {
       return Res.fromErrorRes(res);
     }
     return Res(
-        (res.data["novels"] as List).map((e) => Novel.fromJson(e)).toList(),
+        NovelSeriesResponse.fromJson(res.data),
         subData: res.data["next_url"]);
   }
 

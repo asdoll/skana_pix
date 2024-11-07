@@ -504,3 +504,92 @@ class SimpleNovel {
         'coverUrl': coverUrl,
       };
 }
+
+class NovelSeriesDetail {
+  int id;
+  String title;
+  String? caption;
+  bool isOriginal;
+  bool isConcluded;
+  int contentCount;
+  int totalCharacterCount;
+  Author user;
+  String displayText;
+  int novelAiType;
+  bool? watchlistAdded;
+
+  NovelSeriesDetail(
+      this.id,
+      this.title,
+      this.caption,
+      this.isOriginal,
+      this.isConcluded,
+      this.contentCount,
+      this.totalCharacterCount,
+      this.user,
+      this.displayText,
+      this.novelAiType,
+      this.watchlistAdded);
+
+  factory NovelSeriesDetail.fromJson(Map<String, dynamic> json) =>
+      NovelSeriesDetail(
+        (json['id'] as num).toInt(),
+        json['title'] as String,
+        json['caption'] as String?,
+        json['is_original'] as bool,
+        json['is_concluded'] as bool,
+        (json['content_count'] as num).toInt(),
+        (json['total_character_count'] as num).toInt(),
+        Author.fromJson(json['user'] as Map<String, dynamic>),
+        json['display_text'] as String,
+        (json['novel_ai_type'] as num).toInt(),
+        json['watchlist_added'] as bool?,
+      );
+  Map<String, dynamic> toJson() => <String, dynamic>{
+        'id': id,
+        'title': title,
+        'caption': caption,
+        'is_original': isOriginal,
+        'is_concluded': isConcluded,
+        'content_count': contentCount,
+        'total_character_count': totalCharacterCount,
+        'user': user.toJson(),
+        'display_text': displayText,
+        'novel_ai_type': novelAiType,
+        'watchlist_added': watchlistAdded,
+      };
+}
+
+class NovelSeriesResponse {
+  NovelSeriesDetail novelSeriesDetail;
+  Novel first;
+  Novel? last;
+  List<Novel> novels;
+  String? nextUrl;
+
+  NovelSeriesResponse(
+      this.novelSeriesDetail, this.first, this.last, this.novels, this.nextUrl);
+
+  factory NovelSeriesResponse.fromJson(Map<String, dynamic> json) =>
+      NovelSeriesResponse(
+        NovelSeriesDetail.fromJson(
+            json['novel_series_detail'] as Map<String, dynamic>),
+        Novel.fromJson(
+            json['novel_series_first_novel'] as Map<String, dynamic>),
+        json['novel_series_latest_novel'] == null
+            ? null
+            : Novel.fromJson(
+                json['novel_series_latest_novel'] as Map<String, dynamic>),
+        (json['novels'] as List<dynamic>)
+            .map((e) => Novel.fromJson(e as Map<String, dynamic>))
+            .toList(),
+        json['next_url'] as String?,
+      );
+  Map<String, dynamic> toJson() => <String, dynamic>{
+        'novel_series_detail': novelSeriesDetail,
+        'novel_series_first_novel': first,
+        'novel_series_latest_novel': last,
+        'novels': novels,
+        'next_url': nextUrl,
+      };
+}

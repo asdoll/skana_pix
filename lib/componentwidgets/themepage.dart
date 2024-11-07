@@ -223,7 +223,9 @@ class _ThemePageState extends State<ThemePage> with TickerProviderStateMixin {
                 child: Card(
                     child: SwitchListTile(
                   value: settings.isAMOLED,
-                  onChanged: (v) => settings.set("isAMOLED",v),
+                  onChanged: (v) {setState(() {
+                    settings.set("isAMOLED",v);
+                  });},
                   title: const Text("AMOLED"),
                 )),
               ),
@@ -232,7 +234,9 @@ class _ThemePageState extends State<ThemePage> with TickerProviderStateMixin {
                     child: SwitchListTile(
                   value: settings.useDynamicColor,
                   onChanged: (v) async {
-                    settings.set("useDynamicColor",v);
+                    setState(() {
+                      settings.set("useDynamicColor",v);
+                    });
                   },
                   title: Text("Dynamic Color".i18n),
                 )),
@@ -269,7 +273,9 @@ class _ThemePageState extends State<ThemePage> with TickerProviderStateMixin {
         builder: (context) =>
             ColorPickPage(initialColor: Color(settings.seedColor))));
     if (result != null) {
-      settings.set("seedColor",result.value);
+      setState(() {
+        settings.set("seedColor", result.value);
+      });
     }
   }
 }

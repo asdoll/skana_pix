@@ -344,7 +344,15 @@
         "Paragraph spacing":"段间距",
         "Column spacing":"分栏间距",
         "NoMore":"没有了",
-        "Enter novel page directly":"直接进入小说页"
+        "Enter novel page directly":"直接进入小说页",
+        "View the latest":"查看最新",
+        "No download link":"没有下载链接",
+        "Check updates":"检查更新",
+        "Current Version":"当前版本",
+        "Latest Version":"最新版本",
+        "Release Date":"发布日期",
+        "Release Notes":"更新日志"
+
     },
     "zh_TW": {
         "Search": "搜索",
@@ -691,6 +699,13 @@
         "Paragraph spacing": "段間距",
         "Column spacing": "分欄間距",
         "NoMore": "沒有了",
-        "Enter novel page directly": "直接進入小說頁"
+        "Enter novel page directly": "直接進入小說頁",
+        "View the latest": "查看最新",
+        "No download link": "沒有下載鏈接",
+        "Check updates": "檢查更新",
+        "Current Version": "當前版本",
+        "Latest Version": "最新版本",
+        "Release Date": "發布日期",
+        "Release Notes": "更新日誌"
     }
 }

@@ -5,6 +5,7 @@ import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:skana_pix/componentwidgets/blocklistpage.dart';
 import 'package:skana_pix/componentwidgets/followlist.dart';
+import 'package:skana_pix/componentwidgets/newversion.dart';
 import 'package:skana_pix/componentwidgets/prefsettings.dart';
 import 'package:skana_pix/model/worktypes.dart';
 import 'package:skana_pix/pixiv_dart_api.dart';
@@ -15,11 +16,14 @@ import 'package:url_launcher/url_launcher_string.dart';
 
 import '../componentwidgets/about.dart';
 import '../componentwidgets/avatar.dart';
+import '../componentwidgets/boardpage.dart';
 import '../componentwidgets/booktagpage.dart';
 import '../componentwidgets/dataexport.dart';
 import '../componentwidgets/historypage.dart';
 import '../componentwidgets/mybookmarks.dart';
 import '../componentwidgets/themepage.dart';
+import '../controller/updater.dart';
+import '../model/boardinfo.dart';
 import '../utils/leaders.dart';
 import 'loginpage.dart';
 
@@ -34,38 +38,40 @@ class _SettingPageState extends State<SettingPage> {
   @override
   void initState() {
     super.initState();
-    initMethod();
-    //fetchBoard();
+    if(settings.checkUpdate) {
+      initMethod();
+    }
+    fetchBoard();
   }
 
   bool hasNewVersion = false;
 
   initMethod() async {
     if (Constants.isGooglePlay || DynamicData.isIOS) return;
-    // if (Updater.result != Result.timeout) {
-    //   bool hasNew = Updater.result == Result.yes;
-    //   if (mounted)
-    //     setState(() {
-    //       hasNewVersion = hasNew;
-    //     });
-    //   return;
-    // }
-    // Result result = await Updater.check();
-    // switch (result) {
-    //   case Result.yes:
-    //     if (mounted) {
-    //       setState(() {
-    //         hasNewVersion = true;
-    //       });
-    //     }
-    //     break;
-    //   default:
-    //     if (mounted) {
-    //       setState(() {
-    //         hasNewVersion = false;
-    //       });
-    //     }
-    // }
+    if (Updater.result != Result.timeout) {
+      bool hasNew = Updater.result == Result.yes;
+      if (mounted)
+        setState(() {
+          hasNewVersion = hasNew;
+        });
+      return;
+    }
+    Result result = await Updater.check();
+    switch (result) {
+      case Result.yes:
+        if (mounted) {
+          setState(() {
+            hasNewVersion = true;
+          });
+        }
+        break;
+      default:
+        if (mounted) {
+          setState(() {
+            hasNewVersion = false;
+          });
+        }
+    }
   }
 
   @override
@@ -89,133 +95,142 @@ class _SettingPageState extends State<SettingPage> {
                         Icons.palette,
                       ),
                       onPressed: () {
-                        Navigator.of(context).push(MaterialPageRoute(
-                            builder: (context) => ThemePage()));
+                        Leader.push(context, ThemePage(), root: true);
                       },
                     ),
                   ],
                 ),
                 Observer(
-                  warnWhenNoObservables: false,
-                  builder: (context) {
-                  if (!ConnectManager().notLoggedIn) {
-                    return SingleChildScrollView(
-                      child: Column(
-                        children: <Widget>[
-                          Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: InkWell(
-                              onTap: () {
-                                // Navigator.of(context, rootNavigator: true)
-                                //     .push(MaterialPageRoute(builder: (_) {
-                                //   return AccountSelectPage();
-                                // }));
-                              },
-                              child: Row(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  PainterAvatar(
-                                    url: ConnectManager()
-                                        .apiClient
-                                        .account
-                                        .user
-                                        .profileImg,
-                                    id: int.parse(
-                                      ConnectManager().apiClient.userid,
-                                    ),
-                                    isMe: true,
-                                  ),
-                                  Padding(
-                                    padding: const EdgeInsets.symmetric(
-                                        horizontal: 8.0),
-                                    child: Column(
-                                      mainAxisSize: MainAxisSize.max,
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.start,
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        Padding(
-                                          padding: const EdgeInsets.symmetric(
-                                              vertical: 8.0),
-                                          child: Text(
+                    warnWhenNoObservables: false,
+                    builder: (context) {
+                      if (!ConnectManager().notLoggedIn) {
+                        return SingleChildScrollView(
+                          child: Column(
+                            children: <Widget>[
+                              Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: InkWell(
+                                  onTap: () {
+                                    // Navigator.of(context, rootNavigator: true)
+                                    //     .push(MaterialPageRoute(builder: (_) {
+                                    //   return AccountSelectPage();
+                                    // }));
+                                  },
+                                  child: Row(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      PainterAvatar(
+                                        url: ConnectManager()
+                                            .apiClient
+                                            .account
+                                            .user
+                                            .profileImg,
+                                        id: int.parse(
+                                          ConnectManager().apiClient.userid,
+                                        ),
+                                        isMe: true,
+                                      ),
+                                      Padding(
+                                        padding: const EdgeInsets.symmetric(
+                                            horizontal: 8.0),
+                                        child: Column(
+                                          mainAxisSize: MainAxisSize.max,
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.start,
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            Padding(
+                                              padding:
+                                                  const EdgeInsets.symmetric(
+                                                      vertical: 8.0),
+                                              child: Text(
+                                                  ConnectManager()
+                                                      .apiClient
+                                                      .account
+                                                      .user
+                                                      .name,
+                                                  style: Theme.of(context)
+                                                      .textTheme
+                                                      .titleMedium),
+                                            ),
+                                            Text(
                                               ConnectManager()
                                                   .apiClient
                                                   .account
                                                   .user
-                                                  .name,
+                                                  .email,
                                               style: Theme.of(context)
                                                   .textTheme
-                                                  .titleMedium),
+                                                  .bodySmall,
+                                            )
+                                          ],
                                         ),
-                                        Text(
-                                          ConnectManager()
-                                              .apiClient
-                                              .account
-                                              .user
-                                              .email,
-                                          style: Theme.of(context)
-                                              .textTheme
-                                              .bodySmall,
-                                        )
-                                      ],
-                                    ),
-                                  )
-                                ],
+                                      )
+                                    ],
+                                  ),
+                                ),
                               ),
-                            ),
+                              ListTile(
+                                leading: Icon(Icons.favorite_rounded),
+                                title: Text("My Bookmarks".i18n),
+                                onTap: () => Leader.pushWithScaffold(
+                                    context,
+                                    MyBookmarksPage(
+                                      portal: 'mybookmark',
+                                      type: settings.awPrefer == "novel"
+                                          ? ArtworkType.NOVEL
+                                          : ArtworkType.ILLUST,
+                                    ),
+                                    root: true),
+                              ),
+                              ListTile(
+                                leading: Icon(Icons.bookmark),
+                                title: Text("Favorite Tags".i18n),
+                                onTap: () => Leader.pushWithScaffold(
+                                    context, BookTagPage(),
+                                    root: true),
+                              ),
+                              ListTile(
+                                leading: Icon(Icons.star_rate_rounded),
+                                title: Text("Following".i18n),
+                                onTap: () {
+                                  Navigator.of(context, rootNavigator: true)
+                                      .push(MaterialPageRoute(
+                                          builder: (BuildContext context) =>
+                                              FollowList(
+                                                id: int.parse(ConnectManager()
+                                                    .apiClient
+                                                    .userid),
+                                                setAppBar: true,
+                                                isMe: true,
+                                              )));
+                                },
+                              ),
+                              ListTile(
+                                leading: Icon(Icons.people_rounded),
+                                title: Text("My Pixiv".i18n),
+                                onTap: () {
+                                  Navigator.of(context, rootNavigator: true)
+                                      .push(MaterialPageRoute(
+                                          builder: (BuildContext context) =>
+                                              FollowList(
+                                                id: int.parse(ConnectManager()
+                                                    .apiClient
+                                                    .userid),
+                                                setAppBar: true,
+                                                isMe: true,
+                                                isMyPixiv: true,
+                                              )));
+                                },
+                              ),
+                            ],
                           ),
-                          ListTile(
-                            leading: Icon(Icons.favorite_rounded),
-                            title: Text("My Bookmarks".i18n),
-                            onTap: () => Leader.pushWithScaffold(
-                                context,
-                                MyBookmarksPage(
-                                  portal: 'mybookmark',
-                                  type: settings.awPrefer == "novel"
-                                      ? ArtworkType.NOVEL
-                                      : ArtworkType.ILLUST,
-                                )),
-                          ),
-                          ListTile(
-                            leading: Icon(Icons.bookmark),
-                            title: Text("Favorite Tags".i18n),
-                            onTap: () =>
-                                Leader.pushWithScaffold(context, BookTagPage()),
-                          ),
-                          ListTile(
-                            leading: Icon(Icons.star_rate_rounded),
-                            title: Text("Following".i18n),
-                            onTap: () {
-                              Navigator.of(context).push(MaterialPageRoute(
-                                  builder: (BuildContext context) => FollowList(
-                                        id: int.parse(
-                                            ConnectManager().apiClient.userid),
-                                        setAppBar: true,
-                                        isMe: true,
-                                      )));
-                            },
-                          ),
-                          ListTile(
-                            leading: Icon(Icons.people_rounded),
-                            title: Text("My Pixiv".i18n),
-                            onTap: () {
-                              Navigator.of(context).push(MaterialPageRoute(
-                                  builder: (BuildContext context) => FollowList(
-                                        id: int.parse(
-                                            ConnectManager().apiClient.userid),
-                                        setAppBar: true,
-                                        isMe: true,
-                                        isMyPixiv: true,
-                                      )));
-                            },
-                          ),
-                        ],
-                      ),
-                    );
-                  }
-                  return Container();
-                }),
+                        );
+                      }
+                      return Container();
+                    }),
                 Divider(),
                 Column(
                   children: <Widget>[
@@ -227,17 +242,14 @@ class _SettingPageState extends State<SettingPage> {
                     ListTile(
                       leading: Icon(Icons.history),
                       title: Text("History".i18n),
-                      onTap: () {
-                        Navigator.of(context).push(
-                            MaterialPageRoute(builder: (BuildContext context) {
-                          return HistoryPage();
-                        }));
-                      },
+                      onTap: () =>
+                          Leader.push(context, HistoryPage(), root: true),
                     ),
                     ListTile(
                       leading: Icon(Icons.block),
                       title: Text("Block List".i18n),
-                      onTap: () => Leader.push(context, BlockListPage()),
+                      onTap: () =>
+                          Leader.push(context, BlockListPage(), root: true),
                     ),
                     if (!ConnectManager().notLoggedIn)
                       ListTile(
@@ -251,15 +263,12 @@ class _SettingPageState extends State<SettingPage> {
                     ListTile(
                       leading: Icon(Icons.settings),
                       title: Text("Preference Settings".i18n),
-                      onTap: () {
-                        Navigator.of(context).push(
-                            MaterialPageRoute(builder: (BuildContext context) {
-                          return PreferenceSettings();
-                        }));
-                      },
+                      onTap: () => Leader.push(context, PreferenceSettings(),
+                          root: true),
                     ),
                     ListTile(
-                      onTap: () => Leader.push(context, DataExport()),
+                      onTap: () =>
+                          Leader.push(context, DataExport(), root: true),
                       title: Text("App Data".i18n),
                       leading: Icon(Icons.folder_open_rounded),
                     ),
@@ -272,40 +281,51 @@ class _SettingPageState extends State<SettingPage> {
                       leading: Icon(Icons.message),
                       title: Text("About".i18n),
                       onTap: () => Leader.push(
-                          context, AboutPage(newVersion: hasNewVersion)),
-                      // trailing: Visibility(
-                      //   child: NewVersionChip(),
-                      //   visible: hasNewVersion,
-                      // ),
+                          context, AboutPage(newVersion: hasNewVersion),
+                          root: true),
                     ),
-                    // if (_needBoardSection)
-                    //   ListTile(
-                    //     leading: Icon(Icons.article),
-                    //     title: Text(I18n.of(context).bulletin_board),
-                    //     onTap: () => Leader.push(
-                    //         context,
-                    //         BoardPage(
-                    //           boardList: _boardList,
-                    //         )),
-                    //   ),
+                    if (_needBoardSection)
+                      ListTile(
+                        leading: Icon(Icons.article),
+                        title: Text("Bulletin Board".i18n),
+                        onTap: () => Leader.push(
+                            context,
+                            BoardPage(
+                              boardList: _boardList,
+                            ),root: true),
+                      ),
+                    ListTile(
+                      leading: Icon(Icons.update),
+                      title: Text("Check updates".i18n),
+                      onTap: () => Leader.push(
+                          context,
+                          NewVersionPage(
+                            newVersion: hasNewVersion,
+                          ),root: true),
+                      trailing: Visibility(
+                        child: NewVersionChip(),
+                        visible: hasNewVersion,
+                      ),
+                    ),
                     Observer(
-                      warnWhenNoObservables: false,
-                      builder: (context) {
-                      if (!ConnectManager().notLoggedIn) {
-                        return ListTile(
-                          leading: Icon(Icons.arrow_back),
-                          title: Text("Logout".i18n),
-                          onTap: () => _showLogoutDialog(context),
-                        );
-                      } else {
-                        return ListTile(
-                          leading: Icon(Icons.arrow_back),
-                          title: Text("Login".i18n),
-                          onTap: () => Leader.push(
-                              context, LoginPage(() => setState(() {}))),
-                        );
-                      }
-                    })
+                        warnWhenNoObservables: false,
+                        builder: (context) {
+                          if (!ConnectManager().notLoggedIn) {
+                            return ListTile(
+                              leading: Icon(Icons.arrow_back),
+                              title: Text("Logout".i18n),
+                              onTap: () => _showLogoutDialog(context),
+                            );
+                          } else {
+                            return ListTile(
+                              leading: Icon(Icons.arrow_back),
+                              title: Text("Login".i18n),
+                              onTap: () => Leader.push(
+                                  context, LoginPage(() => setState(() {})),
+                                  root: true),
+                            );
+                          }
+                        })
                   ],
                 )
               ],
@@ -436,24 +456,40 @@ class _SettingPageState extends State<SettingPage> {
   //   await glanceIllustPersistProvider.close();
   // }
 
-  // bool _needBoardSection = false;
-  // List<BoardInfo> _boardList = [];
+  bool _needBoardSection = false;
+  List<BoardInfo> _boardList = [];
 
-  // fetchBoard() async {
-  //   try {
-  //     if (BoardInfo.boardDataLoaded) {
-  //       setState(() {
-  //         _boardList = BoardInfo.boardList;
-  //         _needBoardSection = _boardList.isNotEmpty;
-  //       });
-  //       return;
-  //     }
-  //     final list = await BoardInfo.load();
-  //     setState(() {
-  //       BoardInfo.boardDataLoaded = true;
-  //       _boardList = list;
-  //       _needBoardSection = _boardList.isNotEmpty;
-  //     });
-  //   } catch (e) {}
-  // }
+  fetchBoard() async {
+    try {
+      if (BoardInfo.boardDataLoaded) {
+        setState(() {
+          _boardList = BoardInfo.boardList;
+          _needBoardSection = _boardList.isNotEmpty;
+        });
+        return;
+      }
+      final list = await BoardInfo.load();
+      setState(() {
+        BoardInfo.boardDataLoaded = true;
+        _boardList = list;
+        _needBoardSection = _boardList.isNotEmpty;
+      });
+    } catch (e) {}
+  }
+}
+
+class NewVersionChip extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      child: Text(
+        "New",
+        style: TextStyle(color: Colors.white, fontSize: 12.0),
+      ),
+      padding: EdgeInsets.symmetric(horizontal: 4.0, vertical: 2),
+      decoration: BoxDecoration(
+          color: Colors.red,
+          borderRadius: BorderRadius.all(Radius.circular(24.0))),
+    );
+  }
 }

@@ -1,5 +1,9 @@
+import 'package:bot_toast/bot_toast.dart';
 import 'package:flutter/services.dart';
+import 'package:skana_pix/controller/updater.dart';
 import 'package:skana_pix/pixiv_dart_api.dart';
+import 'package:skana_pix/utils/translate.dart';
+import 'package:url_launcher/url_launcher_string.dart';
 import 'defaults.dart';
 import 'package:persistent_bottom_nav_bar/persistent_bottom_nav_bar.dart';
 
@@ -31,6 +35,12 @@ class _HomePageState extends State<HomePage> {
   final PersistentTabController _controller =
       PersistentTabController(initialIndex: 0);
   final NavBarStyle _navBarStyle = NavBarStyle.style6;
+
+  @override
+  void initState() {
+    super.initState();
+    newVersionCheck();
+  }
 
   List<Widget> _buildScreens() {
     return [MainScreen(), FeedPage(), SearchPage(), SettingPage()];
@@ -153,5 +163,32 @@ class _HomePageState extends State<HomePage> {
         ),
       ),
     );
+  }
+
+  void newVersionCheck() async {
+    final newVersion = await Updater.check();
+    if (newVersion == Result.yes) {
+      BotToast.showWidget(toastBuilder: (_) {
+        return AlertDialog(
+          title: Text("New version available".i18n),
+          content: Text(Updater.updateDescription ?? ""),
+          actions: [
+            TextButton(
+              onPressed: () {
+                BotToast.cleanAll();
+              },
+              child: Text("Cancel".i18n),
+            ),
+            TextButton(
+              onPressed: () {
+                BotToast.cleanAll();
+                launchUrlString(Updater.updateUrl!);
+              },
+              child: Text("Update".i18n),
+            ),
+          ],
+        );
+      });
+    }
   }
 }

@@ -33,7 +33,7 @@ class Leader {
     if (link.path.contains("novel") && link.path.contains("series")) {
       final id = int.tryParse(link.pathSegments.last);
       if (id != null) {
-        Leader.push(context, NovelSeriesPage(id));
+        Leader.push(context, NovelSeriesPage(id), root: true);
         return true;
       }
     }
@@ -77,7 +77,7 @@ class Leader {
           context,
           SoupPage(
               url: link.toString().replaceAll("pixez://", "https://"),
-              spotlight: null));
+              spotlight: null),root: true);
       return true;
     }
     if (link.scheme == "pixiv") {
@@ -199,7 +199,7 @@ class Leader {
       if (link.queryParameters['illust_id'] != null) {
         try {
           var id = link.queryParameters['illust_id'];
-          Leader.push(context, IllustPageLite(id.toString()));
+          Leader.push(context, IllustPageLite(id.toString()), root: true);
           return true;
         } catch (e) {}
       }
@@ -228,7 +228,8 @@ class Leader {
         if (i == "i") {
           try {
             int id = int.parse(link.pathSegments[link.pathSegments.length - 1]);
-            Leader.push(context, IllustPageLite(id.toString()));
+            Leader.push(context, IllustPageLite(id.toString()),
+                root: true);
             return true;
           } catch (e) {}
         } else if (i == "u") {
@@ -261,7 +262,14 @@ class Leader {
   }
 
   static Future<dynamic> pushWithScaffold(context, Widget widget,
-      {Widget? icon, Widget? title}) {
+      {Widget? icon, Widget? title, bool root =false}) {
+    if(root) {
+      return Navigator.of(context, rootNavigator: true).push(MaterialPageRoute(
+        builder: (context) => Scaffold(
+          body: widget,
+        ),
+      ));
+    }
     return Navigator.of(context).push(MaterialPageRoute(
         builder: (context) => Scaffold(
               body: widget,
@@ -274,7 +282,15 @@ class Leader {
     Widget? icon,
     Widget? title,
     bool forceSkipWrap = false,
+    bool root = false,
   }) {
+    if(root) {
+      return Navigator.of(context, rootNavigator: true).push(MaterialPageRoute(
+        builder: (context) => Scaffold(
+          body: widget,
+        ),
+      ));
+    }
     return Navigator.of(context).push(MaterialPageRoute(
         builder: (context) => Scaffold(
               body: widget,

@@ -7,10 +7,17 @@ import 'package:flutter/scheduler.dart';
 
 import '../controller/settings.dart';
 
+
+class Constants{
+  static const String appName = 'SkanaPix';
+  static const String appVersion = '1.0.0';
+  static const isGooglePlay = bool.fromEnvironment("IS_GOOGLEPLAY", defaultValue: false);
+}
+
 class DynamicData {
   static var activeNavColor = Color(settings.seedColor);
   static var inActiveNavColor = CupertinoColors.systemGrey;
-  static var themeData = ThemeData(
+  static ThemeData get themeData => ThemeData(
     brightness: Brightness.light,
     colorScheme: ColorScheme.fromSeed(
       seedColor: Color(settings.seedColor),
@@ -18,7 +25,16 @@ class DynamicData {
     ),
     useMaterial3: true,
   );
-  static var darkTheme = ThemeData(
+  static ThemeData get darkTheme => settings.isAMOLED? 
+  ThemeData(
+    brightness: Brightness.dark,
+    colorScheme: ColorScheme.fromSeed(
+      seedColor: Color(settings.seedColor),
+      brightness: Brightness.dark,
+    ),
+    useMaterial3: true,
+  ).copyWith(scaffoldBackgroundColor: Colors.black)
+  :ThemeData(
     brightness: Brightness.dark,
     colorScheme: ColorScheme.fromSeed(
       seedColor: Color(settings.seedColor),
@@ -26,6 +42,9 @@ class DynamicData {
     ),
     useMaterial3: true,
   );
+
+  static ThemeWarp get themeWarp => ThemeWarp(
+      themeData: themeData, darkTheme: darkTheme, themeMode: settings.themeMode);
 
   static ThemeData get themes =>
       (SchedulerBinding.instance.platformDispatcher.platformBrightness ==
@@ -61,8 +80,30 @@ class DynamicData {
   static final settingScrollController = ScrollController();
 }
 
-class Constants{
-  static const String appName = 'SkanaPix';
-  static const String appVersion = '1.0.0';
-  static const isGooglePlay = bool.fromEnvironment("IS_GOOGLEPLAY", defaultValue: false);
+class ThemeWarp{
+  ThemeData themeData;
+  ThemeData darkTheme;
+  ThemeMode themeMode;
+  ThemeWarp({required this.themeData, required this.darkTheme, required this.themeMode});
+}
+
+class ThemeStuff {
+  static ThemeStuff? _instance;
+
+  static ThemeStuff get instance {
+    _instance ??= ThemeStuff._init();
+
+    return _instance!;
+  }
+
+  ThemeStuff._init() {
+    theme.value = DynamicData.themeWarp;
+  }
+
+  ValueNotifier<ThemeWarp> theme = ValueNotifier<ThemeWarp>(DynamicData.themeWarp);
+
+  void updateValue(ThemeWarp themes) {
+    theme.value = themes;
+    print(theme.value);
+  }
 }

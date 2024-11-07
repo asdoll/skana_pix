@@ -8,6 +8,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:skana_pix/model/worktypes.dart';
 import 'package:skana_pix/pixiv_dart_api.dart';
 import 'package:skana_pix/utils/translate.dart';
+import 'package:skana_pix/view/defaults.dart';
 
 import '../utils/text_composition/text_composition.dart';
 
@@ -169,14 +170,17 @@ class UserSetting {
       case 'darkMode':
         darkMode = value;
         prefs.setString('darkMode', darkMode);
+        ThemeStuff.instance.updateValue(DynamicData.themeWarp);
         break;
       case 'isAMOLED':
         isAMOLED = value;
         prefs.setBool('isAMOLED', isAMOLED);
+        ThemeStuff.instance.updateValue(DynamicData.themeWarp);
         break;
       case 'useDynamicColor':
         useDynamicColor = value;
         prefs.setBool('useDynamicColor', useDynamicColor);
+        ThemeStuff.instance.updateValue(DynamicData.themeWarp);
         break;
       case 'language':
         language = value;
@@ -293,6 +297,7 @@ class UserSetting {
       case 'seedColor':
         seedColor = value;
         prefs.setInt('seedColor', seedColor);
+        ThemeStuff.instance.updateValue(DynamicData.themeWarp);
         break;
       case 'novelDirectEntry':
         novelDirectEntry = value;
