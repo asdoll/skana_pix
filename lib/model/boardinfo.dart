@@ -52,7 +52,7 @@ class BoardInfo {
   static Future<List<BoardInfo>> load() async {
     print(path());
     final request = await Dio().get(
-        'https://raw.githubusercontent.com/asdoll/skana_pix/refs/heads/master/.github/board/${path()}');
+        'https://raw.githubusercontent.com/asdoll/skana_pix/refs/heads/main/.github/board/${path()}');
     final list = (jsonDecode(request.data) as List)
         .map((e) => BoardInfo.fromJson(e))
         .toList();
