@@ -1,3 +1,4 @@
+import 'package:bot_toast/bot_toast.dart';
 import 'package:flutter/material.dart';
 import 'package:skana_pix/pixiv_dart_api.dart';
 import 'package:skana_pix/utils/translate.dart';
@@ -25,10 +26,11 @@ class _PreferenceSettingsState extends State<PreferenceSettings> {
             title: Text('Language'.i18n),
             trailing: DropdownButton<String>(
               value: settings.language,
-              onChanged: (String? newValue) {
+              onChanged: (String? newValue) async {
                 setState(() {
                   settings.set("language", newValue!);
                 });
+                BotToast.showText(text:"Please reboot to take effect".i18n);
               },
               items: [
                 DropdownMenuItem(
@@ -128,6 +130,16 @@ class _PreferenceSettingsState extends State<PreferenceSettings> {
             onChanged: (value) {
               setState(() {
                 settings.set("novelDirectEntry", value);
+              });
+            },
+          ),
+          Divider(),
+          SwitchListTile(
+            title: Text("Check updates on start".i18n),
+            value: settings.checkUpdate,
+            onChanged: (value) {
+              setState(() {
+                settings.set("checkUpdate", value);
               });
             },
           ),

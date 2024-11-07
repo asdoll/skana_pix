@@ -1,48 +1,48 @@
 import 'package:dio/dio.dart';
-import 'package:flutter/foundation.dart';
-import 'package:skana_pix/pixiv_dart_api.dart';
 import 'package:skana_pix/view/defaults.dart';
 
 enum Result { yes, no, timeout }
 
 class Updater {
   static Result result = Result.timeout;
-  static String? updateUrl;
-  static String? updateDescription;
-  static String? updateVersion;
-  static String? updateDate;
+  String updateUrl = "https://github.com/asdoll/skana_pix/releases";
+  String updateDescription = "";
+  String updateVersion = "";
+  String updateDate = "";
 
   static Future<Result> check() async {
     //if (Constants.isGooglePlay) return Result.no;
-    final result = await compute(checkUpdate, "");
+    final result = await checkUpdate("");
     Updater.result = result;
     return result;
   }
 }
 
+Updater updater = Updater();
+
 Future<Result> checkUpdate(String arg) async {
-  logger("check for update ============");
+  print("check for update ============");
   try {
     Response response =
         await Dio(BaseOptions(baseUrl: 'https://api.github.com'))
             .get('/repos/asdoll/skana_pix/releases/latest');
     if (response.statusCode != 200) return Result.no;
     String tagName = response.data['tag_name'];
-    Updater.updateVersion = tagName;
-    logger("tagName:$tagName ");
+    updater.updateVersion = tagName;
+    print("tagName:$tagName ");
     if (tagName != Constants.appVersion) {
       List<String> remoteList = tagName.split(".");
       List<String> localList = Constants.appVersion.split(".");
-      logger("r:$remoteList l$localList");
+      print("r:$remoteList l$localList");
       if (remoteList.length != localList.length) return Result.yes;
       for (var i = 0; i < remoteList.length; i++) {
         int r = int.tryParse(remoteList[i]) ?? 0;
         int l = int.tryParse(localList[i]) ?? 0;
-        logger("r:$r l$l");
+        print("r:$r l$l");
         if (r > l) {
-          Updater.updateDate = response.data['published_at'];
-          Updater.updateUrl = response.data['assets'][0]['browser_download_url'];
-          Updater.updateDescription = response.data['body'];
+          updater.updateDate = response.data['published_at'];
+          updater.updateUrl = response.data['assets'][0]['browser_download_url'];
+          updater.updateDescription = response.data['body'];
           return Result.yes;
         }
       }

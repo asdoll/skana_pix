@@ -7,10 +7,10 @@ import 'package:skana_pix/pixiv_dart_api.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 
-import 'utils/applinks.dart';
-import 'utils/translate.dart';
-import 'view/homepage.dart';
-import 'view/defaults.dart';
+import 'package:skana_pix/utils/applinks.dart';
+import 'package:skana_pix/utils/translate.dart';
+import 'package:skana_pix/view/homepage.dart';
+import 'package:skana_pix/view/defaults.dart';
 
 Future<void> main() async {
   runZonedGuarded(() async {

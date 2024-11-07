@@ -6,7 +6,7 @@ import 'package:skana_pix/utils/translate.dart';
 import 'package:skana_pix/view/defaults.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 
-import '../controller/updater.dart';
+import 'package:skana_pix/controller/updater.dart';
 
 class NewVersionPage extends StatefulWidget {
   final bool newVersion;
@@ -56,28 +56,28 @@ class _NewVersionPageState extends State<NewVersionPage> {
             if(hasNewVersion)
             ListTile(
               title: Text('Latest Version'.i18n),
-              subtitle: Text(Updater.updateVersion??""),
+              subtitle: Text(updater.updateVersion),
             ),
             if(hasNewVersion)
             ListTile(
               title: Text('Release Date'.i18n),
-              subtitle: Text(Updater.updateDate!=null? DateTime.parse(Updater.updateDate!).toShortTime() :""),
+              subtitle: Text(updater.updateDate.isNotEmpty? DateTime.parse(updater.updateDate).toShortTime() :""),
             ),
             if(hasNewVersion)
             ListTile(
               title: Text('Release Notes'.i18n),
-              subtitle: Text(Updater.updateDescription??""),
+              subtitle: Text(updater.updateDescription),
             ),
             if(hasNewVersion)
             ListTile(
               title: Text('Download'.i18n),
               onTap: () async {
-                if(Updater.updateUrl==null) 
+                if(updater.updateUrl.isEmpty) 
                 {
                   BotToast.showText(text: 'No download link'.i18n);
                   return;
                 }
-                await launchUrlString(Updater.updateUrl!);
+                await launchUrlString(updater.updateUrl);
               },
             ),
             ListTile(
@@ -92,14 +92,6 @@ class _NewVersionPageState extends State<NewVersionPage> {
 
   check() async {
     if (Constants.isGooglePlay || DynamicData.isIOS) return;
-    if (Updater.result != Result.timeout) {
-      bool hasNew = Updater.result == Result.yes;
-      if (mounted)
-        setState(() {
-          hasNewVersion = hasNew;
-        });
-      return;
-    }
     Result result = await Updater.check();
     switch (result) {
       case Result.yes:

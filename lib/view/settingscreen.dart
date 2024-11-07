@@ -22,7 +22,7 @@ import '../componentwidgets/dataexport.dart';
 import '../componentwidgets/historypage.dart';
 import '../componentwidgets/mybookmarks.dart';
 import '../componentwidgets/themepage.dart';
-import '../controller/updater.dart';
+import 'package:skana_pix/controller/updater.dart';
 import '../model/boardinfo.dart';
 import '../utils/leaders.dart';
 import 'loginpage.dart';

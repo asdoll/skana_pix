@@ -39,7 +39,9 @@ class _HomePageState extends State<HomePage> {
   @override
   void initState() {
     super.initState();
+    if(settings.checkUpdate) {
     newVersionCheck();
+    }
   }
 
   List<Widget> _buildScreens() {
@@ -171,7 +173,7 @@ class _HomePageState extends State<HomePage> {
       BotToast.showWidget(toastBuilder: (_) {
         return AlertDialog(
           title: Text("New version available".i18n),
-          content: Text(Updater.updateDescription ?? ""),
+          content: Text(updater.updateDescription),
           actions: [
             TextButton(
               onPressed: () {
@@ -182,7 +184,7 @@ class _HomePageState extends State<HomePage> {
             TextButton(
               onPressed: () {
                 BotToast.cleanAll();
-                launchUrlString(Updater.updateUrl!);
+                launchUrlString(updater.updateUrl);
               },
               child: Text("Update".i18n),
             ),
