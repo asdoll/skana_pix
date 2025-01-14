@@ -139,7 +139,7 @@ class TextCompositionPageState extends State<TextCompositionPage>
                     mainAxisSize: MainAxisSize.min,
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Text(widget.controller.name ?? ""),
+                      Text(""),
                       // SizedBox(height: 10),
                       // Text("这是底线（最后一页）", style: colorStyle),
                       // SizedBox(height: 10),
