@@ -357,7 +357,7 @@ class TextComposition extends ChangeNotifier {
 
   List<Widget> get pages {
     if (textPages.isEmpty) {
-      return [CircularProgressIndicator()];
+      return [Center(child: CircularProgressIndicator())];
     }
     return [
       for (var i = _currentIndex + HALF, last = _currentIndex - HALF; i > last; i--)
