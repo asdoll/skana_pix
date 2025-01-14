@@ -38,22 +38,6 @@ Future<void> main() async {
 class MyApp extends StatelessWidget {
   MyApp({super.key});
   ThemeStuff appValueNotifier = ThemeStuff.instance;
-//   @override
-//   Widget build(BuildContext) {
-//     return AppWarp();
-//   }
-// }
-
-// class AppWarp extends StatefulWidget{
-//   const AppWarp({super.key});
-
-//   @override
-//   _AppWarpState createState() => _AppWarpState();
-// }
-
-// class _AppWarpState extends State<AppWarp> {
-
-//   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return ValueListenableBuilder(
