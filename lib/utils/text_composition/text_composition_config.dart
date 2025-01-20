@@ -60,7 +60,7 @@ class TextCompositionConfig {
     this.showInfo = true,
     this.justifyHeight = true,
     this.oneHand = false,
-    this.underLine = true,
+    this.underLine = false,
     this.animationStatus = true,
     this.animationHighImage = false,
     this.animationWithImage = true,
@@ -75,12 +75,12 @@ class TextCompositionConfig {
     this.columnPadding = 30,
     this.columns = 0,
     this.indentation = 2,
-    this.fontColor = const Color(0xFF303133),
+    this.fontColor = const Color(0xFF353535),
     this.fontSize = 20,
     this.fontHeight = 1.6,
     this.fontFamily = '',
-    this.background = '#FFFFFFCC',
-    this.backgroundColor = const Color(0xFFFFFFCC),
+    this.background = '#FF999C99',
+    this.backgroundColor = const Color(0xFF999C99),
   });
 
   bool updateConfig({

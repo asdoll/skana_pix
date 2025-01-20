@@ -3,6 +3,7 @@ import 'dart:ui';
 
 import 'package:bot_toast/bot_toast.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_displaymode/flutter_displaymode.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:skana_pix/model/worktypes.dart';
@@ -48,6 +49,7 @@ class UserSetting {
   List<String> historyUserTag = [];
   int seedColor = 0xFF536DFE;
   bool novelDirectEntry = false;
+  bool isHighRefreshRate = true;
 
   Future<void> saveDefaults() async {
     await prefs.setString('darkMode', darkMode);
@@ -83,6 +85,7 @@ class UserSetting {
     await prefs.setStringList('bookmarkedNovelTags', bookmarkedNovelTags);
     await prefs.setInt('seedColor', seedColor);
     await prefs.setBool('novelDirectEntry', novelDirectEntry);
+    await prefs.setBool('isHighRefreshRate', isHighRefreshRate);
   }
 
   Future<void> init() async {
@@ -126,6 +129,7 @@ class UserSetting {
     bookmarkedNovelTags = prefs.getStringList('bookmarkedNovelTags') ?? [];
     seedColor = prefs.getInt('seedColor') ?? 0xFF536DFE;
     novelDirectEntry = prefs.getBool('novelDirectEntry') ?? false;
+    isHighRefreshRate = prefs.getBool('isHighRefreshRate') ?? true;
   }
 
   void setDefaults() {
@@ -162,6 +166,7 @@ class UserSetting {
     bookmarkedNovelTags = [];
     seedColor = 0xFF536DFE;
     novelDirectEntry = false;
+    isHighRefreshRate = true;
     saveDefaults();
   }
 
@@ -303,6 +308,9 @@ class UserSetting {
         novelDirectEntry = value;
         prefs.setBool('novelDirectEntry', novelDirectEntry);
         break;
+      case 'isHighRefreshRate':
+        isHighRefreshRate = value;
+        prefs.setBool('isHighRefreshRate', isHighRefreshRate);
     }
   }
 
@@ -345,6 +353,7 @@ class UserSetting {
       'bookmarkedNovelTags': bookmarkedNovelTags,
       'seedColor': seedColor,
       'novelDirectEntry': novelDirectEntry,
+      'isHighRefreshRate': isHighRefreshRate,
     };
   }
 
@@ -382,6 +391,7 @@ class UserSetting {
     bookmarkedNovelTags = List<String>.from(map['bookmarkedNovelTags']);
     seedColor = map['seedColor'] ?? 0xFF536DFE;
     novelDirectEntry = map['novelDirectEntry'] ?? false;
+    isHighRefreshRate = map['isHighRefreshRate'] ?? true;
     saveDefaults();
     BotToast.showText(text: "Imported".i18n);
   }
@@ -426,6 +436,17 @@ class UserSetting {
       return Locale('en', 'US');
     }
     return Locale(loc[0], loc[1]);
+  }
+
+  void setHighRefreshRate(bool enabled) {
+    set('isHighRefreshRate', enabled);
+    if(DynamicData.isAndroid) {
+      if(enabled){
+        FlutterDisplayMode.setHighRefreshRate();
+      } else {
+        FlutterDisplayMode.setLowRefreshRate();
+      }
+    }
   }
 
   String getLocale() {

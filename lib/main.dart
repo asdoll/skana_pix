@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:skana_pix/pixiv_dart_api.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
+import 'package:flutter_displaymode/flutter_displaymode.dart';
 
 import 'package:skana_pix/utils/applinks.dart';
 import 'package:skana_pix/utils/translate.dart';
@@ -35,9 +36,23 @@ Future<void> main() async {
   });
 }
 
-class MyApp extends StatelessWidget {
-  MyApp({super.key});
+class MyApp extends StatefulWidget {
+  const MyApp({super.key});
+  @override
+  State<MyApp> createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
   ThemeStuff appValueNotifier = ThemeStuff.instance;
+
+  @override
+  void initState() {
+    super.initState();
+    if(Platform.isAndroid && settings.isHighRefreshRate) {
+      FlutterDisplayMode.setHighRefreshRate();
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return ValueListenableBuilder(

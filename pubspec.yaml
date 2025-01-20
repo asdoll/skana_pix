@@ -74,6 +74,7 @@ dependencies:
   vector_math: ^2.1.4
   hive_flutter: ^1.1.0
   flutter_xlider: ^3.5.0
+  flutter_displaymode: ^0.6.0
 
 
 dev_dependencies:

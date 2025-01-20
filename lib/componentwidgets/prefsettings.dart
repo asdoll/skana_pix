@@ -2,6 +2,7 @@ import 'package:bot_toast/bot_toast.dart';
 import 'package:flutter/material.dart';
 import 'package:skana_pix/pixiv_dart_api.dart';
 import 'package:skana_pix/utils/translate.dart';
+import 'package:skana_pix/view/defaults.dart';
 
 class PreferenceSettings extends StatefulWidget {
   @override
@@ -140,6 +141,18 @@ class _PreferenceSettingsState extends State<PreferenceSettings> {
             onChanged: (value) {
               setState(() {
                 settings.set("checkUpdate", value);
+              });
+            },
+          ),
+          if(DynamicData.isAndroid)
+            Divider(),
+          if(DynamicData.isAndroid)
+            SwitchListTile(
+            title: Text("High Refresh mode".i18n),
+            value: settings.isHighRefreshRate,
+            onChanged: (value) {
+              setState(() {
+                settings.set("isHighRefreshRate", value);
               });
             },
           ),

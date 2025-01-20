@@ -354,7 +354,8 @@
         "Release Notes":"更新日志",
         "Check updates on start": "启动时检查更新",
         "Please reboot to take effect":"请重启应用生效",
-        "Bulletin Board": "公告板"
+        "Bulletin Board": "公告板",
+        "High Refresh mode": "高刷新率"
     },
     "zh_TW": {
         "Search": "搜索",
@@ -711,6 +712,7 @@
         "Release Notes": "更新日誌",
         "Check updates on start": "啟動時檢查更新",
         "Please reboot to take effect": "請重啟應用生效",
-        "Bulletin Board": "公告板"
+        "Bulletin Board": "公告板",
+        "High Refresh mode": "高刷新率"
     }
 }
