@@ -235,7 +235,7 @@ create table $novelHisTable (
           ctitle,
           cuser_name
         ],
-        orderBy: "$ctime DESC",
+        orderBy: ctime,
         limit: limit,
         offset: offset);
 
