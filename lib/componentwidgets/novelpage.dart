@@ -6,6 +6,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:flutter_xlider/flutter_xlider.dart';
+import 'package:get/get.dart';
 import 'package:path/path.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:skana_pix/componentwidgets/novelbookmark.dart';
@@ -118,10 +119,10 @@ class _NovelViewerPageState extends State<NovelViewerPage> {
               onPressed: () {
                 _novelStore.fetch();
               },
-              child: Text("Retry".i18n)),
+              child: Text("Retry".tr)),
           Padding(
             padding: const EdgeInsets.all(16.0),
-            child: Text('Network error'.i18n,
+            child: Text('Network error'.tr,
                 style: Theme.of(context).textTheme.labelSmall),
           ),
         ],
@@ -158,7 +159,7 @@ class _NovelViewerPageState extends State<NovelViewerPage> {
                   showDialog(
                     context: context,
                     builder: (context) => AlertDialog(
-                      title: Text("Pick A Color".i18n),
+                      title: Text("Pick A Color".tr),
                       content: SingleChildScrollView(
                         child: ColorPicker(
                           pickerColor: color,
@@ -314,10 +315,10 @@ class _NovelViewerPageState extends State<NovelViewerPage> {
                               if (_novelStore.novelWebResponse!.seriesNavigation
                                       ?.prevNovel !=
                                   null)
-                                Text("Previous".i18n,
+                                Text("Previous".tr,
                                     style: TextStyle(color: color))
                               else
-                                Text("NoMore".i18n,
+                                Text("NoMore".tr,
                                     style: TextStyle(color: color))
                             ],
                           ),
@@ -344,10 +345,10 @@ class _NovelViewerPageState extends State<NovelViewerPage> {
                               if (_novelStore.novelWebResponse!.seriesNavigation
                                       ?.nextNovel !=
                                   null)
-                                Text("Next".i18n,
+                                Text("Next".tr,
                                     style: TextStyle(color: color))
                               else
-                                Text("No more".i18n,
+                                Text("No more".tr,
                                     style: TextStyle(color: color))
                             ],
                           ),
@@ -473,7 +474,7 @@ class _NovelViewerPageState extends State<NovelViewerPage> {
                 ]),
                 const SizedBox(width: 8),
                 UserFollowButton(
-                  followed: widget.novel.author.isFollowed,
+                  liked: widget.novel.author.isFollowed,
                   onPressed: () async {
                     follow();
                   },
@@ -523,7 +524,7 @@ class _NovelViewerPageState extends State<NovelViewerPage> {
                 runSpacing: 1,
                 children: [
                   if (widget.novel.isAi)
-                    Text("AI-generated".i18n,
+                    Text("AI-generated".tr,
                         style: Theme.of(context).textTheme.bodySmall!.copyWith(
                             color: Theme.of(context).colorScheme.secondary)),
                   for (var f in widget.novel.tags) buildRow(context, f)
@@ -554,7 +555,7 @@ class _NovelViewerPageState extends State<NovelViewerPage> {
                     builder: (BuildContext context) => CommentPage(
                         id: widget.novel.id, type: ArtworkType.NOVEL)));
               },
-              child: Text("Show comments".i18n)),
+              child: Text("Show comments".tr)),
         ],
       ),
     );
@@ -571,7 +572,7 @@ class _NovelViewerPageState extends State<NovelViewerPage> {
     var res = await followUser(widget.novel.author.id.toString(), method);
     if (res.error) {
       if (mounted) {
-        BotToast.showText(text: "Network Error".i18n);
+        BotToast.showText(text: "Network Error".tr);
       }
     } else {
       widget.novel.author.isFollowed = !widget.novel.author.isFollowed;
@@ -648,19 +649,19 @@ class _NovelViewerPageState extends State<NovelViewerPage> {
                 onPressed: () {
                   Navigator.pop(context, 0);
                 },
-                child: Text("Block".i18n),
+                child: Text("Block".tr),
               ),
               SimpleDialogOption(
                 onPressed: () {
                   Navigator.pop(context, 1);
                 },
-                child: Text("Bookmark".i18n),
+                child: Text("Bookmark".tr),
               ),
               SimpleDialogOption(
                 onPressed: () {
                   Navigator.pop(context, 2);
                 },
-                child: Text("Copy".i18n),
+                child: Text("Copy".tr),
               ),
             ],
           );
@@ -680,7 +681,7 @@ class _NovelViewerPageState extends State<NovelViewerPage> {
           await Clipboard.setData(ClipboardData(text: f.name));
           ScaffoldMessenger.of(context).showSnackBar(SnackBar(
             duration: Duration(seconds: 1),
-            content: Text("Copied to clipboard".i18n),
+            content: Text("Copied to clipboard".tr),
           ));
         }
     }
@@ -779,7 +780,7 @@ class _NovelViewerPageState extends State<NovelViewerPage> {
                 ),
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                  child: Text('Previous'.i18n),
+                  child: Text('Previous'.tr),
                 ),
                 buildListTile(
                     _novelStore.novelWebResponse!.seriesNavigation?.prevNovel,
@@ -787,21 +788,21 @@ class _NovelViewerPageState extends State<NovelViewerPage> {
                 Divider(),
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                  child: Text('Next'.i18n),
+                  child: Text('Next'.tr),
                 ),
                 buildListTile(
                     _novelStore.novelWebResponse!.seriesNavigation?.nextNovel,
                     context),
                 if (DynamicData.isAndroid)
                   ListTile(
-                    title: Text("Export".i18n),
+                    title: Text("Export".tr),
                     leading: Icon(Icons.folder_zip),
                     onTap: () {
                       _export(context);
                     },
                   ),
                 ListTile(
-                  title: Text("Share".i18n),
+                  title: Text("Share".tr),
                   leading: Icon(
                     Icons.share,
                   ),
@@ -820,7 +821,7 @@ class _NovelViewerPageState extends State<NovelViewerPage> {
   Widget buildListTile(SimpleNovel? relNovel, BuildContext context) {
     if (relNovel == null)
       return ListTile(
-        title: Text("No more".i18n),
+        title: Text("No more".tr),
       );
     return ListTile(
       title: Text(relNovel.title, maxLines: 2, overflow: TextOverflow.ellipsis),
@@ -845,7 +846,7 @@ class _NovelViewerPageState extends State<NovelViewerPage> {
     final box = context.findRenderObject() as RenderBox?;
     Share.shareXFiles([XFile(targetPath)],
         sharePositionOrigin: box!.localToGlobal(Offset.zero) & box.size);
-    logger("path: $targetPath");
+    log.d("path: $targetPath");
   }
 }
 
@@ -875,7 +876,7 @@ class NovelStore {
       }
       return result;
     } catch (e) {
-      loggerError(e.toString());
+      log.e(e.toString());
       errorMessage = e.toString();
     }
     return result;

@@ -13,8 +13,8 @@ class PixivImage extends StatefulWidget {
   final double? width;
   final String? host;
 
-  PixivImage(this.url,
-      {this.placeWidget,
+  const PixivImage(this.url,
+      {super.key, this.placeWidget,
       this.fade = true,
       this.fit,
       this.enableMemoryCache,
@@ -23,7 +23,7 @@ class PixivImage extends StatefulWidget {
       this.width});
 
   @override
-  _PixivImageState createState() => _PixivImageState();
+  State<PixivImage> createState() => _PixivImageState();
 }
 
 class _PixivImageState extends State<PixivImage> {
@@ -65,7 +65,7 @@ class _PixivImageState extends State<PixivImage> {
     return CachedNetworkImage(
         placeholder: (context, url) =>
             widget.placeWidget ?? Container(height: height),
-        errorWidget: (context, url, _) => Container(
+        errorWidget: (context, url, _) => SizedBox(
               height: height,
               child: Center(
                 child: TextButton(

@@ -1,11 +1,9 @@
-
-import 'package:bot_toast/bot_toast.dart';
-import 'package:dio/dio.dart';
-import 'package:flutter/material.dart';
-import 'package:skana_pix/componentwidgets/imagetab.dart';
+import 'package:dio/dio.dart' as d;
+import 'package:get/get.dart';
+import 'package:shadcn_flutter/shadcn_flutter.dart';
+import 'package:skana_pix/componentwidgets/imagelist.dart';
 import 'package:skana_pix/model/worktypes.dart';
 import 'package:skana_pix/pixiv_dart_api.dart';
-import 'package:skana_pix/view/homepage.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 
 import '../componentwidgets/novelpage.dart';
@@ -15,17 +13,29 @@ import '../componentwidgets/souppage.dart';
 import '../componentwidgets/userpage.dart';
 
 class Leader {
-  static Future<void> pushUntilHome(BuildContext context) async {
-    Navigator.of(context).pushAndRemoveUntil(
-      MaterialPageRoute(
-        builder: (context) => HomePage(),
-      ),
-      (route) => false,
-    );
+  static showBasicToast(Widget? title, Widget? subtitle, Widget? trailing) {
+    showToast(
+        context: Get.context!,
+        builder: (BuildContext context, ToastOverlay overlay) {
+          return SurfaceCard(
+            child: Basic(
+              title: title,
+              subtitle: subtitle,
+              trailing: trailing,
+              trailingAlignment: Alignment.center,
+            ),
+          );
+        });
   }
 
-  static popUtilHome(BuildContext context) {
-    Navigator.of(context).popUntil((route) => route.isFirst);
+  static showTextToast(String text) {
+    showToast(
+        context: Get.context!,
+        builder: (BuildContext context, ToastOverlay overlay) {
+          return SurfaceCard(
+            child: Text(text),
+          );
+        });
   }
 
   static Future<bool> pushWithUri(BuildContext context, Uri link) async {
@@ -57,12 +67,12 @@ class Leader {
     }
     if (link.host == "pixiv.me") {
       try {
-        BotToast.showText(text: "Pixiv me...");
-        var dio = Dio();
-        Response response = await dio.getUri(link);
+        showBasicToast(Text("Pixiv me..."), null, null);
+        var dio = d.Dio();
+        d.Response response = await dio.getUri(link);
         if (response.isRedirect == true) {
           Uri source = response.realUri;
-          logger("here we go pixiv me:" + source.toString());
+          log.d("here we go pixiv me:$source");
           return await pushWithUri(context, source);
         }
       } catch (e) {
@@ -77,7 +87,8 @@ class Leader {
           context,
           SoupPage(
               url: link.toString().replaceAll("pixez://", "https://"),
-              spotlight: null),root: true);
+              spotlight: null),
+          root: true);
       return true;
     }
     if (link.scheme == "pixiv") {
@@ -160,7 +171,7 @@ class Leader {
         }));
         return true;
       } catch (e) {
-        loggerError(e.toString());
+        log.e(e.toString());
       }
     } else if (link.host.contains('pixiv')) {
       if (link.path.contains("artworks")) {
@@ -175,7 +186,7 @@ class Leader {
             }));
             return true;
           } catch (e) {
-            loggerError(e.toString());
+            log.e(e.toString());
           }
         }
       }
@@ -192,7 +203,7 @@ class Leader {
                     )));
             return true;
           } catch (e) {
-            print(e);
+            log.e(e);
           }
         }
       }
@@ -228,8 +239,7 @@ class Leader {
         if (i == "i") {
           try {
             int id = int.parse(link.pathSegments[link.pathSegments.length - 1]);
-            Leader.push(context, IllustPageLite(id.toString()),
-                root: true);
+            Leader.push(context, IllustPageLite(id.toString()), root: true);
             return true;
           } catch (e) {}
         } else if (i == "u") {
@@ -262,17 +272,17 @@ class Leader {
   }
 
   static Future<dynamic> pushWithScaffold(context, Widget widget,
-      {Widget? icon, Widget? title, bool root =false}) {
-    if(root) {
+      {Widget? icon, Widget? title, bool root = false}) {
+    if (root) {
       return Navigator.of(context, rootNavigator: true).push(MaterialPageRoute(
         builder: (context) => Scaffold(
-          body: widget,
+          child: widget,
         ),
       ));
     }
     return Navigator.of(context).push(MaterialPageRoute(
         builder: (context) => Scaffold(
-              body: widget,
+              child: widget,
             )));
   }
 
@@ -284,16 +294,16 @@ class Leader {
     bool forceSkipWrap = false,
     bool root = false,
   }) {
-    if(root) {
+    if (root) {
       return Navigator.of(context, rootNavigator: true).push(MaterialPageRoute(
         builder: (context) => Scaffold(
-          body: widget,
+          child: widget,
         ),
       ));
     }
     return Navigator.of(context).push(MaterialPageRoute(
         builder: (context) => Scaffold(
-              body: widget,
+              child: widget,
             )));
   }
 }

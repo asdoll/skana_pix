@@ -64,7 +64,7 @@ dependencies:
   flutter_mobx: ^2.2.1+1
   flutter_launcher_icons: ^0.14.1
   flutter_colorpicker: ^1.1.0
-  archive: ^3.6.1
+  archive: ^4.0.2
   sqflite: ^2.4.0
   sqflite_common_ffi: ^2.3.4
   path: ^1.9.0
@@ -75,6 +75,9 @@ dependencies:
   hive_flutter: ^1.1.0
   flutter_xlider: ^3.5.0
   flutter_displaymode: ^0.6.0
+  logger: ^2.5.0
+  shadcn_flutter: ^0.0.24
+  get: ^4.6.6
 
 
 dev_dependencies:
@@ -103,10 +106,56 @@ flutter:
 
   assets:
     - assets/
-    - assets/i18n/
     - assets/emojis/
     - assets/icon/
     - assets/images/
+  fonts:
+    - family: GeistSans
+      fonts:
+        - asset: packages/shadcn_flutter/fonts/Geist-Black.otf
+          weight: 800
+        - asset: packages/shadcn_flutter/fonts/Geist-Bold.otf
+          weight: 700
+        - asset: packages/shadcn_flutter/fonts/Geist-Light.otf
+          weight: 300
+        - asset: packages/shadcn_flutter/fonts/Geist-Medium.otf
+          weight: 500
+        - asset: packages/shadcn_flutter/fonts/Geist-SemiBold.otf
+          weight: 600
+        - asset: packages/shadcn_flutter/fonts/Geist-Thin.otf
+          weight: 100
+        - asset: packages/shadcn_flutter/fonts/Geist-UltraBlack.otf
+          weight: 900
+        - asset: packages/shadcn_flutter/fonts/Geist-UltraLight.otf
+          weight: 200
+        - asset: packages/shadcn_flutter/fonts/Geist-Regular.otf
+          weight: 400
+    - family: GeistMono
+      fonts:
+        - asset: packages/shadcn_flutter/fonts/GeistMono-Black.otf
+          weight: 800
+        - asset: packages/shadcn_flutter/fonts/GeistMono-Bold.otf
+          weight: 700
+        - asset: packages/shadcn_flutter/fonts/GeistMono-Light.otf
+          weight: 300
+        - asset: packages/shadcn_flutter/fonts/GeistMono-Medium.otf
+          weight: 500
+        - asset: packages/shadcn_flutter/fonts/GeistMono-Regular.otf
+          weight: 400
+        - asset: packages/shadcn_flutter/fonts/GeistMono-SemiBold.otf
+          weight: 600
+        - asset: packages/shadcn_flutter/fonts/GeistMono-Thin.otf
+          weight: 100
+        - asset: packages/shadcn_flutter/fonts/GeistMono-UltraBlack.otf
+          weight: 900
+        - asset: packages/shadcn_flutter/fonts/GeistMono-UltraLight.otf
+          weight: 200
+    - family: RadixIcons
+      fonts:
+        - asset: packages/shadcn_flutter/icons/RadixIcons.otf
+    - family: BootstrapIcons
+      fonts:
+        - asset: packages/shadcn_flutter/icons/BootstrapIcons.otf
 
 
   # To add assets to your application, add an assets section, like this:

@@ -2,6 +2,7 @@ import 'package:bot_toast/bot_toast.dart';
 import 'package:easy_refresh/easy_refresh.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
+import 'package:get/get.dart';
 import 'package:mobx/mobx.dart';
 import 'package:skana_pix/componentwidgets/headerfooter.dart';
 import 'package:skana_pix/pixiv_dart_api.dart';
@@ -62,10 +63,10 @@ class _FollowListState extends State<FollowList>
       appBar: widget.setAppBar
           ? AppBar(
               title: Text(widget.isMyPixiv
-                  ? "My Pixiv".i18n
+                  ? "My Pixiv".tr
                   : widget.isMe
-                      ? "My Follow".i18n
-                      : "Following".i18n),
+                      ? "My Follow".tr
+                      : "Following".tr),
             )
           : null,
       body: Observer(builder: (_) {
@@ -127,8 +128,8 @@ class _FollowListState extends State<FollowList>
               minWidth: 80.0,
             ),
             children: [
-              Text("Public".i18n),
-              Text("Private".i18n),
+              Text("Public".tr),
+              Text("Private".tr),
             ]),
       ],
     );
@@ -145,7 +146,7 @@ class _FollowListState extends State<FollowList>
           if (value.errorMessage != null &&
               value.errorMessage!.contains("timeout")) {
             BotToast.showText(
-                text: "Network Error. Please refresh to try again.".i18n);
+                text: "Network Error. Please refresh to try again.".tr);
           }
         });
       }
@@ -173,7 +174,7 @@ class _FollowListState extends State<FollowList>
           if (value.errorMessage != null &&
               value.errorMessage!.contains("timeout")) {
             BotToast.showText(
-                text: "Network Error. Please refresh to try again.".i18n);
+                text: "Network Error. Please refresh to try again.".tr);
           }
         });
         easyRefreshController.finishRefresh(IndicatorResult.fail);

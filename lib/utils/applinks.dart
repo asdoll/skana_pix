@@ -64,7 +64,7 @@ void handleLinks() async {
       await Future.delayed(const Duration(milliseconds: 200));
     }
     _firstLink = false;
-    logger("App Link$uri");
+    log.d("App Link$uri");
     if (onLink?.call(uri) == true) {
       return;
     }

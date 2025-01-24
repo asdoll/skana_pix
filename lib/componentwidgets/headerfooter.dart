@@ -1,25 +1,33 @@
 import 'package:easy_refresh/easy_refresh.dart';
-import 'package:flutter/material.dart';
-import 'package:skana_pix/utils/translate.dart';
-
+import 'package:shadcn_flutter/shadcn_flutter.dart';
+import 'package:get/get.dart';
 class DefaultHeaderFooter {
   static Header header(BuildContext context,
       {IndicatorPosition position = IndicatorPosition.above,
       bool safeArea = true}) {
-    return MaterialHeader(
-        position: position,
-        safeArea: safeArea,
-        backgroundColor: Theme.of(context).scaffoldBackgroundColor);
+    return ClassicHeader(
+      position: position,
+      safeArea: safeArea,
+      dragText: 'Pull to refresh',
+      armedText: 'Release ready',
+      readyText: 'Refreshing...',
+      processingText: 'Refreshing...',
+      processedText: 'Succeeded',
+      noMoreText: 'No more',
+      failedText: 'Failed',
+      showText: true,
+      messageText: 'Last updated at %T',
+    );
   }
 
   static Footer footer(BuildContext context,
       {IndicatorPosition position = IndicatorPosition.above}) {
     return ClassicFooter(
         position: position,
-        processingText: "Loading".i18n,
-        failedText: "Failed".i18n,
+        processingText: "Loading".tr,
+        failedText: "Failed".tr,
         showMessage: false,
-        processedText: "Successed".i18n,
-        noMoreText: "No more".i18n);
+        processedText: "Successed".tr,
+        noMoreText: "No more".tr);
   }
 }

@@ -10,7 +10,7 @@ import 'package:skana_pix/componentwidgets/userworks.dart';
 import 'package:skana_pix/controller/caches.dart';
 import 'package:skana_pix/model/worktypes.dart';
 import 'package:skana_pix/pixiv_dart_api.dart';
-import 'package:skana_pix/utils/translate.dart';
+import 'package:get/get.dart';
 import 'package:skana_pix/utils/widgetplugin.dart';
 
 import 'avatar.dart';
@@ -109,7 +109,7 @@ class _UserPageState extends State<UserPage> with TickerProviderStateMixin {
                             isMuted = false;
                           });
                         },
-                        child: Text("Unblock".i18n)),
+                        child: Text("Unblock".tr)),
                   ],
                 ),
               ),
@@ -129,7 +129,7 @@ class _UserPageState extends State<UserPage> with TickerProviderStateMixin {
                     Padding(
                       padding: const EdgeInsets.all(8.0),
                       child: Text(
-                        "Network Error".i18n,
+                        "Network Error".tr,
                       ),
                     ),
                     Padding(
@@ -139,7 +139,7 @@ class _UserPageState extends State<UserPage> with TickerProviderStateMixin {
                         onPressed: () {
                           firstLoad();
                         },
-                        child: Text("Retry".i18n),
+                        child: Text("Retry".tr),
                       ),
                     )
                   ],
@@ -268,7 +268,7 @@ class _UserPageState extends State<UserPage> with TickerProviderStateMixin {
                     if (_tabIndex == 0) _scrollController.position.jumpTo(0);
                   },
                   child: Tab(
-                    text: "Artworks".i18n,
+                    text: "Artworks".tr,
                   ),
                 ),
                 GestureDetector(
@@ -276,7 +276,7 @@ class _UserPageState extends State<UserPage> with TickerProviderStateMixin {
                     if (_tabIndex == 1) _scrollController.position.jumpTo(0);
                   },
                   child: Tab(
-                    text: "Bookmarks".i18n,
+                    text: "Bookmarks".tr,
                   ),
                 ),
                 GestureDetector(
@@ -284,7 +284,7 @@ class _UserPageState extends State<UserPage> with TickerProviderStateMixin {
                     if (_tabIndex == 2) _scrollController.position.jumpTo(0);
                   },
                   child: Tab(
-                    text: "Details".i18n,
+                    text: "Details".tr,
                   ),
                 ),
               ],
@@ -340,7 +340,7 @@ class _UserPageState extends State<UserPage> with TickerProviderStateMixin {
                           context: context,
                           builder: (context) {
                             return AlertDialog(
-                              title: Text("Save".i18n),
+                              title: Text("Save".tr),
                               content: ClipRRect(
                                 borderRadius: BorderRadius.circular(12),
                                 child: CachedNetworkImage(
@@ -354,14 +354,14 @@ class _UserPageState extends State<UserPage> with TickerProviderStateMixin {
                                     onPressed: () async {
                                       Navigator.of(context).pop();
                                     },
-                                    child: Text("Cancel".i18n)),
+                                    child: Text("Cancel".tr)),
                                 TextButton(
                                     onPressed: () async {
                                       Navigator.of(context).pop();
                                       await _saveUserBg(context,
                                           userDetail!.backgroundImage!);
                                     },
-                                    child: Text("Ok".i18n)),
+                                    child: Text("Ok".tr)),
                               ],
                             );
                           });
@@ -388,7 +388,7 @@ class _UserPageState extends State<UserPage> with TickerProviderStateMixin {
         switch (index) {
           case 0:
             if (widget.isMe) {
-              BotToast.showText(text: "You can't follow yourself".i18n);
+              BotToast.showText(text: "You can't follow yourself".tr);
               return;
             }
             follow("private");
@@ -400,16 +400,16 @@ class _UserPageState extends State<UserPage> with TickerProviderStateMixin {
                   context: context,
                   builder: (context) {
                     return AlertDialog(
-                      title: Text('${"Block User".i18n}?'),
+                      title: Text('${"Block User".tr}?'),
                       actions: <Widget>[
                         TextButton(
-                          child: Text("Ok".i18n),
+                          child: Text("Ok".tr),
                           onPressed: () {
                             Navigator.of(context).pop("OK");
                           },
                         ),
                         TextButton(
-                          child: Text("Cancel".i18n),
+                          child: Text("Cancel".tr),
                           onPressed: () {
                             Navigator.of(context).pop();
                           },
@@ -430,7 +430,7 @@ class _UserPageState extends State<UserPage> with TickerProviderStateMixin {
             {
               Clipboard.setData(ClipboardData(
                   text: 'painter:${userDetail?.name ?? ''}\npid:${widget.id}'));
-              BotToast.showText(text: "Copied to clipboard".i18n);
+              BotToast.showText(text: "Copied to clipboard".tr);
               break;
             }
           default:
@@ -441,15 +441,15 @@ class _UserPageState extends State<UserPage> with TickerProviderStateMixin {
           if (!userDetail!.isFollowed)
             PopupMenuItem<int>(
               value: 0,
-              child: Text("Follow privately".i18n),
+              child: Text("Follow privately".tr),
             ),
           PopupMenuItem<int>(
             value: 1,
-            child: Text("Block User".i18n),
+            child: Text("Block User".tr),
           ),
           PopupMenuItem<int>(
             value: 2,
-            child: Text("Copy Info".i18n),
+            child: Text("Copy Info".tr),
           ),
         ];
       },
@@ -471,7 +471,7 @@ class _UserPageState extends State<UserPage> with TickerProviderStateMixin {
               Text(
                 userDetail == null
                     ? ""
-                    : '${userDetail!.totalFollowUsers} ${"Follow".i18n}',
+                    : '${userDetail!.totalFollowUsers} ${"Follow".tr}',
                 style: Theme.of(context).textTheme.bodySmall,
               )
             ]),
@@ -501,7 +501,7 @@ class _UserPageState extends State<UserPage> with TickerProviderStateMixin {
                       .push(MaterialPageRoute(builder: (BuildContext context) {
                     return Scaffold(
                       appBar: AppBar(
-                        title: Text("Followed".i18n),
+                        title: Text("Followed".tr),
                       ),
                       body: FollowList(id: widget.id),
                     );
@@ -510,7 +510,7 @@ class _UserPageState extends State<UserPage> with TickerProviderStateMixin {
                 child: Text(
                   userDetail == null
                       ? ""
-                      : '${userDetail!.totalFollowUsers} ${"Follow".i18n}',
+                      : '${userDetail!.totalFollowUsers} ${"Follow".tr}',
                   style: Theme.of(context).textTheme.bodySmall,
                 ),
               )
@@ -583,7 +583,7 @@ class _UserPageState extends State<UserPage> with TickerProviderStateMixin {
                         context: context,
                         builder: (context) {
                           return AlertDialog(
-                            title: Text("Save".i18n),
+                            title: Text("Save".tr),
                             content: ClipRRect(
                               borderRadius: BorderRadius.circular(12),
                               child: CachedNetworkImage(
@@ -597,13 +597,13 @@ class _UserPageState extends State<UserPage> with TickerProviderStateMixin {
                                   onPressed: () async {
                                     Navigator.of(context).pop();
                                   },
-                                  child: Text("Cancel".i18n)),
+                                  child: Text("Cancel".tr)),
                               TextButton(
                                   onPressed: () async {
                                     Navigator.of(context).pop();
                                     await _saveUserC(context);
                                   },
-                                  child: Text("Ok".i18n)),
+                                  child: Text("Ok".tr)),
                             ],
                           );
                         });
@@ -623,11 +623,11 @@ class _UserPageState extends State<UserPage> with TickerProviderStateMixin {
                   : Padding(
                       padding: const EdgeInsets.only(right: 16.0, bottom: 4.0),
                       child: UserFollowButton(
-                        followed: userDetail!.isFollowed,
+                        liked: userDetail!.isFollowed,
                         onPressed: () async {
                           if (widget.isMe) {
                             BotToast.showText(
-                                text: "You can't follow yourself".i18n);
+                                text: "You can't follow yourself".tr);
                             return;
                           }
                           follow("public");
@@ -645,7 +645,7 @@ class _UserPageState extends State<UserPage> with TickerProviderStateMixin {
     try {
       saveUrl(url, context: context);
     } catch (e) {
-      print(e);
+      log.e(e);
     }
   }
 
@@ -666,7 +666,7 @@ class _UserPageState extends State<UserPage> with TickerProviderStateMixin {
     try {
       saveUrl(url, filenm: fileName, context: context);
     } catch (e) {
-      print(e);
+      log.e(e);
     }
   }
 
@@ -681,14 +681,14 @@ class _UserPageState extends State<UserPage> with TickerProviderStateMixin {
     var res = await followUser(userDetail!.id.toString(), method, type);
     if (res.error) {
       if (mounted) {
-        BotToast.showText(text: "Network Error".i18n);
+        BotToast.showText(text: "Network Error".tr);
       }
     } else {
       if (method == "add" && type == "private") {
-        BotToast.showText(text: "Followed privately".i18n);
+        BotToast.showText(text: "Followed privately".tr);
       } else {
         BotToast.showText(
-            text: userDetail!.isFollowed ? "Unfollowed".i18n : "Followed".i18n);
+            text: userDetail!.isFollowed ? "Unfollowed".tr : "Followed".tr);
       }
       userDetail!.isFollowed = !userDetail!.isFollowed;
     }
@@ -713,7 +713,7 @@ class _UserPageState extends State<UserPage> with TickerProviderStateMixin {
           if (value.errorMessage != null &&
               value.errorMessage!.contains("timeout")) {
             BotToast.showText(
-                text: "Network Error. Please refresh to try again.".i18n);
+                text: "Network Error. Please refresh to try again.".tr);
           }
         });
       }

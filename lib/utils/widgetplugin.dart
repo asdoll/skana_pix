@@ -29,10 +29,6 @@ extension WidgetExtension on Widget{
     return Padding(padding: EdgeInsets.symmetric(horizontal: padding), child: this);
   }
 
-  Widget paddingAll(double padding){
-    return Padding(padding: EdgeInsets.all(padding), child: this);
-  }
-
   Widget rounded(double radius){
     return ClipRRect(borderRadius: BorderRadius.circular(radius), child: this);
   }

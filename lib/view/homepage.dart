@@ -1,196 +1,111 @@
-import 'package:bot_toast/bot_toast.dart';
-import 'package:flutter/services.dart';
-import 'package:skana_pix/controller/updater.dart';
-import 'package:skana_pix/pixiv_dart_api.dart';
-import 'package:skana_pix/utils/translate.dart';
-import 'package:url_launcher/url_launcher_string.dart';
-import 'defaults.dart';
-import 'package:persistent_bottom_nav_bar/persistent_bottom_nav_bar.dart';
+import 'package:get/get.dart';
+import 'package:skana_pix/controller/account_controller.dart';
+import 'package:skana_pix/controller/page_index_controller.dart';
+import 'package:skana_pix/model/worktypes.dart';
+import 'package:skana_pix/view/recom_images_page.dart';
+import 'package:shadcn_flutter/shadcn_flutter.dart';
 
-import 'package:flutter/material.dart';
-
-import 'feedpage.dart';
 import 'loginpage.dart';
-import 'mainscreen.dart';
-import 'searchpage.dart';
-import 'settingscreen.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
-
-  // This widget is the home page of your application. It is stateful, meaning
-  // that it has a State object (defined below) that contains fields that affect
-  // how it looks.
-
-  // This class is the configuration for the state. It holds the values (in this
-  // case the title) provided by the parent (in this case the App widget) and
-  // used by the build method of the State. Fields in a Widget subclass are
-  // always marked "final".
 
   @override
   State<HomePage> createState() => _HomePageState();
 }
 
 class _HomePageState extends State<HomePage> {
-  final PersistentTabController _controller =
-      PersistentTabController(initialIndex: 0);
-  final NavBarStyle _navBarStyle = NavBarStyle.style6;
-
-  @override
-  void initState() {
-    super.initState();
-    if(settings.checkUpdate) {
-    newVersionCheck();
-    }
-  }
-
-  List<Widget> _buildScreens() {
-    return [MainScreen(), FeedPage(), SearchPage(), SettingPage()];
-  }
-
-  void jumpTab() {
-    _controller.jumpToTab(0);
-  }
-
-  List<PersistentBottomNavBarItem> _navBarsItems() {
-    return [
-      PersistentBottomNavBarItem(
-        icon: Icon(Icons.auto_awesome),
-        inactiveIcon: Icon(Icons.auto_awesome_outlined),
-        //title: ("Trending"),
-        activeColorPrimary: DynamicData.themeData.primaryColor,
-        inactiveColorPrimary: DynamicData.inActiveNavColor,
-        scrollController: DynamicData.recommendScrollController,
-        routeAndNavigatorSettings: RouteAndNavigatorSettings(
-          initialRoute: "/",
-        ),
-        iconSize: 26.0,
-      ),
-      PersistentBottomNavBarItem(
-        icon: Icon(Icons.motion_photos_on),
-        inactiveIcon: Icon(Icons.motion_photos_on_outlined),
-        //title: ("Feed"),
-        activeColorPrimary: DynamicData.themeData.primaryColor,
-        inactiveColorPrimary: DynamicData.inActiveNavColor,
-        scrollController: DynamicData.feedScrollController,
-        routeAndNavigatorSettings: RouteAndNavigatorSettings(
-          initialRoute: "/",
-        ),
-        iconSize: 26.0,
-      ),
-      PersistentBottomNavBarItem(
-        icon: Icon(Icons.search),
-        inactiveIcon: Icon(Icons.search),
-        //title: ("search"),
-        activeColorPrimary: DynamicData.themeData.primaryColor,
-        inactiveColorPrimary: DynamicData.inActiveNavColor,
-        scrollController: DynamicData.searchScrollController,
-        routeAndNavigatorSettings: RouteAndNavigatorSettings(
-          initialRoute: "/",
-        ),
-        iconSize: 26.0,
-      ),
-      PersistentBottomNavBarItem(
-        icon: Icon(Icons.pest_control_rodent),
-        inactiveIcon: Icon(Icons.pest_control_rodent_outlined),
-        //title: ("Users"),
-        activeColorPrimary: DynamicData.themeData.primaryColor,
-        inactiveColorPrimary: DynamicData.inActiveNavColor,
-        scrollController: DynamicData.settingScrollController,
-        routeAndNavigatorSettings: RouteAndNavigatorSettings(
-          initialRoute: "/",
-        ),
-        iconSize: 26.0,
-      ),
-    ];
-  }
-
   @override
   Widget build(BuildContext context) {
-    if (ConnectManager().notLoggedIn) {
-      return Scaffold(
-        appBar: AppBar(
-          toolbarHeight: 0.0,
-          systemOverlayStyle: SystemUiOverlayStyle.light.copyWith(
-              systemNavigationBarColor:
-                  Theme.of(context).scaffoldBackgroundColor),
-        ),
-        body: Material(
-          child: LoginPage(() => setState(() {})),
-        ),
-      );
-    }
+    return Obx(() {
+      if (!accountController.isLoggedIn.value) {
+        return Scaffold(
+          child: LoginPage(),
+        );
+      }
 
-    return Scaffold(
-      appBar: AppBar(
-        toolbarHeight: 0.0,
-        systemOverlayStyle: SystemUiOverlayStyle.light.copyWith(
-            systemNavigationBarColor:
-                Theme.of(context).scaffoldBackgroundColor),
-      ),
-      body: Material(
-        color: getTheme(context).primaryColor,
-        child: PersistentTabView(
-          context,
-          controller: _controller,
-          screens: _buildScreens(),
-          items: _navBarsItems(),
-          handleAndroidBackButtonPress: true, // Default is true.
-          resizeToAvoidBottomInset:
-              true, // This needs to be true if you want to move up the screen on a non-scrollable screen when keyboard appears. Default is true.
-          stateManagement: true, // Default is true.
-          hideNavigationBarWhenKeyboardAppears: true,
-          popBehaviorOnSelectedNavBarItemPress: PopBehavior.all,
-          padding: const EdgeInsets.only(top: 4),
-          backgroundColor: getTheme(context).scaffoldBackgroundColor,
-          isVisible: true,
-          animationSettings: const NavBarAnimationSettings(
-            navBarItemAnimation: ItemAnimationSettings(
-              // Navigation Bar's items animation properties.
-              duration: Duration(milliseconds: 400),
-              curve: Curves.ease,
-            ),
-            screenTransitionAnimation: ScreenTransitionAnimationSettings(
-              // Screen transition animation on change of selected tab.
-              animateTabTransition: true,
-              duration: Duration(milliseconds: 200),
-              screenTransitionAnimationType:
-                  ScreenTransitionAnimationType.fadeIn,
-            ),
+      return Scaffold(
+        headers: [
+          AppBar(
+            title: Text(pages[pageIndexController.pageIndex.value]),
+            padding: EdgeInsets.all(10),
+            leading: [
+              OutlineButton(
+                density: ButtonDensity.icon,
+                onPressed: () {
+                  openDrawer(
+                      context: context,
+                      draggable: false,
+                      builder: (context) {
+                        return Container(
+                          width: MediaQuery.of(context).size.width * 0.6,
+                          alignment: Alignment.center,
+                          padding: const EdgeInsets.symmetric(vertical: 48),
+                          child: NavigationSidebar(
+                            index: pageIndexController.pageIndex.value,
+                            onSelected: (index) {
+                              pageIndexController.pageIndex.value = index;
+                              closeDrawer(context);
+                            },
+                            children: [
+                              const NavigationLabel(child: Text('Discovery')),
+                              buildButton(
+                                  'Listen Now', BootstrapIcons.playCircle),
+                              buildButton('Browse', BootstrapIcons.grid),
+                              buildButton('Radio', BootstrapIcons.broadcast),
+                              const NavigationGap(24),
+                              const NavigationDivider(),
+                              const NavigationLabel(child: Text('Library')),
+                              buildButton(
+                                  'Playlist', BootstrapIcons.musicNoteList),
+                              buildButton('Songs', BootstrapIcons.musicNote),
+                              buildButton('For You', BootstrapIcons.person),
+                              buildButton('Artists', BootstrapIcons.mic),
+                              buildButton('Albums', BootstrapIcons.record2),
+                              const NavigationGap(24),
+                              const NavigationDivider(),
+                              const NavigationLabel(child: Text('Playlists')),
+                              buildButton('Recently Added',
+                                  BootstrapIcons.musicNoteList),
+                              buildButton('Recently Played',
+                                  BootstrapIcons.musicNoteList),
+                            ],
+                          ),
+                        );
+                      },
+                      position: OverlayPosition.left);
+                },
+                child: const Icon(Icons.menu),
+              ),
+            ],
           ),
-          confineToSafeArea: true,
-          navBarHeight: 42,
-          navBarStyle:
-              _navBarStyle, // Choose the nav bar style with this property
-        ),
-      ),
-    );
+          const Divider(),
+        ],
+        child: switch (pageIndexController.pageIndex.value) {
+          0 => RecomImagesPage(ArtworkType.ILLUST),
+          _ => RecomImagesPage(ArtworkType.MANGA),
+          // 0 => IllustRecomPage(),
+          // 1 => MangaRecomPage(),
+          // 2 => NovelRecomPage(),
+          // 3 => RankingPage(),
+          // 4 => PixivisionPage(),
+          // 5 => IllustFeedPage(),
+          // 6 => NovelFeedPage(),
+          // 7 => SearchPage(),
+          // 8 => BookmarksPage(),
+          // 9 => MyTagsPage(),
+          // 10 => FollowingPage(),
+          // 11 => HistoryPage(),
+          // _ => SettingsPage(),
+        },
+      );
+    });
   }
 
-  void newVersionCheck() async {
-    final newVersion = await Updater.check();
-    if (newVersion == Result.yes) {
-      BotToast.showWidget(toastBuilder: (_) {
-        return AlertDialog(
-          title: Text("New version available".i18n),
-          content: Text(updater.updateDescription),
-          actions: [
-            TextButton(
-              onPressed: () {
-                BotToast.cleanAll();
-              },
-              child: Text("Cancel".i18n),
-            ),
-            TextButton(
-              onPressed: () {
-                BotToast.cleanAll();
-                launchUrlString(updater.updateUrl);
-              },
-              child: Text("Update".i18n),
-            ),
-          ],
-        );
-      });
-    }
+  NavigationBarItem buildButton(String label, IconData icon) {
+    return NavigationButton(
+      label: Text(label),
+      child: Icon(icon),
+    );
   }
 }

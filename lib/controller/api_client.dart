@@ -123,7 +123,7 @@ class ApiClient extends BaseClient {
       errorCount = 0;
       return const Res(true);
     } catch (e, s) {
-      netErrLog("$e\n$s");
+      log.e("$e\n$s");
       return Res.error(e);
     }
   }
@@ -155,7 +155,7 @@ class ApiClient extends BaseClient {
       errorCount = 0;
       return const Res(true);
     } catch (e, s) {
-      netErrLog("$e\n$s");
+      log.e("$e\n$s");
       return Res.error(e);
     }
   }
@@ -191,7 +191,7 @@ class ApiClient extends BaseClient {
       }
     } catch (e, s) {
       errorCount++;
-      netErrLog("$e\n$s");
+      log.e("$e\n$s");
       return Res.error(e);
     }
   }
@@ -224,7 +224,7 @@ class ApiClient extends BaseClient {
       }
     } catch (e, s) {
       errorCount++;
-      netErrLog("$e\n$s");
+      log.e("$e\n$s");
       return Res.error(e);
     }
   }
@@ -279,7 +279,7 @@ class ApiClient extends BaseClient {
       }
     } catch (e, s) {
       errorCount++;
-      netErrLog("$e\n$s");
+      log.e("$e\n$s");
       return Res.error(e);
     }
   }

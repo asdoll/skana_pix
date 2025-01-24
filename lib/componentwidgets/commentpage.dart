@@ -1,8 +1,10 @@
 import 'package:bot_toast/bot_toast.dart';
 import 'package:easy_refresh/easy_refresh.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:skana_pix/componentwidgets/headerfooter.dart';
 import 'package:skana_pix/componentwidgets/pixivimage.dart';
+import 'package:skana_pix/controller/like_controller.dart';
 import 'package:skana_pix/pixiv_dart_api.dart';
 import 'package:skana_pix/utils/translate.dart';
 import 'package:skana_pix/view/defaults.dart';
@@ -157,10 +159,10 @@ class _CommentPageState extends State<CommentPage> {
   }
 
   bool commentHateByUser(Comment comment) {
-    if (settings.blockedComments.contains(comment.comment)) {
+    if (localManager.blockedComments.contains(comment.comment)) {
       return true;
     }
-    if (settings.blockedCommentUsers.contains(comment.name)) {
+    if (localManager.blockedCommentUsers.contains(comment.name)) {
       return true;
     }
     return false;
@@ -184,7 +186,7 @@ class _CommentPageState extends State<CommentPage> {
     return Container(
       child: Scaffold(
         appBar: AppBar(
-          title: Text("Comments".i18n),
+          title: Text("Comments".tr),
         ),
         body: SafeArea(
           child: Column(
@@ -380,7 +382,7 @@ class _CommentPageState extends State<CommentPage> {
                                   controller: _editController,
                                   decoration: InputDecoration(
                                       labelText:
-                                          "${"Reply to".i18n} ${parentCommentName ?? "Artwork".i18n}",
+                                          "${"Reply to".tr} ${parentCommentName ?? "Artwork".tr}",
                                       suffixIcon: IconButton(
                                           icon: const Icon(
                                             Icons.reply,
@@ -408,10 +410,10 @@ class _CommentPageState extends State<CommentPage> {
                                                         text:
                                                             res.errorMessage ??
                                                                 "Network Error"
-                                                                    .i18n);
+                                                                    .tr);
                                                   } else {
                                                     BotToast.showText(
-                                                        text: "Commented".i18n);
+                                                        text: "Commented".tr);
                                                     easyRefreshController
                                                         .callRefresh();
                                                   }
@@ -425,10 +427,10 @@ class _CommentPageState extends State<CommentPage> {
                                                         text:
                                                             res.errorMessage ??
                                                                 "Network Error"
-                                                                    .i18n);
+                                                                    .tr);
                                                   } else {
                                                     BotToast.showText(
-                                                        text: "Commented".i18n);
+                                                        text: "Commented".tr);
                                                     easyRefreshController
                                                         .callRefresh();
                                                   }
@@ -436,7 +438,7 @@ class _CommentPageState extends State<CommentPage> {
                                               }
                                               _editController.clear();
                                             } catch (e) {
-                                              loggerError("Comment Error");
+                                              log.e("Comment Error");
                                             }
                                           })),
                                 ),
@@ -487,7 +489,7 @@ class _CommentPageState extends State<CommentPage> {
               });
             },
             child: Text(
-              widget.isReplay ? "" : "Reply".i18n,
+              widget.isReplay ? "" : "Reply".tr,
               style: TextStyle(color: Theme.of(context).colorScheme.secondary),
             )),
         if (!widget.isReplay)
@@ -507,14 +509,14 @@ class _CommentPageState extends State<CommentPage> {
                           mainAxisSize: MainAxisSize.min,
                           children: [
                             ListTile(
-                              title: Text("Block User".i18n),
+                              title: Text("Block User".tr),
                               onTap: () async {
                                 Navigator.of(context).pop();
                                 settings.addBlockedCommentUsers([comment.name]);
                               },
                             ),
                             ListTile(
-                              title: Text("Block Comment".i18n),
+                              title: Text("Block Comment".tr),
                               onTap: () {
                                 Navigator.of(context).pop();
                                 settings.addBlockedComments([comment.comment]);
@@ -572,7 +574,7 @@ class _CommentPageState extends State<CommentPage> {
         return true;
       } else {
         var message = value.errorMessage ??
-            "Network Error. Please refresh to try again.".i18n;
+            "Network Error. Please refresh to try again.".tr;
         if (message == "No more data") {}
         if (message.length > 45) {
           message = "${message.substring(0, 20)}...";
@@ -607,9 +609,9 @@ class _CommentPageState extends State<CommentPage> {
         setState(() {
           if (value.errorMessage != null &&
               value.errorMessage!.contains("timeout")) {
-            errorMessage = "Network Error. Please refresh to try again.".i18n;
+            errorMessage = "Network Error. Please refresh to try again.".tr;
             BotToast.showText(
-                text: "Network Error. Please refresh to try again.".i18n);
+                text: "Network Error. Please refresh to try again.".tr);
           }
         });
         easyRefreshController.finishRefresh(IndicatorResult.fail);

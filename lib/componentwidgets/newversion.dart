@@ -2,7 +2,7 @@ import 'package:bot_toast/bot_toast.dart';
 import 'package:easy_refresh/easy_refresh.dart';
 import 'package:flutter/material.dart';
 import 'package:skana_pix/pixiv_dart_api.dart';
-import 'package:skana_pix/utils/translate.dart';
+import 'package:get/get.dart';
 import 'package:skana_pix/view/defaults.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 
@@ -33,7 +33,7 @@ class _NewVersionPageState extends State<NewVersionPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Check updates'.i18n),
+        title: Text('Check updates'.tr),
       ),
       body: buildCheck(context),
     );
@@ -50,38 +50,38 @@ class _NewVersionPageState extends State<NewVersionPage> {
         child: ListView(
           children: [
             ListTile(
-              title: Text('Current Version'.i18n),
+              title: Text('Current Version'.tr),
               subtitle: Text(Constants.appVersion),
             ),
             if(hasNewVersion)
             ListTile(
-              title: Text('Latest Version'.i18n),
+              title: Text('Latest Version'.tr),
               subtitle: Text(updater.updateVersion),
             ),
             if(hasNewVersion)
             ListTile(
-              title: Text('Release Date'.i18n),
+              title: Text('Release Date'.tr),
               subtitle: Text(updater.updateDate.isNotEmpty? DateTime.parse(updater.updateDate).toShortTime() :""),
             ),
             if(hasNewVersion)
             ListTile(
-              title: Text('Release Notes'.i18n),
+              title: Text('Release Notes'.tr),
               subtitle: Text(updater.updateDescription),
             ),
             if(hasNewVersion)
             ListTile(
-              title: Text('Download'.i18n),
+              title: Text('Download'.tr),
               onTap: () async {
                 if(updater.updateUrl.isEmpty) 
                 {
-                  BotToast.showText(text: 'No download link'.i18n);
+                  BotToast.showText(text: 'No download link'.tr);
                   return;
                 }
                 await launchUrlString(updater.updateUrl);
               },
             ),
             ListTile(
-              title: Text('Check for updates'.i18n),
+              title: Text('Check for updates'.tr),
               onTap: () async {
                 await check();
               },

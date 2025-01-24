@@ -4,6 +4,8 @@ import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import 'package:skana_pix/view/defaults.dart';
 
+import '../controller/logging.dart';
+
 class BoardInfo {
   BoardInfo({
     required this.title,
@@ -50,7 +52,7 @@ class BoardInfo {
   }
 
   static Future<List<BoardInfo>> load() async {
-    print(path());
+    log.d(path());
     final request = await Dio().get(
         'https://raw.githubusercontent.com/asdoll/skana_pix/refs/heads/main/.github/board/${path()}');
     final list = (jsonDecode(request.data) as List)

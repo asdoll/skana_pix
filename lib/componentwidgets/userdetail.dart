@@ -3,7 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:skana_pix/componentwidgets/selecthtml.dart';
 import 'package:skana_pix/model/user.dart';
-import 'package:skana_pix/utils/translate.dart';
+import 'package:get/get.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 
 import 'followlist.dart';
@@ -50,12 +50,12 @@ class _UserDetailPageState extends State<UserDetailPage> {
             padding: const EdgeInsets.all(8.0),
             child: DataTable(
               columns: <DataColumn>[
-                DataColumn(label: Text("Nickname".i18n)),
+                DataColumn(label: Text("Nickname".tr)),
                 DataColumn(label: Expanded(child: Text(detail.name))),
               ],
               rows: <DataRow>[
                 DataRow(cells: [
-                  DataCell(Text("Artist ID".i18n)),
+                  DataCell(Text("Artist ID".tr)),
                   DataCell(Text(detail.id.toString()), onTap: () {
                     try {
                       Clipboard.setData(
@@ -64,13 +64,13 @@ class _UserDetailPageState extends State<UserDetailPage> {
                   }),
                 ]),
                 DataRow(cells: [
-                  DataCell(Text("Follows".i18n)),
+                  DataCell(Text("Follows".tr)),
                   DataCell(Text(detail.totalFollowUsers.toString()), onTap: () {
                     Navigator.of(context).push(
                         MaterialPageRoute(builder: (BuildContext context) {
                       return Scaffold(
                         appBar: AppBar(
-                          title: Text("Followed".i18n),
+                          title: Text("Followed".tr),
                         ),
                         body: FollowList(id: detail.id, isNovel: false),
                       );
@@ -78,7 +78,7 @@ class _UserDetailPageState extends State<UserDetailPage> {
                   }),
                 ]),
                 DataRow(cells: [
-                  DataCell(Text("Total My Pixiv users".i18n)),
+                  DataCell(Text("Total My Pixiv users".tr)),
                   DataCell(Text(detail.myPixivUsers.toString()), onTap: () {
                     Navigator.of(context).push(
                         MaterialPageRoute(builder: (BuildContext context) {
@@ -107,11 +107,11 @@ class _UserDetailPageState extends State<UserDetailPage> {
                   }),
                 ]),
                 DataRow(cells: [
-                  DataCell(Text("Gender".i18n)),
+                  DataCell(Text("Gender".tr)),
                   DataCell(Text(detail.gender)),
                 ]),
                 DataRow(cells: [
-                  DataCell(Text("Job".i18n)),
+                  DataCell(Text("Job".tr)),
                   DataCell(Text(detail.job)),
                 ]),
                 DataRow(cells: [

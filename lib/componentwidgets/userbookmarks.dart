@@ -8,7 +8,7 @@ import 'package:mobx/mobx.dart';
 import 'package:skana_pix/componentwidgets/headerfooter.dart';
 import 'package:skana_pix/model/worktypes.dart';
 import 'package:skana_pix/pixiv_dart_api.dart';
-import 'package:skana_pix/utils/translate.dart';
+import 'package:get/get.dart';
 import 'package:waterfall_flow/waterfall_flow.dart';
 
 import 'imagetab.dart';
@@ -59,8 +59,8 @@ class _BookmarksPageState extends State<BookmarksPage>
     return Column(
       children: [
         TabBar.secondary(controller: _tabController, tabs: [
-          Tab(text: "Artwork".i18n),
-          Tab(text: "Novel".i18n),
+          Tab(text: "Artwork".tr),
+          Tab(text: "Novel".tr),
         ]),
         Expanded(
           child: TabBarView(
@@ -269,11 +269,11 @@ class _BookmarkContentState extends State<BookmarkContent> {
               onPressed: () {
                 reset();
               },
-              child: Text("Retry".i18n)),
+              child: Text("Retry".tr)),
           Padding(
               padding: const EdgeInsets.all(16.0),
               child: Text(
-                ("Failed to load".i18n),
+                ("Failed to load".tr),
               ))
         ],
       ),
@@ -354,7 +354,7 @@ class _BookmarkContentState extends State<BookmarkContent> {
       return IllustCard(
         illusts,
         true,
-        initialPage: index,
+        index: index,
       );
     }, childCount: illusts.length);
   }

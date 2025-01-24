@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
+import 'package:get/get.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:skana_pix/componentwidgets/blocklistpage.dart';
 import 'package:skana_pix/componentwidgets/followlist.dart';
@@ -174,7 +175,7 @@ class _SettingPageState extends State<SettingPage> {
                               ),
                               ListTile(
                                 leading: Icon(Icons.favorite_rounded),
-                                title: Text("My Bookmarks".i18n),
+                                title: Text("My Bookmarks".tr),
                                 onTap: () => Leader.pushWithScaffold(
                                     context,
                                     MyBookmarksPage(
@@ -187,14 +188,14 @@ class _SettingPageState extends State<SettingPage> {
                               ),
                               ListTile(
                                 leading: Icon(Icons.bookmark),
-                                title: Text("Favorite Tags".i18n),
+                                title: Text("Favorite Tags".tr),
                                 onTap: () => Leader.pushWithScaffold(
                                     context, BookTagPage(),
                                     root: true),
                               ),
                               ListTile(
                                 leading: Icon(Icons.star_rate_rounded),
-                                title: Text("Following".i18n),
+                                title: Text("Following".tr),
                                 onTap: () {
                                   Navigator.of(context, rootNavigator: true)
                                       .push(MaterialPageRoute(
@@ -210,7 +211,7 @@ class _SettingPageState extends State<SettingPage> {
                               ),
                               ListTile(
                                 leading: Icon(Icons.people_rounded),
-                                title: Text("My Pixiv".i18n),
+                                title: Text("My Pixiv".tr),
                                 onTap: () {
                                   Navigator.of(context, rootNavigator: true)
                                       .push(MaterialPageRoute(
@@ -241,20 +242,20 @@ class _SettingPageState extends State<SettingPage> {
                     // ),
                     ListTile(
                       leading: Icon(Icons.history),
-                      title: Text("History".i18n),
+                      title: Text("History".tr),
                       onTap: () =>
                           Leader.push(context, HistoryPage(), root: true),
                     ),
                     ListTile(
                       leading: Icon(Icons.block),
-                      title: Text("Block List".i18n),
+                      title: Text("Block List".tr),
                       onTap: () =>
                           Leader.push(context, BlockListPage(), root: true),
                     ),
                     if (!ConnectManager().notLoggedIn)
                       ListTile(
                         leading: Icon(Icons.account_box),
-                        title: Text("Account Settings".i18n),
+                        title: Text("Account Settings".tr),
                         onTap: () {
                           launchUrlString(
                               "https://www.pixiv.net/setting_user.php");
@@ -262,14 +263,14 @@ class _SettingPageState extends State<SettingPage> {
                       ),
                     ListTile(
                       leading: Icon(Icons.settings),
-                      title: Text("Preference Settings".i18n),
+                      title: Text("Preference Settings".tr),
                       onTap: () => Leader.push(context, PreferenceSettings(),
                           root: true),
                     ),
                     ListTile(
                       onTap: () =>
                           Leader.push(context, DataExport(), root: true),
-                      title: Text("App Data".i18n),
+                      title: Text("App Data".tr),
                       leading: Icon(Icons.folder_open_rounded),
                     ),
                   ],
@@ -279,7 +280,7 @@ class _SettingPageState extends State<SettingPage> {
                   children: <Widget>[
                     ListTile(
                       leading: Icon(Icons.message),
-                      title: Text("About".i18n),
+                      title: Text("About".tr),
                       onTap: () => Leader.push(
                           context, AboutPage(newVersion: hasNewVersion),
                           root: true),
@@ -287,7 +288,7 @@ class _SettingPageState extends State<SettingPage> {
                     if (_needBoardSection)
                       ListTile(
                         leading: Icon(Icons.article),
-                        title: Text("Bulletin Board".i18n),
+                        title: Text("Bulletin Board".tr),
                         onTap: () => Leader.push(
                             context,
                             BoardPage(
@@ -296,7 +297,7 @@ class _SettingPageState extends State<SettingPage> {
                       ),
                     ListTile(
                       leading: Icon(Icons.update),
-                      title: Text("Check updates".i18n),
+                      title: Text("Check updates".tr),
                       onTap: () => Leader.push(
                           context,
                           NewVersionPage(
@@ -313,16 +314,14 @@ class _SettingPageState extends State<SettingPage> {
                           if (!ConnectManager().notLoggedIn) {
                             return ListTile(
                               leading: Icon(Icons.arrow_back),
-                              title: Text("Logout".i18n),
+                              title: Text("Logout".tr),
                               onTap: () => _showLogoutDialog(context),
                             );
                           } else {
                             return ListTile(
                               leading: Icon(Icons.arrow_back),
-                              title: Text("Login".i18n),
-                              onTap: () => Leader.push(
-                                  context, LoginPage(() => setState(() {})),
-                                  root: true),
+                              title: Text("Login".tr),
+                              onTap: () => Get.offAll(() => LoginPage()),
                             );
                           }
                         })
@@ -379,16 +378,16 @@ class _SettingPageState extends State<SettingPage> {
         context: context,
         builder: (context) {
           return AlertDialog(
-            title: Text("Logout".i18n),
+            title: Text("Logout".tr),
             actions: <Widget>[
               TextButton(
-                child: Text("Cancel".i18n),
+                child: Text("Cancel".tr),
                 onPressed: () {
                   Navigator.of(context).pop("CANCEL");
                 },
               ),
               TextButton(
-                child: Text("Ok".i18n),
+                child: Text("Ok".tr),
                 onPressed: () {
                   Navigator.of(context).pop("OK");
                 },
@@ -400,11 +399,7 @@ class _SettingPageState extends State<SettingPage> {
       case "OK":
         {
           ConnectManager().logout();
-          DynamicData.rootNavigatorKey.currentState!.pushAndRemoveUntil(
-              MaterialPageRoute(
-                builder: (context) => HomePage(),
-              ),
-              (route) => false);
+          Get.offAll(() => HomePage());
         }
         break;
       case "CANCEL":
@@ -417,16 +412,16 @@ class _SettingPageState extends State<SettingPage> {
     final result = await showDialog(
         builder: (BuildContext context) {
           return AlertDialog(
-            title: Text("Clear All Cache".i18n),
+            title: Text("Clear All Cache".tr),
             actions: <Widget>[
               TextButton(
-                child: Text("Cancel".i18n),
+                child: Text("Cancel".tr),
                 onPressed: () {
                   Navigator.of(context).pop("CANCEL");
                 },
               ),
               TextButton(
-                child: Text("Ok".i18n),
+                child: Text("Ok".tr),
                 onPressed: () {
                   Navigator.of(context).pop("OK");
                 },

@@ -1,4 +1,4 @@
-import 'package:flutter/widgets.dart';
+import 'package:shadcn_flutter/shadcn_flutter.dart';
 
 class NullHero extends StatelessWidget {
   final String? tag;

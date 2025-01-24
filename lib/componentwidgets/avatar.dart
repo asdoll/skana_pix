@@ -1,5 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:flutter/material.dart';
+import 'package:shadcn_flutter/shadcn_flutter.dart';
+import 'package:get/get.dart';
 import 'package:skana_pix/controller/caches.dart';
 import 'package:skana_pix/model/worktypes.dart';
 
@@ -9,34 +10,30 @@ class PainterAvatar extends StatefulWidget {
   final String url;
   final int id;
   final GestureTapCallback? onTap;
-  final Size? size;
+  final double? size;
   final ArtworkType type;
   final bool isMe;
 
   const PainterAvatar(
-      {Key? key,
+      {super.key,
       required this.url,
       required this.id,
       this.onTap,
-      this.size,
+      this.size = 60,
       this.type = ArtworkType.ALL,
-      this.isMe = false})
-      : super(key: key);
+      this.isMe = false});
 
   @override
-  _PainterAvatarState createState() => _PainterAvatarState();
+  State<PainterAvatar> createState() => _PainterAvatarState();
 }
 
 class _PainterAvatarState extends State<PainterAvatar> {
   void pushToUserPage() {
-    Navigator.of(context, rootNavigator: true)
-        .push(MaterialPageRoute(builder: (_) {
-      return UserPage(
-        id: widget.id,
-        type: widget.type,
-        isMe: widget.isMe,
-      );
-    }));
+    Get.to(() => UserPage(
+          id: widget.id,
+          type: widget.type,
+          isMe: widget.isMe,
+        ));
   }
 
   @override
@@ -45,53 +42,16 @@ class _PainterAvatarState extends State<PainterAvatar> {
         onTap: () {
           if (widget.onTap == null) {
             pushToUserPage();
-          } else
+          } else {
             widget.onTap!();
+          }
         },
-        child: widget.size == null
-            ? CachedNetworkImage(
-                imageUrl: widget.url,
-                imageBuilder: (context, imageProvider) => Container(
-                  width: 60.0,
-                  height: 60.0,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    image: DecorationImage(
-                        image: imageProvider, fit: BoxFit.cover),
-                  ),
-                ),
-                //httpHeaders: Hoster.header(url: widget.url),
-                cacheManager: imagesCacheManager,
-                errorWidget: (context, url, error) => Container(
-                  width: 60.0,
-                  height: 60.0,
-                  decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      color: Theme.of(context).cardColor),
-                ),
-              )
-            : CachedNetworkImage(
-                imageUrl: widget.url,
-                cacheManager: imagesCacheManager,
-                errorWidget: (context, url, error) => Container(
-                  width: widget.size!.width,
-                  height: widget.size!.height,
-                  decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      color: Theme.of(context).cardColor),
-                ),
-                imageBuilder: (context, imageProvider) => Container(
-                  width: widget.size!.width,
-                  height: widget.size!.height,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    image: DecorationImage(
-                        image: imageProvider, fit: BoxFit.cover),
-                  ),
-                ),
-                width: widget.size!.width,
-                height: widget.size!.height,
-                //httpHeaders: Hoster.header(url: widget.url),
-              ));
+        child: Avatar(
+          backgroundColor: Theme.of(context).colorScheme.card,
+          initials: Avatar.getInitials(widget.id.toString()),
+          size: widget.size,
+          provider: CachedNetworkImageProvider(widget.url,
+              cacheManager: imagesCacheManager),
+        ));
   }
 }

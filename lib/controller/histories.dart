@@ -1,9 +1,7 @@
 import 'dart:convert';
 
-import 'package:bot_toast/bot_toast.dart';
 import 'package:flutter/services.dart';
 import 'package:skana_pix/pixiv_dart_api.dart';
-import 'package:skana_pix/utils/translate.dart';
 
 import '../utils/safplugin.dart';
 
@@ -97,7 +95,6 @@ class HistoryManager {
           userName: illustMap['user_name']);
       illustHistoryProvider.insert(illustHis);
     }
-    BotToast.showText(text: "Imported".i18n);
   }
 
   Future<void> importNovelData() async {
@@ -117,7 +114,6 @@ class HistoryManager {
           userName: novelMap['user_name']);
       novelHistoryProvider.insert(noveHis);
     }
-    BotToast.showText(text: "Imported".i18n);
   }
 
   Future<void> exportIllustData() async {

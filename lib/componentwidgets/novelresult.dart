@@ -9,7 +9,7 @@ import 'package:skana_pix/componentwidgets/novelcard.dart';
 import 'package:skana_pix/model/worktypes.dart';
 import 'package:skana_pix/pixiv_dart_api.dart';
 import 'package:skana_pix/utils/filters.dart';
-import 'package:skana_pix/utils/translate.dart';
+import 'package:get/get.dart';
 import 'package:waterfall_flow/waterfall_flow.dart';
 
 import 'headerfooter.dart';
@@ -165,7 +165,7 @@ class _NovelResultPageState extends State<NovelResultPage> {
                         children: <Widget>[
                           TextButton(
                               onPressed: () {},
-                              child: Text("Filter".i18n,
+                              child: Text("Filter".tr,
                                   style: TextStyle(
                                       color: Theme.of(context)
                                           .colorScheme
@@ -177,7 +177,7 @@ class _NovelResultPageState extends State<NovelResultPage> {
                                 });
                                 Navigator.of(context).pop();
                               },
-                              child: Text("Apply".i18n,
+                              child: Text("Apply".tr,
                                   style: TextStyle(
                                       color: Theme.of(context)
                                           .colorScheme
@@ -192,10 +192,10 @@ class _NovelResultPageState extends State<NovelResultPage> {
                             groupValue: search_target
                                 .indexOf(searchOptions.searchTargetNovel),
                             children: <int, Widget>{
-                              0: Text(search_target_name_novel[0].i18n),
-                              1: Text(search_target_name_novel[1].i18n),
-                              2: Text(search_target_name_novel[2].i18n),
-                              3: Text(search_target_name_novel[3].i18n),
+                              0: Text(search_target_name_novel[0].tr),
+                              1: Text(search_target_name_novel[1].tr),
+                              2: Text(search_target_name_novel[2].tr),
+                              3: Text(search_target_name_novel[3].tr),
                             },
                             onValueChanged: (int? index) {
                               setS(() {
@@ -214,13 +214,13 @@ class _NovelResultPageState extends State<NovelResultPage> {
                             groupValue:
                                 search_sort.indexOf(searchOptions.selectSort),
                             children: <int, Widget>{
-                              0: Text(search_sort_name[0].i18n),
-                              1: Text(search_sort_name[1].i18n),
-                              2: Text(search_sort_name[2].i18n),
+                              0: Text(search_sort_name[0].tr),
+                              1: Text(search_sort_name[1].tr),
+                              2: Text(search_sort_name[2].tr),
                               if (!ConnectManager().notLoggedIn &&
                                   ConnectManager().apiClient.isPremium) ...{
-                                3: Text(search_sort_name[3].i18n),
-                                4: Text(search_sort_name[4].i18n),
+                                3: Text(search_sort_name[3].tr),
+                                4: Text(search_sort_name[4].tr),
                               }
                             },
                             onValueChanged: (int? index) {
@@ -246,7 +246,7 @@ class _NovelResultPageState extends State<NovelResultPage> {
                             searchOptions.searchAI = v;
                           });
                         },
-                        title: Text("AI-generated".i18n),
+                        title: Text("AI-generated".tr),
                       ),
                       Container(
                         height: 16,
@@ -356,7 +356,7 @@ class _NovelResultPageState extends State<NovelResultPage> {
           if (value.errorMessage != null &&
               value.errorMessage!.contains("timeout")) {
             BotToast.showText(
-                text: "Network Error. Please refresh to try again.".i18n);
+                text: "Network Error. Please refresh to try again.".tr);
           }
         });
       }
@@ -377,7 +377,7 @@ class _NovelResultPageState extends State<NovelResultPage> {
           if (value.errorMessage != null &&
               value.errorMessage!.contains("timeout")) {
             BotToast.showText(
-                text: "Network Error. Please refresh to try again.".i18n);
+                text: "Network Error. Please refresh to try again.".tr);
           }
         });
         easyRefreshController.finishRefresh(IndicatorResult.fail);

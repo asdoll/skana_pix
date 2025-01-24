@@ -1,7 +1,6 @@
-import 'package:bot_toast/bot_toast.dart';
 import 'package:flutter/material.dart';
 import 'package:skana_pix/pixiv_dart_api.dart';
-import 'package:skana_pix/utils/translate.dart';
+import 'package:get/get.dart';
 import 'package:skana_pix/utils/widgetplugin.dart';
 
 abstract class LoadingState<T extends StatefulWidget, S extends Object>
@@ -138,14 +137,13 @@ abstract class MultiPageLoadingState<T extends StatefulWidget, S extends Object>
         return true;
       } else {
         var message = value.errorMessage ??
-            "Network Error. Please refresh to try again.".i18n;
+            "Network Error. Please refresh to try again.".tr;
         if (message == "No more data") {
           return false;
         }
         if (message.length > 45) {
           message = "${message.substring(0, 20)}...";
         }
-        BotToast.showText(text: message);
         return false;
       }
     });
@@ -178,7 +176,7 @@ abstract class MultiPageLoadingState<T extends StatefulWidget, S extends Object>
           _isFirstLoading = false;
           if (value.errorMessage != null &&
               value.errorMessage!.contains("timeout")) {
-            _error = "Network Error. Please refresh to try again.".i18n;
+            _error = "Network Error. Please refresh to try again.".tr;
           }
         });
       }

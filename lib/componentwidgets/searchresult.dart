@@ -3,11 +3,11 @@ import 'package:easy_refresh/easy_refresh.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
+import 'package:get/get.dart';
 import 'package:mobx/mobx.dart';
 import 'package:skana_pix/componentwidgets/headerfooter.dart';
 import 'package:skana_pix/model/worktypes.dart';
 import 'package:skana_pix/pixiv_dart_api.dart';
-import 'package:skana_pix/utils/translate.dart';
 import 'package:waterfall_flow/waterfall_flow.dart';
 
 import '../utils/filters.dart';
@@ -129,7 +129,7 @@ class _ResultPageState extends State<ResultPage> {
       padding: EdgeInsets.all(5.0),
       itemCount: data.length,
       itemBuilder: (BuildContext context, int index) {
-        return IllustCard(data, true, initialPage: index, type: widget.type);
+        return IllustCard(data, true, index: index, type: widget.type);
       },
     );
   }
@@ -173,7 +173,7 @@ class _ResultPageState extends State<ResultPage> {
                         children: <Widget>[
                           TextButton(
                               onPressed: () {},
-                              child: Text("Filter".i18n,
+                              child: Text("Filter".tr,
                                   style: TextStyle(
                                       color: Theme.of(context)
                                           .colorScheme
@@ -185,7 +185,7 @@ class _ResultPageState extends State<ResultPage> {
                                 });
                                 Navigator.of(context).pop();
                               },
-                              child: Text("Apply".i18n,
+                              child: Text("Apply".tr,
                                   style: TextStyle(
                                       color: Theme.of(context)
                                           .colorScheme
@@ -200,9 +200,9 @@ class _ResultPageState extends State<ResultPage> {
                             groupValue: search_target
                                 .indexOf(searchOptions.searchTarget),
                             children: <int, Widget>{
-                              0: Text(search_target_name[0].i18n),
-                              1: Text(search_target_name[1].i18n),
-                              2: Text(search_target_name[2].i18n),
+                              0: Text(search_target_name[0].tr),
+                              1: Text(search_target_name[1].tr),
+                              2: Text(search_target_name[2].tr),
                             },
                             onValueChanged: (int? index) {
                               setS(() {
@@ -221,13 +221,13 @@ class _ResultPageState extends State<ResultPage> {
                             groupValue:
                                 search_sort.indexOf(searchOptions.selectSort),
                             children: <int, Widget>{
-                              0: Text(search_sort_name[0].i18n),
-                              1: Text(search_sort_name[1].i18n),
-                              2: Text(search_sort_name[2].i18n),
+                              0: Text(search_sort_name[0].tr),
+                              1: Text(search_sort_name[1].tr),
+                              2: Text(search_sort_name[2].tr),
                               if (!ConnectManager().notLoggedIn &&
                                   ConnectManager().apiClient.isPremium) ...{
-                                3: Text(search_sort_name[3].i18n),
-                                4: Text(search_sort_name[4].i18n),
+                                3: Text(search_sort_name[3].tr),
+                                4: Text(search_sort_name[4].tr),
                               }
                             },
                             onValueChanged: (int? index) {
@@ -253,7 +253,7 @@ class _ResultPageState extends State<ResultPage> {
                             searchOptions.searchAI = v;
                           });
                         },
-                        title: Text("AI-generated".i18n),
+                        title: Text("AI-generated".tr),
                       ),
                       Container(
                         height: 16,
@@ -325,7 +325,7 @@ class _ResultPageState extends State<ResultPage> {
       itemBuilder: (context) {
         return [
           PopupMenuItem(
-            child: Text("All".i18n),
+            child: Text("All".tr),
             value: "all",
             onTap: () {
               setState(() {
@@ -335,7 +335,7 @@ class _ResultPageState extends State<ResultPage> {
             },
           ),
           PopupMenuItem(
-            child: Text("Illust".i18n),
+            child: Text("Illust".tr),
             value: "illust",
             onTap: () {
               setState(() {
@@ -345,7 +345,7 @@ class _ResultPageState extends State<ResultPage> {
             },
           ),
           PopupMenuItem(
-            child: Text("Manga".i18n),
+            child: Text("Manga".tr),
             value: "manga",
             onTap: () {
               setState(() {
@@ -425,7 +425,7 @@ class _ResultPageState extends State<ResultPage> {
           if (value.errorMessage != null &&
               value.errorMessage!.contains("timeout")) {
             BotToast.showText(
-                text: "Network Error. Please refresh to try again.".i18n);
+                text: "Network Error. Please refresh to try again.".tr);
           }
         });
         easyRefreshController.finishLoad(IndicatorResult.fail);
@@ -450,7 +450,7 @@ class _ResultPageState extends State<ResultPage> {
           if (value.errorMessage != null &&
               value.errorMessage!.contains("timeout")) {
             BotToast.showText(
-                text: "Network Error. Please refresh to try again.".i18n);
+                text: "Network Error. Please refresh to try again.".tr);
           }
         });
         easyRefreshController.finishRefresh(IndicatorResult.fail);

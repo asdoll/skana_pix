@@ -5,18 +5,20 @@ import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:mobx/mobx.dart';
 import 'package:skana_pix/componentwidgets/headerfooter.dart';
-import 'package:skana_pix/componentwidgets/imagetab.dart';
+import 'package:skana_pix/componentwidgets/imagelist.dart';
 import 'package:skana_pix/componentwidgets/novelpage.dart';
 import 'package:skana_pix/componentwidgets/pixivimage.dart';
 import 'package:skana_pix/controller/histories.dart';
 import 'package:skana_pix/pixiv_dart_api.dart';
-import 'package:skana_pix/utils/translate.dart';
+import 'package:get/get.dart';
 import 'package:animated_search_bar/animated_search_bar.dart';
 import 'package:skana_pix/utils/widgetplugin.dart';
 
 class HistoryPage extends StatefulWidget {
+  const HistoryPage({super.key});
+
   @override
-  _HistoryPageState createState() => _HistoryPageState();
+  State<HistoryPage> createState() => _HistoryPageState();
 }
 
 class _HistoryPageState extends State<HistoryPage>
@@ -39,8 +41,8 @@ class _HistoryPageState extends State<HistoryPage>
         title: TabBar(
           controller: _tabController,
           tabs: [
-            Tab(text: "Illust•Manga".i18n),
-            Tab(text: "Novel".i18n),
+            Tab(text: "Illust•Manga".tr),
+            Tab(text: "Novel".tr),
           ],
         ),
       ),
@@ -56,8 +58,10 @@ class _HistoryPageState extends State<HistoryPage>
 }
 
 class IllustsHistory extends StatefulWidget {
+  const IllustsHistory({super.key});
+
   @override
-  _IllustsHistoryState createState() => _IllustsHistoryState();
+  State<IllustsHistory>  createState() => _IllustsHistoryState();
 }
 
 class _IllustsHistoryState extends State<IllustsHistory> {
@@ -120,16 +124,16 @@ class _IllustsHistoryState extends State<IllustsHistory> {
         context: context,
         builder: (context) {
           return AlertDialog(
-            title: Text("${"Delete".i18n} ${"All".i18n}?"),
+            title: Text("${"Delete".tr} ${"All".tr}?"),
             actions: <Widget>[
               TextButton(
-                child: Text("Cancel".i18n),
+                child: Text("Cancel".tr),
                 onPressed: () {
                   Navigator.of(context).pop();
                 },
               ),
               TextButton(
-                child: Text("Ok".i18n),
+                child: Text("Ok".tr),
                 onPressed: () {
                   Navigator.of(context).pop("OK");
                 },
@@ -148,9 +152,9 @@ class _IllustsHistoryState extends State<IllustsHistory> {
 
   Widget buildSearchbar(BuildContext context) {
     return AnimatedSearchBar(
-      label: "Search Illusts or Pianters".i18n,
+      label: "Search Illusts or Pianters".tr,
       searchDecoration: InputDecoration(
-          labelText: 'Search'.i18n,
+          labelText: 'Search'.tr,
           alignLabelWithHint: true,
           contentPadding: EdgeInsets.symmetric(vertical: 8, horizontal: 8),
           border: OutlineInputBorder(
@@ -198,16 +202,16 @@ class _IllustsHistoryState extends State<IllustsHistory> {
                         context: context,
                         builder: (context) {
                           return AlertDialog(
-                            title: Text("${"Delete".i18n}?"),
+                            title: Text("${"Delete".tr}?"),
                             actions: <Widget>[
                               TextButton(
-                                child: Text("Cancel".i18n),
+                                child: Text("Cancel".tr),
                                 onPressed: () {
                                   Navigator.of(context).pop();
                                 },
                               ),
                               TextButton(
-                                child: Text("Ok".i18n),
+                                child: Text("Ok".tr),
                                 onPressed: () {
                                   Navigator.of(context).pop("OK");
                                 },
@@ -242,6 +246,8 @@ class _IllustsHistoryState extends State<IllustsHistory> {
 }
 
 class NovelsHistory extends StatefulWidget {
+  const NovelsHistory({super.key});
+
   @override
   _NovelsHistoryState createState() => _NovelsHistoryState();
 }
@@ -306,16 +312,16 @@ class _NovelsHistoryState extends State<NovelsHistory> {
         context: context,
         builder: (context) {
           return AlertDialog(
-            title: Text("${"Delete".i18n} ${"All".i18n}?"),
+            title: Text("${"Delete".tr} ${"All".tr}?"),
             actions: <Widget>[
               TextButton(
-                child: Text("Cancel".i18n),
+                child: Text("Cancel".tr),
                 onPressed: () {
                   Navigator.of(context).pop();
                 },
               ),
               TextButton(
-                child: Text("Ok".i18n),
+                child: Text("Ok".tr),
                 onPressed: () {
                   Navigator.of(context).pop("OK");
                 },
@@ -334,9 +340,9 @@ class _NovelsHistoryState extends State<NovelsHistory> {
 
   Widget buildSearchbar(BuildContext context) {
     return AnimatedSearchBar(
-      label: "Search Novels or Authors".i18n,
+      label: "Search Novels or Authors".tr,
       searchDecoration: InputDecoration(
-          labelText: 'Search'.i18n,
+          labelText: 'Search'.tr,
           alignLabelWithHint: true,
           contentPadding: EdgeInsets.symmetric(vertical: 8, horizontal: 8),
           border: OutlineInputBorder(
@@ -383,16 +389,16 @@ class _NovelsHistoryState extends State<NovelsHistory> {
                       context: context,
                       builder: (context) {
                         return AlertDialog(
-                          title: Text("${"Delete".i18n}?"),
+                          title: Text("${"Delete".tr}?"),
                           actions: <Widget>[
                             TextButton(
-                              child: Text("Cancel".i18n),
+                              child: Text("Cancel".tr),
                               onPressed: () {
                                 Navigator.of(context).pop();
                               },
                             ),
                             TextButton(
-                              child: Text("Ok".i18n),
+                              child: Text("Ok".tr),
                               onPressed: () {
                                 Navigator.of(context).pop("OK");
                               },

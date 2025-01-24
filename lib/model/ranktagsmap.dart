@@ -1,4 +1,4 @@
-import 'package:skana_pix/utils/translate.dart';
+import 'package:get/get.dart';
 
 final modeIllust = [
   "day",
@@ -35,24 +35,24 @@ final modeNovel = [
 ];
 
 Map<String, String> rankTagsMap = {
-  "day": "Daily".i18n,
-  "day_male": "For male".i18n,
-  "day_female": "For female".i18n,
-  "week_original": "Originals".i18n,
-  "week_rookie": "Rookies".i18n,
-  "week": "Weekly".i18n,
-  "month": "Monthly".i18n,
-  "day_ai": "Daily AI".i18n,
-  "day_r18_ai": "Daily R18 AI".i18n,
-  "day_r18": "Daily R18".i18n,
-  "week_r18": "Weekly R18".i18n,
-  "week_r18g": "Weekly R18G".i18n,
-  "day_manga": "Daily Manga".i18n,
-  "week_manga": "Weekly Manga".i18n,
-  "month_manga": "Monthly Manga".i18n,
-  "week_rookie_manga": "Rookies Manga".i18n,
-  "day_r18_manga": "Daily R18 Manga".i18n,
-  "week_r18_manga": "Weekly R18 Manga".i18n,
-  "week_ai": "Weekly AI".i18n,
-  "week_ai_r18": "Weekly AI R18".i18n,
+  "day": "Daily".tr,
+  "day_male": "For male".tr,
+  "day_female": "For female".tr,
+  "week_original": "Originals".tr,
+  "week_rookie": "Rookies".tr,
+  "week": "Weekly".tr,
+  "month": "Monthly".tr,
+  "day_ai": "Daily AI".tr,
+  "day_r18_ai": "Daily R18 AI".tr,
+  "day_r18": "Daily R18".tr,
+  "week_r18": "Weekly R18".tr,
+  "week_r18g": "Weekly R18G".tr,
+  "day_manga": "Daily Manga".tr,
+  "week_manga": "Weekly Manga".tr,
+  "month_manga": "Monthly Manga".tr,
+  "week_rookie_manga": "Rookies Manga".tr,
+  "day_r18_manga": "Daily R18 Manga".tr,
+  "week_r18_manga": "Weekly R18 Manga".tr,
+  "week_ai": "Weekly AI".tr,
+  "week_ai_r18": "Weekly AI R18".tr,
 };

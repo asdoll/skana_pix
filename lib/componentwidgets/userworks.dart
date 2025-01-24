@@ -8,7 +8,7 @@ import 'package:mobx/mobx.dart';
 import 'package:skana_pix/componentwidgets/headerfooter.dart';
 import 'package:skana_pix/model/worktypes.dart';
 import 'package:skana_pix/pixiv_dart_api.dart';
-import 'package:skana_pix/utils/translate.dart';
+import 'package:get/get.dart';
 import 'package:waterfall_flow/waterfall_flow.dart';
 
 import 'imagetab.dart';
@@ -60,9 +60,9 @@ class _WorksPageState extends State<WorksPage> with TickerProviderStateMixin {
     return Column(
       children: [
         TabBar.secondary(controller: _tabController, tabs: [
-          Tab(text: "Illust".i18n),
-          Tab(text: "Manga".i18n),
-          Tab(text: "Novel".i18n),
+          Tab(text: "Illust".tr),
+          Tab(text: "Manga".tr),
+          Tab(text: "Novel".tr),
         ]),
         Expanded(
           child: TabBarView(
@@ -279,11 +279,11 @@ class _WorkContentState extends State<WorkContent> {
               onPressed: () {
                 reset();
               },
-              child: Text("Retry".i18n)),
+              child: Text("Retry".tr)),
           Padding(
               padding: const EdgeInsets.all(16.0),
               child: Text(
-                ("Failed to load".i18n),
+                ("Failed to load".tr),
               ))
         ],
       ),
@@ -365,7 +365,7 @@ class _WorkContentState extends State<WorkContent> {
         return IllustCard(
           manga,
           false,
-          initialPage: index,
+          index: index,
         );
       }, childCount: manga.length);
     }
@@ -373,7 +373,7 @@ class _WorkContentState extends State<WorkContent> {
       return IllustCard(
         illusts,
         false,
-        initialPage: index,
+        index: index,
       );
     }, childCount: illusts.length);
   }

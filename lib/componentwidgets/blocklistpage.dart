@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
+import 'package:get/get.dart';
 import 'package:mobx/mobx.dart';
 import 'package:skana_pix/pixiv_dart_api.dart';
 import 'package:skana_pix/utils/translate.dart';
@@ -33,7 +34,7 @@ class _BlockListPageState extends State<BlockListPage> {
     return Observer(builder: (_) {
       return Scaffold(
         appBar: AppBar(
-          title: Text('Block List'.i18n),
+          title: Text('Block List'.tr),
         ),
         body: Padding(
           padding: const EdgeInsets.all(8.0),
@@ -44,7 +45,7 @@ class _BlockListPageState extends State<BlockListPage> {
               children: <Widget>[
                 Row(
                   children: [
-                    Text("Tags".i18n),
+                    Text("Tags".tr),
                     IconButton(
                         onPressed: () {
                           _showBanTagAddDialog(false);
@@ -68,7 +69,7 @@ class _BlockListPageState extends State<BlockListPage> {
                 Divider(),
                 Row(
                   children: [
-                    Text("Novel Tags".i18n),
+                    Text("Novel Tags".tr),
                     IconButton(
                         onPressed: () {
                           _showBanTagAddDialog(true);
@@ -93,7 +94,7 @@ class _BlockListPageState extends State<BlockListPage> {
                 Divider(),
                 Row(
                   children: [
-                    Text("Pianters".i18n),
+                    Text("Pianters".tr),
                     Opacity(
                       child:
                           IconButton(onPressed: () {}, icon: Icon(Icons.add)),
@@ -121,7 +122,7 @@ class _BlockListPageState extends State<BlockListPage> {
                 Divider(),
                 Row(
                   children: [
-                    Text("Authors".i18n),
+                    Text("Authors".tr),
                     Opacity(
                       child:
                           IconButton(onPressed: () {}, icon: Icon(Icons.add)),
@@ -149,7 +150,7 @@ class _BlockListPageState extends State<BlockListPage> {
                 Divider(),
                 Row(
                   children: [
-                    Text("Commentors".i18n),
+                    Text("Commentors".tr),
                     Opacity(
                       child:
                           IconButton(onPressed: () {}, icon: Icon(Icons.add)),
@@ -177,7 +178,7 @@ class _BlockListPageState extends State<BlockListPage> {
                 Divider(),
                 Row(
                   children: [
-                    Text("Illusts".i18n),
+                    Text("Illusts".tr),
                     Opacity(
                       child:
                           IconButton(onPressed: () {}, icon: Icon(Icons.add)),
@@ -201,7 +202,7 @@ class _BlockListPageState extends State<BlockListPage> {
                 Divider(),
                 Row(
                   children: [
-                    Text("Novels".i18n),
+                    Text("Novels".tr),
                     Opacity(
                       child:
                           IconButton(onPressed: () {}, icon: Icon(Icons.add)),
@@ -225,7 +226,7 @@ class _BlockListPageState extends State<BlockListPage> {
                 Divider(),
                 Row(
                   children: [
-                    Text("Comments".i18n),
+                    Text("Comments".tr),
                     Opacity(
                       child:
                           IconButton(onPressed: () {}, icon: Icon(Icons.add)),
@@ -264,12 +265,12 @@ class _BlockListPageState extends State<BlockListPage> {
             content: TextField(
               controller: controller,
               decoration: InputDecoration(
-                  hintText: isNovel ? "Novel Tag".i18n : "Tag".i18n,
+                  hintText: isNovel ? "Novel Tag".tr : "Tag".tr,
                   hintStyle: TextStyle(fontSize: 12)),
             ),
             actions: <Widget>[
               TextButton(
-                child: Text("Cancel".i18n),
+                child: Text("Cancel".tr),
                 onPressed: () {
                   Navigator.pop(context);
                 },
@@ -278,7 +279,7 @@ class _BlockListPageState extends State<BlockListPage> {
                 onPressed: () {
                   Navigator.pop(context, controller.text);
                 },
-                child: Text("Ok".i18n),
+                child: Text("Ok".tr),
               ),
             ],
           );
@@ -302,11 +303,11 @@ class _BlockListPageState extends State<BlockListPage> {
       context: context,
       builder: (context) {
         return AlertDialog(
-          title: Text("Delete".i18n),
-          content: Text('Delete this tag?'.i18n),
+          title: Text("Delete".tr),
+          content: Text('Delete this tag?'.tr),
           actions: <Widget>[
             TextButton(
-              child: Text("Cancel".i18n),
+              child: Text("Cancel".tr),
               onPressed: () {
                 Navigator.pop(context);
               },
@@ -315,7 +316,7 @@ class _BlockListPageState extends State<BlockListPage> {
               onPressed: () {
                 Navigator.pop(context, "OK");
               },
-              child: Text("Ok".i18n),
+              child: Text("Ok".tr),
             ),
           ],
         );
@@ -345,11 +346,11 @@ class _BlockListPageState extends State<BlockListPage> {
       context: context,
       builder: (context) {
         return AlertDialog(
-          title: Text("Delete".i18n),
-          content: Text('Delete this user?'.i18n),
+          title: Text("Delete".tr),
+          content: Text('Delete this user?'.tr),
           actions: <Widget>[
             TextButton(
-              child: Text("Cancel".i18n),
+              child: Text("Cancel".tr),
               onPressed: () {
                 Navigator.pop(context);
               },
@@ -358,7 +359,7 @@ class _BlockListPageState extends State<BlockListPage> {
               onPressed: () {
                 Navigator.pop(context, "OK");
               },
-              child: Text("Ok".i18n),
+              child: Text("Ok".tr),
             ),
           ],
         );
@@ -403,11 +404,11 @@ class _BlockListPageState extends State<BlockListPage> {
       context: context,
       builder: (context) {
         return AlertDialog(
-          title: Text("Delete".i18n),
-          content: Text("${'Delete'.i18n}?"),
+          title: Text("Delete".tr),
+          content: Text("${'Delete'.tr}?"),
           actions: <Widget>[
             TextButton(
-              child: Text("Cancel".i18n),
+              child: Text("Cancel".tr),
               onPressed: () {
                 Navigator.pop(context);
               },
@@ -416,7 +417,7 @@ class _BlockListPageState extends State<BlockListPage> {
               onPressed: () {
                 Navigator.pop(context, "OK");
               },
-              child: Text("Ok".i18n),
+              child: Text("Ok".tr),
             ),
           ],
         );
@@ -454,16 +455,5 @@ class _BlockListPageState extends State<BlockListPage> {
           break;
         }
     }
-  }
-
-  loadDirects() {
-    blockedUsers.addAll(settings.blockedUsers);
-    blockedCommentUsers.addAll(settings.blockedCommentUsers);
-    blockedNovelUsers.addAll(settings.blockedNovelUsers);
-    blockedTags.addAll(settings.blockedTags);
-    blockedNovelTags.addAll(settings.blockedNovelTags);
-    blockedIllusts.addAll(settings.blockedIllusts);
-    blockedNovels.addAll(settings.blockedNovels);
-    blockedComments.addAll(settings.blockedComments);
   }
 }

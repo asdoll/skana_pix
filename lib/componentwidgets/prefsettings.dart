@@ -1,7 +1,7 @@
 import 'package:bot_toast/bot_toast.dart';
 import 'package:flutter/material.dart';
 import 'package:skana_pix/pixiv_dart_api.dart';
-import 'package:skana_pix/utils/translate.dart';
+import 'package:get/get.dart';
 import 'package:skana_pix/view/defaults.dart';
 
 class PreferenceSettings extends StatefulWidget {
@@ -19,24 +19,24 @@ class _PreferenceSettingsState extends State<PreferenceSettings> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Preference Settings'.i18n),
+        title: Text('Preference Settings'.tr),
       ),
       body: ListView(
         children: [
           ListTile(
-            title: Text('Language'.i18n),
+            title: Text('Language'.tr),
             trailing: DropdownButton<String>(
-              value: settings.language,
+              value: settings.getLocale(),
               onChanged: (String? newValue) async {
                 setState(() {
                   settings.set("language", newValue!);
                 });
-                BotToast.showText(text:"Please reboot to take effect".i18n);
+                BotToast.showText(text:"Please reboot to take effect".tr);
               },
               items: [
                 DropdownMenuItem(
                   value: 'system',
-                  child: Text('System'.i18n),
+                  child: Text('System'.tr),
                 ),
                 const DropdownMenuItem(
                   value: 'en_US',
@@ -54,7 +54,7 @@ class _PreferenceSettingsState extends State<PreferenceSettings> {
             ),
           ),
           ListTile(
-            title: Text("Prefer types to display".i18n),
+            title: Text("Prefer types to display".tr),
             trailing: DropdownButton<String>(
               value: settings.awPrefer,
               onChanged: (String? newValue) {
@@ -65,22 +65,22 @@ class _PreferenceSettingsState extends State<PreferenceSettings> {
               items: [
                 DropdownMenuItem(
                   value: 'illust',
-                  child: Text('Illust'.i18n),
+                  child: Text('Illust'.tr),
                 ),
                 DropdownMenuItem(
                   value: 'manga',
-                  child: Text('Manga'.i18n),
+                  child: Text('Manga'.tr),
                 ),
                 DropdownMenuItem(
                   value: 'novel',
-                  child: Text('Novel'.i18n),
+                  child: Text('Novel'.tr),
                 ),
               ],
             ),
           ),
           Divider(),
           SwitchListTile(
-            title: Text("Show Original in detail page".i18n),
+            title: Text("Show Original in detail page".tr),
             onChanged: (value) {
               setState(() {
                 settings.set("showOriginal", value);
@@ -89,7 +89,7 @@ class _PreferenceSettingsState extends State<PreferenceSettings> {
             value: settings.showOriginal,
           ),
           SwitchListTile(
-            title: Text("Blur R18 Image".i18n),
+            title: Text("Blur R18 Image".tr),
             onChanged: (value) {
               setState(() {
                 settings.set("hideR18", value);
@@ -98,7 +98,7 @@ class _PreferenceSettingsState extends State<PreferenceSettings> {
             value: settings.hideR18,
           ),
           SwitchListTile(
-            title: Text("Hide AI Image".i18n),
+            title: Text("Hide AI Image".tr),
             onChanged: (value) {
               setState(() {
                 settings.set("hideAI", value);
@@ -107,7 +107,7 @@ class _PreferenceSettingsState extends State<PreferenceSettings> {
             value: settings.hideAI,
           ),
           SwitchListTile(
-            title: Text("Show AI Badge".i18n),
+            title: Text("Show AI Badge".tr),
             onChanged: (value) {
               setState(() {
                 settings.set("feedAIBadge", value);
@@ -116,7 +116,7 @@ class _PreferenceSettingsState extends State<PreferenceSettings> {
             value: settings.feedAIBadge,
           ),
           SwitchListTile(
-            title: Text("Long press image card to save".i18n),
+            title: Text("Long press image card to save".tr),
             value: settings.longPressSaveConfirm,
             onChanged: (value) {
               setState(() {
@@ -126,7 +126,7 @@ class _PreferenceSettingsState extends State<PreferenceSettings> {
           ),
           Divider(),
           SwitchListTile(
-            title: Text("Enter novel page directly".i18n),
+            title: Text("Enter novel page directly".tr),
             value: settings.novelDirectEntry,
             onChanged: (value) {
               setState(() {
@@ -136,7 +136,7 @@ class _PreferenceSettingsState extends State<PreferenceSettings> {
           ),
           Divider(),
           SwitchListTile(
-            title: Text("Check updates on start".i18n),
+            title: Text("Check updates on start".tr),
             value: settings.checkUpdate,
             onChanged: (value) {
               setState(() {
@@ -148,11 +148,11 @@ class _PreferenceSettingsState extends State<PreferenceSettings> {
             Divider(),
           if(DynamicData.isAndroid)
             SwitchListTile(
-            title: Text("High Refresh mode".i18n),
+            title: Text("High Refresh mode".tr),
             value: settings.isHighRefreshRate,
             onChanged: (value) {
               setState(() {
-                settings.set("isHighRefreshRate", value);
+                settings.set("highRefreshRate", value);
               });
             },
           ),

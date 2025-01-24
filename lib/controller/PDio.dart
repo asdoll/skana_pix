@@ -8,7 +8,7 @@ import 'logging.dart';
 class LogInterceptor implements Interceptor {
   @override
   void onError(DioException err, ErrorInterceptorHandler handler) {
-    netErrLog(
+    log.e(
         "${err.requestOptions.method} ${err.requestOptions.path}\n$err\n${err.response?.data.toString()}");
     switch (err.type) {
       case DioExceptionType.badResponse:
@@ -74,9 +74,9 @@ class LogInterceptor implements Interceptor {
         "Response ${response.realUri.toString()} ${response.statusCode}\n"
         "headers:\n$headers\n$content";
     if (response.statusCode != null && response.statusCode! < 400) {
-      netInfoLog(msg);
+      log.i(msg);
     } else {
-      netErrLog(msg);
+      log.d(msg);
     }
     handler.next(response);
   }
@@ -89,7 +89,7 @@ class LogInterceptor implements Interceptor {
     if (options.headers["Host"] == null && options.headers["host"] == null) {
       options.headers["host"] = options.uri.host;
     }
-    netInfoLog(
+    log.i(
         "${options.method} ${options.uri}\n${options.headers}\n${options.data}");
     handler.next(options);
   }

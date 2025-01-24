@@ -1,6 +1,7 @@
 import 'package:easy_refresh/easy_refresh.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
+import 'package:get/get.dart';
 import 'package:mobx/mobx.dart';
 import 'package:skana_pix/componentwidgets/headerfooter.dart';
 import 'package:skana_pix/componentwidgets/novelcard.dart';
@@ -60,9 +61,9 @@ class _FeedNovelState extends State<FeedNovel> {
               minWidth: 80.0,
             ),
             children: [
-              Text("All".i18n),
-              Text("Public".i18n),
-              Text("Private".i18n),
+              Text("All".tr),
+              Text("Public".tr),
+              Text("Private".tr),
             ]),
         Expanded(
           child: buildContent(context),
@@ -84,12 +85,12 @@ class _FeedNovelState extends State<FeedNovel> {
             return Center(
               child: Column(
                 children: [
-                  Text("Error".i18n),
+                  Text("Error".tr),
                   ElevatedButton(
                     onPressed: () {
                       reset();
                     },
-                    child: Text("Retry".i18n),
+                    child: Text("Retry".tr),
                   )
                 ],
               ),

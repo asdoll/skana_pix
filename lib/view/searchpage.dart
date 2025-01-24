@@ -1,15 +1,14 @@
 import 'dart:math';
 
-import 'package:bot_toast/bot_toast.dart';
 import 'package:easy_refresh/easy_refresh.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:mobx/mobx.dart';
 import 'package:skana_pix/componentwidgets/headerfooter.dart';
-import 'package:skana_pix/componentwidgets/imagetab.dart';
+import 'package:skana_pix/componentwidgets/imagelist.dart';
 import 'package:skana_pix/componentwidgets/usersearch.dart';
 import 'package:skana_pix/pixiv_dart_api.dart';
-import 'package:skana_pix/utils/translate.dart';
+import 'package:get/get.dart';
 
 import '../componentwidgets/novelresult.dart';
 import '../componentwidgets/pixivimage.dart';
@@ -63,19 +62,19 @@ class _SearchPageState extends State<SearchPage> {
                   Container(
                     height: 30.0,
                     width: 80,
-                    child: Tab(text: 'Illust•Manga'.i18n),
+                    child: Tab(text: 'Illust•Manga'.tr),
                   ),
                   Container(
                     height: 30.0,
                     width: 80,
                     // color: Colors.red,
-                    child: Tab(text: 'Novel'.i18n),
+                    child: Tab(text: 'Novel'.tr),
                   ),
                   Container(
                     height: 30.0,
                     width: 80,
                     // color: Colors.red,
-                    child: Tab(text: 'User'.i18n),
+                    child: Tab(text: 'User'.tr),
                   ),
                 ],
                 indicatorSize: TabBarIndicatorSize.tab,
@@ -119,7 +118,7 @@ class _SearchRecommmendUserPageState extends State<SearchRecommmendUserPage> {
   void initState() {
     _refreshController = EasyRefreshController(
         controlFinishLoad: true, controlFinishRefresh: true);
-    tagHistory.addAll(settings.getHistoryTag(null).reversed);
+    tagHistory.addAll(settings.getHistoryTag(ArtworkType.ALL).reversed);
     super.initState();
   }
 
@@ -163,7 +162,7 @@ class _SearchRecommmendUserPageState extends State<SearchRecommmendUserPage> {
                     crossAxisAlignment: CrossAxisAlignment.end,
                     children: [
                       Text(
-                        "History".i18n,
+                        "History".tr,
                         style: TextStyle(
                             fontSize: 16.0,
                             color: Theme.of(context)
@@ -239,20 +238,20 @@ class _SearchRecommmendUserPageState extends State<SearchRecommmendUserPage> {
                         context: context,
                         builder: (context) {
                           return AlertDialog(
-                            title: Text("Clean history?".i18n),
+                            title: Text("Clean history?".tr),
                             actions: [
                               TextButton(
                                   onPressed: () {
                                     Navigator.of(context).pop();
                                   },
-                                  child: Text("Cancel".i18n)),
+                                  child: Text("Cancel".tr)),
                               TextButton(
                                   onPressed: () {
-                                    settings.clearHistoryTag(null);
+                                    settings.clearHistoryTag(ArtworkType.ALL);
                                     reset();
                                     Navigator.of(context).pop();
                                   },
-                                  child: Text("Ok".i18n)),
+                                  child: Text("Ok".tr)),
                             ],
                           );
                         });
@@ -270,7 +269,7 @@ class _SearchRecommmendUserPageState extends State<SearchRecommmendUserPage> {
                             color: Theme.of(context).textTheme.bodySmall!.color,
                           ),
                           Text(
-                            "Clear search history".i18n,
+                            "Clear search history".tr,
                             style: Theme.of(context)
                                 .textTheme
                                 .bodyMedium!
@@ -293,7 +292,7 @@ class _SearchRecommmendUserPageState extends State<SearchRecommmendUserPage> {
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16.0),
               child: Text(
-                "Recommended Users".i18n,
+                "Recommended Users".tr,
                 style: TextStyle(
                     fontSize: 16.0,
                     color: Theme.of(context).textTheme.titleLarge!.color),
@@ -316,20 +315,20 @@ class _SearchRecommmendUserPageState extends State<SearchRecommmendUserPage> {
             context: context,
             builder: (context) {
               return AlertDialog(
-                title: Text('${"Delete".i18n}?'),
+                title: Text('${"Delete".tr}?'),
                 actions: [
                   TextButton(
                       onPressed: () {
-                        settings.deleteHistoryTag(null, f);
+                        settings.deleteHistoryTag(ArtworkType.ALL, f);
                         reset();
                         Navigator.of(context).pop();
                       },
-                      child: Text("Ok".i18n)),
+                      child: Text("Ok".tr)),
                   TextButton(
                       onPressed: () {
                         Navigator.of(context).pop();
                       },
-                      child: Text("Cancel".i18n)),
+                      child: Text("Cancel".tr)),
                 ],
               );
             });
@@ -384,13 +383,13 @@ class _SearchRecommmendUserPageState extends State<SearchRecommmendUserPage> {
         return true;
       } else {
         var message = value.errorMessage ??
-            "Network Error. Please refresh to try again.".i18n;
+            "Network Error. Please refresh to try again.".tr;
         if (message == "No more data") {}
         if (message.length > 45) {
           message = "${message.substring(0, 20)}...";
         }
         isError = true;
-        BotToast.showText(text: message);
+        //BotToast.showText(text: message);
         _refreshController.finishLoad(IndicatorResult.fail);
         return false;
       }
@@ -403,7 +402,7 @@ class _SearchRecommmendUserPageState extends State<SearchRecommmendUserPage> {
       isLoading = false;
       users.clear();
       tagHistory.clear();
-      tagHistory.addAll(settings.getHistoryTag(null).reversed);
+      tagHistory.addAll(settings.getHistoryTag(ArtworkType.ALL).reversed);
     });
     firstLoad();
     return true;
@@ -427,8 +426,8 @@ class _SearchRecommmendUserPageState extends State<SearchRecommmendUserPage> {
           if (value.errorMessage != null &&
               value.errorMessage!.contains("timeout")) {
             isError = true;
-            BotToast.showText(
-                text: "Network Error. Please refresh to try again.".i18n);
+            //BotToast.showText(
+            //    text: "Network Error. Please refresh to try again.".tr);
           }
         });
         _refreshController.finishRefresh(IndicatorResult.fail);
@@ -508,7 +507,7 @@ class _SearchRecommendPageState extends State<SearchRecommendPage> {
                     crossAxisAlignment: CrossAxisAlignment.end,
                     children: [
                       Text(
-                        "History".i18n,
+                        "History".tr,
                         style: TextStyle(
                             fontSize: 16.0,
                             color: Theme.of(context)
@@ -584,20 +583,20 @@ class _SearchRecommendPageState extends State<SearchRecommendPage> {
                         context: context,
                         builder: (context) {
                           return AlertDialog(
-                            title: Text("Clean history?".i18n),
+                            title: Text("Clean history?".tr),
                             actions: [
                               TextButton(
                                   onPressed: () {
                                     Navigator.of(context).pop();
                                   },
-                                  child: Text("Cancel".i18n)),
+                                  child: Text("Cancel".tr)),
                               TextButton(
                                   onPressed: () {
                                     settings.clearHistoryTag(widget.type);
                                     _refresh();
                                     Navigator.of(context).pop();
                                   },
-                                  child: Text("Ok".i18n)),
+                                  child: Text("Ok".tr)),
                             ],
                           );
                         });
@@ -615,7 +614,7 @@ class _SearchRecommendPageState extends State<SearchRecommendPage> {
                             color: Theme.of(context).textTheme.bodySmall!.color,
                           ),
                           Text(
-                            "Clear search history".i18n,
+                            "Clear search history".tr,
                             style: Theme.of(context)
                                 .textTheme
                                 .bodyMedium!
@@ -638,7 +637,7 @@ class _SearchRecommendPageState extends State<SearchRecommendPage> {
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16.0),
               child: Text(
-                "Recommended Tags".i18n,
+                "Recommended Tags".tr,
                 style: TextStyle(
                     fontSize: 16.0,
                     color: Theme.of(context).textTheme.titleLarge!.color),
@@ -739,7 +738,7 @@ class _SearchRecommendPageState extends State<SearchRecommendPage> {
             context: context,
             builder: (context) {
               return AlertDialog(
-                title: Text('${"Delete".i18n}?'),
+                title: Text('${"Delete".tr}?'),
                 actions: [
                   TextButton(
                       onPressed: () {
@@ -747,12 +746,12 @@ class _SearchRecommendPageState extends State<SearchRecommendPage> {
                         _refresh();
                         Navigator.of(context).pop();
                       },
-                      child: Text("Ok".i18n)),
+                      child: Text("Ok".tr)),
                   TextButton(
                       onPressed: () {
                         Navigator.of(context).pop();
                       },
-                      child: Text("Cancel".i18n)),
+                      child: Text("Cancel".tr)),
                 ],
               );
             });
@@ -786,7 +785,7 @@ class _SearchRecommendPageState extends State<SearchRecommendPage> {
         });
         _refreshController.finishRefresh();
       } else {
-        BotToast.showText(text: "Network error".i18n);
+        BotToast.showText(text: "Network error".tr);
         _refreshController.finishRefresh(IndicatorResult.fail);
       }
     });

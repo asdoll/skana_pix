@@ -1,6 +1,7 @@
 import 'package:easy_refresh/easy_refresh.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
+import 'package:get/get.dart';
 import 'package:mobx/mobx.dart';
 import 'package:skana_pix/utils/translate.dart';
 
@@ -60,7 +61,7 @@ class _BookTagPageState extends State<BookTagPage> {
                     crossAxisAlignment: CrossAxisAlignment.end,
                     children: [
                       Text(
-                        "Illust•Manga".i18n,
+                        "Illust•Manga".tr,
                         style: TextStyle(
                             fontSize: 16.0,
                             color: Theme.of(context)
@@ -129,7 +130,7 @@ class _BookTagPageState extends State<BookTagPage> {
                       Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            Text("No bookmarked tags".i18n),
+                            Text("No bookmarked tags".tr),
                           ]),
                     ]),
                   );
@@ -146,20 +147,20 @@ class _BookTagPageState extends State<BookTagPage> {
                         context: context,
                         builder: (context) {
                           return AlertDialog(
-                            title: Text("Clean history?".i18n),
+                            title: Text("Clean history?".tr),
                             actions: [
                               TextButton(
                                   onPressed: () {
                                     Navigator.of(context).pop();
                                   },
-                                  child: Text("Cancel".i18n)),
+                                  child: Text("Cancel".tr)),
                               TextButton(
                                   onPressed: () {
                                     settings.clearBookmarkedTags();
                                     _refresh();
                                     Navigator.of(context).pop();
                                   },
-                                  child: Text("Ok".i18n)),
+                                  child: Text("Ok".tr)),
                             ],
                           );
                         });
@@ -177,7 +178,7 @@ class _BookTagPageState extends State<BookTagPage> {
                             color: Theme.of(context).textTheme.bodySmall!.color,
                           ),
                           Text(
-                            "Clear search history".i18n,
+                            "Clear search history".tr,
                             style: Theme.of(context)
                                 .textTheme
                                 .bodyMedium!
@@ -213,7 +214,7 @@ class _BookTagPageState extends State<BookTagPage> {
                     crossAxisAlignment: CrossAxisAlignment.end,
                     children: [
                       Text(
-                        "Novel".i18n,
+                        "Novel".tr,
                         style: TextStyle(
                             fontSize: 16.0,
                             color: Theme.of(context)
@@ -283,7 +284,7 @@ class _BookTagPageState extends State<BookTagPage> {
                       Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            Text("No bookmarked tags".i18n),
+                            Text("No bookmarked tags".tr),
                           ]),
                     ]),
                   );
@@ -300,20 +301,20 @@ class _BookTagPageState extends State<BookTagPage> {
                         context: context,
                         builder: (context) {
                           return AlertDialog(
-                            title: Text("Clean history?".i18n),
+                            title: Text("Clean history?".tr),
                             actions: [
                               TextButton(
                                   onPressed: () {
                                     Navigator.of(context).pop();
                                   },
-                                  child: Text("Cancel".i18n)),
+                                  child: Text("Cancel".tr)),
                               TextButton(
                                   onPressed: () {
                                     settings.clearBookmarkedNovelTags();
                                     _refresh();
                                     Navigator.of(context).pop();
                                   },
-                                  child: Text("Ok".i18n)),
+                                  child: Text("Ok".tr)),
                             ],
                           );
                         });
@@ -331,7 +332,7 @@ class _BookTagPageState extends State<BookTagPage> {
                             color: Theme.of(context).textTheme.bodySmall!.color,
                           ),
                           Text(
-                            "Clear search history".i18n,
+                            "Clear search history".tr,
                             style: Theme.of(context)
                                 .textTheme
                                 .bodyMedium!
@@ -377,7 +378,7 @@ class _BookTagPageState extends State<BookTagPage> {
             context: context,
             builder: (context) {
               return AlertDialog(
-                title: Text('${"Delete".i18n}?'),
+                title: Text('${"Delete".tr}?'),
                 actions: [
                   TextButton(
                       onPressed: () {
@@ -389,12 +390,12 @@ class _BookTagPageState extends State<BookTagPage> {
                         _refresh();
                         Navigator.of(context).pop();
                       },
-                      child: Text("Ok".i18n)),
+                      child: Text("Ok".tr)),
                   TextButton(
                       onPressed: () {
                         Navigator.of(context).pop();
                       },
-                      child: Text("Cancel".i18n)),
+                      child: Text("Cancel".tr)),
                 ],
               );
             });

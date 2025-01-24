@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:skana_pix/model/worktypes.dart';
-import 'package:skana_pix/utils/translate.dart';
+import 'package:get/get.dart';
 import 'package:skana_pix/utils/widgetplugin.dart';
 
 import 'searchsuggestion.dart';
@@ -59,10 +59,10 @@ class _SearchBar1State extends State<SearchBar1> {
                 child: Container(
                   child: Text(
                     widget.type == ArtworkType.ILLUST
-                        ? 'Search Illust or Manga'.i18n
+                        ? 'Search Illust or Manga'.tr
                         : widget.type == ArtworkType.NOVEL
-                            ? 'Search Novel'.i18n
-                            : 'Search User'.i18n,
+                            ? 'Search Novel'.tr
+                            : 'Search User'.tr,
                     style: TextStyle(
                         fontSize: 16,
                         color: Theme.of(context).textTheme.displaySmall!.color),

@@ -1,11 +1,10 @@
 import 'package:bot_toast/bot_toast.dart';
 import 'package:easy_refresh/easy_refresh.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:mobx/mobx.dart';
 import 'package:skana_pix/pixiv_dart_api.dart';
-import 'package:skana_pix/utils/translate.dart';
+import 'package:get/get.dart';
 import 'package:waterfall_flow/waterfall_flow.dart';
 
 import 'headerfooter.dart';
@@ -126,7 +125,7 @@ class _UserResultPageState extends State<UserResultPage> {
           if (value.errorMessage != null &&
               value.errorMessage!.contains("timeout")) {
             BotToast.showText(
-                text: "Network Error. Please refresh to try again.".i18n);
+                text: "Network Error. Please refresh to try again.".tr);
           }
         });
       }
@@ -147,7 +146,7 @@ class _UserResultPageState extends State<UserResultPage> {
           if (value.errorMessage != null &&
               value.errorMessage!.contains("timeout")) {
             BotToast.showText(
-                text: "Network Error. Please refresh to try again.".i18n);
+                text: "Network Error. Please refresh to try again.".tr);
           }
         });
         easyRefreshController.finishRefresh(IndicatorResult.fail);

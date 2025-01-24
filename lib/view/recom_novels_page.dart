@@ -1,4 +1,3 @@
-import 'package:bot_toast/bot_toast.dart';
 import 'package:easy_refresh/easy_refresh.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
@@ -17,8 +16,7 @@ import '../componentwidgets/novelpage.dart';
 import '../componentwidgets/pixivimage.dart';
 import '../componentwidgets/rankingpage.dart';
 import '../utils/filters.dart';
-import 'defaults.dart';
-
+import 'package:get/get.dart';
 class RecomNovelsPage extends StatefulWidget {
   RecomNovelsPage({super.key});
   @override
@@ -55,7 +53,6 @@ class _RecomNovelsPageState
       },
       childBuilder: (context, physics) => Observer(
         builder: (context) => CustomScrollView(
-          controller: DynamicData.recommendScrollController,
           physics: physics,
           slivers: [
             SliverToBoxAdapter(
@@ -80,7 +77,7 @@ class _RecomNovelsPageState
                     ),
                     child: Center(
                       child: Text(
-                        "Recommend".i18n,
+                        "Recommend".tr,
                         overflow: TextOverflow.clip,
                         style: TextStyle(
                             fontWeight: FontWeight.w600, fontSize: 24.0),
@@ -116,7 +113,7 @@ class _RecomNovelsPageState
             child: Padding(
               padding: EdgeInsets.only(left: 20.0),
               child: Text(
-                "Ranking".i18n,
+                "Ranking".tr,
                 style: TextStyle(
                   fontWeight: FontWeight.w600,
                   fontSize: 24.0,
@@ -129,7 +126,7 @@ class _RecomNovelsPageState
             padding: EdgeInsets.all(4.0),
             child: TextButton(
               child: Text(
-                "More".i18n,
+                "More".tr,
                 style: Theme.of(context).textTheme.bodySmall,
               ),
               onPressed: () {
@@ -323,7 +320,7 @@ class _RecomNovelsPageState
                                           PainterAvatar(
                                             url: novel.author.avatar,
                                             id: novel.author.id,
-                                            size: Size(16, 16),
+                                            size: 16,
                                           ),
                                           Padding(
                                             padding: const EdgeInsets.only(
@@ -385,7 +382,7 @@ class _RecomNovelsPageState
           tops.addAll(value.data);
         });
       } else {
-        BotToast.showText(text: "Failed to load Ranking".i18n);
+        //BotToast.showText(text: "Failed to load Ranking".tr);
         return false;
       }
     });

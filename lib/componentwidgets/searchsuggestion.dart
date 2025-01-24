@@ -7,7 +7,7 @@ import 'package:skana_pix/componentwidgets/userpage.dart';
 import 'package:skana_pix/componentwidgets/usersearch.dart';
 import 'package:skana_pix/model/worktypes.dart';
 import 'package:skana_pix/pixiv_dart_api.dart';
-import 'package:skana_pix/utils/translate.dart';
+import 'package:get/get.dart';
 import 'package:skana_pix/utils/widgetplugin.dart';
 
 import '../utils/leaders.dart';
@@ -94,7 +94,7 @@ class _SearchSuggestionPageState extends State<SearchSuggestionPage> {
                         if (index == 0) {
                           return ListTile(
                             title: Text(_filter.text),
-                            subtitle: Text("Artwork ID".i18n),
+                            subtitle: Text("Artwork ID".tr),
                             onTap: () {
                               Navigator.of(context).push(MaterialPageRoute(
                                   builder: (context) =>
@@ -105,7 +105,7 @@ class _SearchSuggestionPageState extends State<SearchSuggestionPage> {
                         if (index == 1) {
                           return ListTile(
                             title: Text(_filter.text),
-                            subtitle: Text("Artist ID".i18n),
+                            subtitle: Text("Artist ID".tr),
                             onTap: () {
                               Navigator.of(context).push(MaterialPageRoute(
                                   builder: (context) => UserPage(
@@ -207,19 +207,19 @@ class _SearchSuggestionPageState extends State<SearchSuggestionPage> {
             DropdownMenuItem(
                 value: ArtworkType.ILLUST,
                 child: Text(
-                  "Artwork".i18n,
+                  "Artwork".tr,
                   style: TextStyle(fontSize: 16),
                 )),
             DropdownMenuItem(
                 value: ArtworkType.NOVEL,
                 child: Text(
-                  "Novel".i18n,
+                  "Novel".tr,
                   style: TextStyle(fontSize: 16),
                 )),
             DropdownMenuItem(
                 value: ArtworkType.ALL,
                 child: Text(
-                  "User".i18n,
+                  "User".tr,
                   style: TextStyle(fontSize: 16),
                 )),
           ],
@@ -294,7 +294,7 @@ class _SearchSuggestionPageState extends State<SearchSuggestionPage> {
         },
         decoration: InputDecoration(
           border: InputBorder.none,
-          hintText: "Enter keywords or links".i18n,
+          hintText: "Enter keywords or links".tr,
         ));
   }
 }

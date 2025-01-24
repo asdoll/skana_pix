@@ -1,110 +1,83 @@
 import 'dart:ui';
 
-import 'package:bot_toast/bot_toast.dart';
-import 'package:flutter/material.dart';
-import 'package:skana_pix/componentwidgets/loading.dart';
+import 'package:flutter/material.dart' show InkWell;
+import 'package:skana_pix/controller/list_controller.dart';
+import 'package:skana_pix/controller/recom_controller.dart';
 import 'package:skana_pix/model/worktypes.dart';
 import 'package:skana_pix/pixiv_dart_api.dart';
-import 'package:skana_pix/utils/translate.dart';
+import 'package:get/get.dart';
 import 'package:blur/blur.dart';
-
+import 'package:shadcn_flutter/shadcn_flutter.dart';
 import '../view/defaults.dart';
 import 'imagelist.dart';
 import 'nullhero.dart';
 import 'pixivimage.dart';
 import 'staricon.dart';
 
-typedef UpdateFavoriteFunc = void Function(bool v);
-
 class IllustCard extends StatefulWidget {
-  const IllustCard(this.illusts, this.showMangaBadage,
-      {this.initialPage = 0,
+  const IllustCard(
+      {this.index = 0,
       this.type = ArtworkType.ILLUST,
       this.useSquare = false,
+      required this.controllerTag,
+      this.showMangaBadage = true,
       super.key});
 
-  final showMangaBadage;
+  final bool showMangaBadage;
 
   final bool useSquare;
 
-  final List<Illust> illusts;
-
-  static Map<String, UpdateFavoriteFunc> favoriteCallbacks = {};
-
-  final int initialPage;
+  final int index;
 
   final ArtworkType type;
 
+  final String controllerTag;
+
   @override
-  _IllustCardState createState() => _IllustCardState();
+  State<IllustCard> createState() => _IllustCardState();
 }
 
 class _IllustCardState extends State<IllustCard> {
-  late List<Illust> illusts;
-  bool isBookmarking = false;
-  late String tag;
-  late int page = 0;
-  Illust get illust => illusts[page];
-  String get nextUrl => illusts.length < 2
-      ? "end"
-      : (widget.type == ArtworkType.ILLUST ? "illust" : "manga");
 
-  @override
-  void initState() {
-    illusts = widget.illusts;
-    page = widget.initialPage;
-    tag = hashCode.toString();
-    IllustCard.favoriteCallbacks[illust.id.toString()] = (v) {
-      setState(() {
-        illust.isBookmarked = v;
-      });
-    };
-    super.initState();
-  }
+  late ListController listController;
 
-  @override
-  void dispose() {
-    if (illusts.length > page) {
-      IllustCard.favoriteCallbacks.remove(illust.id.toString());
-    }
-    super.dispose();
-  }
-
-  @override
-  void didUpdateWidget(covariant IllustCard oldWidget) {
-    super.didUpdateWidget(oldWidget);
-    illusts = widget.illusts;
-    page = widget.initialPage;
-  }
 
   @override
   Widget build(BuildContext context) {
-    if ((illust.isR18 || illust.isR18G) && settings.hideR18) {
-      return buildR18InkWell(context);
+    if(widget.controllerTag.startsWith("recom_")){
+      listController = Get.find<RecomImagesController>(tag: widget.controllerTag.split("_")[1]);
+    }else{
+      listController = Get.find<ListController>(tag: widget.controllerTag);
+    }
+    return Obx(() {
+
+    if ((listController.illusts[widget.index].isR18 || listController.illusts[widget.index].isR18G) && settings.hideR18) {
+      return buildR18InkWell(context, listController.illusts[widget.index]);
     }
 
-    return buildInkWell(context);
+    return buildInkWell(context, listController.illusts[widget.index]);
+    });
   }
 
-  _onLongPressSave() async {
+  _onLongPressSave(Illust illust) async {
     if (settings.longPressSaveConfirm) {
       final result = await showDialog(
           context: context,
           builder: (context) {
             return AlertDialog(
-              title: Text("Save".i18n),
+              title: Text("Save".tr),
               content: Text(illust.title),
               actions: <Widget>[
                 TextButton(
-                  child: Text("Cancel".i18n),
+                  child: Text("Cancel".tr),
                   onPressed: () {
-                    Navigator.of(context).pop(false);
+                    Get.back(result: false);
                   },
                 ),
                 TextButton(
-                  child: Text("Ok".i18n),
+                  child: Text("Ok".tr),
                   onPressed: () {
-                    Navigator.of(context).pop(true);
+                    Get.back(result: true);
                   },
                 ),
               ],
@@ -121,19 +94,10 @@ class _IllustCardState extends State<IllustCard> {
     // }
   }
 
-  Future _buildTap(BuildContext context) {
-    return Navigator.of(context).push(MaterialPageRoute(
-        builder: (BuildContext context) => ImageListPage(
-              illusts: illusts,
-              initialPage: page,
-              nextUrl: nextUrl,
-            )));
-  }
-
-  Widget cardText() {
+  Widget cardText(Illust illust) {
     if (illust.type == "manga" && widget.showMangaBadage) {
       return Text(
-        illust.type.i18n,
+        illust.type.tr,
         style: TextStyle(color: Colors.white),
       );
     }
@@ -146,7 +110,7 @@ class _IllustCardState extends State<IllustCard> {
     return Text('');
   }
 
-  Widget _buildPic(String tag, bool tooLong) {
+  Widget _buildPic(String tag, bool tooLong, Illust illust) {
     return tooLong
         ? NullHero(
             tag: tag,
@@ -159,84 +123,82 @@ class _IllustCardState extends State<IllustCard> {
           );
   }
 
-  Widget buildInkWell(BuildContext context) {
+  Widget buildInkWell(BuildContext context, Illust illust) {
     var tooLong = (illust.height.toDouble() / illust.width.toDouble() > 3) ||
         widget.useSquare;
     var radio =
         (tooLong) ? 1.0 : illust.width.toDouble() / illust.height.toDouble();
     return Card(
-        margin: const EdgeInsets.all(8.0),
+        padding: const EdgeInsets.all(8.0),
         clipBehavior: Clip.antiAlias,
-        color: Theme.of(context).colorScheme.surface,
         child: _buildAnimationWraper(
-          context,
-          Column(
-            children: <Widget>[
-              AspectRatio(
-                  aspectRatio: radio,
-                  child: Stack(
-                    children: [
-                      Positioned.fill(child: _buildPic(tag, tooLong)),
-                      Positioned(
-                          top: 5.0,
-                          right: 5.0,
-                          child: Row(
-                            children: [
-                              if (settings.feedAIBadge && illust.isAi)
-                                _buildAIBadge(),
-                              _buildVisibility(),
-                              if (illust.isUgoira) _buildUgoiraBadge(),
-                            ],
-                          )),
-                    ],
-                  )),
-              _buildBottom(context),
-            ],
-          ),
-        ));
+            context,
+            Column(
+              children: <Widget>[
+                AspectRatio(
+                    aspectRatio: radio,
+                    child: Stack(
+                      children: [
+                        Positioned.fill(child: _buildPic("${widget.controllerTag}_${illust.id}", tooLong, illust)),
+                        Positioned(
+                            top: 5.0,
+                            right: 5.0,
+                            child: Row(
+                              children: [
+                                if (settings.feedAIBadge && illust.isAi)
+                                  _buildAIBadge(),
+                                _buildVisibility(illust),
+                                if (illust.isUgoira) _buildUgoiraBadge(),
+                              ],
+                            )),
+                      ],
+                    )),
+                _buildBottom(context, illust),
+              ],
+            ),
+            illust));
   }
 
-  Widget buildR18InkWell(BuildContext context) {
+  Widget buildR18InkWell(BuildContext context, Illust illust) {
     var tooLong = illust.height.toDouble() / illust.width.toDouble() > 3;
     var radio =
         (tooLong) ? 1.0 : illust.width.toDouble() / illust.height.toDouble();
     return Card(
-        margin: const EdgeInsets.all(8.0),
+        padding: const EdgeInsets.all(8.0),
         clipBehavior: Clip.antiAlias,
-        color: Theme.of(context).colorScheme.surface,
         child: _buildAnimationWraper(
-          context,
-          Column(
-            children: <Widget>[
-              AspectRatio(
-                  aspectRatio: radio,
-                  child: Stack(
-                    children: [
-                      Positioned.fill(
-                          child: blurWidget(_buildPic(tag, tooLong))),
-                      Positioned(
-                          top: 5.0,
-                          right: 5.0,
-                          child: Row(
-                            children: [
-                              if (settings.feedAIBadge && illust.isAi)
-                                _buildAIBadge(),
-                              _buildR18Badge(),
-                              if (illust.isUgoira) _buildUgoiraBadge(),
-                            ],
-                          )),
-                    ],
-                  )),
-              _buildBottom(context),
-            ],
-          ),
-        ));
+            context,
+            Column(
+              children: <Widget>[
+                AspectRatio(
+                    aspectRatio: radio,
+                    child: Stack(
+                      children: [
+                        Positioned.fill(
+                            child: blurWidget(_buildPic("${widget.controllerTag}_${illust.id}", tooLong, illust))),
+                        Positioned(
+                            top: 5.0,
+                            right: 5.0,
+                            child: Row(
+                              children: [
+                                if (settings.feedAIBadge && illust.isAi)
+                                  _buildAIBadge(),
+                                _buildR18Badge(),
+                                if (illust.isUgoira) _buildUgoiraBadge(),
+                              ],
+                            )),
+                      ],
+                    )),
+                _buildBottom(context, illust),
+              ],
+            ),
+            illust));
   }
 
   Widget blurWidget(Widget w) {
     return Blur(
       blur: 5,
-      blurColor: Colors.grey,
+      blurColor: Colors.gray,
       child: w,
     );
   }
@@ -246,7 +208,7 @@ class _IllustCardState extends State<IllustCard> {
       padding: EdgeInsets.all(4.0),
       child: Container(
         decoration: const BoxDecoration(
-          color: Colors.black26,
+          color: Color.fromRGBO(255, 255, 255, 0.2),
           borderRadius: BorderRadius.all(Radius.circular(4.0)),
         ),
         child: const Padding(
@@ -265,7 +227,7 @@ class _IllustCardState extends State<IllustCard> {
       padding: EdgeInsets.all(4.0),
       child: Container(
         decoration: const BoxDecoration(
-          color: Colors.black26,
+          color: Color.fromRGBO(255, 255, 255, 0.2),
           borderRadius: BorderRadius.all(Radius.circular(4.0)),
         ),
         child: const Padding(
@@ -284,7 +246,7 @@ class _IllustCardState extends State<IllustCard> {
       padding: EdgeInsets.all(4.0),
       child: Container(
         decoration: const BoxDecoration(
-          color: Colors.black26,
+          color: Color.fromRGBO(255, 255, 255, 0.2),
           borderRadius: BorderRadius.all(Radius.circular(4.0)),
         ),
         child: const Padding(
@@ -298,19 +260,20 @@ class _IllustCardState extends State<IllustCard> {
     );
   }
 
-  Widget _buildAnimationWraper(BuildContext context, Widget child) {
+  Widget _buildAnimationWraper(
+      BuildContext context, Widget child, Illust illust) {
     return InkWell(
       onLongPress: () {
-        _buildLongPressToSaveHint();
+        _buildLongPressToSaveHint(illust);
       },
       onTap: () {
-        _buildInkTap(context, tag);
+        Get.to(() => ImageListPage(controllerTag: widget.controllerTag, index: widget.index),preventDuplicates: false);
       },
       child: child,
     );
   }
 
-  _buildLongPressToSaveHint() async {
+  _buildLongPressToSaveHint(Illust illust) async {
     if (DynamicData.isIOS) {
       if (settings.firstLongPressSave) {
         settings.set("firstLongPressSave", false);
@@ -323,24 +286,18 @@ class _IllustCardState extends State<IllustCard> {
                 actions: <Widget>[
                   TextButton(
                       onPressed: () {
-                        Navigator.of(context).pop();
+                        Get.back();
                       },
-                      child: Text('Ok'.i18n))
+                      child: Text('Ok'.tr))
                 ],
               );
             });
       }
     }
-    _onLongPressSave();
+    _onLongPressSave(illust);
   }
 
-  Future _buildInkTap(BuildContext context, String heroTag) {
-    return Navigator.of(context, rootNavigator: true).push(MaterialPageRoute(
-        builder: (BuildContext context) => ImageListPage(
-            initialPage: page, illusts: illusts, nextUrl: nextUrl)));
-  }
-
-  Widget _buildBottom(BuildContext context) {
+  Widget _buildBottom(BuildContext context, Illust illust) {
     return Container(
       child: Stack(
         children: <Widget>[
@@ -353,7 +310,7 @@ class _IllustCardState extends State<IllustCard> {
                 illust.title,
                 maxLines: 1,
                 overflow: TextOverflow.clip,
-                style: Theme.of(context).textTheme.bodyMedium,
+                style: Theme.of(context).typography.textSmall,
                 strutStyle:
                     const StrutStyle(forceStrutHeight: true, leading: 0),
               ),
@@ -361,7 +318,7 @@ class _IllustCardState extends State<IllustCard> {
                 illust.author.name,
                 maxLines: 1,
                 overflow: TextOverflow.clip,
-                style: Theme.of(context).textTheme.bodySmall,
+                style: Theme.of(context).typography.textSmall,
                 strutStyle:
                     const StrutStyle(forceStrutHeight: true, leading: 0),
               )
@@ -369,70 +326,14 @@ class _IllustCardState extends State<IllustCard> {
           ),
           Align(
             alignment: Alignment.centerRight,
-            child: GestureDetector(
-              child: StarIcon(state: likeState(), illust: illust),
-              onTap: likes,
-              // onLongPress: () async {
-              //   final result = await showModalBottomSheet(
-              //     context: context,
-              //     clipBehavior: Clip.hardEdge,
-              //     shape: RoundedRectangleBorder(
-              //       borderRadius:
-              //           BorderRadius.vertical(top: Radius.circular(16)),
-              //     ),
-              //     constraints: BoxConstraints.expand(
-              //         height: MediaQuery.of(context).size.height * .618),
-              //     isScrollControlled: true,
-              //     builder: (_) => TagForIllustPage(id: illust.id),
-              //   );
-              //   if (result?.isNotEmpty ?? false) {
-              //     LPrinter.d(result);
-              //     String restrict = result['restrict'];
-              //     List<String>? tags = result['tags'];
-              //     store.star(restrict: restrict, tags: tags, force: true);
-              //   }
-              // },
-            ),
+            child: StarIcon(id: illust.id.toString(), type: widget.type),
           )
         ],
       ),
     );
   }
 
-  int likeState() {
-    if (isBookmarking) {
-      return 1;
-    }
-    if (illust.isBookmarked) {
-      return 2;
-    }
-    return 0;
-  }
-
-  void likes([String type = "public"]) async {
-    if (isBookmarking) return;
-    setState(() {
-      isBookmarking = true;
-    });
-    var method = illust.isBookmarked ? "delete" : "add";
-    var res = await ConnectManager()
-        .apiClient
-        .addBookmark(illust.id.toString(), method, type);
-    if (res.error) {
-      BotToast.showText(text: "Network Error".i18n);
-    } else {
-      illust.isBookmarked = !illust.isBookmarked;
-      StarIcon.favoriteCallbacks[illust.id.toString()]
-          ?.call(illust.isBookmarked);
-      IllustCard.favoriteCallbacks[illust.id.toString()]
-          ?.call(illust.isBookmarked);
-    }
-    setState(() {
-      isBookmarking = false;
-    });
-  }
-
-  Widget _buildVisibility() {
+  Widget _buildVisibility(Illust illust) {
     return Visibility(
       visible: ((illust.type == "manga") && (widget.showMangaBadage)) ||
           illust.images.length > 1,
@@ -442,55 +343,17 @@ class _IllustCardState extends State<IllustCard> {
           padding: EdgeInsets.all(4.0),
           child: Container(
             decoration: const BoxDecoration(
-              color: Colors.black26,
+              color: Color.fromRGBO(255, 255, 255, 0.2),
               borderRadius: BorderRadius.all(Radius.circular(4.0)),
             ),
             child: Padding(
               padding:
                   const EdgeInsets.symmetric(vertical: 2.0, horizontal: 2.0),
-              child: cardText(),
+              child: cardText(illust),
             ),
           ),
         ),
       ),
     );
-  }
-}
-
-class IllustStoreWidget extends StatefulWidget {
-  final String id;
-  const IllustStoreWidget(this.id, {super.key});
-  @override
-  _IllustStoreWidgetState createState() => _IllustStoreWidgetState();
-}
-
-class _IllustStoreWidgetState extends LoadingState<IllustStoreWidget, Illust> {
-  @override
-  Widget buildContent(BuildContext context, Illust data) {
-    return IllustCard([data], false);
-  }
-
-  @override
-  Future<Res<Illust>> loadData() {
-    return getIllustByID(widget.id);
-  }
-}
-
-class IllustPageLite extends StatefulWidget {
-  final String id;
-  const IllustPageLite(this.id, {super.key});
-  @override
-  _IllustPageLiteState createState() => _IllustPageLiteState();
-}
-
-class _IllustPageLiteState extends LoadingState<IllustPageLite, Illust> {
-  @override
-  Widget buildContent(BuildContext context, Illust data) {
-    return ImageListPage(illusts: [data], initialPage: 0);
-  }
-
-  @override
-  Future<Res<Illust>> loadData() {
-    return getIllustByID(widget.id);
   }
 }

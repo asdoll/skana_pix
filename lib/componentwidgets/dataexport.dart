@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:bot_toast/bot_toast.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:skana_pix/controller/histories.dart';
 import 'package:skana_pix/pixiv_dart_api.dart';
@@ -25,63 +26,63 @@ class _DataExportState extends State<DataExport> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("App Data".i18n),
+        title: Text("App Data".tr),
       ),
       body: ListView(children: [
         Text(
-          "Import".i18n,
+          "Import".tr,
           overflow: TextOverflow.clip,
           style: TextStyle(fontWeight: FontWeight.w600, fontSize: 24.0),
         ).paddingHorizontal(16),
         ListTile(
-            title: Text("Import settings,blocks and bookmarked tags".i18n),
+            title: Text("Import settings,blocks and bookmarked tags".tr),
             onTap: () {
               importSettings();
             }),
         ListTile(
-            title: Text("Import Illust History".i18n),
+            title: Text("Import Illust History".tr),
             onTap: () {
               historyManager.importIllustData();
             }),
         ListTile(
-            title: Text("Import Novel History".i18n),
+            title: Text("Import Novel History".tr),
             onTap: () {
               historyManager.importNovelData();
             }),
         Divider(),
         Text(
-          "Export".i18n,
+          "Export".tr,
           overflow: TextOverflow.clip,
           style: TextStyle(fontWeight: FontWeight.w600, fontSize: 24.0),
         ).paddingHorizontal(16),
-        ListTile(title: Text("Export settings,blocks and bookmarked tags".i18n), onTap: () {
+        ListTile(title: Text("Export settings,blocks and bookmarked tags".tr), onTap: () {
           exportSettings();
         }),
-        ListTile(title: Text("Export Illust History".i18n), onTap: () {
+        ListTile(title: Text("Export Illust History".tr), onTap: () {
           historyManager.exportIllustData();
         }),
-        ListTile(title: Text("Export Novel History".i18n), onTap: () {
+        ListTile(title: Text("Export Novel History".tr), onTap: () {
           historyManager.exportNovelData();
         }),
         Divider(),
         Text(
-          "Reset".i18n,
+          "Reset".tr,
           overflow: TextOverflow.clip,
           style: TextStyle(fontWeight: FontWeight.w600, fontSize: 24.0),
         ).paddingHorizontal(16),
-        ListTile(title: Text("Reset settings,blocks and bookmarked tags".i18n), onTap: () {
+        ListTile(title: Text("Reset settings,blocks and bookmarked tags".tr), onTap: () {
           resetSettings();
 
         }),
-        ListTile(title: Text("Clear Illust History".i18n), onTap: () {
+        ListTile(title: Text("Clear Illust History".tr), onTap: () {
           historyManager.clearIllusts();
-          BotToast.showText(text: "Cleared".i18n);
+          BotToast.showText(text: "Cleared".tr);
         }),
-        ListTile(title: Text("Clear Novel History".i18n), onTap: () {
+        ListTile(title: Text("Clear Novel History".tr), onTap: () {
           historyManager.clearNovels();
-          BotToast.showText(text: "Cleared".i18n);
+          BotToast.showText(text: "Cleared".tr);
         }),
-        ListTile(title: Text("Clear Cache".i18n), onTap: () {
+        ListTile(title: Text("Clear Cache".tr), onTap: () {
           _showClearCacheDialog(context);
         }),
       ]).paddingAll(8),
@@ -92,16 +93,16 @@ class _DataExportState extends State<DataExport> {
     final result = await showDialog(
         builder: (BuildContext context) {
           return AlertDialog(
-            title: Text("Clear All Cache".i18n),
+            title: Text("Clear All Cache".tr),
             actions: <Widget>[
               TextButton(
-                child: Text("Cancel".i18n),
+                child: Text("Cancel".tr),
                 onPressed: () {
                   Navigator.of(context).pop("CANCEL");
                 },
               ),
               TextButton(
-                child: Text("Ok".i18n),
+                child: Text("Ok".tr),
                 onPressed: () {
                   Navigator.of(context).pop("OK");
                 },

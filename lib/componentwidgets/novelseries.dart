@@ -6,7 +6,7 @@ import 'package:share_plus/share_plus.dart';
 import 'package:skana_pix/componentwidgets/userpage.dart';
 import 'package:skana_pix/model/worktypes.dart';
 import 'package:skana_pix/pixiv_dart_api.dart';
-import 'package:skana_pix/utils/translate.dart';
+import 'package:get/get.dart';
 
 import '../utils/leaders.dart';
 import 'avatar.dart';
@@ -135,7 +135,7 @@ class _NovelSeriesPageState extends State<NovelSeriesPage> {
                                 onPressed: () {
                                   Leader.push(context, NovelViewerPage(last!));
                                 },
-                                child: Text("View the latest".i18n)),
+                                child: Text("View the latest".tr)),
                           ),
                         ),
                         Divider()
@@ -271,7 +271,7 @@ class _NovelSeriesPageState extends State<NovelSeriesPage> {
           if (value.errorMessage != null &&
               value.errorMessage!.contains("timeout")) {
             BotToast.showText(
-                text: "Network Error. Please refresh to try again.".i18n);
+                text: "Network Error. Please refresh to try again.".tr);
           }
         });
       }
@@ -305,7 +305,7 @@ class _NovelSeriesPageState extends State<NovelSeriesPage> {
           if (value.errorMessage != null &&
               value.errorMessage!.contains("timeout")) {
             BotToast.showText(
-                text: "Network Error. Please refresh to try again.".i18n);
+                text: "Network Error. Please refresh to try again.".tr);
           }
         });
         easyRefreshController.finishRefresh(IndicatorResult.fail);

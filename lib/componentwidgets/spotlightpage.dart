@@ -30,7 +30,7 @@ class _SpotlightPageState extends State<SpotlightPage> {
       return Scaffold(
         appBar: AppBar(
           centerTitle: true,
-          title: DynamicData.isDarkMode
+          title: settings.isDarkMode
               ? Image.asset(
                   'assets/images/pixivision-white-logo.png',
                   fit: BoxFit.fitHeight,

@@ -3,7 +3,7 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:skana_pix/pixiv_dart_api.dart';
-import 'package:skana_pix/utils/translate.dart';
+import 'package:get/get.dart';
 import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 
 class ColorPickPage extends StatefulWidget {
@@ -65,7 +65,7 @@ class _ColorPickPageState extends State<ColorPickPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("Pick A Color".i18n),
+        title: Text("Pick A Color".tr),
         actions: <Widget>[
           IconButton(
               icon: Icon(Icons.edit),
@@ -81,7 +81,7 @@ class _ColorPickPageState extends State<ColorPickPage> {
                     context: context,
                     builder: (context) {
                       return AlertDialog(
-                        title: Text("16 radix RGB".i18n),
+                        title: Text("16 radix RGB".tr),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(8.0),
                         ),
@@ -89,7 +89,7 @@ class _ColorPickPageState extends State<ColorPickPage> {
                           controller: textEditingController,
                           maxLength: 6,
                           decoration: InputDecoration(
-                              prefix: Text("${"Color".i18n}(0xff"),
+                              prefix: Text("${"Color".tr}(0xff"),
                               suffix: Text(")")),
                         ),
                         actions: <Widget>[
@@ -102,14 +102,14 @@ class _ColorPickPageState extends State<ColorPickPage> {
                                   return;
                                 }
                                 Navigator.of(context)
-                                    .pop("${"Color".i18n}(0xff${result})");
+                                    .pop("${"Color".tr}(0xff${result})");
                               },
-                              child: Text("Ok".i18n)),
+                              child: Text("Ok".tr)),
                           TextButton(
                               onPressed: () {
                                 Navigator.of(context).pop();
                               },
-                              child: Text("Cancel".i18n)),
+                              child: Text("Cancel".tr)),
                         ],
                       );
                     });
@@ -195,25 +195,25 @@ class _ThemePageState extends State<ThemePage> with TickerProviderStateMixin {
     return Observer(builder: (context) {
       return Scaffold(
         appBar: AppBar(
-            title: Text("Skin".i18n),
+            title: Text("Skin".tr),
             bottom: TabBar(
                 controller: TabController(
                   length: 3,
-                  initialIndex: ThemeMode.values.indexOf(settings.themeMode),
+                  initialIndex: int.parse(settings.darkMode),
                   vsync: this,
                 ),
                 onTap: (i) {
-                  settings.setThemeMode(i);
+                  settings.set("darkMode", i.toString());
                 },
                 tabs: [
                   Tab(
-                    text: "System".i18n,
+                    text: "System".tr,
                   ),
                   Tab(
-                    text: "Light".i18n,
+                    text: "Light".tr,
                   ),
                   Tab(
-                    text: "Dark".i18n,
+                    text: "Dark".tr,
                   ),
                 ])),
         body: Observer(builder: (_) {
@@ -238,29 +238,29 @@ class _ThemePageState extends State<ThemePage> with TickerProviderStateMixin {
                       settings.set("useDynamicColor",v);
                     });
                   },
-                  title: Text("Dynamic Color".i18n),
+                  title: Text("Dynamic Color".tr),
                 )),
               ),
-              if (!settings.useDynamicColor)
-                SliverToBoxAdapter(
-                  child: Card(
-                    child: ListTile(
-                      leading: SizedBox(
-                        width: 30,
-                        height: 30,
-                        child: Container(
-                          decoration: BoxDecoration(
-                              color: Color(settings.seedColor),
-                              borderRadius: BorderRadius.circular(10)),
-                        ),
-                      ),
-                      title: Text("Seed Color".i18n),
-                      onTap: () {
-                        _pickColor();
-                      },
-                    ),
-                  ),
-                )
+              // if (!settings.useDynamicColor)
+              //   SliverToBoxAdapter(
+              //     child: Card(
+              //       child: ListTile(
+              //         leading: SizedBox(
+              //           width: 30,
+              //           height: 30,
+              //           child: Container(
+              //             decoration: BoxDecoration(
+              //                 color: Color(settings.seedColor),
+              //                 borderRadius: BorderRadius.circular(10)),
+              //           ),
+              //         ),
+              //         title: Text("Seed Color".tr),
+              //         onTap: () {
+              //           _pickColor();
+              //         },
+              //       ),
+              //     ),
+              //   )
             ],
           );
         }),
@@ -268,14 +268,14 @@ class _ThemePageState extends State<ThemePage> with TickerProviderStateMixin {
     });
   }
 
-  _pickColor() async {
-    Color? result = await Navigator.of(context).push(MaterialPageRoute(
-        builder: (context) =>
-            ColorPickPage(initialColor: Color(settings.seedColor))));
-    if (result != null) {
-      setState(() {
-        settings.set("seedColor", result.value);
-      });
-    }
-  }
+  // _pickColor() async {
+  //   Color? result = await Navigator.of(context).push(MaterialPageRoute(
+  //       builder: (context) =>
+  //           ColorPickPage(initialColor: Color(settings.seedColor))));
+  //   if (result != null) {
+  //     setState(() {
+  //       settings.set("seedColor", result.value);
+  //     });
+  //   }
+  // }
 }

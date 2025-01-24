@@ -1,45 +1,38 @@
-import 'package:bot_toast/bot_toast.dart';
-import 'package:flutter/material.dart';
-import 'package:skana_pix/pixiv_dart_api.dart';
+import 'package:shadcn_flutter/shadcn_flutter.dart';
+import 'package:get/get.dart';
+import 'package:skana_pix/controller/account_controller.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 import '../componentwidgets/webview.dart';
 import '../utils/applinks.dart';
-import '../utils/navigation.dart';
-import '../utils/translate.dart';
 import 'defaults.dart';
 
 class LoginPage extends StatefulWidget {
-  const LoginPage(this.callback, {super.key});
-
-  final void Function() callback;
+  const LoginPage({super.key});
 
   @override
   State<LoginPage> createState() => _LoginPageState();
 }
 
 class _LoginPageState extends State<LoginPage> {
-  bool checked = false;
-
-  bool waitingForAuth = false;
-
-  bool isLogging = false;
 
   @override
   Widget build(BuildContext context) {
-    if (isLogging) {
-      return buildLoading(context);
-    } else if (!waitingForAuth) {
+    return Obx(() {
+      if (accountController.isLoading.value) {
+        return buildLoading(context);
+      } else if (!accountController.waitingForAuth.value) {
       return buildLogin(context);
-    } else {
-      return buildWaiting(context);
-    }
+      } else {
+        return buildWaiting(context);
+      }
+    });
   }
 
   Widget buildLogin(BuildContext context) {
     return SizedBox(
       child: Center(
         child: Card(
-            margin: const EdgeInsets.symmetric(vertical: 16, horizontal: 24),
+            padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 24),
             child: SizedBox(
               width: 300,
               height: 300,
@@ -51,7 +44,7 @@ class _LoginPageState extends State<LoginPage> {
                   Align(
                     alignment: Alignment.centerLeft,
                     child: Text(
-                      ("     ${"SkanaPix".i18n}"),
+                      ("     ${"SkanaPix".tr}"),
                       style: const TextStyle(fontSize: 20),
                     ),
                   ),
@@ -62,9 +55,9 @@ class _LoginPageState extends State<LoginPage> {
                         children: [
                           SizedBox(
                             width: 110,
-                            child: FilledButton(
+                            child: PrimaryButton(
                               onPressed: onContinue,
-                              child: Text("Login".i18n),
+                              child: Text("Login".tr),
                             ),
                           ),
                           const SizedBox(
@@ -75,7 +68,7 @@ class _LoginPageState extends State<LoginPage> {
                                 horizontal: 8, vertical: 4),
                             child: Text(
                                 "You need to complete the login operation in the browser window that will open."
-                                    .i18n),
+                                    .tr),
                           )
                         ],
                       ),
@@ -92,7 +85,7 @@ class _LoginPageState extends State<LoginPage> {
     return SizedBox(
       child: Center(
         child: Card(
-            margin: const EdgeInsets.symmetric(vertical: 16, horizontal: 24),
+            padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 24),
             child: SizedBox(
               width: 300,
               height: 300,
@@ -101,7 +94,7 @@ class _LoginPageState extends State<LoginPage> {
                   Align(
                     alignment: Alignment.centerLeft,
                     child: Text(
-                      "Waiting...".i18n,
+                      "Waiting...".tr,
                       style: const TextStyle(
                           fontSize: 24, fontWeight: FontWeight.bold),
                     ),
@@ -113,18 +106,16 @@ class _LoginPageState extends State<LoginPage> {
                             horizontal: 8, vertical: 4),
                         child: Text(
                             "Waiting for authentication. Please finished in the browser."
-                                .i18n),
+                                .tr),
                       ),
                     ),
                   ),
                   Row(
                     children: [
-                      TextButton(
-                          child: Text("Back".i18n),
+                      OutlineButton(
+                          child: Text("Back".tr),
                           onPressed: () {
-                            setState(() {
-                              waitingForAuth = false;
-                            });
+                            accountController.waitingForAuth.value = false;
                           }),
                       const Spacer(),
                     ],
@@ -140,7 +131,7 @@ class _LoginPageState extends State<LoginPage> {
     return SizedBox(
       child: Center(
         child: Card(
-            margin: const EdgeInsets.symmetric(vertical: 16, horizontal: 24),
+            padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 24),
             child: SizedBox(
               width: 300,
               height: 300,
@@ -149,14 +140,14 @@ class _LoginPageState extends State<LoginPage> {
                   Align(
                     alignment: Alignment.centerLeft,
                     child: Text(
-                      "Logging in".i18n,
+                      "Logging in".tr,
                       style: const TextStyle(
                           fontSize: 24, fontWeight: FontWeight.bold),
                     ),
                   ),
                   const Expanded(
                     child: Center(
-                      child: CircularProgressIndicator.adaptive(),
+                      child: CircularProgressIndicator(),
                     ),
                   ),
                 ],
@@ -176,31 +167,38 @@ class _LoginPageState extends State<LoginPage> {
         builder: (context) {
           var alertDialog = AlertDialog(
               content: Text(
-                  "I understand this is a free unofficial application.".i18n),
+                  "I understand this is a free unofficial application.".tr),
               actions: [
-                TextButton(
-                  child: Text("Cancel".i18n),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    OutlineButton(
+                  child: Text("Cancel".tr),
                   onPressed: () {
                     exitLogin = true;
-                    DynamicData.rootNavigatorKey.currentState!.pop();
+                    Get.back();
                   },
                 ),
-                TextButton(
-                  child: Text("Continue with Webview".i18n),
+                const SizedBox(height: 16),
+                PrimaryButton(
+                  child: Text("Continue with Webview".tr),
                   onPressed: () {
                     exitLogin = false;
                     useExternal = false;
-                    DynamicData.rootNavigatorKey.currentState!.pop();
+                    Get.back();
                   },
                 ),
-                TextButton(
-                  child: Text("Continue with External Browser".i18n),
+                const SizedBox(height: 16),
+                PrimaryButton(
+                  child: Text("Continue with External Browser".tr),
                   onPressed: () {
                     exitLogin = false;
                     useExternal = true;
-                    DynamicData.rootNavigatorKey.currentState!.pop();
+                    Get.back();
                   },
                 ),
+                  ],
+                )
               ]);
           return alertDialog;
         },
@@ -209,24 +207,22 @@ class _LoginPageState extends State<LoginPage> {
     if (exitLogin) {
       return;
     }
-    var url = await generateWebviewUrl();
+    var url = await accountController.generateWebviewUrl();
     onLink = (uri) {
       if (uri.scheme == "pixiv") {
-        onFinished(uri.queryParameters["code"]!);
+        accountController.onFinished(uri.queryParameters["code"]!);
         onLink = null;
         return true;
       }
       return false;
     };
-    setState(() {
-      waitingForAuth = true;
-    });
+    accountController.waitingForAuth.value = true;
     if (!useExternal && mounted) {
-      context.to(() => WebviewPage(
+      Get.to(() => WebviewPage(
             url,
             onNavigation: (req) {
               if (req.url.startsWith("pixiv://")) {
-                DynamicData.rootNavigatorKey.currentState!.pop();
+                Get.back();
                 onLink?.call(Uri.parse(req.url));
                 return false;
               }
@@ -238,21 +234,4 @@ class _LoginPageState extends State<LoginPage> {
     }
   }
 
-  void onFinished(String code) async {
-    setState(() {
-      isLogging = true;
-      waitingForAuth = false;
-    });
-    var res = await loginWithCode(code);
-    if (res.error) {
-      if (mounted) {
-        BotToast.showText(text: res.errorMessage!);
-      }
-      setState(() {
-        isLogging = false;
-      });
-    } else {
-      widget.callback();
-    }
-  }
 }

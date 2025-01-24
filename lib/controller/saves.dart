@@ -21,7 +21,7 @@ class Savers {
       await file.writeAsString(encoder.convert(account.toJson()));
       return true;
     } on FileSystemException catch (e) {
-      loggerError("Error writing account json: $e");
+      log.e("Error writing account json: $e");
       return false;
     }
   }
@@ -32,7 +32,7 @@ class Savers {
       await file.writeAsString(text);
       return true;
     } on FileSystemException catch (e) {
-      loggerError("Error writing text: $e");
+      log.e("Error writing text: $e");
       return false;
     }
   }

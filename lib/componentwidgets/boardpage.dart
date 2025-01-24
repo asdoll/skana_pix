@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
+import 'package:get/get.dart';
 import 'package:skana_pix/utils/translate.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -48,7 +49,7 @@ class _BoardPageState extends State<BoardPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("Bulletin Board".i18n),
+        title: Text("Bulletin Board".tr),
       ),
       body: RefreshIndicator(
         onRefresh: () async {

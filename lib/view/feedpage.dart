@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:skana_pix/componentwidgets/avatar.dart';
 import 'package:skana_pix/pixiv_dart_api.dart';
-import 'package:skana_pix/utils/translate.dart';
 
 import '../componentwidgets/feedillust.dart';
 import '../componentwidgets/feednovel.dart';
@@ -36,14 +36,14 @@ class _FeedPageState extends State<FeedPage>
       child: Scaffold(
         appBar: AppBar(
           title: TabBar(tabs: [
-            Tab(text: 'Illust•Manga'.i18n),
-            Tab(text: 'Novel'.i18n),
+            Tab(text: 'Illust•Manga'.tr),
+            Tab(text: 'Novel'.tr),
           ], controller: _tabController),
           actions: [
             PainterAvatar(
               url: ConnectManager().apiClient.account.user.profileImg,
               id: int.parse(ConnectManager().apiClient.userid),
-              size: Size(40, 40),
+              size: 40,
             ),
           ],
         ),

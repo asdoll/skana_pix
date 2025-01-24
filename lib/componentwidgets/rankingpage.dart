@@ -5,7 +5,7 @@ import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:mobx/mobx.dart';
 import 'package:skana_pix/componentwidgets/headerfooter.dart';
 import 'package:skana_pix/pixiv_dart_api.dart';
-import 'package:skana_pix/utils/translate.dart';
+import 'package:get/get.dart';
 import 'package:skana_pix/utils/widgetplugin.dart';
 import 'package:waterfall_flow/waterfall_flow.dart';
 
@@ -59,7 +59,7 @@ class _RankingPageState extends State<RankingPage>
     super.build(context);
     List<String> titles = [];
     for (String i in modeList) {
-      titles.add(rankTagsMap[i]!.i18n);
+      titles.add(rankTagsMap[i]!.tr);
     }
     return Column(
       children: <Widget>[
@@ -269,7 +269,7 @@ class _OneRankingIllustPageState
           itemCount: data.length,
           itemBuilder: (context, index) {
             return IllustCard(data, false,
-                initialPage: index, type: widget.awType);
+                index: index, type: widget.awType);
           },
           gridDelegate: _buildGridDelegate(context),
         ),
@@ -347,7 +347,7 @@ class _OneRankingNovelPageState extends State<_OneRankingNovelPage> {
         return true;
       } else {
         var message = value.errorMessage ??
-            "Network Error. Please refresh to try again.".i18n;
+            "Network Error. Please refresh to try again.".tr;
         if (message == "No more data") {
           return false;
         }
@@ -390,7 +390,7 @@ class _OneRankingNovelPageState extends State<_OneRankingNovelPage> {
           _isFirstLoading = false;
           if (value.errorMessage != null &&
               value.errorMessage!.contains("timeout")) {
-            _error = "Network Error. Please refresh to try again.".i18n;
+            _error = "Network Error. Please refresh to try again.".tr;
           }
           _refreshController.finishLoad(IndicatorResult.fail);
         });

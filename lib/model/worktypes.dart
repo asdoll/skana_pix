@@ -3,4 +3,5 @@ enum ArtworkType {
   MANGA,
   NOVEL,
   ALL,
+  USER,
 }

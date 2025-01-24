@@ -260,7 +260,7 @@ class SoupFetcher {
         }
         amWorks.add(amWork);
       } catch (e) {
-        loggerError("soup fetch error");
+        log.e("soup fetch error");
       }
     }
   }
@@ -316,7 +316,7 @@ class SoupFetcher {
         }
         amWorks.add(amWork);
       } catch (e) {
-        loggerError("soup fetch error");
+        log.e("soup fetch error");
       }
     }
   }

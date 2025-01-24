@@ -2,16 +2,15 @@ import 'dart:convert';
 import 'dart:io';
 import 'dart:typed_data';
 
-import 'package:flutter/material.dart';
 import 'package:file_selector/file_selector.dart';
 import 'package:flutter_file_dialog/flutter_file_dialog.dart';
+import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:skana_pix/controller/caches.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:skana_pix/pixiv_dart_api.dart';
-import 'package:skana_pix/utils/translate.dart';
 import 'package:image_gallery_saver_plus/image_gallery_saver_plus.dart';
-import 'package:bot_toast/bot_toast.dart';
+import 'package:skana_pix/utils/leaders.dart';
 import '../view/defaults.dart';
 import 'safplugin.dart';
 
@@ -82,14 +81,6 @@ String bytesToText(int bytes) {
   }
 }
 
-bool isDarkMode(BuildContext context) {
-  return Theme.of(context).brightness == Brightness.dark;
-}
-
-ThemeData getTheme(BuildContext context) {
-  return isDarkMode(context) ? DynamicData.darkTheme : DynamicData.themeData;
-}
-
 void removeUserData() {
   var dataFile = File(BasePath.accountJsonPath);
   if (dataFile.existsSync()) {
@@ -126,11 +117,10 @@ String getExtensionName(String url) {
   return '.jpg';
 }
 
-void saveUrl(String url, {String? filenm, BuildContext? context}) async {
-  BotToast.showText(text: "Saved".i18n);
+void saveUrl(String url, {String? filenm}) async {
   if (DynamicData.isIOS && (await Permission.photosAddOnly.status.isDenied)) {
-    if (await Permission.storage.request().isDenied && context != null) {
-      BotToast.showText(text: "Permission denied".i18n);
+    if (await Permission.storage.request().isDenied) {
+      Leader.showTextToast("Permission denied".tr);
       return;
     }
   }
@@ -145,15 +135,15 @@ void saveUrl(String url, {String? filenm, BuildContext? context}) async {
     }
     await ImageGallerySaverPlus.saveImage(await file.readAsBytes(),
         quality: 100, name: fileName);
-    BotToast.showText(text: "Saved".i18n);
+    Leader.showTextToast("Saved".tr);
   }
 }
 
 void saveImage(Illust illust,
-    {List<bool>? indexes, BuildContext? context, String? quality}) async {
+    {List<bool>? indexes, String? quality}) async {
   if (DynamicData.isIOS && (await Permission.photosAddOnly.status.isDenied)) {
     if (await Permission.storage.request().isDenied) {
-      BotToast.showText(text: "Permission denied".i18n);
+      Leader.showTextToast("Permission denied".tr);
       return;
     }
   }
@@ -190,7 +180,7 @@ void saveImage(Illust illust,
       }
       await ImageGallerySaverPlus.saveImage(await file.readAsBytes(),
           quality: 100, name: fileName);
-      BotToast.showText(text: "${illust.title} ${"Saved".i18n}");
+      Leader.showTextToast("${illust.title} ${"Saved".tr}");
     }
   }
 }
@@ -212,19 +202,19 @@ Future<void> importSettings() async {
   final decoder = JsonDecoder();
   final map = decoder.convert(json);
   settings.setFromMap(map);
-  BotToast.showText(text: "Imported".i18n);
+  Leader.showTextToast("Imported".tr);
 }
 
 Future<void> exportSettings() async {
   final json = settings.toJson();
   final result = await SAFPlugin.createFile("settings.json", "application/json");
-  BotToast.showText(text: result??"empty");
+  Leader.showTextToast(result??"empty");
   if (result == null) return;
   await SAFPlugin.writeUri(result, utf8.encode(json));
-  BotToast.showText(text: "Exported".i18n);
+  Leader.showTextToast("Exported".tr);
 }
 
 Future<void> resetSettings() async {
   settings.clearSettings();
-  BotToast.showText(text: "Reseted".i18n);
+  Leader.showTextToast("Reseted".tr);
 }

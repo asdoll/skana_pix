@@ -1,9 +1,8 @@
-import 'package:bot_toast/bot_toast.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:skana_pix/model/worktypes.dart';
 import 'package:skana_pix/pixiv_dart_api.dart';
-import 'package:skana_pix/utils/translate.dart';
+import 'package:get/get.dart';
 
 import 'avatar.dart';
 import 'commentpage.dart';
@@ -69,7 +68,7 @@ class _IllustDetailContentState extends State<IllustDetailContent> {
           Padding(
             padding:
                 const EdgeInsets.only(left: 16.0, right: 16.0, bottom: 4.0),
-            child: Text("Related artworks".i18n),
+            child: Text("Related artworks".tr),
           ),
         ],
       ),
@@ -157,7 +156,7 @@ class _IllustDetailContentState extends State<IllustDetailContent> {
             children: <Widget>[
               Container(
                   child: Text(
-                "Artwork ID".i18n,
+                "Artwork ID".tr,
                 style: TextStyle(
                     fontSize: 12,
                     color: Theme.of(context).colorScheme.onSurface),
@@ -171,7 +170,7 @@ class _IllustDetailContentState extends State<IllustDetailContent> {
               ),
               Container(
                   child: Text(
-                "Pixel".i18n,
+                "Pixel".tr,
                 style: TextStyle(
                     fontSize: 12,
                     color: Theme.of(context).colorScheme.onSurface),
@@ -218,7 +217,7 @@ class _IllustDetailContentState extends State<IllustDetailContent> {
               child: RichText(
                   textAlign: TextAlign.start,
                   text: TextSpan(
-                      text: "AI-generated".i18n,
+                      text: "AI-generated".tr,
                       children: [
                         TextSpan(
                           text: " ",
@@ -313,7 +312,7 @@ class _IllustDetailContentState extends State<IllustDetailContent> {
                       width: 4,
                     ),
                     Text(
-                      "Show comments".i18n,
+                      "Show comments".tr,
                       style: Theme.of(context).textTheme.titleSmall,
                     ),
                   ]),
@@ -346,19 +345,19 @@ class _IllustDetailContentState extends State<IllustDetailContent> {
                 onPressed: () {
                   Navigator.pop(context, 0);
                 },
-                child: Text("Block".i18n),
+                child: Text("Block".tr),
               ),
               SimpleDialogOption(
                 onPressed: () {
                   Navigator.pop(context, 1);
                 },
-                child: Text("Bookmark".i18n),
+                child: Text("Bookmark".tr),
               ),
               SimpleDialogOption(
                 onPressed: () {
                   Navigator.pop(context, 2);
                 },
-                child: Text("Copy".i18n),
+                child: Text("Copy".tr),
               ),
             ],
           );
@@ -378,7 +377,7 @@ class _IllustDetailContentState extends State<IllustDetailContent> {
           await Clipboard.setData(ClipboardData(text: f.name));
           ScaffoldMessenger.of(context).showSnackBar(SnackBar(
             duration: Duration(seconds: 1),
-            content: Text("Copied to clipboard".i18n),
+            content: Text("Copied to clipboard".tr),
           ));
         }
     }
@@ -438,21 +437,16 @@ class _IllustDetailContentState extends State<IllustDetailContent> {
     );
   }
 
-  Future<void> _push2UserPage(BuildContext context, Illust illust) async {
-    await Navigator.of(context).push(MaterialPageRoute(
-        builder: (BuildContext context) => UserPage(
+  Widget _buildNameAvatar(BuildContext context, Illust illust) {
+    return InkWell(
+      onTap: () {
+        Get.to(() => UserPage(
               id: illust.author.id,
               heroTag: hashCode.toString(),
               type: illust.type == "illust"
                   ? ArtworkType.ILLUST
                   : ArtworkType.MANGA,
-            )));
-  }
-
-  Widget _buildNameAvatar(BuildContext context, Illust illust) {
-    return InkWell(
-      onTap: () async {
-        await _push2UserPage(context, illust);
+            ));
       },
       child: Row(
         mainAxisAlignment: MainAxisAlignment.start,
@@ -465,10 +459,7 @@ class _IllustDetailContentState extends State<IllustDetailContent> {
               child: PainterAvatar(
                 url: illust.author.avatar,
                 id: illust.author.id,
-                size: Size(32, 32),
-                onTap: () async {
-                  await _push2UserPage(context, illust);
-                },
+                size: 32,
               ),
             ),
           ),
@@ -480,11 +471,17 @@ class _IllustDetailContentState extends State<IllustDetailContent> {
                 mainAxisAlignment: MainAxisAlignment.start,
                 children: <Widget>[
                   Hero(
-                    tag: illust.author.name + this.hashCode.toString(),
+                    tag: illust.author.name + hashCode.toString(),
                     child: SelectionArea(
                       child: GestureDetector(
                         onTap: () {
-                          _push2UserPage(context, illust);
+                          Get.to(() => UserPage(
+                                id: illust.author.id,
+                                heroTag: hashCode.toString(),
+                                type: illust.type == "illust"
+                                    ? ArtworkType.ILLUST
+                                    : ArtworkType.MANGA,
+                              ));
                         },
                         child: Text(
                           illust.author.name,
@@ -501,10 +498,8 @@ class _IllustDetailContentState extends State<IllustDetailContent> {
             ),
           ),
           UserFollowButton(
-            followed: illust.author.isFollowed,
-            onPressed: () async {
-              follow();
-            },
+            id: illust.author.id.toString(),
+            liked: illust.author.isFollowed,
           ),
           SizedBox(
             width: 12,
@@ -512,30 +507,5 @@ class _IllustDetailContentState extends State<IllustDetailContent> {
         ],
       ),
     );
-  }
-
-  bool isFollowing = false;
-
-  void follow() async {
-    if (isFollowing) return;
-    setState(() {
-      isFollowing = true;
-    });
-    var method = widget.illust.author.isFollowed ? "delete" : "add";
-    var res = await followUser(widget.illust.author.id.toString(), method);
-    if (res.error) {
-      if (mounted) {
-        BotToast.showText(text: "Network Error".i18n);
-      }
-    } else {
-      widget.illust.author.isFollowed = !widget.illust.author.isFollowed;
-    }
-    setState(() {
-      isFollowing = false;
-    });
-    // UserInfoPage.followCallbacks[widget.illust.author.id.toString()]
-    //     ?.call(widget.illust.author.isFollowed);
-    // UserPreviewWidget.followCallbacks[widget.illust.author.id.toString()]
-    //     ?.call(widget.illust.author.isFollowed);
   }
 }

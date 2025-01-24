@@ -1,68 +1,25 @@
 import 'dart:io';
-import 'dart:ui';
+//import 'package:flutter/scheduler.dart';
 
-import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter/scheduler.dart';
+import 'package:flutter/services.dart';
+import 'package:get/get.dart';
+import 'package:shadcn_flutter/shadcn_flutter.dart';
 
+import '../controller/logging.dart';
 import '../controller/settings.dart';
 
 
 class Constants{
   static const String appName = 'SkanaPix';
-  static const String appVersion = '1.0.2';
+  static const String appVersion = '1.0.3';
   static const isGooglePlay = bool.fromEnvironment("IS_GOOGLEPLAY", defaultValue: false);
 }
 
 class DynamicData {
-  static var activeNavColor = Color(settings.seedColor);
-  static var inActiveNavColor = CupertinoColors.systemGrey;
-  static ThemeData get themeData => ThemeData(
-    brightness: Brightness.light,
-    colorScheme: ColorScheme.fromSeed(
-      seedColor: Color(settings.seedColor),
-      brightness: Brightness.light,
-    ),
-    useMaterial3: true,
-  );
-  static ThemeData get darkTheme => settings.isAMOLED? 
-  ThemeData(
-    brightness: Brightness.dark,
-    colorScheme: ColorScheme.fromSeed(
-      seedColor: Color(settings.seedColor),
-      brightness: Brightness.dark,
-    ),
-    useMaterial3: true,
-  ).copyWith(scaffoldBackgroundColor: Colors.black)
-  :ThemeData(
-    brightness: Brightness.dark,
-    colorScheme: ColorScheme.fromSeed(
-      seedColor: Color(settings.seedColor),
-      brightness: Brightness.dark,
-    ),
-    useMaterial3: true,
-  );
 
-  static ThemeWarp get themeWarp => ThemeWarp(
-      themeData: themeData, darkTheme: darkTheme, themeMode: settings.themeMode);
+  static double widthScreen = Get.width;
 
-  static ThemeData get themes =>
-      (SchedulerBinding.instance.platformDispatcher.platformBrightness ==
-              Brightness.dark)
-          ? themeData
-          : darkTheme;
-
-  static bool get isDarkMode => settings.themeMode == ThemeMode.system ?
-      SchedulerBinding.instance.platformDispatcher.platformBrightness ==
-      Brightness.dark : settings.themeMode == ThemeMode.dark;
-
-  static double widthScreen = WidgetsBinding
-          .instance.platformDispatcher.views.first.physicalSize.width /
-      WidgetsBinding.instance.platformDispatcher.views.first.devicePixelRatio;
-
-  static double heightScreen = WidgetsBinding
-          .instance.platformDispatcher.views.first.physicalSize.height /
-      WidgetsBinding.instance.platformDispatcher.views.first.devicePixelRatio;
+  static double heightScreen = Get.height;
 
   static bool get isMobile => Platform.isAndroid || Platform.isIOS;
   static bool get isIOS => Platform.isIOS;
@@ -70,40 +27,75 @@ class DynamicData {
   static bool get isDesktop =>
       Platform.isWindows || Platform.isMacOS || Platform.isLinux;
 
-  static final rootNavigatorKey = GlobalKey<NavigatorState>();
-
-  static GlobalKey<NavigatorState>? mainNavigatorKey;
-
-  static final recommendScrollController = ScrollController();
-  static final feedScrollController = ScrollController();
-  static final searchScrollController = ScrollController();
-  static final settingScrollController = ScrollController();
 }
 
-class ThemeWarp{
-  ThemeData themeData;
-  ThemeData darkTheme;
-  ThemeMode themeMode;
-  ThemeWarp({required this.themeData, required this.darkTheme, required this.themeMode});
-}
+class ThemeManager {
+  static ThemeManager? _instance;
 
-class ThemeStuff {
-  static ThemeStuff? _instance;
-
-  static ThemeStuff get instance {
-    _instance ??= ThemeStuff._init();
+  static ThemeManager get instance {
+    _instance ??= ThemeManager._init();
 
     return _instance!;
   }
 
-  ThemeStuff._init() {
-    theme.value = DynamicData.themeWarp;
+  ThemeData getUpdatedTheme() {
+    return getTheme(settings.themeName, settings.isDarkMode);
   }
 
-  ValueNotifier<ThemeWarp> theme = ValueNotifier<ThemeWarp>(DynamicData.themeWarp);
+  ThemeManager._init() {
+    updateValue(getUpdatedTheme());
+    if(settings.darkMode == "0") {
+      WidgetsBinding.instance.platformDispatcher.onPlatformBrightnessChanged =
+          () {
+        updateValue(getUpdatedTheme());
+      };
+    }
+  }
 
-  void updateValue(ThemeWarp themes) {
+  ValueNotifier<ThemeData> theme = ValueNotifier<ThemeData>(getTheme('zinc', false));
+
+  void updateValue(ThemeData themes) {
     theme.value = themes;
-    print(theme.value);
+    SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
+      systemNavigationBarColor: Colors.transparent,
+      statusBarBrightness: settings.isDarkMode ? Brightness.light : Brightness.dark,
+      statusBarIconBrightness: settings.isDarkMode ? Brightness.light : Brightness.dark,
+    ));
+    log.d(theme.value);
   }
+}
+
+ThemeData getTheme(String themeName, bool isDark) {
+  switch (themeName) {
+    case 'blue':
+      return ThemeData(colorScheme: ColorSchemes.blue(isDark ? ThemeMode.dark : ThemeMode.light),radius: 0.5);
+    case 'green':
+      return ThemeData(colorScheme: ColorSchemes.green(isDark ? ThemeMode.dark : ThemeMode.light),radius: 0.5);
+    case 'red':
+      return ThemeData(colorScheme: ColorSchemes.red(isDark ? ThemeMode.dark : ThemeMode.light),radius: 0.5);
+    case 'yellow':
+      return ThemeData(colorScheme: ColorSchemes.yellow(isDark ? ThemeMode.dark : ThemeMode.light),radius: 0.5);
+    case 'zinc':
+      return ThemeData(colorScheme: ColorSchemes.zinc(isDark ? ThemeMode.dark : ThemeMode.light),radius: 0.5);
+    case 'neutral':
+      return ThemeData(colorScheme: ColorSchemes.neutral(isDark ? ThemeMode.dark : ThemeMode.light),radius: 0.5);
+    case 'stone':
+      return ThemeData(colorScheme: ColorSchemes.stone(isDark ? ThemeMode.dark : ThemeMode.light),radius: 0.5);
+    case 'rose':
+      return ThemeData(colorScheme: ColorSchemes.rose(isDark ? ThemeMode.dark : ThemeMode.light),radius: 0.5);
+    case 'violet':
+      return ThemeData(colorScheme: ColorSchemes.violet(isDark ? ThemeMode.dark : ThemeMode.light),radius: 0.5);
+    case 'slate':
+      return ThemeData(colorScheme: ColorSchemes.slate(isDark ? ThemeMode.dark : ThemeMode.light),radius: 0.5);
+    case 'orange':
+      return ThemeData(colorScheme: ColorSchemes.orange(isDark ? ThemeMode.dark : ThemeMode.light),radius: 0.5);
+    case 'gray':
+      return ThemeData(colorScheme: ColorSchemes.gray(isDark ? ThemeMode.dark : ThemeMode.light),radius: 0.5);
+    default:
+      return ThemeData(colorScheme: ColorSchemes.zinc(isDark ? ThemeMode.dark : ThemeMode.light),radius: 0.5);
+  }
+}
+
+List<String> getThemeNames() {
+  return ['blue', 'green', 'red', 'yellow', 'zinc', 'neutral', 'stone', 'rose', 'violet', 'slate', 'orange', 'gray'];
 }

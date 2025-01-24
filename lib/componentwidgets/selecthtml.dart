@@ -37,7 +37,7 @@ class _SelectableHtmlState extends State<SelectableHtml> {
         },
         onTapUrl: (String url) async {
           try {
-            logger("html tap url: $url");
+            log.d("html tap url: $url");
             //bool result = 
             await launchUrl(Uri.parse(url),mode: LaunchMode.externalNonBrowserApplication);
             // if (!result) {

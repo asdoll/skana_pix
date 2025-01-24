@@ -1,8 +1,10 @@
 import 'dart:async';
 import 'dart:io';
 
-import 'package:bot_toast/bot_toast.dart';
-import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:get/get.dart';
+import 'package:skana_pix/controller/account_controller.dart';
+import 'package:skana_pix/controller/page_index_controller.dart';
 import 'package:skana_pix/pixiv_dart_api.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
@@ -12,27 +14,37 @@ import 'package:skana_pix/utils/applinks.dart';
 import 'package:skana_pix/utils/translate.dart';
 import 'package:skana_pix/view/homepage.dart';
 import 'package:skana_pix/view/defaults.dart';
+import 'package:shadcn_flutter/shadcn_flutter.dart';
+
+import 'controller/like_controller.dart';
 
 Future<void> main() async {
   runZonedGuarded(() async {
     WidgetsFlutterBinding.ensureInitialized();
     FlutterError.onError = (details) {
-      Log.error("Unhandled", "${details.exception}\n${details.stack}");
+      // ignore: avoid_print
+      print("Unhandled:${details.exception}\n${details.stack}");
     };
+    initLogger();
     await settings.init();
     await TextConfigManager.init();
-    setSystemProxy();
+    //setSystemProxy();
     await ConnectManager().init();
-    await TranslateMap.init();
-    await Log.init();
+    Get.addTranslations(TranslateMap.translation);
+    Get.updateLocale(settings.localeObj());
     handleLinks();
+    pageIndexController = Get.put(PageIndexController());
+    accountController = Get.put(AccountController());
+    localManager = Get.put(LocalManager());
+    localManager.init();
+    likeController = Get.put(LikeController());
     if (Platform.isWindows || Platform.isLinux) {
       sqfliteFfiInit();
       databaseFactory = databaseFactoryFfi;
     }
     runApp(MyApp());
   }, (e, s) {
-    loggerError("Unhandled Exception: $e\n$s");
+    log.e("Unhandled Exception: $e\n$s");
   });
 }
 
@@ -43,7 +55,7 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-  ThemeStuff appValueNotifier = ThemeStuff.instance;
+  ThemeManager appValueNotifier = ThemeManager.instance;
 
   @override
   void initState() {
@@ -58,15 +70,13 @@ class _MyAppState extends State<MyApp> {
     return ValueListenableBuilder(
       valueListenable: appValueNotifier.theme,
       builder: (context, value, child) {
-        return MaterialApp(
+        SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
+        return ShadcnApp(
           title: 'Skana_pix',
-          builder: BotToastInit(),
-          navigatorObservers: [BotToastNavigatorObserver()],
-          theme: value.themeData,
-          darkTheme: value.darkTheme,
-          themeMode: value.themeMode,
+          navigatorObservers: [GetObserver()],
+          theme: value,
           home: const HomePage(),
-          navigatorKey: DynamicData.rootNavigatorKey,
+          navigatorKey: Get.key,
           localizationsDelegates: const [
             GlobalMaterialLocalizations.delegate,
             GlobalWidgetsLocalizations.delegate,

@@ -98,8 +98,8 @@ extension NovelExt on ApiClient {
           NovelWebResponse.fromJson(jsonDecode(json));
       return Res(novelTextResponse);
     } catch (e, s) {
-      Log.error(
-          "Data Convert", "Failed to analyze html novel content: \n$e\n$s");
+      log.e(
+          "Data Convert: Failed to analyze html novel content: \n$e\n$s");
       return Res.error(e);
     }
   }

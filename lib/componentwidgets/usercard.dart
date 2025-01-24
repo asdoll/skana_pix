@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:skana_pix/pixiv_dart_api.dart';
 import 'package:skana_pix/utils/translate.dart';
 import 'package:skana_pix/utils/widgetplugin.dart';
-
+import 'package:get/get.dart';
 import '../model/worktypes.dart';
 import 'avatar.dart';
 import 'followbutton.dart';
@@ -159,7 +159,7 @@ class _PainterCardState extends State<PainterCard> {
           ),
           Spacer(),
           UserFollowButton(
-            followed: _user.isFollowed,
+            liked: _user.isFollowed,
             onPressed: () async {
               try {
                 var method = _user.isFollowed ? "delete" : "add";
@@ -169,7 +169,7 @@ class _PainterCardState extends State<PainterCard> {
                     _user.isFollowed = !_user.isFollowed;
                   });
                 } else {
-                  BotToast.showText(text: "Network Error".i18n);
+                  BotToast.showText(text: "Network Error".tr);
                 }
               } catch (e) {}
             },

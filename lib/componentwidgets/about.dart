@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:skana_pix/utils/translate.dart';
 import 'package:skana_pix/utils/widgetplugin.dart';
 import 'package:url_launcher/url_launcher_string.dart';
@@ -21,7 +22,7 @@ class _AboutPageState extends State<AboutPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('About'.i18n),
+        title: Text('About'.tr),
       ),
       body: ListView(children: [
         const ListTile(

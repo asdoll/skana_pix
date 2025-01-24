@@ -25,25 +25,25 @@ class ConnectManager {
       BasePath.cachePath = (await getApplicationCacheDirectory()).path;
       BasePath.dataPath = (await getApplicationSupportDirectory()).path;
     } on MissingPlatformDirectoryException catch (_, e) {
-      loggerError(e.toString());
+      log.e(e.toString());
     }
 
     try {
       Directory(BasePath.dataPath).createSync();
       Directory(BasePath.cachePath).createSync();
       if (!File(BasePath.accountJsonPath).existsSync()) {
-        logger('user not logged in.');
+        log.i('user not logged in.');
       } else {
         var account = await Account.fromPath();
         if (account == null) {
-          logger('user not logged in.');
+          log.i('user not logged in.');
           return;
         }
         apiClient = ApiClient(account, PDio());
-        logger('user logged in.');
+        log.i('user logged in.');
       }
     } catch (e) {
-      loggerError('init error: $e');
+      log.e('init error: $e');
     }
   }
 

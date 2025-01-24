@@ -2,6 +2,7 @@ import 'package:bot_toast/bot_toast.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:skana_pix/pixiv_dart_api.dart';
+import 'package:get/get.dart';
 import 'package:skana_pix/utils/translate.dart';
 import 'package:skana_pix/utils/widgetplugin.dart';
 
@@ -243,7 +244,7 @@ class _NovelCardState extends State<NovelCard> {
                 ]),
                 const SizedBox(width: 8),
                 UserFollowButton(
-                  followed: widget.novel.author.isFollowed,
+                  liked: widget.novel.author.isFollowed,
                   onPressed: () async {
                     follow();
                   },
@@ -293,7 +294,7 @@ class _NovelCardState extends State<NovelCard> {
                 runSpacing: 1,
                 children: [
                   if (widget.novel.isAi)
-                    Text("AI-generated".i18n,
+                    Text("AI-generated".tr,
                         style: Theme.of(context).textTheme.bodySmall!.copyWith(
                             color: Theme.of(context).colorScheme.secondary)),
                   for (var f in widget.novel.tags) buildRow(context, f)
@@ -325,7 +326,7 @@ class _NovelCardState extends State<NovelCard> {
                     builder: (BuildContext context) => CommentPage(
                         id: widget.novel.id, type: ArtworkType.NOVEL)));
               },
-              child: Text("Show comments".i18n)),
+              child: Text("Show comments".tr)),
         ],
       ),
     );
@@ -342,7 +343,7 @@ class _NovelCardState extends State<NovelCard> {
     var res = await followUser(widget.novel.author.id.toString(), method);
     if (res.error) {
       if (mounted) {
-        BotToast.showText(text: "Network Error".i18n);
+        BotToast.showText(text: "Network Error".tr);
       }
     } else {
       setState(() {
@@ -421,19 +422,19 @@ class _NovelCardState extends State<NovelCard> {
                 onPressed: () {
                   Navigator.pop(context, 0);
                 },
-                child: Text("Block".i18n),
+                child: Text("Block".tr),
               ),
               SimpleDialogOption(
                 onPressed: () {
                   Navigator.pop(context, 1);
                 },
-                child: Text("Bookmark".i18n),
+                child: Text("Bookmark".tr),
               ),
               SimpleDialogOption(
                 onPressed: () {
                   Navigator.pop(context, 2);
                 },
-                child: Text("Copy".i18n),
+                child: Text("Copy".tr),
               ),
             ],
           );
@@ -453,7 +454,7 @@ class _NovelCardState extends State<NovelCard> {
           await Clipboard.setData(ClipboardData(text: f.name));
           ScaffoldMessenger.of(context).showSnackBar(SnackBar(
             duration: Duration(seconds: 1),
-            content: Text("Copied to clipboard".i18n),
+            content: Text("Copied to clipboard".tr),
           ));
         }
     }

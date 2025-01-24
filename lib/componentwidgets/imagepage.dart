@@ -1,12 +1,13 @@
 import 'dart:io';
 
-import 'package:bot_toast/bot_toast.dart';
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart' show BottomAppBar;
+import 'package:path/path.dart' as path;
+import 'package:shadcn_flutter/shadcn_flutter.dart';
 import 'package:flutter/services.dart';
 import 'package:photo_view/photo_view.dart';
 import 'package:photo_view/photo_view_gallery.dart';
 import 'package:skana_pix/pixiv_dart_api.dart';
-import 'package:path/path.dart';
+import 'package:skana_pix/utils/leaders.dart';
 import '../controller/caches.dart';
 import 'pixivimage.dart';
 
@@ -53,28 +54,21 @@ class _ImagePageState extends State<ImagePage> {
       if (widget.urls.length == 1) {
         final url = widget.urls.first;
         return Scaffold(
-          extendBody: true,
-          extendBodyBehindAppBar: true,
           backgroundColor: Colors.black,
-          bottomNavigationBar: _buildBottom(context),
-          body: Container(
-            child: PhotoView(
-              filterQuality: FilterQuality.high,
-              initialScale: PhotoViewComputedScale.contained,
-              heroAttributes: PhotoViewHeroAttributes(tag: url),
-              imageProvider: PixivProvider.url(url),
-              loadingBuilder: (context, event) => _buildLoading(event),
-            ),
+          footers: [_buildBottom(context)],
+          child: PhotoView(
+            filterQuality: FilterQuality.high,
+            initialScale: PhotoViewComputedScale.contained,
+            heroAttributes: PhotoViewHeroAttributes(tag: url),
+            imageProvider: PixivProvider.url(url),
+            loadingBuilder: (context, event) => _buildLoading(event),
           ),
         );
       } else {
         return Scaffold(
-          extendBody: true,
-          bottomNavigationBar: _buildBottom(context),
-          extendBodyBehindAppBar: true,
+          footers: [_buildBottom(context)],
           backgroundColor: Colors.black,
-          body: Container(
-              child: PhotoViewGallery.builder(
+          child: PhotoViewGallery.builder(
             scrollPhysics: const BouncingScrollPhysics(),
             pageController: controller,
             builder: (BuildContext context, int index) {
@@ -101,7 +95,7 @@ class _ImagePageState extends State<ImagePage> {
               }
             },
             loadingBuilder: (context, event) => _buildLoading(event),
-          )),
+          ),
         );
       }
     });
@@ -115,7 +109,7 @@ class _ImagePageState extends State<ImagePage> {
         color: Colors.transparent,
         child: Row(
           children: [
-            IconButton(
+            IconButton.ghost(
                 onPressed: () {
                   setState(() {
                     _fullScreen = false;
@@ -125,7 +119,7 @@ class _ImagePageState extends State<ImagePage> {
                 },
                 icon: Icon(
                   Icons.fullscreen_exit,
-                  color: Colors.white.withOpacity(0.5),
+                  color: Colors.white.withAlpha(50),
                 ))
           ],
         ),
@@ -141,8 +135,7 @@ class _ImagePageState extends State<ImagePage> {
           children: [
             Row(
               children: [
-                IconButton(
-                  iconSize: 16,
+                IconButton.ghost(
                   icon: Icon(
                     Icons.photo_library_outlined,
                     color: Colors.white,
@@ -152,8 +145,8 @@ class _ImagePageState extends State<ImagePage> {
                 Text(
                   "${currentPage + 1}/${widget.urls.length}",
                   style: Theme.of(context)
-                      .textTheme
-                      .bodyLarge!
+                      .typography
+                      .large
                       .copyWith(color: Colors.white),
                 ),
               ],
@@ -161,7 +154,7 @@ class _ImagePageState extends State<ImagePage> {
             Row(
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
-                IconButton(
+                IconButton.ghost(
                     icon: Icon(
                       Icons.arrow_back,
                       color: Colors.white,
@@ -169,7 +162,7 @@ class _ImagePageState extends State<ImagePage> {
                     onPressed: () async {
                       Navigator.of(context).pop();
                     }),
-                IconButton(
+                IconButton.ghost(
                   icon: Icon(Icons.fullscreen, color: Colors.white),
                   onPressed: () {
                     setState(() {
@@ -180,31 +173,31 @@ class _ImagePageState extends State<ImagePage> {
                   },
                 ),
                 GestureDetector(
-                    child: IconButton(
+                    child: IconButton.ghost(
                         icon: Icon(
                           Icons.save_alt,
                           color: Colors.white,
                         ),
                         onPressed: () {
-                          File file = File(join(
+                          File file = File(path.join(
                               BasePath.cachePath,
                               "share_cache",
-                              basenameWithoutExtension(nowUrl) +
+                              path.basenameWithoutExtension(nowUrl) +
                                   (nowUrl.endsWith(".png") ? ".png" : ".jpg")));
                           if (!file.existsSync()) {
                             file.createSync(recursive: true);
                           }
 
-                          saveUrl(widget.urls[currentPage], context: context);
+                          saveUrl(widget.urls[currentPage]);
                         }),
                     onLongPress: () async {
-                      saveUrl(widget.urls[currentPage], context: context);
+                      saveUrl(widget.urls[currentPage]);
                     }),
                 AnimatedOpacity(
                   opacity: shareShow ? 1 : 0.5,
                   duration: Duration(milliseconds: 500),
                   child: Builder(builder: (context) {
-                    return IconButton(
+                    return IconButton.ghost(
                         icon: Icon(
                           Icons.share,
                           color: Colors.white,
@@ -213,10 +206,10 @@ class _ImagePageState extends State<ImagePage> {
                           var file =
                               await imagesCacheManager.getFileFromCache(nowUrl);
                           if (file != null) {
-                            String targetPath = join(
+                            String targetPath = path.join(
                                 BasePath.cachePath,
                                 "share_cache",
-                                basenameWithoutExtension(file.file.path) +
+                                path.basenameWithoutExtension(file.file.path) +
                                     (nowUrl.endsWith(".png")
                                         ? ".png"
                                         : ".jpg"));
@@ -231,7 +224,7 @@ class _ImagePageState extends State<ImagePage> {
                                 sharePositionOrigin:
                                     box!.localToGlobal(Offset.zero) & box.size);
                           } else {
-                            BotToast.showText(text: "can not find image cache");
+                            Leader.showTextToast("can not find image cache");
                           }
                         });
                   }),
@@ -268,10 +261,10 @@ class _ImagePageState extends State<ImagePage> {
       });
     }
     return Center(
-      child: Container(
+      child: SizedBox(
         width: 20.0,
         height: 20.0,
-        child: CircularProgressIndicator.adaptive(value: value),
+        child: CircularProgressIndicator(value: value),
       ),
     );
   }

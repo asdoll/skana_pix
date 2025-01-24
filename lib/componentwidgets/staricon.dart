@@ -1,81 +1,60 @@
-import 'package:flutter/material.dart';
-import 'package:skana_pix/pixiv_dart_api.dart';
-
-import '../model/illust.dart';
-
-typedef UpdateFavoriteFunc = void Function(bool v);
+import 'package:get/get.dart';
+import 'package:shadcn_flutter/shadcn_flutter.dart';
+import 'package:skana_pix/controller/like_controller.dart';
+import 'package:skana_pix/model/worktypes.dart';
 
 class StarIcon extends StatefulWidget {
-  final int state;
-  final Illust illust;
-
-  static Map<String, UpdateFavoriteFunc> favoriteCallbacks = {};
+  final String id;
+  final ArtworkType type;
+  final double size;
+  final bool liked;
 
   const StarIcon({
-    Key? key,
-    required this.state,
-    required this.illust,
-  }) : super(key: key);
+    super.key,
+    required this.id,
+    required this.type,
+    this.size = 40,
+    this.liked = false,
+  });
 
   @override
-  _StarIconState createState() => _StarIconState();
+  State<StarIcon> createState() => _StarIconState();
 }
 
 class _StarIconState extends State<StarIcon> {
-  late int state;
 
-  @override
-  void initState() {
-    StarIcon.favoriteCallbacks[widget.illust.toString()] = (v) {
-      setState(() {
-        widget.illust.isBookmarked = v;
-      });
-    };
-    state = widget.state;
-    super.initState();
-  }
-
-  @override
-  void dispose() {
-    StarIcon.favoriteCallbacks.remove(widget.illust.toString());
-    super.dispose();
-  }
-
-  @override
-  void didUpdateWidget(covariant StarIcon oldWidget) {
-    super.didUpdateWidget(oldWidget);
-    if (oldWidget.state != widget.state) {
-      setState(() {
-        state = widget.state;
-      });
-    }
-  }
+  int get liked => widget.liked ? 2 : 0;
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: 40,
-      height: 40,
-      color: Colors.transparent,
-      child: _buildData(state),
-    );
-  }
-
-  Widget _buildData(int state) {
-    switch (state) {
-      case 0:
-        return Icon(
-          Icons.favorite_border,
-          color: Theme.of(context).colorScheme.onSurfaceVariant,
-        );
-      case 1:
-        return Icon(Icons.favorite,
-            color: Theme.of(context).colorScheme.onSurfaceVariant);
-      default:
-        return Icon(
-          Icons.favorite,
-          color: Colors.red,
-        );
-    }
+        width: widget.size,
+        height: widget.size,
+        color: Colors.transparent,
+        child: IconButton.ghost(
+          onPressed: () {
+            likeController.toggle(widget.id, widget.type, liked);
+          },
+          icon: Obx(() {
+            switch (widget.type == ArtworkType.ILLUST ||
+                    widget.type == ArtworkType.MANGA
+                ? likeController.illusts[widget.id] ?? liked
+                : likeController.novels[widget.id] ?? liked) {
+              case 0:
+                return Icon(
+                  Icons.favorite_border,
+                  color: Theme.of(context).colorScheme.secondaryForeground,
+                );
+              case 1:
+                return Icon(Icons.favorite,
+                    color: Theme.of(context).colorScheme.secondaryForeground);
+              default:
+                return Icon(
+                  Icons.favorite,
+                  color: Colors.red,
+                );
+            }
+          }),
+        ));
   }
 }
