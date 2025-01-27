@@ -44,7 +44,7 @@ class ImageListPage extends StatefulWidget {
 
 class _ImageListPageState extends State<ImageListPage> {
   late final PageController controller;
-  late ListController listController;
+  late ListIllustController listController;
   String type = "";
 
   @override
@@ -60,14 +60,14 @@ class _ImageListPageState extends State<ImageListPage> {
           Get.find<RecomImagesController>(tag: widget.controllerTag);
     } else {
       log.e("Unknown type: $type");
-      listController = Get.find<ListController>(tag: widget.controllerTag);
+      listController = Get.find<ListIllustController>(tag: widget.controllerTag);
     }
   }
 
   @override
   void dispose() {
     controller.dispose();
-    ListController.sendHistory();
+    ListIllustController.sendHistory();
     super.dispose();
   }
 
@@ -205,7 +205,7 @@ class _IllustPageState extends State<IllustPage> {
         tag: "related_${widget.illust.id}");
     relatedListController.firstLoad();
     if (user.isPremium) {
-      ListController.historyIds.add(widget.illust.id);
+      ListIllustController.historyIds.add(widget.illust.id);
     }
     super.initState();
   }

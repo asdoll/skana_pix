@@ -16,6 +16,7 @@ class LikeController extends GetxController {
     if (illusts[id] == 1) return;
     state = illusts[id] ?? state;
     illusts[id] = 1;
+    illusts.refresh();
     var res = await ConnectManager().apiClient.addBookmark(
         id, state == 0 ? "add" : "delete", private ? "private" : "public");
     if (res.success) {
@@ -24,12 +25,14 @@ class LikeController extends GetxController {
       Leader.showTextToast("Network Error".tr);
       illusts[id] = state;
     }
+    illusts.refresh();
   }
 
   Future<void> toggleNovel(String id, int state, {bool private = false}) async {
     if (novels[id] == 1) return;
     state = novels[id] ?? state;
     novels[id] = 1;
+    novels.refresh();
     var res = state == 0
         ? await ConnectManager()
             .apiClient
@@ -41,12 +44,14 @@ class LikeController extends GetxController {
       Leader.showTextToast("Network Error".tr);
       novels[id] = state;
     }
+    novels.refresh();
   }
 
   Future<void> toggleUser(String id, int state, {bool private = false}) async {
     if (users[id] == 1) return;
     state = users[id] ?? state;
     users[id] = 1;
+    users.refresh();
     var res = await ConnectManager().apiClient.follow(
         id, state == 0 ? "add" : "delete", private ? "private" : "public");
     if (res.success) {
@@ -55,6 +60,7 @@ class LikeController extends GetxController {
       Leader.showTextToast("Network Error".tr);
       users[id] = state;
     }
+    users.refresh();
   }
 
   Future<void> toggle(String id, ArtworkType type, int state,
@@ -73,6 +79,10 @@ class LikeController extends GetxController {
   void clear() {
     illusts.clear();
     novels.clear();
+    users.clear();
+    illusts.refresh();
+    novels.refresh();
+    users.refresh();
   }
 }
 
@@ -109,6 +119,20 @@ class LocalManager extends GetxController {
     historyIllustTag = settings.settings[28].split(';').obs;
     historyNovelTag = settings.settings[29].split(';').obs;
     historyUserTag = settings.settings[30].split(';').obs;
+    blockedUsers.refresh();
+    blockedTags.refresh();
+    blockedCommentUsers.refresh();
+    blockedNovelUsers.refresh();
+    bookmarkedTags.refresh();
+    bookmarkedNovelTags.refresh();
+    blockedComments.refresh();
+    blockedNovels.refresh();
+    blockedNovelTags.refresh();
+    blockedIllusts.refresh();
+    historyIllustTag.refresh();
+    historyNovelTag.refresh();
+    historyUserTag.refresh();
+
   }
 
   void add(String param, List<String> value) {
@@ -127,6 +151,9 @@ class LocalManager extends GetxController {
         break;
       case "bookmarkedTags":
         settings.addBookmarkedTags(value);
+        break;
+      case "bookmarkedNovelTags":
+        settings.addBookmarkedNovelTags(value);
         break;
       case "blockedComments":
         settings.addBlockedComments(value);
@@ -169,6 +196,9 @@ class LocalManager extends GetxController {
       case "bookmarkedTags":
         settings.removeBookmarkedTags(value);
         break;
+      case "bookmarkedNovelTags":
+        settings.removeBookmarkedNovelTags(value);
+        break;
       case "blockedComments":
         settings.removeBlockedComments(value);
         break;
@@ -189,6 +219,65 @@ class LocalManager extends GetxController {
         break;
       case "historyUserTag":
         settings.deleteHistoryTag(ArtworkType.USER, value.first);
+        break;
+    }
+  }
+
+  void clear(String param) {
+    switch (param) {
+      case "blockedUsers":
+        settings.clearBlockedUsers();
+        break;
+      case "blockedTags":
+        settings.clearBlockedTags();
+        break;
+      case "blockedCommentUsers":
+        settings.clearBlockedCommentUsers();
+        break;
+      case "blockedNovelUsers":
+        settings.clearBlockedNovelUsers();
+        break;
+      case "bookmarkedTags":
+        settings.clearBookmarkedTags();
+        break;
+      case "bookmarkedNovelTags":
+        settings.clearBookmarkedNovelTags();
+        break;
+      case "blockedComments":
+        settings.clearBlockedComments();
+        break;
+      case "blockedNovels":
+        settings.clearBlockedNovels();
+        break;
+      case "blockedNovelTags":
+        settings.clearBlockedNovelTags();
+        break;
+      case "blockedIllusts":
+        settings.clearBlockedIllusts();
+        break;
+      case "historyIllustTag":
+        settings.clearHistoryTag(ArtworkType.ILLUST);
+        break;
+      case "historyNovelTag":
+        settings.clearHistoryTag(ArtworkType.NOVEL);
+        break;
+      case "historyUserTag":
+        settings.clearHistoryTag(ArtworkType.USER);
+        break;
+      case "ALL":
+        settings.clearBlockedIllusts();
+        settings.clearBlockedNovels();
+        settings.clearBlockedUsers();
+        settings.clearBlockedTags();
+        settings.clearBlockedCommentUsers();
+        settings.clearBlockedNovelUsers();
+        settings.clearBookmarkedTags();
+        settings.clearBookmarkedNovelTags();
+        settings.clearBlockedComments();
+        settings.clearBlockedNovelTags();
+        settings.clearHistoryTag(ArtworkType.ILLUST);
+        settings.clearHistoryTag(ArtworkType.NOVEL);
+        settings.clearHistoryTag(ArtworkType.USER);
         break;
     }
   }

@@ -5,9 +5,9 @@ class PageIndexController extends GetxController {
 
 }
 
-List<String> pages = ["Illust","Manga","Novel",//recom
+List<String> pages = ["Recommended Illusts","Recommended Mangas","Recommended Novels",//recom
+"Feed Illust/Manga","Feed Novel",//feed
 "Ranking","Pixivision",
-"Illust/Manga","Novel",//feed
 "Search","Bookmarks","My Tags","Following","History","Settings"];
 
 late PageIndexController pageIndexController;

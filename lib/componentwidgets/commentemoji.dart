@@ -4,10 +4,10 @@ import 'commentpage.dart';
 
 class CommentEmojiText extends StatefulWidget {
   final String text;
-  const CommentEmojiText({Key? key, required this.text}) : super(key: key);
+  const CommentEmojiText({super.key, required this.text});
 
   @override
-  _CommentEmojiTextState createState() => _CommentEmojiTextState();
+  State<CommentEmojiText> createState() => _CommentEmojiTextState();
 }
 
 class _CommentEmojiTextState extends State<CommentEmojiText> {
@@ -58,10 +58,11 @@ class _CommentEmojiTextState extends State<CommentEmojiText> {
         emojiCollecting = false;
         emojiText = "";
       } else {
-        if (emojiCollecting)
+        if (emojiCollecting) {
           emojiText += element;
-        else
+        } else {
           template += element;
+        }
       }
     }
     if (template.isNotEmpty) {

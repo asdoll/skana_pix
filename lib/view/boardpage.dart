@@ -1,64 +1,41 @@
-import 'package:flutter/material.dart';
+import 'package:easy_refresh/easy_refresh.dart';
+import 'package:shadcn_flutter/shadcn_flutter.dart';
 import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
 import 'package:get/get.dart';
-import 'package:skana_pix/utils/translate.dart';
+import 'package:skana_pix/componentwidgets/headerfooter.dart';
+import 'package:skana_pix/controller/update_controller.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-import '../model/boardinfo.dart';
-
 class BoardPage extends StatefulWidget {
-  final List<BoardInfo> boardList;
-  const BoardPage({super.key, required this.boardList});
+  const BoardPage({super.key});
 
   @override
   State<BoardPage> createState() => _BoardPageState();
 }
 
 class _BoardPageState extends State<BoardPage> {
-  late List<BoardInfo> _boardList = widget.boardList;
-
-  @override
-  void initState() {
-    super.initState();
-    fetchBoard();
-  }
-
-  fetchBoard() async {
-    try {
-      if (_boardList.isNotEmpty) {
-        return;
-      }
-      if (BoardInfo.boardDataLoaded) {
-        setState(() {
-          _boardList = BoardInfo.boardList;
-        });
-        return;
-      }
-      final list = await BoardInfo.load();
-      BoardInfo.boardList = list;
-      BoardInfo.boardDataLoaded = true;
-      if (mounted) {
-        setState(() {
-          _boardList = list;
-        });
-      }
-    } catch (e) {}
-  }
 
   @override
   Widget build(BuildContext context) {
+    EasyRefreshController controller = EasyRefreshController(controlFinishRefresh: true);
+
     return Scaffold(
-      appBar: AppBar(
-        title: Text("Bulletin Board".tr),
-      ),
-      body: RefreshIndicator(
+      headers: [
+        AppBar(
+          title: Text("Bulletin Board".tr),
+        ),
+      ],
+      child: Obx(() {
+        return EasyRefresh(
+        controller: controller,
         onRefresh: () async {
-          await fetchBoard();
+          boardController.fetchBoard(controller: controller);
         },
-        backgroundColor: Theme.of(context).cardColor,
+        refreshOnStart: true,
+        header: DefaultHeaderFooter.header(context),
         child: ListView(
           children: [
-            for (final board in _boardList)
+            for (final board in boardController.boardList)
               Container(
                 margin: EdgeInsets.all(16),
                 child: Column(
@@ -67,7 +44,7 @@ class _BoardPageState extends State<BoardPage> {
                     Container(height: 1),
                     Text(
                       board.title,
-                      style: Theme.of(context).textTheme.titleLarge,
+                      style: Theme.of(context).typography.h2
                     ),
                     SizedBox(
                       height: 1,
@@ -82,8 +59,10 @@ class _BoardPageState extends State<BoardPage> {
                 ),
               )
           ],
-        ),
-      ),
+          ),
+        );
+      }),
     );
   }
 }
+

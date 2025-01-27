@@ -1,9 +1,7 @@
-import 'package:bot_toast/bot_toast.dart';
 import 'package:flutter/material.dart';
 import 'package:skana_pix/pixiv_dart_api.dart';
 import 'package:skana_pix/utils/translate.dart';
 import 'package:skana_pix/utils/widgetplugin.dart';
-import 'package:get/get.dart';
 import '../model/worktypes.dart';
 import 'avatar.dart';
 import 'followbutton.dart';
@@ -13,8 +11,7 @@ import 'userpage.dart';
 class PainterCard extends StatefulWidget {
   final UserPreview user;
   final ArtworkType type;
-  const PainterCard({Key? key, required this.user, this.type = ArtworkType.ALL})
-      : super(key: key);
+  const PainterCard({super.key, required this.user, this.type = ArtworkType.ALL});
 
   @override
   State<PainterCard> createState() => _PainterCardState();
@@ -160,19 +157,7 @@ class _PainterCardState extends State<PainterCard> {
           Spacer(),
           UserFollowButton(
             liked: _user.isFollowed,
-            onPressed: () async {
-              try {
-                var method = _user.isFollowed ? "delete" : "add";
-                Res<bool> res = await followUser(_user.id.toString(), method);
-                if (res.success) {
-                  setState(() {
-                    _user.isFollowed = !_user.isFollowed;
-                  });
-                } else {
-                  BotToast.showText(text: "Network Error".tr);
-                }
-              } catch (e) {}
-            },
+            id: _user.id.toString(),
           )
         ],
       ),

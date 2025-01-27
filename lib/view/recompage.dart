@@ -1,12 +1,13 @@
 import 'package:easy_refresh/easy_refresh.dart';
 import 'package:get/get.dart';
 import 'package:skana_pix/componentwidgets/headerfooter.dart';
+import 'package:skana_pix/componentwidgets/novelcard.dart';
 import 'package:skana_pix/controller/recom_controller.dart';
 import 'package:skana_pix/model/worktypes.dart';
 import 'package:skana_pix/view/defaults.dart';
 import 'package:waterfall_flow/waterfall_flow.dart';
 import 'package:shadcn_flutter/shadcn_flutter.dart';
-import '../componentwidgets/imagetab.dart';
+import '../componentwidgets/imagecard.dart';
 
 class RecomImagesPage extends StatefulWidget {
   final ArtworkType type;
@@ -63,3 +64,48 @@ class _RecomImagesPageState extends State<RecomImagesPage> {
     );
   }
 }
+
+class RecomNovelsPage extends StatefulWidget {
+  const RecomNovelsPage({super.key});
+  @override
+  State<RecomNovelsPage> createState() => _RecomNovelsPageState();
+}
+
+class _RecomNovelsPageState extends State<RecomNovelsPage> {
+  @override
+  Widget build(BuildContext context) {
+    EasyRefreshController easyRefreshController = EasyRefreshController(
+        controlFinishLoad: true, controlFinishRefresh: true);
+    RecomNovelsController recomNovelsController = Get.put(
+        RecomNovelsController(easyRefreshController: easyRefreshController),
+        tag: "recom_novels");
+    return EasyRefresh.builder(
+      controller: easyRefreshController,
+      callRefreshOverOffset: 10,
+      header: DefaultHeaderFooter.header(context),
+      footer: DefaultHeaderFooter.footer(context),
+      onRefresh: () {
+        recomNovelsController.reset();
+      },
+      onLoad: () {
+        recomNovelsController.nextPage();
+      },
+      childBuilder: (context, physics) => Obx(
+        () => CustomScrollView(
+          physics: physics,
+          slivers: [
+            SliverToBoxAdapter(
+              child: Container(height: MediaQuery.of(context).padding.top),
+            ),
+            SliverList(
+                delegate: SliverChildBuilderDelegate(
+                    (BuildContext context, int index) {
+              return NovelCard(index, "recom_novels");
+            }, childCount: recomNovelsController.novels.length)),
+          ],
+        ),
+      ),
+    );
+  }
+}
+

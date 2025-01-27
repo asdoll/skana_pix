@@ -1,10 +1,8 @@
 import 'dart:math';
 
 import 'package:flutter/material.dart';
-import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:skana_pix/pixiv_dart_api.dart';
 import 'package:get/get.dart';
-import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 
 class ColorPickPage extends StatefulWidget {
   final Color initialColor;

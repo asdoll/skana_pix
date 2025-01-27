@@ -1,82 +1,42 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:get/get.dart';
 import 'package:path_provider/path_provider.dart';
-import 'package:skana_pix/componentwidgets/blocklistpage.dart';
+import 'package:skana_pix/controller/account_controller.dart';
+import 'package:skana_pix/controller/update_controller.dart';
+import 'package:skana_pix/view/blocklistpage.dart';
 import 'package:skana_pix/componentwidgets/followlist.dart';
 import 'package:skana_pix/componentwidgets/newversion.dart';
 import 'package:skana_pix/componentwidgets/prefsettings.dart';
 import 'package:skana_pix/model/worktypes.dart';
 import 'package:skana_pix/pixiv_dart_api.dart';
-import 'package:skana_pix/utils/translate.dart';
-import 'package:skana_pix/view/defaults.dart';
 import 'package:skana_pix/view/homepage.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 
-import '../componentwidgets/about.dart';
+import 'about.dart';
 import '../componentwidgets/avatar.dart';
-import '../componentwidgets/boardpage.dart';
-import '../componentwidgets/booktagpage.dart';
+import 'boardpage.dart';
+import 'mytagspage.dart';
 import '../componentwidgets/dataexport.dart';
 import '../componentwidgets/historypage.dart';
 import '../componentwidgets/mybookmarks.dart';
 import '../componentwidgets/themepage.dart';
-import 'package:skana_pix/controller/updater.dart';
-import '../model/boardinfo.dart';
 import '../utils/leaders.dart';
 import 'loginpage.dart';
 
 class SettingPage extends StatefulWidget {
-  const SettingPage({Key? key}) : super(key: key);
+  const SettingPage({super.key});
 
   @override
-  _SettingPageState createState() => _SettingPageState();
+  State<SettingPage> createState() => _SettingPageState();
 }
 
 class _SettingPageState extends State<SettingPage> {
-  @override
-  void initState() {
-    super.initState();
-    if(settings.checkUpdate) {
-      initMethod();
-    }
-    fetchBoard();
-  }
-
-  bool hasNewVersion = false;
-
-  initMethod() async {
-    if (Constants.isGooglePlay || DynamicData.isIOS) return;
-    if (Updater.result != Result.timeout) {
-      bool hasNew = Updater.result == Result.yes;
-      if (mounted)
-        setState(() {
-          hasNewVersion = hasNew;
-        });
-      return;
-    }
-    Result result = await Updater.check();
-    switch (result) {
-      case Result.yes:
-        if (mounted) {
-          setState(() {
-            hasNewVersion = true;
-          });
-        }
-        break;
-      default:
-        if (mounted) {
-          setState(() {
-            hasNewVersion = false;
-          });
-        }
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
+    boardController.fetchBoard();
     return Scaffold(
       body: SafeArea(
         child: SingleChildScrollView(
@@ -101,10 +61,8 @@ class _SettingPageState extends State<SettingPage> {
                     ),
                   ],
                 ),
-                Observer(
-                    warnWhenNoObservables: false,
-                    builder: (context) {
-                      if (!ConnectManager().notLoggedIn) {
+                Obx(() {
+                  if (!accountController.isLoggedIn.value) {
                         return SingleChildScrollView(
                           child: Column(
                             children: <Widget>[
@@ -190,7 +148,7 @@ class _SettingPageState extends State<SettingPage> {
                                 leading: Icon(Icons.bookmark),
                                 title: Text("Favorite Tags".tr),
                                 onTap: () => Leader.pushWithScaffold(
-                                    context, BookTagPage(),
+                                    context, MyTagsPage(),
                                     root: true),
                               ),
                               ListTile(
@@ -252,15 +210,19 @@ class _SettingPageState extends State<SettingPage> {
                       onTap: () =>
                           Leader.push(context, BlockListPage(), root: true),
                     ),
-                    if (!ConnectManager().notLoggedIn)
-                      ListTile(
+                    Obx(() {
+                      if (!accountController.isLoggedIn.value) {
+                        return Container();
+                      }
+                      return ListTile(
                         leading: Icon(Icons.account_box),
                         title: Text("Account Settings".tr),
                         onTap: () {
                           launchUrlString(
                               "https://www.pixiv.net/setting_user.php");
                         },
-                      ),
+                      );
+                    }),
                     ListTile(
                       leading: Icon(Icons.settings),
                       title: Text("Preference Settings".tr),
@@ -282,49 +244,45 @@ class _SettingPageState extends State<SettingPage> {
                       leading: Icon(Icons.message),
                       title: Text("About".tr),
                       onTap: () => Leader.push(
-                          context, AboutPage(newVersion: hasNewVersion),
+                          context, AboutPage(),
                           root: true),
                     ),
-                    if (_needBoardSection)
-                      ListTile(
-                        leading: Icon(Icons.article),
-                        title: Text("Bulletin Board".tr),
-                        onTap: () => Leader.push(
-                            context,
-                            BoardPage(
-                              boardList: _boardList,
-                            ),root: true),
-                      ),
+                    Obx(() => boardController.needBoardSection.value
+                        ? ListTile(
+                            leading: Icon(Icons.article),
+                            title: Text("Bulletin Board".tr),
+                            onTap: () => Get.to(() => BoardPage()),
+                          )
+                        : Container()),
                     ListTile(
                       leading: Icon(Icons.update),
                       title: Text("Check updates".tr),
                       onTap: () => Leader.push(
                           context,
-                          NewVersionPage(
-                            newVersion: hasNewVersion,
-                          ),root: true),
+                          NewVersionPage(),
+                          root: true),
                       trailing: Visibility(
+                        visible: updateController.hasNewVersion.value,
                         child: NewVersionChip(),
-                        visible: hasNewVersion,
                       ),
                     ),
-                    Observer(
-                        warnWhenNoObservables: false,
-                        builder: (context) {
-                          if (!ConnectManager().notLoggedIn) {
-                            return ListTile(
-                              leading: Icon(Icons.arrow_back),
-                              title: Text("Logout".tr),
-                              onTap: () => _showLogoutDialog(context),
-                            );
-                          } else {
-                            return ListTile(
-                              leading: Icon(Icons.arrow_back),
-                              title: Text("Login".tr),
-                              onTap: () => Get.offAll(() => LoginPage()),
-                            );
-                          }
-                        })
+                    Obx(
+                      () {
+                        if (accountController.isLoggedIn.value) {
+                          return ListTile(
+                            leading: Icon(Icons.arrow_back),
+                            title: Text("Logout".tr),
+                            onTap: () => _showLogoutDialog(context),
+                          );
+                        } else {
+                          return ListTile(
+                            leading: Icon(Icons.arrow_back),
+                            title: Text("Login".tr),
+                            onTap: () => Get.offAll(() => LoginPage()),
+                          );
+                        }
+                      },
+                    ),
                   ],
                 )
               ],
@@ -408,6 +366,7 @@ class _SettingPageState extends State<SettingPage> {
     }
   }
 
+  // ignore: unused_element
   Future _showClearCacheDialog(BuildContext context) async {
     final result = await showDialog(
         builder: (BuildContext context) {
@@ -417,74 +376,43 @@ class _SettingPageState extends State<SettingPage> {
               TextButton(
                 child: Text("Cancel".tr),
                 onPressed: () {
-                  Navigator.of(context).pop("CANCEL");
+                  Get.back(result: "CANCEL");
                 },
               ),
               TextButton(
                 child: Text("Ok".tr),
                 onPressed: () {
-                  Navigator.of(context).pop("OK");
+                  Get.back(result: "OK");
                 },
               ),
             ],
           );
         },
         context: context);
-    switch (result) {
-      case "OK":
-        {
-          try {
-            Directory tempDir = await getTemporaryDirectory();
+    if (result == "OK") {
+      try {
+        Directory tempDir = await getTemporaryDirectory();
             tempDir.deleteSync(recursive: true);
             //cleanGlanceData();
-          } catch (e) {}
-        }
-        break;
+      } catch (e) {}
     }
-  }
-
-  // void cleanGlanceData() async {
-  //   GlanceIllustPersistProvider glanceIllustPersistProvider =
-  //       GlanceIllustPersistProvider();
-  //   await glanceIllustPersistProvider.open();
-  //   await glanceIllustPersistProvider.deleteAll();
-  //   await glanceIllustPersistProvider.close();
-  // }
-
-  bool _needBoardSection = false;
-  List<BoardInfo> _boardList = [];
-
-  fetchBoard() async {
-    try {
-      if (BoardInfo.boardDataLoaded) {
-        setState(() {
-          _boardList = BoardInfo.boardList;
-          _needBoardSection = _boardList.isNotEmpty;
-        });
-        return;
-      }
-      final list = await BoardInfo.load();
-      setState(() {
-        BoardInfo.boardDataLoaded = true;
-        _boardList = list;
-        _needBoardSection = _boardList.isNotEmpty;
-      });
-    } catch (e) {}
   }
 }
 
 class NewVersionChip extends StatelessWidget {
+  const NewVersionChip({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Container(
-      child: Text(
-        "New",
-        style: TextStyle(color: Colors.white, fontSize: 12.0),
-      ),
       padding: EdgeInsets.symmetric(horizontal: 4.0, vertical: 2),
       decoration: BoxDecoration(
           color: Colors.red,
           borderRadius: BorderRadius.all(Radius.circular(24.0))),
+      child: Text(
+        "New",
+        style: TextStyle(color: Colors.white, fontSize: 12.0),
+      ),
     );
   }
 }

@@ -1,8 +1,12 @@
-import 'package:bot_toast/bot_toast.dart';
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart' as m;
+import 'package:shadcn_flutter/shadcn_flutter.dart';
 import 'package:flutter/services.dart';
+import 'package:skana_pix/componentwidgets/staricon.dart';
+import 'package:skana_pix/controller/like_controller.dart';
+import 'package:skana_pix/controller/recom_controller.dart';
 import 'package:skana_pix/pixiv_dart_api.dart';
 import 'package:get/get.dart';
+import 'package:skana_pix/utils/leaders.dart';
 import 'package:skana_pix/utils/translate.dart';
 import 'package:skana_pix/utils/widgetplugin.dart';
 
@@ -10,7 +14,6 @@ import '../model/worktypes.dart';
 import 'avatar.dart';
 import 'commentpage.dart';
 import 'followbutton.dart';
-import 'novelbookmark.dart';
 import 'novelpage.dart';
 import 'novelresult.dart';
 import 'novelseries.dart';
@@ -18,25 +21,27 @@ import 'pixivimage.dart';
 import 'selecthtml.dart';
 
 class NovelCard extends StatefulWidget {
-  final Novel novel;
-  const NovelCard(this.novel, {super.key});
+  final String controllerTag;
+  final int index;
+  const NovelCard(this.index,this.controllerTag, {super.key});
 
   @override
   State<NovelCard> createState() => _NovelCardState();
 }
 
 class _NovelCardState extends State<NovelCard> {
-  Novel get novel => widget.novel;
+  late RecomNovelsController recomNovelsController;
+
   @override
   Widget build(BuildContext context) {
-    {
+    recomNovelsController = Get.find<RecomNovelsController>(tag: widget.controllerTag);
+    return Obx(() {
       return Padding(
         padding: const EdgeInsets.symmetric(horizontal: 4.0),
-        child: InkWell(
+        child: m.InkWell(
           onTap: () {
             if (settings.novelDirectEntry) {
-              Navigator.of(context, rootNavigator: true).push(MaterialPageRoute(
-                  builder: (BuildContext context) => NovelViewerPage(novel)));
+              Get.to(() => NovelViewerPage(recomNovelsController.novels[widget.index]),preventDuplicates: false);
             } else {
               buildShowModalBottomSheet(context);
             }
@@ -54,7 +59,7 @@ class _NovelCardState extends State<NovelCard> {
                       Padding(
                         padding: const EdgeInsets.symmetric(vertical: 8.0),
                         child: PixivImage(
-                          novel.coverImageUrl,
+                          recomNovelsController.novels[widget.index].coverImageUrl,
                           width: 80,
                           height: 120,
                           fit: BoxFit.cover,
@@ -68,9 +73,9 @@ class _NovelCardState extends State<NovelCard> {
                               padding:
                                   const EdgeInsets.only(top: 8.0, left: 8.0),
                               child: Text(
-                                novel.title,
+                                recomNovelsController.novels[widget.index].title,
                                 overflow: TextOverflow.ellipsis,
-                                style: Theme.of(context).textTheme.bodyLarge,
+                                style: Theme.of(context).typography.textLarge,
                                 maxLines: 3,
                               ),
                             ),
@@ -81,11 +86,11 @@ class _NovelCardState extends State<NovelCard> {
                                 crossAxisAlignment: CrossAxisAlignment.center,
                                 children: [
                                   Text(
-                                    novel.author.name.atMost8,
+                                    recomNovelsController.novels[widget.index].author.name.atMost8,
                                     maxLines: 1,
                                     style: Theme.of(context)
-                                        .textTheme
-                                        .bodySmall!
+                                        .typography
+                                        .textSmall
                                         .copyWith(
                                             color: Theme.of(context)
                                                 .colorScheme
@@ -99,18 +104,18 @@ class _NovelCardState extends State<NovelCard> {
                                           Icons.sticky_note_2_outlined,
                                           size: 12,
                                           color: Theme.of(context)
-                                              .textTheme
-                                              .labelSmall!
+                                              .typography
+                                              .textSmall
                                               .color,
                                         ),
                                         const SizedBox(
                                           width: 2,
                                         ),
                                         Text(
-                                          '${novel.length}',
+                                          '${recomNovelsController.novels[widget.index].length}',
                                           style: Theme.of(context)
-                                              .textTheme
-                                              .labelSmall,
+                                              .typography
+                                              .textSmall,
                                         )
                                       ],
                                     ),
@@ -126,12 +131,12 @@ class _NovelCardState extends State<NovelCard> {
                                 spacing: 2, // gap between adjacent chips
                                 runSpacing: 0,
                                 children: [
-                                  if (novel.tags.isEmpty) Container(),
-                                  for (var f in novel.tags)
+                                  if (recomNovelsController.novels[widget.index].tags.isEmpty) Container(),
+                                  for (var f in recomNovelsController.novels[widget.index].tags)
                                     Text(
                                       f.name,
                                       style:
-                                          Theme.of(context).textTheme.bodySmall,
+                                          Theme.of(context).typography.textSmall,
                                     )
                                 ],
                               ),
@@ -150,9 +155,14 @@ class _NovelCardState extends State<NovelCard> {
                   child: Column(
                     mainAxisSize: MainAxisSize.max,
                     children: [
-                      NovelBookmarkButton(novel: novel, colorMode: ""),
-                      Text('${novel.totalBookmarks}',
-                          style: Theme.of(context).textTheme.bodySmall)
+                      StarIcon(
+                        id: recomNovelsController.novels[widget.index].id.toString(),
+                        type: ArtworkType.NOVEL,
+                        size: 20,
+                        liked: recomNovelsController.novels[widget.index].isBookmarked,
+                      ),
+                      Text('${recomNovelsController.novels[widget.index].totalBookmarks}',
+                          style: Theme.of(context).typography.textSmall)
                     ],
                   ),
                 )
@@ -161,36 +171,24 @@ class _NovelCardState extends State<NovelCard> {
           ),
         ),
       );
-    }
+    });
   }
 
   Future buildShowModalBottomSheet(BuildContext context) {
-    return showModalBottomSheet(
-      isScrollControlled: false,
+    return openSheet(
       context: context,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(
-          top: Radius.circular(16),
-        ),
-      ),
+      position: OverlayPosition.bottom,
       builder: (_) {
-        return Scaffold(
-          floatingActionButton: FloatingActionButton(
+        return m.Scaffold(
+          floatingActionButton: m.IconButton(
             onPressed: () {
-              Navigator.pop(context);
-              Navigator.of(context, rootNavigator: true).push(MaterialPageRoute(
-                  builder: (BuildContext context) => NovelViewerPage(novel)));
+              Get.back();
+              Get.to(() => NovelViewerPage(recomNovelsController.novels[widget.index]),preventDuplicates: false);
             },
-            child: Icon(Icons.menu_book_rounded),
+            icon: Icon(Icons.menu_book_rounded),
           ),
-          body: Container(
-            decoration: BoxDecoration(
-                borderRadius: BorderRadius.only(
-                    topLeft: Radius.circular(8.0),
-                    topRight: Radius.circular(8.0))),
-            child: SingleChildScrollView(child: _buildFirstView(context)),
-          ),
-        ).rounded(16);
+          body: SingleChildScrollView(child: _buildFirstView(context)),
+        );
       },
     );
   }
@@ -205,7 +203,7 @@ class _NovelCardState extends State<NovelCard> {
           ),
           Center(
             child: PixivImage(
-              widget.novel.coverImageUrl,
+              recomNovelsController.novels[widget.index].coverImageUrl,
               width: 80,
               height: 120,
               fit: BoxFit.cover,
@@ -215,8 +213,8 @@ class _NovelCardState extends State<NovelCard> {
             padding: const EdgeInsets.only(
                 left: 16.0, right: 16.0, top: 12.0, bottom: 8.0),
             child: Text(
-              "${widget.novel.title}",
-              style: Theme.of(context).textTheme.titleMedium,
+              recomNovelsController.novels[widget.index].title,
+              style: Theme.of(context).typography.h3,
             ),
           ),
           Padding(
@@ -227,14 +225,14 @@ class _NovelCardState extends State<NovelCard> {
               children: [
                 Wrap(crossAxisAlignment: WrapCrossAlignment.center, children: [
                   PainterAvatar(
-                    url: widget.novel.author.avatar,
-                    id: widget.novel.author.id,
-                    size: Size(16, 16),
+                    url: recomNovelsController.novels[widget.index].author.avatar,
+                    id: recomNovelsController.novels[widget.index].author.id,
+                    size: 16,
                   ),
                   Padding(
                     padding: const EdgeInsets.only(left: 6.0),
                     child: Text(
-                      widget.novel.author.name.atMost8,
+                      recomNovelsController.novels[widget.index].author.name.atMost8,
                       style: const TextStyle(
                         fontSize: 14,
                         fontWeight: FontWeight.w600,
@@ -244,45 +242,41 @@ class _NovelCardState extends State<NovelCard> {
                 ]),
                 const SizedBox(width: 8),
                 UserFollowButton(
-                  liked: widget.novel.author.isFollowed,
-                  onPressed: () async {
-                    follow();
-                  },
+                  id: recomNovelsController.novels[widget.index].author.id.toString(),
+                  liked: recomNovelsController.novels[widget.index].author.isFollowed,
                 ),
               ],
             ),
           ),
-          if (widget.novel.seriesId != null)
+          if (recomNovelsController.novels[widget.index].seriesId != null)
             Padding(
               padding: const EdgeInsets.only(
                   left: 16.0, right: 16.0, top: 0.0, bottom: 0.0),
-              child: InkWell(
+              child: m.InkWell(
                 onTap: () {
-                  Navigator.of(context).push(MaterialPageRoute(
-                      builder: (BuildContext context) =>
-                          NovelSeriesPage(widget.novel.seriesId!)));
+                  Get.to(() => NovelSeriesPage(recomNovelsController.novels[widget.index].seriesId!));
                 },
                 child: Container(
                   height: 22,
                   padding: const EdgeInsets.symmetric(horizontal: 14),
                   decoration: BoxDecoration(
-                    color: Theme.of(context).colorScheme.secondaryContainer,
+                    color: Theme.of(context).colorScheme.secondary,
                     borderRadius: const BorderRadius.all(Radius.circular(12.5)),
                   ),
                   child: Text(
-                    "Series:${widget.novel.seriesTitle}",
-                    style: Theme.of(context).textTheme.titleSmall,
+                    "Series:${recomNovelsController.novels[widget.index].seriesTitle}",
+                    style: Theme.of(context).typography.textSmall,
                   ),
                 ),
               ),
             ),
           //MARK DETAIL NUM,
-          _buildNumItem(widget.novel, context),
+          _buildNumItem(recomNovelsController.novels[widget.index], context),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16.0),
             child: Text(
-              widget.novel.createDate.toShortTime(),
-              style: Theme.of(context).textTheme.labelSmall,
+              recomNovelsController.novels[widget.index].createDate.toShortTime(),
+              style: Theme.of(context).typography.textSmall,
             ),
           ),
           Padding(
@@ -293,70 +287,36 @@ class _NovelCardState extends State<NovelCard> {
                 spacing: 2,
                 runSpacing: 1,
                 children: [
-                  if (widget.novel.isAi)
+                  if (recomNovelsController.novels[widget.index].isAi)
                     Text("AI-generated".tr,
-                        style: Theme.of(context).textTheme.bodySmall!.copyWith(
+                        style: Theme.of(context).typography.textSmall.copyWith(
                             color: Theme.of(context).colorScheme.secondary)),
-                  for (var f in widget.novel.tags) buildRow(context, f)
+                  for (var f in recomNovelsController.novels[widget.index].tags) buildRow(context, f)
                 ],
               )),
           Padding(
             padding: const EdgeInsets.all(8.0),
             child: Card(
-              shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8.0)),
               child: Padding(
                 padding: const EdgeInsets.all(8.0),
-                child: SelectionArea(
-                  onSelectionChanged: (value) {
-                    // ignore: unused_local_variable
-                    var _selectedText = value?.plainText ?? "";
-                  },
+                child: m.SelectionArea(
                   contextMenuBuilder: (context, editableTextState) {
                     return _buildSelectionMenu(editableTextState, context);
                   },
-                  child: SelectableHtml(data: widget.novel.caption),
+                  child: SelectableHtml(data: recomNovelsController.novels[widget.index].caption),
                 ),
               ),
             ),
           ),
           TextButton(
               onPressed: () {
-                Navigator.of(context).push(MaterialPageRoute(
-                    builder: (BuildContext context) => CommentPage(
-                        id: widget.novel.id, type: ArtworkType.NOVEL)));
+                Get.to(() => CommentPage(
+                        id: recomNovelsController.novels[widget.index].id, type: ArtworkType.NOVEL));
               },
               child: Text("Show comments".tr)),
         ],
       ),
     );
-  }
-
-  bool isFollowing = false;
-
-  void follow() async {
-    if (isFollowing) return;
-    setState(() {
-      isFollowing = true;
-    });
-    var method = widget.novel.author.isFollowed ? "delete" : "add";
-    var res = await followUser(widget.novel.author.id.toString(), method);
-    if (res.error) {
-      if (mounted) {
-        BotToast.showText(text: "Network Error".tr);
-      }
-    } else {
-      setState(() {
-        widget.novel.author.isFollowed = !widget.novel.author.isFollowed;
-      });
-    }
-    setState(() {
-      isFollowing = false;
-    });
-    // UserInfoPage.followCallbacks[widget.illust.author.id.toString()]
-    //     ?.call(widget.illust.author.isFollowed);
-    // UserPreviewWidget.followCallbacks[widget.illust.author.id.toString()]
-    //     ?.call(widget.illust.author.isFollowed);
   }
 
   Widget buildRow(BuildContext context, Tag f) {
@@ -365,18 +325,16 @@ class _NovelCardState extends State<NovelCard> {
         _longPressTag(context, f);
       },
       onTap: () {
-        Navigator.of(context).push(MaterialPageRoute(builder: (context) {
-          return NovelResultPage(
+        Get.to(() => NovelResultPage(
             word: f.name,
             translatedName: f.translatedName ?? "",
-          );
-        }));
+          ),preventDuplicates: false);
       },
       child: Container(
         height: 22,
         padding: const EdgeInsets.symmetric(horizontal: 14),
         decoration: BoxDecoration(
-          color: Theme.of(context).colorScheme.secondaryContainer,
+          color: Theme.of(context).colorScheme.secondary,
           borderRadius: const BorderRadius.all(Radius.circular(12.5)),
         ),
         child: RichText(
@@ -386,15 +344,15 @@ class _NovelCardState extends State<NovelCard> {
                 children: [
                   TextSpan(
                     text: " ",
-                    style: Theme.of(context).textTheme.bodySmall,
+                    style: Theme.of(context).typography.textSmall,
                   ),
                   TextSpan(
-                      text: "${f.translatedName ?? "~"}",
-                      style: Theme.of(context).textTheme.bodySmall)
+                      text: f.translatedName ?? "~",
+                      style: Theme.of(context).typography.textSmall)
                 ],
                 style: Theme.of(context)
-                    .textTheme
-                    .bodySmall!
+                    .typography
+                    .textSmall
                     .copyWith(color: Theme.of(context).colorScheme.secondary))),
       ),
     );
@@ -404,35 +362,35 @@ class _NovelCardState extends State<NovelCard> {
     switch (await showDialog(
         context: context,
         builder: (BuildContext context) {
-          return SimpleDialog(
+          return AlertDialog(
             title: RichText(
               text: TextSpan(children: [
                 TextSpan(
                     text: f.name,
-                    style: Theme.of(context).textTheme.bodyLarge!.copyWith(
+                    style: Theme.of(context).typography.textLarge.copyWith(
                         color: Theme.of(context).colorScheme.primary)),
                 if (f.translatedName != null)
                   TextSpan(
                       text: "\n${"${f.translatedName}"}",
-                      style: Theme.of(context).textTheme.bodyLarge!)
+                      style: Theme.of(context).typography.textLarge)
               ]),
             ),
-            children: <Widget>[
-              SimpleDialogOption(
+            actions: <Widget>[
+              TextButton(
                 onPressed: () {
-                  Navigator.pop(context, 0);
+                  Get.back(result: 0);
                 },
                 child: Text("Block".tr),
               ),
-              SimpleDialogOption(
+              TextButton(
                 onPressed: () {
-                  Navigator.pop(context, 1);
+                  Get.back(result: 1);
                 },
                 child: Text("Bookmark".tr),
               ),
-              SimpleDialogOption(
+              TextButton(
                 onPressed: () {
-                  Navigator.pop(context, 2);
+                  Get.back(result: 2);
                 },
                 child: Text("Copy".tr),
               ),
@@ -441,51 +399,27 @@ class _NovelCardState extends State<NovelCard> {
         })) {
       case 0:
         {
-          settings.addBlockedNovelTags([f.name]);
+          localManager.add("blockedNovelTags", [f.name]);
         }
         break;
       case 1:
         {
-          settings.addBookmarkedNovelTags([f.name]);
+          localManager.add("bookmarkedNovelTags", [f.name]);
         }
         break;
       case 2:
         {
           await Clipboard.setData(ClipboardData(text: f.name));
-          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-            duration: Duration(seconds: 1),
-            content: Text("Copied to clipboard".tr),
-          ));
+          Leader.showTextToast("Copied to clipboard".tr);
         }
     }
   }
 
-  AdaptiveTextSelectionToolbar _buildSelectionMenu(
+  m.AdaptiveTextSelectionToolbar _buildSelectionMenu(
       SelectableRegionState editableTextState, BuildContext context) {
     final List<ContextMenuButtonItem> buttonItems =
         editableTextState.contextMenuButtonItems;
-    // if (supportTranslate) {
-    //   buttonItems.insert(
-    //     buttonItems.length,
-    //     ContextMenuButtonItem(
-    //       label: I18n.of(context).translate,
-    //       onPressed: () async {
-    //         final selectionText = _selectedText;
-    //         if (Platform.isIOS) {
-    //           final box = context.findRenderObject() as RenderBox?;
-    //           final pos = box != null
-    //               ? box.localToGlobal(Offset.zero) & box.size
-    //               : null;
-    //           Share.share(selectionText, sharePositionOrigin: pos);
-    //           return;
-    //         }
-    //         await SupportorPlugin.start(selectionText);
-    //         ContextMenuController.removeAny();
-    //       },
-    //     ),
-    //   );
-    // }
-    return AdaptiveTextSelectionToolbar.buttonItems(
+    return m.AdaptiveTextSelectionToolbar.buttonItems(
       anchors: editableTextState.contextMenuAnchors,
       buttonItems: buttonItems,
     );

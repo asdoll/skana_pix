@@ -1,27 +1,25 @@
-import 'package:bot_toast/bot_toast.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter_mobx/flutter_mobx.dart';
-import 'package:mobx/mobx.dart';
-import 'package:skana_pix/componentwidgets/imagetab.dart';
+import 'package:shadcn_flutter/shadcn_flutter.dart';
+import 'package:flutter/material.dart' show InkWell;
+import 'package:skana_pix/componentwidgets/imagelist.dart';
+import 'package:skana_pix/componentwidgets/novelpage.dart';
 import 'package:skana_pix/componentwidgets/userpage.dart';
 import 'package:skana_pix/componentwidgets/usersearch.dart';
+import 'package:skana_pix/controller/search_controller.dart';
 import 'package:skana_pix/model/worktypes.dart';
-import 'package:skana_pix/pixiv_dart_api.dart';
 import 'package:get/get.dart';
-import 'package:skana_pix/utils/widgetplugin.dart';
 
 import '../utils/leaders.dart';
-import 'novelresult.dart';
-import 'searchresult.dart';
+import '../componentwidgets/novelresult.dart';
+import '../componentwidgets/searchresult.dart';
 import 'souppage.dart';
 
 class SearchSuggestionPage extends StatefulWidget {
   final String? preword;
   final ArtworkType type;
-  SearchSuggestionPage(this.type, {this.preword});
+  const SearchSuggestionPage(this.type, {super.key, this.preword});
 
   @override
-  _SearchSuggestionPageState createState() => _SearchSuggestionPageState();
+  State<SearchSuggestionPage> createState() => _SearchSuggestionPageState();
 }
 
 class _SearchSuggestionPageState extends State<SearchSuggestionPage> {
@@ -35,7 +33,7 @@ class _SearchSuggestionPageState extends State<SearchSuggestionPage> {
   @override
   void initState() {
     idV = widget.preword != null && int.tryParse(widget.preword!) != null;
-    _suggestionStore = SuggestionStore();
+    _suggestionStore = Get.put(SuggestionStore());
     var query = widget.preword ?? '';
     _filter = TextEditingController(text: query);
     var tags = query
@@ -49,22 +47,21 @@ class _SearchSuggestionPageState extends State<SearchSuggestionPage> {
 
   @override
   void dispose() {
+    Get.delete<SuggestionStore>();
     _filter.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    return Observer(builder: (context) {
+    return Obx(() {
       return Scaffold(
-        appBar: _buildAppBar(context),
-        body: Container(
-            child: Column(
+        headers: [
+          _buildAppBar(context),
+          const Divider(),
+        ],
+        child: Column(
           children: [
-            Container(
-              height: 1,
-              color: Theme.of(context).dividerColor,
-            ),
             Expanded(
               child: CustomScrollView(
                 slivers: [
@@ -75,14 +72,15 @@ class _SearchSuggestionPageState extends State<SearchSuggestionPage> {
                         spacing: 10,
                         children: [
                           for (String i in tagGroup)
-                            ActionChip(
-                                label: Text(i),
+                            Chip(
+                                child: Text(i),
                                 onPressed: () {
                                   final start = _filter.text.indexOf(i);
-                                  if (start != -1)
+                                  if (start != -1) {
                                     _filter.selection =
                                         TextSelection.fromPosition(TextPosition(
                                             offset: start + i.length));
+                                  }
                                 })
                         ],
                       ),
@@ -92,45 +90,58 @@ class _SearchSuggestionPageState extends State<SearchSuggestionPage> {
                     sliver: SliverList(
                       delegate: SliverChildBuilderDelegate((context, index) {
                         if (index == 0) {
-                          return ListTile(
-                            title: Text(_filter.text),
-                            subtitle: Text("Artwork ID".tr),
+                          return InkWell(
                             onTap: () {
-                              Navigator.of(context).push(MaterialPageRoute(
-                                  builder: (context) =>
-                                      IllustPageLite(_filter.text)));
+                              Get.to(() => IllustPageLite(_filter.text),
+                                  preventDuplicates: false);
                             },
+                            child: Basic(
+                              title: Text(_filter.text),
+                              subtitle: Text("Artwork ID".tr),
+                            ),
                           );
                         }
                         if (index == 1) {
-                          return ListTile(
-                            title: Text(_filter.text),
-                            subtitle: Text("Artist ID".tr),
+                          return InkWell(
                             onTap: () {
-                              Navigator.of(context).push(MaterialPageRoute(
-                                  builder: (context) => UserPage(
-                                        id: int.tryParse(_filter.text)!,
-                                        type: ArtworkType.ALL,
-                                      )));
+                              Get.to(() => NovelPageLite(_filter.text),
+                                  preventDuplicates: false);
                             },
+                            child: Basic(
+                              title: Text(_filter.text),
+                              subtitle: Text("Novel ID".tr),
+                            ),
                           );
                         }
-                        if (index == 2 && _filter.text.length < 5) {
-                          return ListTile(
-                            title: Text(_filter.text),
-                            subtitle: Text("Pixivision ID"),
+                        if (index == 2) {
+                          return InkWell(
                             onTap: () {
-                              Navigator.of(context).push(MaterialPageRoute(
-                                  builder: (context) => SoupPage(
-                                        url:
-                                            "https://www.pixivision.net/zh/a/${_filter.text.trim()}",
-                                        spotlight: null,
-                                      )));
+                              Get.to(() => UserPage(
+                                  id: int.tryParse(_filter.text)!,
+                                  type: ArtworkType.ALL));
                             },
+                            child: Basic(
+                              title: Text(_filter.text),
+                              subtitle: Text("Artist ID".tr),
+                            ),
                           );
                         }
-                        return ListTile();
-                      }, childCount: 3),
+                        if (index == 3 && _filter.text.length < 5) {
+                          return InkWell(
+                            onTap: () {
+                              Get.to(() => SoupPage(
+                                  url:
+                                      "https://www.pixivision.net/zh/a/${_filter.text.trim()}",
+                                  spotlight: null));
+                            },
+                            child: Basic(
+                              title: Text(_filter.text),
+                              subtitle: Text("Pixivision".tr),
+                            ),
+                          );
+                        }
+                        return Basic();
+                      }, childCount: 4),
                     ),
                     visible: idV,
                   ),
@@ -138,7 +149,7 @@ class _SearchSuggestionPageState extends State<SearchSuggestionPage> {
                     SliverList(
                       delegate: SliverChildBuilderDelegate((context, index) {
                         final tags = _suggestionStore.autoWords;
-                        return ListTile(
+                        return InkWell(
                           onTap: () {
                             if (tagGroup.length > 1) {
                               tagGroup.last = tags[index].name;
@@ -149,8 +160,7 @@ class _SearchSuggestionPageState extends State<SearchSuggestionPage> {
                               setState(() {});
                             } else {
                               FocusScope.of(context).unfocus();
-                              Navigator.of(context, rootNavigator: true)
-                                  .push(MaterialPageRoute(builder: (context) {
+                              Get.to(() {
                                 if (type == ArtworkType.NOVEL) {
                                   return NovelResultPage(
                                     word: tags[index].name,
@@ -158,7 +168,7 @@ class _SearchSuggestionPageState extends State<SearchSuggestionPage> {
                                         tags[index].translatedName ?? "",
                                   );
                                 }
-                                if (type == ArtworkType.ALL) {
+                                if (type == ArtworkType.USER) {
                                   return UserResultPage(
                                     word: tags[index].name,
                                     translatedName:
@@ -170,11 +180,13 @@ class _SearchSuggestionPageState extends State<SearchSuggestionPage> {
                                   translatedName:
                                       tags[index].translatedName ?? "",
                                 );
-                              }));
+                              }, preventDuplicates: false);
                             }
                           },
-                          title: Text(tags[index].name),
-                          subtitle: Text(tags[index].translatedName ?? ""),
+                          child: Basic(
+                            title: Text(tags[index].name),
+                            subtitle: Text(tags[index].translatedName ?? ""),
+                          ),
                         );
                       }, childCount: _suggestionStore.autoWords.length),
                     ),
@@ -182,7 +194,7 @@ class _SearchSuggestionPageState extends State<SearchSuggestionPage> {
               ),
             ),
           ],
-        )),
+        ),
       );
     });
   }
@@ -190,45 +202,39 @@ class _SearchSuggestionPageState extends State<SearchSuggestionPage> {
   AppBar _buildAppBar(context) {
     return AppBar(
       title: _textField(context, TextInputType.text, focusNode),
-      iconTheme:
-          IconThemeData(color: Theme.of(context).textTheme.bodyLarge!.color),
-      actions: <Widget>[
-        IconButton(
-          icon: Icon(Icons.close,
-              color: Theme.of(context).textTheme.bodyLarge!.color),
+      trailing: <Widget>[
+        IconButton.outline(
+          icon: Icon(Icons.close),
           onPressed: () {
             _filter.clear();
           },
         ),
-        DropdownButton(
-          value: type,
-          iconSize: 0,
-          items: [
-            DropdownMenuItem(
-                value: ArtworkType.ILLUST,
-                child: Text(
-                  "Artwork".tr,
-                  style: TextStyle(fontSize: 16),
-                )),
-            DropdownMenuItem(
-                value: ArtworkType.NOVEL,
-                child: Text(
-                  "Novel".tr,
-                  style: TextStyle(fontSize: 16),
-                )),
-            DropdownMenuItem(
-                value: ArtworkType.ALL,
-                child: Text(
-                  "User".tr,
-                  style: TextStyle(fontSize: 16),
-                )),
+        Select<String>(
+          itemBuilder: (context, value) {
+            return Text(value.tr);
+          },
+          children: [
+            SelectItemButton(value: "Artwork", child: Text("Artwork".tr)),
+            SelectItemButton(value: "Novel", child: Text("Novel".tr)),
+            SelectItemButton(value: "User", child: Text("User".tr)),
           ],
-          onChanged: (ArtworkType? value) {
+          onChanged: (value) {
             setState(() {
-              type = value!;
+              if (value == null) return;
+              switch (value) {
+                case "Artwork":
+                  type = ArtworkType.ILLUST;
+                  break;
+                case "Novel":
+                  type = ArtworkType.NOVEL;
+                  break;
+                case "User":
+                  type = ArtworkType.USER;
+                  break;
+              }
             });
           },
-        ).paddingRight(10),
+        ),
       ],
     );
   }
@@ -240,11 +246,10 @@ class _SearchSuggestionPageState extends State<SearchSuggestionPage> {
         focusNode: node,
         keyboardType: inputType,
         autofocus: true,
-        cursorColor: Theme.of(context).iconTheme.color,
         style: Theme.of(context)
-            .textTheme
-            .titleMedium!
-            .copyWith(color: Theme.of(context).iconTheme.color),
+            .typography
+            .h3
+            .copyWith(color: Theme.of(context).colorScheme.input),
         onTap: () {
           FocusScope.of(context).requestFocus(node);
         },
@@ -292,36 +297,6 @@ class _SearchSuggestionPageState extends State<SearchSuggestionPage> {
             );
           }));
         },
-        decoration: InputDecoration(
-          border: InputBorder.none,
-          hintText: "Enter keywords or links".tr,
-        ));
+        placeholder: Text("Enter keywords or links".tr));
   }
-}
-
-class SuggestionStore {
-  ObservableList<Tag> autoWords = ObservableList();
-  fetch(String query) async {
-    try {
-      ConnectManager()
-          .apiClient
-          .getSearchAutoCompleteKeywords(query)
-          .then((value) {
-        if (!value.success) throw BadRequestException("Network error");
-        autoWords.clear();
-        autoWords.addAll(value.data);
-      });
-    } catch (e) {
-      BotToast.showText(text: e.toString());
-    }
-  }
-
-  @override
-  String toString() {
-    return '''
-autoWords: $autoWords
-    ''';
-  }
-
-  ReactiveContext get context => mainContext;
 }

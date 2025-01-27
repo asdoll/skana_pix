@@ -1,5 +1,3 @@
-import 'dart:ui';
-
 import 'package:flutter/material.dart' show InkWell;
 import 'package:skana_pix/controller/list_controller.dart';
 import 'package:skana_pix/controller/recom_controller.dart';
@@ -39,7 +37,7 @@ class IllustCard extends StatefulWidget {
 
 class _IllustCardState extends State<IllustCard> {
 
-  late ListController listController;
+  late ListIllustController listController;
 
 
   @override
@@ -47,7 +45,7 @@ class _IllustCardState extends State<IllustCard> {
     if(widget.controllerTag.startsWith("recom_")){
       listController = Get.find<RecomImagesController>(tag: widget.controllerTag.split("_")[1]);
     }else{
-      listController = Get.find<ListController>(tag: widget.controllerTag);
+      listController = Get.find<ListIllustController>(tag: widget.controllerTag);
     }
     return Obx(() {
 

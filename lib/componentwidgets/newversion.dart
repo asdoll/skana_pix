@@ -1,112 +1,83 @@
-import 'package:bot_toast/bot_toast.dart';
 import 'package:easy_refresh/easy_refresh.dart';
-import 'package:flutter/material.dart';
+import 'package:shadcn_flutter/shadcn_flutter.dart';
+import 'package:flutter/material.dart' show InkWell;
+import 'package:skana_pix/controller/update_controller.dart';
 import 'package:skana_pix/pixiv_dart_api.dart';
 import 'package:get/get.dart';
-import 'package:skana_pix/view/defaults.dart';
+import 'package:skana_pix/utils/leaders.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 
-import 'package:skana_pix/controller/updater.dart';
-
 class NewVersionPage extends StatefulWidget {
-  final bool newVersion;
-  const NewVersionPage({super.key, required this.newVersion});
+  const NewVersionPage({super.key});
   @override
-  _NewVersionPageState createState() => _NewVersionPageState();
+  State<NewVersionPage> createState() => _NewVersionPageState();
 }
 
 class _NewVersionPageState extends State<NewVersionPage> {
-  bool hasNewVersion = false;
-  late EasyRefreshController _controller;
-
-  @override
-  void initState() {
-    super.initState();
-    _controller = EasyRefreshController(
-        controlFinishLoad: true, controlFinishRefresh: true);
-    setState(() {
-      hasNewVersion = widget.newVersion;
-    });
-  }
-
   @override
   Widget build(BuildContext context) {
+    EasyRefreshController controller = EasyRefreshController(
+        controlFinishLoad: true, controlFinishRefresh: true);
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Check updates'.tr),
-      ),
-      body: buildCheck(context),
+      headers: [
+        AppBar(
+          title: Text('Check updates'.tr),
+        ),
+      ],
+      child: Obx(() => EasyRefresh(
+          controller: controller,
+          onRefresh: () async {
+            await updateController.check();
+            controller.finishRefresh();
+          },
+          refreshOnStart: updateController.hasNewVersion.value,
+          child: ListView(
+            children: [
+              Basic(
+                title: Text('Current Version'.tr),
+                subtitle: Text(updateController.getVersion()),
+              ),
+              if (updateController.hasNewVersion.value)
+                Basic(
+                  title: Text('Latest Version'.tr),
+                  subtitle: Text(updateController.updateVersion),
+                ),
+              if (updateController.hasNewVersion.value)
+                Basic(
+                  title: Text('Release Date'.tr),
+                  subtitle: Text(updateController.updateDate.isNotEmpty
+                      ? DateTime.parse(updateController.updateDate)
+                          .toShortTime()
+                      : ""),
+                ),
+              if (updateController.hasNewVersion.value)
+                Basic(
+                  title: Text('Release Notes'.tr),
+                  subtitle: Text(updateController.updateDescription),
+                ),
+              if (updateController.hasNewVersion.value)
+                InkWell(
+                  onTap: () async {
+                    if (updateController.updateUrl.isEmpty) {
+                      Leader.showTextToast('No download link'.tr);
+                      return;
+                    }
+                    await launchUrlString(updateController.updateUrl);
+                  },
+                  child: Basic(
+                    title: Text('Download'.tr),
+                  ),
+                ),
+              InkWell(
+                onTap: () async {
+                  await updateController.check();
+                },
+                child: Basic(
+                  title: Text('Check for updates'.tr),
+                ),
+              ),
+            ],
+          ))),
     );
-  }
-
-  Widget buildCheck(BuildContext context) {
-    return EasyRefresh(
-        controller: _controller,
-        onRefresh: () async {
-          await check();
-          _controller.finishRefresh();
-        },
-        refreshOnStart: !hasNewVersion,
-        child: ListView(
-          children: [
-            ListTile(
-              title: Text('Current Version'.tr),
-              subtitle: Text(Constants.appVersion),
-            ),
-            if(hasNewVersion)
-            ListTile(
-              title: Text('Latest Version'.tr),
-              subtitle: Text(updater.updateVersion),
-            ),
-            if(hasNewVersion)
-            ListTile(
-              title: Text('Release Date'.tr),
-              subtitle: Text(updater.updateDate.isNotEmpty? DateTime.parse(updater.updateDate).toShortTime() :""),
-            ),
-            if(hasNewVersion)
-            ListTile(
-              title: Text('Release Notes'.tr),
-              subtitle: Text(updater.updateDescription),
-            ),
-            if(hasNewVersion)
-            ListTile(
-              title: Text('Download'.tr),
-              onTap: () async {
-                if(updater.updateUrl.isEmpty) 
-                {
-                  BotToast.showText(text: 'No download link'.tr);
-                  return;
-                }
-                await launchUrlString(updater.updateUrl);
-              },
-            ),
-            ListTile(
-              title: Text('Check for updates'.tr),
-              onTap: () async {
-                await check();
-              },
-            ),
-          ],
-        ));
-  }
-
-  check() async {
-    if (Constants.isGooglePlay || DynamicData.isIOS) return;
-    Result result = await Updater.check();
-    switch (result) {
-      case Result.yes:
-        if (mounted) {
-          setState(() {
-            hasNewVersion = true;
-          });
-        }
-        break;
-      default:
-        if (mounted) {
-          setState(() {
-            hasNewVersion = false;
-          });
-        }
-    }
   }
 }

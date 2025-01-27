@@ -9,7 +9,7 @@ import 'package:url_launcher/url_launcher_string.dart';
 import '../componentwidgets/novelpage.dart';
 import '../componentwidgets/novelseries.dart';
 import '../componentwidgets/searchresult.dart';
-import '../componentwidgets/souppage.dart';
+import '../view/souppage.dart';
 import '../componentwidgets/userpage.dart';
 
 class Leader {

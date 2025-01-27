@@ -3,26 +3,23 @@ import 'dart:math';
 import 'package:easy_refresh/easy_refresh.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
-import 'package:flutter_mobx/flutter_mobx.dart';
-import 'package:mobx/mobx.dart';
 import 'package:skana_pix/componentwidgets/headerfooter.dart';
 import 'package:skana_pix/model/worktypes.dart';
 import 'package:skana_pix/pixiv_dart_api.dart';
 import 'package:get/get.dart';
 import 'package:waterfall_flow/waterfall_flow.dart';
 
-import 'imagetab.dart';
+import 'imagecard.dart';
 import 'novelcard.dart';
 
 class MyBookmarksPage extends StatefulWidget {
   final String portal;
   final ArtworkType type;
 
-  const MyBookmarksPage({Key? key, required this.portal, required this.type})
-      : super(key: key);
+  const MyBookmarksPage({super.key, required this.portal, required this.type});
 
   @override
-  _MyBookmarksPageState createState() => _MyBookmarksPageState();
+  State<MyBookmarksPage> createState() => _MyBookmarksPageState();
 }
 
 class _MyBookmarksPageState extends State<MyBookmarksPage>
@@ -206,7 +203,7 @@ class MyBookmarkContent extends StatefulWidget {
       : super(key: key);
 
   @override
-  _MyBookmarkContentState createState() => _MyBookmarkContentState();
+  State<MyBookmarkContent>  createState() => _MyBookmarkContentState();
 }
 
 class _MyBookmarkContentState extends State<MyBookmarkContent> {
@@ -264,32 +261,30 @@ class _MyBookmarkContentState extends State<MyBookmarkContent> {
   }
 
   Widget _buildErrorContent(context) {
-    return Container(
-      child: Column(
-        mainAxisSize: MainAxisSize.max,
-        mainAxisAlignment: MainAxisAlignment.center,
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: <Widget>[
-          Container(
-            height: 50,
-          ),
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child:
-                Text(':(', style: Theme.of(context).textTheme.headlineMedium),
-          ),
-          TextButton(
-              onPressed: () {
-                reset();
-              },
-              child: Text("Retry".tr)),
-          Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Text(
-                ("Failed to load".tr),
-              ))
-        ],
-      ),
+    return Column(
+      mainAxisSize: MainAxisSize.max,
+      mainAxisAlignment: MainAxisAlignment.center,
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: <Widget>[
+        Container(
+          height: 50,
+        ),
+        Padding(
+          padding: const EdgeInsets.all(8.0),
+          child:
+              Text(':(', style: Theme.of(context).textTheme.headlineMedium),
+        ),
+        TextButton(
+            onPressed: () {
+              reset();
+            },
+            child: Text("Retry".tr)),
+        Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Text(
+              ("Failed to load".tr),
+            ))
+      ],
     );
   }
 

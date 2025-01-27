@@ -1,15 +1,12 @@
 import 'dart:io';
 
-import 'package:bot_toast/bot_toast.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_colorpicker/flutter_colorpicker.dart';
-import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:flutter_xlider/flutter_xlider.dart';
 import 'package:get/get.dart';
 import 'package:path/path.dart';
 import 'package:share_plus/share_plus.dart';
-import 'package:skana_pix/componentwidgets/novelbookmark.dart';
+import 'package:skana_pix/componentwidgets/staricon.dart';
 import 'package:skana_pix/componentwidgets/userpage.dart';
 import 'package:skana_pix/controller/histories.dart';
 import 'package:skana_pix/pixiv_dart_api.dart';
@@ -62,9 +59,8 @@ class _NovelViewerPageState extends State<NovelViewerPage> {
     return Scaffold(
       appBar: AppBar(
         toolbarHeight: 0.0,
-        systemOverlayStyle: SystemUiOverlayStyle.light.copyWith(
-            systemNavigationBarColor:
-                config.backgroundColor),
+        systemOverlayStyle: SystemUiOverlayStyle.light
+            .copyWith(systemNavigationBarColor: config.backgroundColor),
       ),
       body: Observer(
         builder: (_) {
@@ -142,7 +138,12 @@ class _NovelViewerPageState extends State<NovelViewerPage> {
         ),
       ),
       actions: [
-        NovelBookmarkButton(novel: widget.novel, colorMode: "default"),
+        StarIcon(
+          id: widget.novel.id.toString(),
+          type: ArtworkType.NOVEL,
+          size: 20,
+          liked: widget.novel.isBookmarked,
+        ),
         IconButton(
             onPressed: () => buildShowModalBottomSheet(context),
             icon: Icon(Icons.info_outline_rounded)),
@@ -345,8 +346,7 @@ class _NovelViewerPageState extends State<NovelViewerPage> {
                               if (_novelStore.novelWebResponse!.seriesNavigation
                                       ?.nextNovel !=
                                   null)
-                                Text("Next".tr,
-                                    style: TextStyle(color: color))
+                                Text("Next".tr, style: TextStyle(color: color))
                               else
                                 Text("No more".tr,
                                     style: TextStyle(color: color))
@@ -459,7 +459,7 @@ class _NovelViewerPageState extends State<NovelViewerPage> {
                   PainterAvatar(
                     url: widget.novel.author.avatar,
                     id: widget.novel.author.id,
-                    size: Size(16, 16),
+                    size: 16,
                   ),
                   Padding(
                     padding: const EdgeInsets.only(left: 6.0),
@@ -474,10 +474,8 @@ class _NovelViewerPageState extends State<NovelViewerPage> {
                 ]),
                 const SizedBox(width: 8),
                 UserFollowButton(
+                  id: widget.novel.author.id.toString(),
                   liked: widget.novel.author.isFollowed,
-                  onPressed: () async {
-                    follow();
-                  },
                 ),
               ],
             ),

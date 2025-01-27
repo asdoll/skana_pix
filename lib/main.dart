@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:skana_pix/controller/account_controller.dart';
+import 'package:skana_pix/controller/update_controller.dart';
 import 'package:skana_pix/controller/page_index_controller.dart';
 import 'package:skana_pix/pixiv_dart_api.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
@@ -33,11 +34,13 @@ Future<void> main() async {
     Get.addTranslations(TranslateMap.translation);
     Get.updateLocale(settings.localeObj());
     handleLinks();
-    pageIndexController = Get.put(PageIndexController());
-    accountController = Get.put(AccountController());
-    localManager = Get.put(LocalManager());
+    pageIndexController = Get.put(PageIndexController(),permanent: true);
+    accountController = Get.put(AccountController(),permanent: true);
+    localManager = Get.put(LocalManager(),permanent: true);
     localManager.init();
-    likeController = Get.put(LikeController());
+    likeController = Get.put(LikeController(),permanent: true);
+    boardController = Get.put(BoardController(),permanent: true);
+    updateController = Get.put(UpdateController(),permanent: true);
     if (Platform.isWindows || Platform.isLinux) {
       sqfliteFfiInit();
       databaseFactory = databaseFactoryFfi;

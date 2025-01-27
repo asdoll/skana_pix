@@ -5,7 +5,7 @@ import 'package:skana_pix/model/worktypes.dart';
 import 'package:skana_pix/pixiv_dart_api.dart';
 import 'package:skana_pix/utils/leaders.dart';
 
-abstract class ListController extends GetxController {
+abstract class ListIllustController extends GetxController {
   ArtworkType type;
   RxList<Illust> illusts = RxList.empty();
   RxString nexturl = "".obs;
@@ -21,10 +21,11 @@ abstract class ListController extends GetxController {
       ConnectManager().apiClient.sendHistory(
           historyIds.reversed.toList());
       historyIds.clear();
+      historyIds.refresh();
     }
   }
 
-  ListController({required this.type});
+  ListIllustController({required this.type});
 
   void nextPage();
 
@@ -37,6 +38,7 @@ abstract class ListController extends GetxController {
     isFirstLoading.value = true;
     isLoading.value = false;
     illusts.clear();
+    illusts.refresh();
     error = null;
     page.value = 1;
     nexturl.value = "";
@@ -46,13 +48,79 @@ abstract class ListController extends GetxController {
   void firstLoad();
 }
 
-class SingleListController extends ListController {
+abstract class ListNovelController extends GetxController {
+  RxList<Novel> novels = RxList.empty();
+  RxString nexturl = "".obs;
+  RxBool isLoading = false.obs;
+  RxBool isFirstLoading = true.obs;
+  RxString? error;
+  RxInt index = 0.obs;
+  RxInt page = 1.obs;
+
+  ListNovelController();
+
+  void nextPage();
+
+  Future<Res<List<Novel>>> loadData();
+
+  void reset(){
+    if(likeController.novels.length> 100){
+      likeController.novels.clear();
+    }
+    isFirstLoading.value = true;
+    isLoading.value = false;
+    novels.clear();
+    novels.refresh();
+    error = null;
+    page.value = 1;
+    nexturl.value = "";
+    firstLoad();
+  }
+
+  void firstLoad();
+}
+
+abstract class ListUserController extends GetxController {
+  RxList<UserPreview> users = RxList.empty();
+  RxString nexturl = "".obs;
+  RxBool isLoading = false.obs;
+  RxBool isFirstLoading = true.obs;
+  RxString? error;
+  RxInt index = 0.obs;
+  RxInt page = 1.obs;
+
+  ListUserController();
+
+  void nextPage();
+
+  Future<Res<List<UserPreview>>> loadData();
+
+  void reset(){
+    if(likeController.users.length> 100){
+      likeController.users.clear();
+    }
+    isFirstLoading.value = true;
+    isLoading.value = false;
+    users.clear();
+    users.refresh();
+    error = null;
+    page.value = 1;
+    nexturl.value = "";
+    firstLoad();
+  }
+
+  void firstLoad();
+}
+
+class SingleListController extends ListIllustController {
   String id;
   SingleListController({required this.id, required super.type});
 
   @override
   Future<Res<List<Illust>>> loadData() async {
-    if (isLoading.value) return Res.error("Loading");
+    if (isLoading.value) {
+      return Res.error("Loading");
+    }
     isLoading.value = true;
     Res<Illust> res = await ConnectManager().apiClient.getIllustByID(id);
     isLoading.value = false;
@@ -69,7 +137,9 @@ class SingleListController extends ListController {
   void firstLoad() {
     loadData().then((value) {
       if (value.success) {
+        illusts.clear();
         illusts.addAll(value.data);
+        illusts.refresh();
       }
     });
   }
@@ -80,7 +150,7 @@ class SingleListController extends ListController {
   }
 }
 
-class RelatedListController extends ListController {
+class RelatedListController extends ListIllustController {
   String id;
   EasyRefreshController refreshController;
   RelatedListController(
@@ -112,6 +182,10 @@ class RelatedListController extends ListController {
     loadData().then((value) {
       if (value.success) {
         illusts.addAll(value.data);
+        illusts.refresh();
+        page.value++;
+        nexturl.value = value.subData ?? "end";
+        refreshController.finishLoad();
       }
     });
   }
@@ -121,6 +195,9 @@ class RelatedListController extends ListController {
     loadData().then((value) {
       if (value.success) {
         illusts.addAll(value.data);
+        illusts.refresh();
+        nexturl.value = value.subData ?? "end";
+        refreshController.finishRefresh();
       }
     });
   }

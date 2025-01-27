@@ -1,26 +1,20 @@
 import 'dart:io';
 
-import 'package:bot_toast/bot_toast.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:skana_pix/controller/histories.dart';
 import 'package:skana_pix/pixiv_dart_api.dart';
-import 'package:skana_pix/utils/translate.dart';
 import 'package:skana_pix/utils/widgetplugin.dart';
 
 class DataExport extends StatefulWidget {
-  DataExport({super.key});
+  const DataExport({super.key});
 
   @override
-  _DataExportState createState() => _DataExportState();
+  State<DataExport> createState() => _DataExportState();
 }
 
 class _DataExportState extends State<DataExport> {
-  @override
-  void initState() {
-    super.initState();
-  }
 
   @override
   Widget build(BuildContext context) {

@@ -1,15 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:skana_pix/utils/translate.dart';
 import 'package:skana_pix/utils/widgetplugin.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 
 class AboutPage extends StatefulWidget {
-  final bool newVersion;
 
-  const AboutPage({super.key, required this.newVersion});
+  const AboutPage({super.key});
   @override
-  _AboutPageState createState() => _AboutPageState();
+  State<AboutPage> createState() => _AboutPageState();
 }
 
 class _AboutPageState extends State<AboutPage> {
@@ -25,17 +23,17 @@ class _AboutPageState extends State<AboutPage> {
         title: Text('About'.tr),
       ),
       body: ListView(children: [
-        const ListTile(
-          title: Text('Version'),
+        ListTile(
+          title: Text('Version'.tr),
           subtitle: Text('1.0.0'),
         ),
-        const ListTile(
-          title: Text('Author'),
+        ListTile(
+          title: Text('Author'.tr),
           subtitle: Text('asdoll'),
         ),
         ListTile(
-          title: const Text('Website'),
-          subtitle: const Text('https://github.com/asdoll/skana_pix'),
+          title: Text('Website'.tr),
+          subtitle: Text('https://github.com/asdoll/skana_pix'),
           onTap: () => launchUrlString("https://github.com/asdoll/skana_pix"),
         ),
         const Divider(),

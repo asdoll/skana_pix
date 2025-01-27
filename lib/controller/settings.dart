@@ -202,6 +202,7 @@ class UserSetting {
     for (var tag in tags) {
       if (!localManager.blockedTags.contains(tag)) {
         localManager.blockedTags.add(tag);
+        localManager.blockedTags.refresh();
       }
     }
     settings[11] = localManager.blockedTags.join(';');
@@ -212,6 +213,7 @@ class UserSetting {
     for (var tag in tags) {
       if (!localManager.bookmarkedTags.contains(tag)) {
         localManager.bookmarkedTags.add(tag);
+        localManager.bookmarkedTags.refresh();
       }
     }
     settings[22] = localManager.bookmarkedTags.join(';');
@@ -222,6 +224,7 @@ class UserSetting {
     for (var user in users) {
       if (!localManager.blockedUsers.contains(user)) {
         localManager.blockedUsers.add(user);
+        localManager.blockedUsers.refresh();
       }
     }
     settings[12] = localManager.blockedUsers.join(';');
@@ -232,6 +235,7 @@ class UserSetting {
     for (var user in users) {
       if (!localManager.blockedCommentUsers.contains(user)) {
         localManager.blockedCommentUsers.add(user);
+        localManager.blockedCommentUsers.refresh();
       }
     }
     settings[13] = localManager.blockedCommentUsers.join(';');
@@ -242,6 +246,7 @@ class UserSetting {
     for (var user in users) {
       if (!localManager.blockedNovelUsers.contains(user)) {
         localManager.blockedNovelUsers.add(user);
+        localManager.blockedNovelUsers.refresh();
       }
     }
     settings[14] = localManager.blockedNovelUsers.join(';');
@@ -252,6 +257,7 @@ class UserSetting {
     for (var comment in comments) {
         if (!localManager.blockedComments.contains(comment)) {
         localManager.blockedComments.add(comment);
+        localManager.blockedComments.refresh();
       }
     }
     settings[24] = localManager.blockedComments.join(';');
@@ -262,6 +268,7 @@ class UserSetting {
     for (var illust in illusts) {
       if (!localManager.blockedIllusts.contains(illust)) {
         localManager.blockedIllusts.add(illust);
+        localManager.blockedIllusts.refresh();
       }
     }
     settings[20] = localManager.blockedIllusts.join(';');
@@ -272,6 +279,7 @@ class UserSetting {
     for (var novel in novels) {
       if (!localManager.blockedNovels.contains(novel)) {
         localManager.blockedNovels.add(novel);
+        localManager.blockedNovels.refresh();
       }
     }
     settings[25] = localManager.blockedNovels.join(';');
@@ -282,6 +290,7 @@ class UserSetting {
     for (var tag in tags) {
       if (!localManager.blockedNovelTags.contains(tag)) {
         localManager.blockedNovelTags.add(tag);
+        localManager.blockedNovelTags.refresh();
       }
     }
     settings[26] = localManager.blockedNovelTags.join(';');
@@ -292,6 +301,7 @@ class UserSetting {
     for (var tag in tags) {
       if (!localManager.bookmarkedNovelTags.contains(tag)) {
         localManager.bookmarkedNovelTags.add(tag);
+        localManager.bookmarkedNovelTags.refresh();
       }
     }
     settings[23] = localManager.bookmarkedNovelTags.join(';');
@@ -300,59 +310,69 @@ class UserSetting {
 
   void clearBlockedTags() {
     localManager.blockedTags.clear();
+    localManager.blockedTags.refresh();
     settings[11] = '';
     updateSettings();
   }
 
   void clearBlockedUsers() {
     localManager.blockedUsers.clear();
+    localManager.blockedUsers.refresh();
     settings[12] = '';
     updateSettings();
   }
 
   void clearBlockedCommentUsers() {
+    localManager.blockedCommentUsers.clear();
     settings[13] = '';
     updateSettings();
   }
 
   void clearBlockedNovelUsers() {
     localManager.blockedNovelUsers.clear();
+    localManager.blockedNovelUsers.refresh();
     settings[14] = '';
     updateSettings();
   }
 
   void clearBlockedIllusts() {
     localManager.blockedIllusts.clear();
+    localManager.blockedIllusts.refresh();
     settings[20] = '';
     updateSettings();
   }
 
   void clearBlockedComments() {
     localManager.blockedComments.clear();
+    localManager.blockedComments.refresh();
     settings[24] = '';
     updateSettings();
   }
 
   void clearBookmarkedTags() {
     localManager.bookmarkedTags.clear();
+    localManager.bookmarkedTags.refresh();
     settings[22] = '';
     updateSettings();
   }
 
   void clearBlockedNovels() {
     localManager.blockedNovels.clear();
+    localManager.blockedNovels.refresh();
     settings[25] = '';
     updateSettings();
   }
 
   void clearBlockedNovelTags() {
     localManager.blockedNovelTags.clear();
+    localManager.blockedNovelTags.refresh();
     settings[26] = '';
     updateSettings();
   }
 
   void clearBookmarkedNovelTags() {
     localManager.bookmarkedNovelTags.clear();
+    localManager.bookmarkedNovelTags.refresh();
     settings[23] = '';
     updateSettings();
   }
@@ -360,6 +380,7 @@ class UserSetting {
   void removeBlockedTags(List<String> tags) {
     for (var tag in tags) {
       localManager.blockedTags.remove(tag);
+      localManager.blockedTags.refresh();
     }
     settings[11] = localManager.blockedTags.join(';');
     updateSettings();
@@ -368,6 +389,7 @@ class UserSetting {
   void removeBookmarkedTags(List<String> tags) {
     for (var tag in tags) {
       localManager.bookmarkedTags.remove(tag);
+      localManager.bookmarkedTags.refresh();
     }
     settings[22] = localManager.bookmarkedTags.join(';');
     updateSettings();
@@ -376,6 +398,7 @@ class UserSetting {
   void removeBlockedUsers(List<String> users) {
     for (var user in users) {
       localManager.blockedUsers.remove(user);
+      localManager.blockedUsers.refresh();
     }
     settings[12] = localManager.blockedUsers.join(';');
     updateSettings();
@@ -384,6 +407,7 @@ class UserSetting {
   void removeBlockedCommentUsers(List<String> users) {
     for (var user in users) {
       localManager.blockedCommentUsers.remove(user);
+      localManager.blockedCommentUsers.refresh();
     }
     settings[13] = localManager.blockedCommentUsers.join(';');
     updateSettings();
@@ -392,6 +416,7 @@ class UserSetting {
   void removeBlockedNovelUsers(List<String> users) {
     for (var user in users) {
       localManager.blockedNovelUsers.remove(user);
+      localManager.blockedNovelUsers.refresh();
     }
     settings[14] = localManager.blockedNovelUsers.join(';');
     updateSettings();
@@ -400,6 +425,7 @@ class UserSetting {
   void removeBlockedComments(List<String> comments) {
     for (var comment in comments) {
       localManager.blockedComments.remove(comment);
+      localManager.blockedComments.refresh();
     }
     settings[24] = localManager.blockedComments.join(';');
     updateSettings();
@@ -408,6 +434,7 @@ class UserSetting {
   void removeBlockedIllusts(List<String> illusts) { 
     for (var illust in illusts) {
       localManager.blockedIllusts.remove(illust);
+      localManager.blockedIllusts.refresh();
     }
     settings[20] = localManager.blockedIllusts.join(';');
     updateSettings();
@@ -416,6 +443,7 @@ class UserSetting {
   void removeBlockedNovels(List<String> novels) {
     for (var novel in novels) {
       localManager.blockedNovels.remove(novel);
+      localManager.blockedNovels.refresh();
     }
     settings[25] = localManager.blockedNovels.join(';');
     updateSettings();
@@ -424,6 +452,7 @@ class UserSetting {
   void removeBlockedNovelTags(List<String> tags) {
     for (var tag in tags) {
       localManager.blockedNovelTags.remove(tag);
+      localManager.blockedNovelTags.refresh();
     }
     settings[26] = localManager.blockedNovelTags.join(';');
     updateSettings();
@@ -432,6 +461,7 @@ class UserSetting {
   void removeBookmarkedNovelTags(List<String> tags) {
     for (var tag in tags) {
       localManager.bookmarkedNovelTags.remove(tag);
+      localManager.bookmarkedNovelTags.refresh();
     }
     settings[23] = localManager.bookmarkedNovelTags.join(';');
     updateSettings();
@@ -449,6 +479,7 @@ class UserSetting {
         }
         localManager.historyIllustTag.add(id);
         settings[28] = localManager.historyIllustTag.join(';');
+        localManager.historyIllustTag.refresh();
         updateSettings();
         break;
       case ArtworkType.NOVEL:
@@ -460,6 +491,7 @@ class UserSetting {
         }
         localManager.historyNovelTag.add(id);
         settings[29] = localManager.historyNovelTag.join(';');
+        localManager.historyNovelTag.refresh();
         updateSettings();
         break;
       case ArtworkType.ALL:
@@ -471,6 +503,7 @@ class UserSetting {
         }
         localManager.historyIllustTag.add(id);
         settings[28] = localManager.historyIllustTag.join(';');
+        localManager.historyIllustTag.refresh();
         updateSettings();
         if (localManager.historyNovelTag.contains(id)) {
           localManager.historyNovelTag.remove(id);
@@ -480,6 +513,7 @@ class UserSetting {
         }
         localManager.historyNovelTag.add(id);
         settings[29] = localManager.historyNovelTag.join(';');
+        localManager.historyNovelTag.refresh();
         updateSettings();
       case ArtworkType.USER:
         if (localManager.historyUserTag.contains(id)) {
@@ -490,6 +524,7 @@ class UserSetting {
         }
         localManager.historyUserTag.add(id);
         settings[30] = localManager.historyUserTag.join(';');
+        localManager.historyUserTag.refresh();
         updateSettings();
         break;
     }
@@ -500,23 +535,28 @@ class UserSetting {
       case ArtworkType.ILLUST:
       case ArtworkType.MANGA:
         localManager.historyIllustTag.remove(tag);
+        localManager.historyIllustTag.refresh();
         settings[28] = localManager.historyIllustTag.join(';');
         updateSettings();
         break;
       case ArtworkType.NOVEL:
         localManager.historyNovelTag.remove(tag);
+        localManager.historyNovelTag.refresh();
         settings[29] = localManager.historyNovelTag.join(';');
         updateSettings();
         break;
       case ArtworkType.ALL:
         localManager.historyIllustTag.remove(tag);
+        localManager.historyIllustTag.refresh();
         settings[28] = localManager.historyIllustTag.join(';');
         updateSettings();
         localManager.historyNovelTag.remove(tag);
+        localManager.historyNovelTag.refresh();
         settings[29] = localManager.historyNovelTag.join(';');
         updateSettings();
       case ArtworkType.USER:
         localManager.historyUserTag.remove(tag);
+        localManager.historyUserTag.refresh();
         settings[30] = localManager.historyUserTag.join(';');
         updateSettings();
         break;
@@ -528,23 +568,28 @@ class UserSetting {
       case ArtworkType.ILLUST:
       case ArtworkType.MANGA:
         localManager.historyIllustTag.clear();
+        localManager.historyIllustTag.refresh();
         settings[28] = localManager.historyIllustTag.join(';');
         updateSettings();
         break;
       case ArtworkType.NOVEL:
         localManager.historyNovelTag.clear();
+        localManager.historyNovelTag.refresh();
         settings[29] = localManager.historyNovelTag.join(';');
         updateSettings();
         break;
       case ArtworkType.ALL:
         localManager.historyIllustTag.clear();
+        localManager.historyIllustTag.refresh();
         settings[28] = localManager.historyIllustTag.join(';');
         updateSettings();
         localManager.historyNovelTag.clear();
+        localManager.historyNovelTag.refresh();
         settings[29] = localManager.historyNovelTag.join(';');
         updateSettings();
       case ArtworkType.USER:
         localManager.historyUserTag.clear();
+        localManager.historyUserTag.refresh();
         settings[30] = localManager.historyUserTag.join(';');
         updateSettings();
         break;

@@ -1,8 +1,7 @@
-import 'package:bot_toast/bot_toast.dart';
 import 'package:easy_refresh/easy_refresh.dart';
 import 'package:flutter/material.dart';
-import 'package:mobx/mobx.dart';
 import 'package:share_plus/share_plus.dart';
+import 'package:skana_pix/componentwidgets/staricon.dart';
 import 'package:skana_pix/componentwidgets/userpage.dart';
 import 'package:skana_pix/model/worktypes.dart';
 import 'package:skana_pix/pixiv_dart_api.dart';
@@ -10,7 +9,6 @@ import 'package:get/get.dart';
 
 import '../utils/leaders.dart';
 import 'avatar.dart';
-import 'novelbookmark.dart';
 import 'novelpage.dart';
 import 'pixivimage.dart';
 
@@ -25,7 +23,7 @@ class NovelSeriesPage extends StatefulWidget {
 
 class _NovelSeriesPageState extends State<NovelSeriesPage> {
   NovelSeriesDetail? novelSeriesDetail;
-  ObservableList<Novel> novels = ObservableList();
+  List<Novel> novels = [];
   bool isLoading = false;
   bool isError = false;
   Novel? last;
@@ -49,7 +47,7 @@ class _NovelSeriesPageState extends State<NovelSeriesPage> {
             PainterAvatar(
               url: novelSeriesDetail!.user.avatar,
               id: novelSeriesDetail!.user.id,
-              size: Size(30, 30),
+              size: 30,
               onTap: () {
                 Leader.push(
                     context,
@@ -243,9 +241,11 @@ class _NovelSeriesPageState extends State<NovelSeriesPage> {
                 child: Column(
                   mainAxisSize: MainAxisSize.max,
                   children: [
-                    NovelBookmarkButton(
-                      novel: novel,
-                      colorMode: "",
+                    StarIcon(
+                      id: novel.id.toString(),
+                      type: ArtworkType.NOVEL,
+                      size: 20,
+                      liked: novel.isBookmarked,
                     ),
                     Text('${novel.totalBookmarks}',
                         style: Theme.of(context).textTheme.bodySmall)

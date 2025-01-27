@@ -254,7 +254,7 @@ class _IllustDetailContentState extends State<IllustDetailContent> {
           ),
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 16),
-            child: Container(
+            child: SizedBox(
               width: double.infinity,
               child: SelectionArea(
                 focusNode: _focusNode,
@@ -389,12 +389,10 @@ class _IllustDetailContentState extends State<IllustDetailContent> {
         await _longPressTag(context, f);
       },
       onTap: () {
-        Navigator.of(context).push(MaterialPageRoute(builder: (context) {
-          return ResultPage(
+        Get.to(() => ResultPage(
             word: f.name,
             translatedName: f.translatedName ?? "",
-          );
-        }));
+          ),preventDuplicates: true);
       },
       child: Container(
         height: 25,

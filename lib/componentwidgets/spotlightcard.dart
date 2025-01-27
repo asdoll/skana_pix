@@ -1,25 +1,25 @@
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:shadcn_flutter/shadcn_flutter.dart';
 import 'package:skana_pix/controller/caches.dart';
 import 'package:skana_pix/pixiv_dart_api.dart';
 
-import 'souppage.dart';
+import '../view/souppage.dart';
 
 class SpotlightCard extends StatelessWidget {
   final SpotlightArticle spotlight;
 
-  const SpotlightCard({Key? key, required this.spotlight}) : super(key: key);
+  const SpotlightCard({super.key, required this.spotlight});
 
+  @override
   Widget build(BuildContext context) {
     return Padding(
       padding: EdgeInsets.all(4.0),
       child: GestureDetector(
         onTap: () async {
-          Navigator.of(context, rootNavigator: true).push(MaterialPageRoute(
-              builder: (BuildContext context) =>
-                  SoupPage(url: spotlight.articleUrl, spotlight: spotlight)));
+          Get.to(() => SoupPage(url: spotlight.articleUrl, spotlight: spotlight,heroTag: "spotlight_${spotlight.id}"),preventDuplicates: false);
         },
-        child: Container(
+        child: SizedBox(
           height: 230,
           child: Stack(
             children: <Widget>[
@@ -29,11 +29,11 @@ class SpotlightCard extends StatelessWidget {
                   width: 160.0,
                   height: 90.0,
                   decoration: BoxDecoration(
-                      color: Theme.of(context).splashColor,
+                      color: Theme.of(context).colorScheme.ring,
                       borderRadius: BorderRadius.all(Radius.circular(8.0))),
                   child: Align(
                     alignment: AlignmentDirectional.bottomCenter,
-                    child: ListTile(
+                    child: Basic(
                         title: Text(
                           spotlight.title,
                           maxLines: 1,
@@ -50,10 +50,10 @@ class SpotlightCard extends StatelessWidget {
               Align(
                 alignment: Alignment.topCenter,
                 child: Card(
-                  elevation: 8.0,
-                  shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.all(Radius.circular(16.0))),
-                  child: Container(
+                  clipBehavior: Clip.antiAlias,
+                  child: SizedBox(
+                    height: 150.0,
+                    width: 150.0,
                     child: CachedNetworkImage(
                       imageUrl: spotlight.thumbnail,
                       //httpHeaders: Hoster.header(url: spotlight.thumbnail),
@@ -62,10 +62,7 @@ class SpotlightCard extends StatelessWidget {
                       cacheManager: imagesCacheManager,
                       width: 150.0,
                     ),
-                    height: 150.0,
-                    width: 150.0,
                   ),
-                  clipBehavior: Clip.antiAlias,
                 ),
               )
             ],
