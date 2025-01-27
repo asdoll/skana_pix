@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:shadcn_flutter/shadcn_flutter.dart';
 
 import 'commentpage.dart';
 
@@ -77,7 +77,7 @@ class _CommentEmojiTextState extends State<CommentEmojiText> {
   Widget build(BuildContext context) {
     return Text.rich(
       TextSpan(
-        style: Theme.of(context).textTheme.bodyMedium,
+        style: Theme.of(context).typography.textSmall,
         children: [for (var i in _spans) i],
       ),
     );

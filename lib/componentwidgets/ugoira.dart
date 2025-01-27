@@ -1,7 +1,7 @@
 import 'dart:io';
 import 'package:archive/archive_io.dart';
 
-import 'package:flutter/material.dart';
+import 'package:shadcn_flutter/shadcn_flutter.dart';
 import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import 'package:skana_pix/controller/caches.dart';
 
@@ -123,14 +123,15 @@ class _UgoiraWidgetState extends State<UgoiraWidget> {
           .toList(),
     );
     try {
-      var cachingFile = thisDownloadManager.getFileStream(_metadata!.url,withProgress: true);
+      var cachingFile =
+          thisDownloadManager.getFileStream(_metadata!.url, withProgress: true);
       cachingFile.listen((event) async {
         if (event is DownloadProgress) {
           setState(() {
             receivedBytes = event.downloaded;
-            expectedBytes = event.totalSize??1;
+            expectedBytes = event.totalSize ?? 1;
           });
-        }else if(event is FileInfo){
+        } else if (event is FileInfo) {
           await extract(event.file.path);
         }
       });

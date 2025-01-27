@@ -60,13 +60,12 @@ class CommentPage extends StatefulWidget {
   final ArtworkType type;
 
   const CommentPage(
-      {Key? key,
+      {super.key,
       required this.id,
       this.isReplay = false,
       this.pId,
       this.name,
-      this.type = ArtworkType.ILLUST})
-      : super(key: key);
+      this.type = ArtworkType.ILLUST});
 
   @override
   State<CommentPage> createState() => _CommentPageState();
@@ -405,10 +404,9 @@ class _CommentPageState extends State<CommentPage> {
                                                       parentId: pp.toString());
                                                   if (res.error) {
                                                     BotToast.showText(
-                                                        text:
-                                                            res.errorMessage ??
-                                                                "Network Error"
-                                                                    .tr);
+                                                        text: res
+                                                                .errorMessage ??
+                                                            "Network Error".tr);
                                                   } else {
                                                     BotToast.showText(
                                                         text: "Commented".tr);
@@ -422,10 +420,9 @@ class _CommentPageState extends State<CommentPage> {
                                                       parentId: pp.toString());
                                                   if (res.error) {
                                                     BotToast.showText(
-                                                        text:
-                                                            res.errorMessage ??
-                                                                "Network Error"
-                                                                    .tr);
+                                                        text: res
+                                                                .errorMessage ??
+                                                            "Network Error".tr);
                                                   } else {
                                                     BotToast.showText(
                                                         text: "Commented".tr);

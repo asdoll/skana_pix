@@ -7,10 +7,10 @@ import 'package:get/get.dart';
 class ColorPickPage extends StatefulWidget {
   final Color initialColor;
 
-  ColorPickPage({required this.initialColor});
+  const ColorPickPage({super.key, required this.initialColor});
 
   @override
-  _ColorPickPageState createState() => _ColorPickPageState();
+  State<ColorPickPage> createState() => _ColorPickPageState();
 }
 
 class _ColorPickPageState extends State<ColorPickPage> {
@@ -178,6 +178,8 @@ class _ColorPickPageState extends State<ColorPickPage> {
 }
 
 class ThemePage extends StatefulWidget {
+  const ThemePage({super.key});
+
   @override
   _ThemePageState createState() => _ThemePageState();
 }
@@ -221,9 +223,11 @@ class _ThemePageState extends State<ThemePage> with TickerProviderStateMixin {
                 child: Card(
                     child: SwitchListTile(
                   value: settings.isAMOLED,
-                  onChanged: (v) {setState(() {
-                    settings.set("isAMOLED",v);
-                  });},
+                  onChanged: (v) {
+                    setState(() {
+                      settings.set("isAMOLED", v);
+                    });
+                  },
                   title: const Text("AMOLED"),
                 )),
               ),
@@ -233,7 +237,7 @@ class _ThemePageState extends State<ThemePage> with TickerProviderStateMixin {
                   value: settings.useDynamicColor,
                   onChanged: (v) async {
                     setState(() {
-                      settings.set("useDynamicColor",v);
+                      settings.set("useDynamicColor", v);
                     });
                   },
                   title: Text("Dynamic Color".tr),

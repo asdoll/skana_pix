@@ -1,4 +1,6 @@
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart' show InkWell;
+import 'package:get/get.dart';
+import 'package:shadcn_flutter/shadcn_flutter.dart';
 import 'package:skana_pix/pixiv_dart_api.dart';
 import 'package:skana_pix/utils/translate.dart';
 import 'package:skana_pix/utils/widgetplugin.dart';
@@ -11,7 +13,8 @@ import 'userpage.dart';
 class PainterCard extends StatefulWidget {
   final UserPreview user;
   final ArtworkType type;
-  const PainterCard({super.key, required this.user, this.type = ArtworkType.ALL});
+  const PainterCard(
+      {super.key, required this.user, this.type = ArtworkType.ALL});
 
   @override
   State<PainterCard> createState() => _PainterCardState();
@@ -19,43 +22,43 @@ class PainterCard extends StatefulWidget {
 
 class _PainterCardState extends State<PainterCard> {
   late ArtworkType type = widget.type;
-  late UserPreview _user = widget.user;
-  late List<dynamic> _works = [];
+  late UserPreview user = widget.user;
+  late List<dynamic> works = [];
 
   @override
   void initState() {
     super.initState();
-    _works.addAll(_user.illusts);
-    _works.addAll(_user.novels);
-    _works.sort((a, b) => b.createDate.compareTo(a.createDate));
+    if (type == ArtworkType.ILLUST) {
+      works.addAll(user.illusts);
+    } else if (type == ArtworkType.NOVEL) {
+      works.addAll(user.novels);
+    } else if (type == ArtworkType.ALL) {
+      works.addAll(user.illusts);
+      works.addAll(user.novels);
+    }
+    works.sort((a, b) => b.createDate.compareTo(a.createDate));
   }
 
   @override
   void didUpdateWidget(covariant PainterCard oldWidget) {
     super.didUpdateWidget(oldWidget);
     type = widget.type;
-    _user.isFollowed = widget.user.isFollowed;
+    user.isFollowed = widget.user.isFollowed;
   }
 
   @override
   Widget build(BuildContext context) {
     return InkWell(
       onTap: () async {
-        await Navigator.of(context, rootNavigator: true)
-            .push(MaterialPageRoute(builder: (BuildContext context) {
-          return UserPage(
-            id: _user.id,
-            type: type,
-          );
-        }));
-        setState(() {});
+        Get.to(() => UserPage(
+              id: user.id,
+              type: type,
+            ));
       },
       child: Card(
         clipBehavior: Clip.antiAlias,
-        child: Container(
-          child: Column(
-            children: [_buildPreviewSlivers(context), buildPadding(context)],
-          ),
+        child: Column(
+          children: [_buildPreviewSlivers(context), buildPadding(context)],
         ),
       ),
     );
@@ -66,10 +69,10 @@ class _PainterCardState extends State<PainterCard> {
       children: [
         for (var i = 0; i < 3; i++)
           Expanded(
-            child: i < _works.length
-                ? (_works[i] is Novel
-                    ? buildCardNovel(context, _works[i] as Novel)
-                    : buildCardIllust(context, _works[i] as Illust))
+            child: i < works.length
+                ? (works[i] is Novel
+                    ? buildCardNovel(context, works[i] as Novel)
+                    : buildCardIllust(context, works[i] as Illust))
                 : Container(),
           )
       ],
@@ -102,7 +105,7 @@ class _PainterCardState extends State<PainterCard> {
                 padding: const EdgeInsets.all(8.0),
                 child: Text(
                   novel.title,
-                  style: Theme.of(context).textTheme.titleSmall,
+                  style: Theme.of(context).typography.h3,
                   maxLines: 3,
                   overflow: TextOverflow.ellipsis,
                 ),
@@ -135,29 +138,26 @@ class _PainterCardState extends State<PainterCard> {
         mainAxisAlignment: MainAxisAlignment.start,
         children: <Widget>[
           Hero(
-            tag: _user.avatar + this.hashCode.toString(),
+            tag: user.avatar + hashCode.toString(),
             child: PainterAvatar(
-              url: _user.avatar,
-              id: _user.id,
+              url: user.avatar,
+              id: user.id,
               onTap: () {
-                Navigator.of(context, rootNavigator: true)
-                    .push(MaterialPageRoute(builder: (BuildContext context) {
-                  return UserPage(
-                    id: _user.id,
-                    type: type,
-                  );
-                }));
+                Get.to(() => UserPage(
+                      id: user.id,
+                      type: type,
+                    ));
               },
             ),
           ),
           Padding(
             padding: const EdgeInsets.all(16.0),
-            child: Center(child: Text(_user.name.atMost13)),
+            child: Center(child: Text(user.name.atMost13)),
           ),
           Spacer(),
           UserFollowButton(
-            liked: _user.isFollowed,
-            id: _user.id.toString(),
+            liked: user.isFollowed,
+            id: user.id.toString(),
           )
         ],
       ),

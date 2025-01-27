@@ -4,8 +4,10 @@ import 'package:get/get.dart';
 import 'package:skana_pix/view/defaults.dart';
 
 class PreferenceSettings extends StatefulWidget {
+  const PreferenceSettings({super.key});
+
   @override
-  _PreferenceSettingsState createState() => _PreferenceSettingsState();
+  State<PreferenceSettings> createState() => _PreferenceSettingsState();
 }
 
 class _PreferenceSettingsState extends State<PreferenceSettings> {
@@ -30,7 +32,6 @@ class _PreferenceSettingsState extends State<PreferenceSettings> {
                 setState(() {
                   settings.set("language", newValue!);
                 });
-                BotToast.showText(text:"Please reboot to take effect".tr);
               },
               items: [
                 DropdownMenuItem(
@@ -143,18 +144,17 @@ class _PreferenceSettingsState extends State<PreferenceSettings> {
               });
             },
           ),
-          if(DynamicData.isAndroid)
-            Divider(),
-          if(DynamicData.isAndroid)
+          if (DynamicData.isAndroid) Divider(),
+          if (DynamicData.isAndroid)
             SwitchListTile(
-            title: Text("High Refresh mode".tr),
-            value: settings.isHighRefreshRate,
-            onChanged: (value) {
-              setState(() {
-                settings.set("highRefreshRate", value);
-              });
-            },
-          ),
+              title: Text("High Refresh mode".tr),
+              value: settings.isHighRefreshRate,
+              onChanged: (value) {
+                setState(() {
+                  settings.set("highRefreshRate", value);
+                });
+              },
+            ),
         ],
       ),
     );
