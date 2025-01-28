@@ -8,23 +8,23 @@ import 'package:photo_view/photo_view.dart';
 import 'package:photo_view/photo_view_gallery.dart';
 import 'package:skana_pix/pixiv_dart_api.dart';
 import 'package:skana_pix/utils/leaders.dart';
-import '../controller/caches.dart';
-import 'pixivimage.dart';
+import '../../controller/caches.dart';
+import '../../componentwidgets/pixivimage.dart';
 
 import 'package:share_plus/share_plus.dart';
 
-class ImagePage extends StatefulWidget {
-  const ImagePage(this.urls, {this.initialPage = 0, super.key});
+class ImageViewPage extends StatefulWidget {
+  const ImageViewPage(this.urls, {this.initialPage = 0, super.key});
 
   final List<String> urls;
 
   final int initialPage;
 
   @override
-  State<ImagePage> createState() => _ImagePageState();
+  State<ImageViewPage> createState() => _ImageViewPageState();
 }
 
-class _ImagePageState extends State<ImagePage> {
+class _ImageViewPageState extends State<ImageViewPage> {
   @override
   void initState() {
     nowUrl = widget.urls.first;

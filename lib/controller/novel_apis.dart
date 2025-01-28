@@ -1,8 +1,8 @@
 part of "api_client.dart";
 
 extension NovelExt on ApiClient {
-  Future<Res<List<Novel>>> getRecommendNovels() {
-    return getNovelsWithNextUrl("/v1/novel/recommended");
+  Future<Res<List<Novel>>> getRecommendNovels([String? nextUrl]) {
+    return getNovelsWithNextUrl(nextUrl ?? "/v1/novel/recommended");
   }
 
   Future<Res<List<Novel>>> getNovelsWithNextUrl(String nextUrl) async {
@@ -104,15 +104,14 @@ extension NovelExt on ApiClient {
     }
   }
 
-  Future<Res<List<Novel>>> relatedNovels(String id) async {
-    var res = await apiPost("/v1/novel/related", data: {
-      "novel_id": id,
-    });
+  Future<Res<List<Novel>>> relatedNovels(String id, [String? nextUrl]) async {
+    var res = await apiGet(nextUrl ?? "/v1/novel/related?novel_id=$id");
     if (res.error) {
       return Res.fromErrorRes(res);
     }
     return Res(
-        (res.data["novels"] as List).map((e) => Novel.fromJson(e)).toList());
+        (res.data["novels"] as List).map((e) => Novel.fromJson(e)).toList(),
+        subData: res.data["next_url"]);
   }
 
   Future<Res<List<Novel>>> getUserNovels(String uid, [String? nextUrl]) {
@@ -195,13 +194,11 @@ extension NovelExt on ApiClient {
     return const Res(true);
   }
 
-  Future<Res<Novel>> getNovelById(String id) async {
+  Future<Res<List<Novel>>> getNovelById(String id) async {
     var res = await apiGet("/v2/novel/detail?novel_id=$id");
     if (res.error) {
       return Res.fromErrorRes(res);
     }
-    // Savers.writeText('${BasePath.downloadNovelPath}test.log',
-    //     Novel.fromJson(res.data["novel"]).toString());
-    return Res(Novel.fromJson(res.data["novel"]));
+    return Res([Novel.fromJson(res.data["novel"])]);
   }
 }

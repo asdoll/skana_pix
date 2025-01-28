@@ -1,6 +1,6 @@
 import 'package:shadcn_flutter/shadcn_flutter.dart';
 import 'package:flutter/material.dart' show InkWell;
-import 'package:skana_pix/componentwidgets/imagelist.dart';
+import 'package:skana_pix/view/imageview/imagelistview.dart';
 import 'package:skana_pix/componentwidgets/novelpage.dart';
 import 'package:skana_pix/componentwidgets/userpage.dart';
 import 'package:skana_pix/componentwidgets/usersearch.dart';

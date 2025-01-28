@@ -8,25 +8,25 @@ import 'package:skana_pix/componentwidgets/imagedetail.dart';
 import 'package:skana_pix/controller/histories.dart';
 import 'package:skana_pix/controller/like_controller.dart';
 import 'package:skana_pix/controller/list_controller.dart';
-import 'package:skana_pix/controller/recom_controller.dart';
 import 'package:skana_pix/pixiv_dart_api.dart';
 import 'package:skana_pix/utils/leaders.dart';
 import 'package:skana_pix/view/defaults.dart';
 
-import '../model/worktypes.dart';
-import 'avatar.dart';
-import 'backarea.dart';
-import 'followbutton.dart';
-import 'imagepage.dart';
-import 'pixivimage.dart';
-import 'ugoira.dart';
+import '../../model/worktypes.dart';
+import '../../componentwidgets/avatar.dart';
+import '../../componentwidgets/backarea.dart';
+import '../../componentwidgets/followbutton.dart';
+import 'imageviewpage.dart';
+import '../../componentwidgets/pixivimage.dart';
+import '../../componentwidgets/ugoira.dart';
 import 'package:icon_decoration/icon_decoration.dart';
 import 'package:get/get.dart';
 
 const _kBottomBarHeight = 64.0;
 
-class ImageListPage extends StatefulWidget {
-  const ImageListPage(
+// page view for image detail page
+class ImageListViewPage extends StatefulWidget {
+  const ImageListViewPage(
       {required this.controllerTag,
       required this.index,
       this.heroTag,
@@ -39,10 +39,10 @@ class ImageListPage extends StatefulWidget {
   final String? heroTag;
 
   @override
-  State<ImageListPage> createState() => _ImageListPageState();
+  State<ImageListViewPage> createState() => _ImageListViewPageState();
 }
 
-class _ImageListPageState extends State<ImageListPage> {
+class _ImageListViewPageState extends State<ImageListViewPage> {
   late final PageController controller;
   late ListIllustController listController;
   String type = "";
@@ -51,17 +51,7 @@ class _ImageListPageState extends State<ImageListPage> {
   void initState() {
     super.initState();
     controller = PageController(initialPage: widget.index);
-    type = widget.controllerTag.split("_")[0];
-    if (type == "illust") {
-      listController =
-          Get.find<SingleListController>(tag: widget.controllerTag);
-    } else if (type == "recom") {
-      listController =
-          Get.find<RecomImagesController>(tag: widget.controllerTag);
-    } else {
-      log.e("Unknown type: $type");
-      listController = Get.find<ListIllustController>(tag: widget.controllerTag);
-    }
+    listController = Get.find<ListIllustController>(tag: widget.controllerTag);
   }
 
   @override
@@ -188,7 +178,7 @@ class _IllustPageState extends State<IllustPage> {
   late ScrollController _scrollController;
   late EasyRefreshController _refreshController;
 
-  late RelatedListController relatedListController;
+  late ListIllustController relatedListController;
 
   @override
   void initState() {
@@ -196,13 +186,14 @@ class _IllustPageState extends State<IllustPage> {
     _refreshController = EasyRefreshController(
         controlFinishLoad: true, controlFinishRefresh: true);
     relatedListController = Get.put(
-        RelatedListController(
+        ListIllustController(
+            controllerType: ListType.related,
             id: widget.illust.id.toString(),
             type: widget.illust.type == "illust"
                 ? ArtworkType.ILLUST
-                : ArtworkType.MANGA,
-            refreshController: _refreshController),
+                : ArtworkType.MANGA),
         tag: "related_${widget.illust.id}");
+    relatedListController.refreshController = _refreshController;
     relatedListController.firstLoad();
     if (user.isPremium) {
       ListIllustController.historyIds.add(widget.illust.id);
@@ -212,7 +203,7 @@ class _IllustPageState extends State<IllustPage> {
 
   @override
   void dispose() {
-    Get.delete<RelatedListController>(tag: "related_${widget.illust.id}");
+    Get.delete<ListIllustController>(tag: "related_${widget.illust.id}");
     _refreshController.dispose();
     _scrollController.dispose();
     super.dispose();
@@ -302,7 +293,7 @@ class _IllustPageState extends State<IllustPage> {
                     return InkWell(
                       onTap: () {
                         Get.to(
-                            () => ImageListPage(
+                            () => ImageListViewPage(
                                 controllerTag: "related_${widget.illust.id}",
                                 index: index),
                             preventDuplicates: false);
@@ -348,9 +339,9 @@ class _IllustPageState extends State<IllustPage> {
           width: imageWidth,
           height: imageHeight,
           child: GestureDetector(
-              onTap: () => Navigator.of(context).push(MaterialPageRoute(
-                  builder: (BuildContext context) => ImagePage(
-                      widget.illust.images.map((e) => e.large).toList()))),
+              onTap: () => Get.to(() => ImageViewPage(
+                  widget.illust.images.map((e) => e.large).toList(),
+                  initialPage: index)),
               child: PixivImage(
                 imageUrl,
                 width: width,
@@ -534,7 +525,7 @@ class _IllustPageState extends State<IllustPage> {
                                 });
                               },
                               onLongPress: () {
-                                Get.to(() => ImagePage(
+                                Get.to(() => ImageViewPage(
                                     illust.images.map((e) => e.large).toList(),
                                     initialPage: index));
                               },
@@ -570,27 +561,26 @@ class _IllustPageState extends State<IllustPage> {
                   ],
                 ),
                 actions: [
-
-                    PrimaryButton(
-                      leading: Icon(!allOn
-                          ? Icons.check_circle_outline
-                          : Icons.check_circle),
-                      child: Text("All".tr),
-                      onPressed: () {
-                        allOn = !allOn;
-                        for (var i = 0; i < indexs.length; i++) {
-                          indexs[i] = allOn;
-                        }
-                        setDialogState(() {});
-                      },
-                    ),
-                    PrimaryButton(
-                      leading: Icon(Icons.save),
-                      child: Text("Save".tr),
-                      onPressed: () {
-                        Get.back(result: "OK");
-                      },
-                    ),
+                  PrimaryButton(
+                    leading: Icon(!allOn
+                        ? Icons.check_circle_outline
+                        : Icons.check_circle),
+                    child: Text("All".tr),
+                    onPressed: () {
+                      allOn = !allOn;
+                      for (var i = 0; i < indexs.length; i++) {
+                        indexs[i] = allOn;
+                      }
+                      setDialogState(() {});
+                    },
+                  ),
+                  PrimaryButton(
+                    leading: Icon(Icons.save),
+                    child: Text("Save".tr),
+                    onPressed: () {
+                      Get.back(result: "OK");
+                    },
+                  ),
                 ],
               ),
             );
@@ -616,9 +606,12 @@ class _IllustPageLiteState extends State<IllustPageLite> {
   @override
   Widget build(BuildContext context) {
     // ignore: unused_local_variable
-    SingleListController controller = Get.put(
-        SingleListController(id: widget.id, type: ArtworkType.ILLUST),
+    ListIllustController controller = Get.put(
+        ListIllustController(
+            controllerType: ListType.single,
+            id: widget.id,
+            type: ArtworkType.ILLUST),
         tag: "illust_${widget.id}");
-    return ImageListPage(controllerTag: "illust_${widget.id}", index: 0);
+    return ImageListViewPage(controllerTag: "illust_${widget.id}", index: 0);
   }
 }

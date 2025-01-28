@@ -1,7 +1,10 @@
 part of 'api_client.dart';
 
 extension IllustExt on ApiClient {
-  Future<Res<List<Illust>>> getRecommendedIllusts() async {
+  Future<Res<List<Illust>>> getRecommendedIllusts([String? nextUrl]) async {
+    if(nextUrl != null) {
+      return getIllustsWithNextUrl(nextUrl);
+    }
     var res = await apiGet(recommendationUrl);
     if (res.success) {
       return Res(
@@ -14,7 +17,10 @@ extension IllustExt on ApiClient {
 
   Future<Res<List<Illust>>> getBookmarkedIllusts(String restrict,
       [String? nextUrl]) async {
-    var res = await apiGet(nextUrl ??
+    if(nextUrl != null) {
+      return getIllustsWithNextUrl(nextUrl);
+    }
+    var res = await apiGet(
         "$bookmarkIllustUrl?user_id=${account.user.id}&restrict=$restrict");
     if (res.success) {
       return Res(
@@ -27,8 +33,11 @@ extension IllustExt on ApiClient {
 
   Future<Res<List<Illust>>> getUserBookmarks(String uid,
       [String? nextUrl]) async {
+    if(nextUrl != null) {
+      return getIllustsWithNextUrl(nextUrl);
+    }
     var res = await apiGet(
-        nextUrl ?? "$bookmarkIllustUrl?user_id=$uid&restrict=public");
+        "$bookmarkIllustUrl?user_id=$uid&restrict=public");
     if (res.success) {
       return Res(
           (res.data["illusts"] as List).map((e) => Illust.fromJson(e)).toList(),
@@ -72,15 +81,15 @@ extension IllustExt on ApiClient {
     final encodedKeyword = Uri.encodeComponent(keyword + fn);
     if (options.selectSort == search_sort[2] && !isPremium) {
       path =
-          "/v1/search/popular-preview/illust?filter=for_android&include_translated_tag_results=true&merge_plain_keyword_results=true&word=$encodedKeyword&search_target=${options.searchTarget}&search_ai_type=${options.searchAI?"1":"0"}";
+          "/v1/search/popular-preview/illust?filter=for_android&include_translated_tag_results=true&merge_plain_keyword_results=true&word=$encodedKeyword&search_target=${options.searchTarget}&search_ai_type=${options.searchAI ? "1" : "0"}";
     } else {
       path =
-          "/v1/search/illust?filter=for_android&include_translated_tag_results=true&merge_plain_keyword_results=true&word=$encodedKeyword&sort=${options.selectSort}&search_target=${options.searchTarget}&search_ai_type=${options.searchAI?"1":"0"}";
+          "/v1/search/illust?filter=for_android&include_translated_tag_results=true&merge_plain_keyword_results=true&word=$encodedKeyword&sort=${options.selectSort}&search_target=${options.searchTarget}&search_ai_type=${options.searchAI ? "1" : "0"}";
     }
-    if(options.startTime != null) {
+    if (options.startTime != null) {
       path += "&start_date=${toRequestDate(options.startTime!)}";
     }
-    if(options.endTime != null) {
+    if (options.endTime != null) {
       path += "&end_date=${toRequestDate(options.endTime!)}";
     }
     var res = await apiGet(path);
@@ -96,8 +105,9 @@ extension IllustExt on ApiClient {
   String? getFormatDate(DateTime? dateTime) {
     if (dateTime == null) {
       return null;
-    } else
+    } else {
       return "${dateTime.year}-${dateTime.month}-${dateTime.day}";
+    }
   }
 
   Future<Res<List<Illust>>> getIllustsWithNextUrl(String nextUrl) async {
@@ -111,8 +121,12 @@ extension IllustExt on ApiClient {
     }
   }
 
-  Future<Res<List<Illust>>> getUserIllusts(String uid, String? type, [String? nextUrl]) async {
-    var res = await apiGet(nextUrl??
+  Future<Res<List<Illust>>> getUserIllusts(String uid, String? type,
+      [String? nextUrl]) async {
+    if(nextUrl != null) {
+      return getIllustsWithNextUrl(nextUrl);
+    }
+    var res = await apiGet(
         "/v1/user/illusts?filter=for_android&user_id=$uid${type != null ? "&type=$type" : ""}");
     if (res.success) {
       return Res(
@@ -125,7 +139,10 @@ extension IllustExt on ApiClient {
 
   Future<Res<List<Illust>>> getFollowingArtworks(String restrict,
       [String? nextUrl]) async {
-    var res = await apiGet(nextUrl ?? "/v2/illust/follow?restrict=$restrict");
+    if(nextUrl != null) {
+      return getIllustsWithNextUrl(nextUrl);
+    }
+    var res = await apiGet("/v2/illust/follow?restrict=$restrict");
     if (res.success) {
       return Res(
           (res.data["illusts"] as List).map((e) => Illust.fromJson(e)).toList(),
@@ -142,11 +159,14 @@ extension IllustExt on ApiClient {
   /// mode: day, week, month, day_male, day_female, week_original, week_rookie, day_manga, week_manga, month_manga, day_r18_manga, day_r18, week_r18, week_r18g, week_rookie_manga
   Future<Res<List<Illust>>> getRanking(String mode,
       [String? date, String? nextUrl]) async {
+    if (nextUrl != null) {
+      return getIllustsWithNextUrl(nextUrl);
+    }
     var link = "/v1/illust/ranking?filter=for_android&mode=$mode";
     if (date != null) {
       link += "&date=$date";
     }
-    var res = await apiGet(nextUrl ?? link);
+    var res = await apiGet(link);
     if (res.success) {
       return Res(
           (res.data["illusts"] as List).map((e) => Illust.fromJson(e)).toList(),
@@ -189,16 +209,19 @@ extension IllustExt on ApiClient {
     }
   }
 
-  Future<Res<Illust>> getIllustByID(String id) async {
+  Future<Res<List<Illust>>> getIllustByID(String id) async {
     var res = await apiGet("/v1/illust/detail?illust_id=$id");
     if (res.success) {
-      return Res(Illust.fromJson(res.data["illust"]));
+      return Res([Illust.fromJson(res.data["illust"])]);
     } else {
       return Res.error(res.errorMessage);
     }
   }
 
-  Future<Res<List<Illust>>> getRecommendedMangas() async {
+  Future<Res<List<Illust>>> getRecommendedMangas([String? nextUrl]) async {
+    if (nextUrl != null) {
+      return getIllustsWithNextUrl(nextUrl);
+    }
     var res = await apiGet(
         "/v1/manga/recommended?filter=for_android&include_ranking_illusts=true&include_privacy_policy=true");
     if (res.success) {
@@ -210,7 +233,10 @@ extension IllustExt on ApiClient {
     }
   }
 
-  Future<Res<List<Illust>>> relatedIllusts(String id) async {
+  Future<Res<List<Illust>>> relatedIllusts(String id, [String? nextUrl]) async {
+    if (nextUrl != null) {
+      return getIllustsWithNextUrl(nextUrl);
+    }
     var res =
         await apiGet("/v2/illust/related?filter=for_android&illust_id=$id");
     if (res.success) {

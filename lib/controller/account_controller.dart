@@ -5,9 +5,10 @@ class AccountController extends GetxController {
   RxBool isLoading = false.obs;
   RxBool waitingForAuth = false.obs;
   RxBool isLoggedIn = false.obs;
-
+  RxString userid = "".obs;
   AccountController() {
     isLoggedIn.value = !ConnectManager().notLoggedIn;
+    userid.value = ConnectManager().apiClient.userid;
   }
 
   Future<String> generateWebviewUrl() {
@@ -23,6 +24,7 @@ class AccountController extends GetxController {
       isLoading.value = false;
     } else {
       isLoggedIn.value = true;
+      userid.value = ConnectManager().apiClient.userid;
     }
   }
 }

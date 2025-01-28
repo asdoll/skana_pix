@@ -6,8 +6,9 @@ import 'package:path_provider/path_provider.dart';
 import 'package:skana_pix/controller/account_controller.dart';
 import 'package:skana_pix/controller/update_controller.dart';
 import 'package:skana_pix/view/blocklistpage.dart';
-import 'package:skana_pix/componentwidgets/followlist.dart';
-import 'package:skana_pix/componentwidgets/newversion.dart';
+import 'package:skana_pix/view/userview/followlist.dart';
+import 'package:skana_pix/view/bookmarkspage.dart';
+import 'package:skana_pix/view/newversion.dart';
 import 'package:skana_pix/componentwidgets/prefsettings.dart';
 import 'package:skana_pix/model/worktypes.dart';
 import 'package:skana_pix/pixiv_dart_api.dart';
@@ -20,7 +21,6 @@ import 'boardpage.dart';
 import 'mytagspage.dart';
 import '../componentwidgets/dataexport.dart';
 import '../componentwidgets/historypage.dart';
-import '../componentwidgets/mybookmarks.dart';
 import '../componentwidgets/themepage.dart';
 import '../utils/leaders.dart';
 import 'loginpage.dart';
@@ -33,7 +33,6 @@ class SettingPage extends StatefulWidget {
 }
 
 class _SettingPageState extends State<SettingPage> {
-
   @override
   Widget build(BuildContext context) {
     boardController.fetchBoard();
@@ -63,133 +62,118 @@ class _SettingPageState extends State<SettingPage> {
                 ),
                 Obx(() {
                   if (!accountController.isLoggedIn.value) {
-                        return SingleChildScrollView(
-                          child: Column(
-                            children: <Widget>[
-                              Padding(
-                                padding: const EdgeInsets.all(8.0),
-                                child: InkWell(
-                                  onTap: () {
-                                    // Navigator.of(context, rootNavigator: true)
-                                    //     .push(MaterialPageRoute(builder: (_) {
-                                    //   return AccountSelectPage();
-                                    // }));
-                                  },
-                                  child: Row(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      PainterAvatar(
-                                        url: ConnectManager()
-                                            .apiClient
-                                            .account
-                                            .user
-                                            .profileImg,
-                                        id: int.parse(
-                                          ConnectManager().apiClient.userid,
-                                        ),
-                                        isMe: true,
-                                      ),
-                                      Padding(
-                                        padding: const EdgeInsets.symmetric(
-                                            horizontal: 8.0),
-                                        child: Column(
-                                          mainAxisSize: MainAxisSize.max,
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.start,
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
-                                          children: [
-                                            Padding(
-                                              padding:
-                                                  const EdgeInsets.symmetric(
-                                                      vertical: 8.0),
-                                              child: Text(
-                                                  ConnectManager()
-                                                      .apiClient
-                                                      .account
-                                                      .user
-                                                      .name,
-                                                  style: Theme.of(context)
-                                                      .textTheme
-                                                      .titleMedium),
-                                            ),
-                                            Text(
+                    return SingleChildScrollView(
+                      child: Column(
+                        children: <Widget>[
+                          Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: InkWell(
+                              onTap: () {
+                                // Navigator.of(context, rootNavigator: true)
+                                //     .push(MaterialPageRoute(builder: (_) {
+                                //   return AccountSelectPage();
+                                // }));
+                              },
+                              child: Row(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  PainterAvatar(
+                                    url: ConnectManager()
+                                        .apiClient
+                                        .account
+                                        .user
+                                        .profileImg,
+                                    id: int.parse(
+                                      ConnectManager().apiClient.userid,
+                                    ),
+                                    isMe: true,
+                                  ),
+                                  Padding(
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 8.0),
+                                    child: Column(
+                                      mainAxisSize: MainAxisSize.max,
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.start,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Padding(
+                                          padding: const EdgeInsets.symmetric(
+                                              vertical: 8.0),
+                                          child: Text(
                                               ConnectManager()
                                                   .apiClient
                                                   .account
                                                   .user
-                                                  .email,
+                                                  .name,
                                               style: Theme.of(context)
                                                   .textTheme
-                                                  .bodySmall,
-                                            )
-                                          ],
+                                                  .titleMedium),
                                         ),
-                                      )
-                                    ],
-                                  ),
-                                ),
-                              ),
-                              ListTile(
-                                leading: Icon(Icons.favorite_rounded),
-                                title: Text("My Bookmarks".tr),
-                                onTap: () => Leader.pushWithScaffold(
-                                    context,
-                                    MyBookmarksPage(
-                                      portal: 'mybookmark',
-                                      type: settings.awPrefer == "novel"
-                                          ? ArtworkType.NOVEL
-                                          : ArtworkType.ILLUST,
+                                        Text(
+                                          ConnectManager()
+                                              .apiClient
+                                              .account
+                                              .user
+                                              .email,
+                                          style: Theme.of(context)
+                                              .textTheme
+                                              .bodySmall,
+                                        )
+                                      ],
                                     ),
-                                    root: true),
+                                  )
+                                ],
                               ),
-                              ListTile(
-                                leading: Icon(Icons.bookmark),
-                                title: Text("Favorite Tags".tr),
-                                onTap: () => Leader.pushWithScaffold(
-                                    context, MyTagsPage(),
-                                    root: true),
-                              ),
-                              ListTile(
-                                leading: Icon(Icons.star_rate_rounded),
-                                title: Text("Following".tr),
-                                onTap: () {
-                                  Navigator.of(context, rootNavigator: true)
-                                      .push(MaterialPageRoute(
-                                          builder: (BuildContext context) =>
-                                              FollowList(
-                                                id: int.parse(ConnectManager()
-                                                    .apiClient
-                                                    .userid),
-                                                setAppBar: true,
-                                                isMe: true,
-                                              )));
-                                },
-                              ),
-                              ListTile(
-                                leading: Icon(Icons.people_rounded),
-                                title: Text("My Pixiv".tr),
-                                onTap: () {
-                                  Navigator.of(context, rootNavigator: true)
-                                      .push(MaterialPageRoute(
-                                          builder: (BuildContext context) =>
-                                              FollowList(
-                                                id: int.parse(ConnectManager()
-                                                    .apiClient
-                                                    .userid),
-                                                setAppBar: true,
-                                                isMe: true,
-                                                isMyPixiv: true,
-                                              )));
-                                },
-                              ),
-                            ],
+                            ),
                           ),
-                        );
-                      }
-                      return Container();
-                    }),
+                          ListTile(
+                            leading: Icon(Icons.favorite_rounded),
+                            title: Text("My Bookmarks".tr),
+                            onTap: () => Get.to(() => Scaffold(
+                                  appBar:
+                                      AppBar(title: Text("My Bookmarks".tr)),
+                                  body: BookmarksPage(
+                                    id: 0,
+                                    type: settings.awPrefer == "novel"
+                                        ? ArtworkType.NOVEL
+                                        : ArtworkType.ILLUST,
+                                  ),
+                                )),
+                          ),
+                          ListTile(
+                            leading: Icon(Icons.bookmark),
+                            title: Text("Favorite Tags".tr),
+                            onTap: () => Leader.pushWithScaffold(
+                                context, MyTagsPage(),
+                                root: true),
+                          ),
+                          ListTile(
+                            leading: Icon(Icons.star_rate_rounded),
+                            title: Text("Following".tr),
+                            onTap: () => Get.to(() => FollowList(
+                                    id: accountController.userid.value,
+                                  setAppBar: true,
+                                  isMe: true,
+                                )),
+                          ),
+                          ListTile(
+                            leading: Icon(Icons.people_rounded),
+                            title: Text("My Pixiv".tr),
+                            onTap: () => Get.to(() => FollowList(
+                                  id: accountController.userid.value,
+                                  setAppBar: true,
+                                  isMe: true,
+                                  isMyPixiv: true,
+                                )),
+                          ),
+                        ],
+                      ),
+                    );
+                  }
+                  return Container();
+                }),
                 Divider(),
                 Column(
                   children: <Widget>[
@@ -243,9 +227,8 @@ class _SettingPageState extends State<SettingPage> {
                     ListTile(
                       leading: Icon(Icons.message),
                       title: Text("About".tr),
-                      onTap: () => Leader.push(
-                          context, AboutPage(),
-                          root: true),
+                      onTap: () =>
+                          Leader.push(context, AboutPage(), root: true),
                     ),
                     Obx(() => boardController.needBoardSection.value
                         ? ListTile(
@@ -257,10 +240,8 @@ class _SettingPageState extends State<SettingPage> {
                     ListTile(
                       leading: Icon(Icons.update),
                       title: Text("Check updates".tr),
-                      onTap: () => Leader.push(
-                          context,
-                          NewVersionPage(),
-                          root: true),
+                      onTap: () =>
+                          Leader.push(context, NewVersionPage(), root: true),
                       trailing: Visibility(
                         visible: updateController.hasNewVersion.value,
                         child: NewVersionChip(),
@@ -392,8 +373,8 @@ class _SettingPageState extends State<SettingPage> {
     if (result == "OK") {
       try {
         Directory tempDir = await getTemporaryDirectory();
-            tempDir.deleteSync(recursive: true);
-            //cleanGlanceData();
+        tempDir.deleteSync(recursive: true);
+        //cleanGlanceData();
       } catch (e) {}
     }
   }

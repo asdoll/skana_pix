@@ -5,10 +5,10 @@ import 'package:shadcn_flutter/shadcn_flutter.dart';
 import 'package:flutter/material.dart' show InkWell;
 import 'package:skana_pix/componentwidgets/chip.dart';
 import 'package:skana_pix/componentwidgets/headerfooter.dart';
-import 'package:skana_pix/componentwidgets/imagelist.dart';
+import 'package:skana_pix/controller/list_controller.dart';
+import 'package:skana_pix/view/imageview/imagelistview.dart';
 import 'package:skana_pix/componentwidgets/usersearch.dart';
 import 'package:skana_pix/controller/like_controller.dart';
-import 'package:skana_pix/controller/recom_controller.dart';
 import 'package:skana_pix/pixiv_dart_api.dart';
 import 'package:get/get.dart';
 
@@ -105,16 +105,16 @@ class _SearchRecommmendUserPageState extends State<SearchRecommmendUserPage> {
   @override
   Widget build(BuildContext context) {
     EasyRefreshController refreshController = EasyRefreshController();
-    RecomUsersController recomUsersController =
-        RecomUsersController(easyRefreshController: refreshController);
-
+    ListUserController controller =
+        ListUserController(userListType: UserListType.recom);
+    controller.refreshController = refreshController;
     return Scaffold(
       child: EasyRefresh(
         header: DefaultHeaderFooter.header(context),
         controller: refreshController,
-        onRefresh: () => recomUsersController.reset(),
-        onLoad: () => recomUsersController.nextPage(),
-        refreshOnStart: recomUsersController.users.isEmpty,
+        onRefresh: () => controller.reset(),
+        onLoad: () => controller.nextPage(),
+        refreshOnStart: controller.users.isEmpty,
         child: Obx(() {
           return CustomScrollView(
             slivers: [
@@ -149,7 +149,7 @@ class _SearchRecommmendUserPageState extends State<SearchRecommmendUserPage> {
                               runSpacing: 0.0,
                               spacing: 5.0,
                               children: [
-                                if (recomUsersController.tagExpand.value)
+                                if (controller.tagExpand.value)
                                   for (var f in localManager.historyUserTag)
                                     PixChip(
                                         f: f,
@@ -159,7 +159,7 @@ class _SearchRecommmendUserPageState extends State<SearchRecommmendUserPage> {
                                                   word: f,
                                                 ),
                                             preventDuplicates: false)),
-                                if (!recomUsersController.tagExpand.value)
+                                if (!controller.tagExpand.value)
                                   for (var f in localManager.historyUserTag
                                       .sublist(0, 12))
                                     PixChip(
@@ -178,13 +178,13 @@ class _SearchRecommmendUserPageState extends State<SearchRecommmendUserPage> {
                                             scale: anim, child: child);
                                       },
                                       child: Icon(
-                                          !recomUsersController.tagExpand.value
+                                          !controller.tagExpand.value
                                               ? Icons.expand_more
                                               : Icons.expand_less),
                                     ),
                                     onPressed: () {
-                                      recomUsersController.tagExpand.value =
-                                          !recomUsersController.tagExpand.value;
+                                      controller.tagExpand.value =
+                                          !controller.tagExpand.value;
                                     })
                               ],
                             ),
@@ -278,8 +278,8 @@ class _SearchRecommmendUserPageState extends State<SearchRecommmendUserPage> {
               ),
               SliverList(
                   delegate: SliverChildBuilderDelegate((context, index) {
-                return PainterCard(user: recomUsersController.users[index]);
-              }, childCount: recomUsersController.users.length)),
+                return PainterCard(user: controller.users[index]);
+              }, childCount: controller.users.length)),
             ],
           );
         }),

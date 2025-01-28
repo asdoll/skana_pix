@@ -1,15 +1,12 @@
-import 'package:easy_refresh/easy_refresh.dart';
 import 'package:flutter/material.dart' show kToolbarHeight;
 import 'package:shadcn_flutter/shadcn_flutter.dart';
 import 'package:skana_pix/componentwidgets/backarea.dart';
-import 'package:skana_pix/componentwidgets/headerfooter.dart';
-import 'package:skana_pix/controller/ranking_controller.dart';
+import 'package:skana_pix/controller/list_controller.dart';
 import 'package:get/get.dart';
-import 'package:waterfall_flow/waterfall_flow.dart';
+import 'package:skana_pix/view/imageview/imagewaterfall.dart';
+import 'package:skana_pix/view/novelview/novellist.dart';
 
 import '../model/worktypes.dart';
-import '../componentwidgets/imagecard.dart';
-import '../componentwidgets/novelcard.dart';
 
 class RankingPage extends StatefulWidget {
   const RankingPage({super.key});
@@ -136,40 +133,14 @@ class _OneRankingIllustPage extends StatefulWidget {
 class _OneRankingIllustPageState extends State<_OneRankingIllustPage> {
   @override
   Widget build(BuildContext context) {
-    EasyRefreshController refreshController = EasyRefreshController(
-        controlFinishLoad: true, controlFinishRefresh: true);
-    RankingIllustController controller = Get.put(
-        RankingIllustController(refreshController, widget.tag,
-            type: widget.awType, dateTime: widget.dateTime),
-        tag: "rankingIllust_${widget.tag}");
-
-    return EasyRefresh.builder(
-      controller: refreshController,
-      header: DefaultHeaderFooter.header(context),
-      footer: DefaultHeaderFooter.footer(context),
-      onRefresh: () {
-        controller.reset();
-      },
-      onLoad: () {
-        controller.nextPage();
-      },
-      childBuilder: (context, physics) => WaterfallFlow.builder(
-        physics: physics,
-        padding: EdgeInsets.all(5.0),
-        itemCount: controller.illusts.length,
-        itemBuilder: (context, index) {
-          return IllustCard(
-            controllerTag: "rankingIllust_${widget.tag}",
-            index: index,
+    // ignore: unused_local_variable
+    ListIllustController controller = Get.put(
+        ListIllustController(
+            controllerType: ListType.ranking,
             type: widget.awType,
-            showMangaBadage: true,
-          );
-        },
-        gridDelegate: SliverWaterfallFlowDelegateWithFixedCrossAxisCount(
-          crossAxisCount: context.orientation == Orientation.portrait ? 2 : 4,
-        ),
-      ),
-    );
+            dateTime: widget.dateTime),
+        tag: "rankingIllust_${widget.tag}");
+    return ImageWaterfall(controllerTag: "rankingIllust_${widget.tag}");
   }
 }
 
@@ -188,27 +159,11 @@ class _OneRankingNovelPage extends StatefulWidget {
 class _OneRankingNovelPageState extends State<_OneRankingNovelPage> {
   @override
   Widget build(BuildContext context) {
-    EasyRefreshController refreshController = EasyRefreshController(
-        controlFinishLoad: true, controlFinishRefresh: true);
-    RankingNovelController controller = Get.put(
-        RankingNovelController(refreshController, widget.tag, dateTime: widget.dateTime),
+    // ignore: unused_local_variable
+    ListNovelController controller = Get.put(
+        ListNovelController(controllerType: ListType.ranking, dateTime: widget.dateTime),
         tag: "rankingNovel_${widget.tag}");
-    return EasyRefresh.builder(
-      controller: refreshController,
-      header: DefaultHeaderFooter.header(context),
-      footer: DefaultHeaderFooter.footer(context),
-      onRefresh: () {
-        controller.reset();
-      },
-      onLoad: () {
-        controller.nextPage();
-      },
-      childBuilder: (context, physics) => ListView.builder(
-              padding: EdgeInsets.all(0),
-              itemBuilder: (context, index) {
-                return NovelCard(index,"rankingNovel_${widget.tag}");
-              },
-              itemCount: controller.novels.length),
-    );
+    return NovelList(controllerTag: "rankingNovel_${widget.tag}");
   }
 }
+

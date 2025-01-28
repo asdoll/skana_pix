@@ -1,13 +1,9 @@
-import 'package:easy_refresh/easy_refresh.dart';
 import 'package:shadcn_flutter/shadcn_flutter.dart';
 import 'package:get/get.dart';
-import 'package:skana_pix/componentwidgets/headerfooter.dart';
-import 'package:skana_pix/componentwidgets/novelcard.dart';
-import 'package:skana_pix/controller/feed_controller.dart';
+import 'package:skana_pix/controller/list_controller.dart';
 import 'package:skana_pix/model/worktypes.dart';
-import 'package:waterfall_flow/waterfall_flow.dart';
-
-import '../componentwidgets/imagecard.dart';
+import 'package:skana_pix/view/imageview/imagewaterfall.dart';
+import 'package:skana_pix/view/novelview/novellist.dart';
 
 class FeedIllust extends StatefulWidget {
   const FeedIllust({super.key});
@@ -20,10 +16,9 @@ class _FeedIllustState extends State<FeedIllust> {
   int tab = 0;
   @override
   Widget build(BuildContext context) {
-    EasyRefreshController refreshController = EasyRefreshController();
-    FeedIllustController feedIllustController = Get.put(
-        FeedIllustController(
-            type: ArtworkType.ILLUST, refreshController: refreshController),
+    ListIllustController feedIllustController = Get.put(
+        ListIllustController(
+            controllerType: ListType.feed, type: ArtworkType.ILLUST),
         tag: "feedillust");
     return Column(
       children: [
@@ -60,55 +55,7 @@ class _FeedIllustState extends State<FeedIllust> {
           ],
         ),
         Expanded(
-          child: EasyRefresh(
-            controller: refreshController,
-            onRefresh: feedIllustController.reset,
-            onLoad: feedIllustController.nextPage,
-            header: DefaultHeaderFooter.header(context),
-            footer: DefaultHeaderFooter.footer(context),
-            child: Obx(
-              () {
-                if (feedIllustController.error != null &&
-                    feedIllustController.error!.isNotEmpty &&
-                    feedIllustController.illusts.isEmpty) {
-                  return Center(
-                    child: Column(
-                      children: [
-                        Text("Error".tr),
-                        Button.primary(
-                          onPressed: () {
-                            feedIllustController.reset();
-                          },
-                          child: Text("Retry".tr),
-                        )
-                      ],
-                    ),
-                  );
-                }
-                if (feedIllustController.illusts.isEmpty) {
-                  return Center(
-                    child: Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child:
-                          Text('[ ]', style: Theme.of(context).typography.h1),
-                    ),
-                  );
-                }
-                return WaterfallFlow.builder(
-                  gridDelegate:
-                      SliverWaterfallFlowDelegateWithFixedCrossAxisCount(
-                    crossAxisCount:
-                        context.orientation == Orientation.portrait ? 2 : 4,
-                  ),
-                  itemBuilder: (BuildContext context, int index) {
-                    return IllustCard(
-                        controllerTag: "feedillust", index: index);
-                  },
-                  itemCount: feedIllustController.illusts.length,
-                );
-              },
-            ),
-          ),
+          child: ImageWaterfall(controllerTag: "feedillust"),
         ),
       ],
     );
@@ -127,9 +74,8 @@ class _FeedNovelState extends State<FeedNovel> {
 
   @override
   Widget build(BuildContext context) {
-    EasyRefreshController refreshController = EasyRefreshController();
-    FeedNovelController feedNovelController = Get.put(
-        FeedNovelController(refreshController: refreshController),
+    ListNovelController feedNovelController = Get.put(
+        ListNovelController(controllerType: ListType.feed),
         tag: "feednovel");
 
     return Column(
@@ -167,54 +113,7 @@ class _FeedNovelState extends State<FeedNovel> {
           ],
         ),
         Expanded(
-          child: EasyRefresh(
-            controller: refreshController,
-            onRefresh: feedNovelController.reset,
-            onLoad: feedNovelController.nextPage,
-            header: DefaultHeaderFooter.header(context),
-            footer: DefaultHeaderFooter.footer(context),
-            child: Obx(
-              () {
-                if (feedNovelController.error != null &&
-                    feedNovelController.error!.isNotEmpty &&
-                    feedNovelController.novels.isEmpty) {
-                  return Center(
-                    child: Column(
-                      children: [
-                        Text("Error".tr),
-                        Button.primary(
-                          onPressed: () {
-                            feedNovelController.reset();
-                          },
-                          child: Text("Retry".tr),
-                        )
-                      ],
-                    ),
-                  );
-                }
-                if (feedNovelController.novels.isEmpty) {
-                  return Center(
-                    child: Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child:
-                          Text('[ ]', style: Theme.of(context).typography.h1),
-                    ),
-                  );
-                }
-                return WaterfallFlow.builder(
-                  gridDelegate:
-                      SliverWaterfallFlowDelegateWithFixedCrossAxisCount(
-                    crossAxisCount:
-                        context.orientation == Orientation.portrait ? 2 : 4,
-                  ),
-                  itemBuilder: (BuildContext context, int index) {
-                    return NovelCard(index, "feednovel");
-                  },
-                  itemCount: feedNovelController.novels.length,
-                );
-              },
-            ),
-          ),
+          child: NovelList(controllerTag: "feednovel"),
         ),
       ],
     );

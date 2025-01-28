@@ -14,15 +14,13 @@ import 'novelcard.dart';
 
 class WorksPage extends StatefulWidget {
   final int id;
-  final String portal;
   final ArtworkType type;
 
   const WorksPage(
-      {Key? key, required this.id, required this.portal, required this.type})
-      : super(key: key);
+      {super.key, required this.id, required this.type});
 
   @override
-  _WorksPageState createState() => _WorksPageState();
+  State<WorksPage> createState() => _WorksPageState();
 }
 
 class _WorksPageState extends State<WorksPage> with TickerProviderStateMixin {

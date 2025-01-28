@@ -1,14 +1,18 @@
 import 'package:get/get.dart';
 import 'package:skana_pix/controller/account_controller.dart';
 import 'package:skana_pix/controller/page_index_controller.dart';
+import 'package:skana_pix/controller/settings.dart';
 import 'package:skana_pix/model/worktypes.dart';
+import 'package:skana_pix/view/bookmarkspage.dart';
 import 'package:skana_pix/view/feedpage.dart';
+import 'package:skana_pix/view/mytagspage.dart';
 import 'package:skana_pix/view/rankingpage.dart';
 import 'package:skana_pix/view/recompage.dart';
 import 'package:shadcn_flutter/shadcn_flutter.dart';
 import 'package:skana_pix/view/searchpage.dart';
 import 'package:skana_pix/view/settingscreen.dart';
 import 'package:skana_pix/view/spotlightpage.dart';
+import 'package:skana_pix/view/userview/followlist.dart';
 
 import 'loginpage.dart';
 
@@ -96,9 +100,19 @@ class _HomePageState extends State<HomePage> {
           5 => RankingPage(),
           6 => SpotlightPage(),
           7 => SearchPage(),
-          // 8 => BookmarksPage(),
-          // 9 => MyTagsPage(),
-          // 10 => FollowingPage(),
+          8 => BookmarksPage(
+              id: 0,
+              type: settings.awPrefer == "novel"
+                  ? ArtworkType.NOVEL
+                  : ArtworkType.ILLUST,
+            ),
+          9 => MyTagsPage(),
+          10 => FollowList(
+              id: accountController.userid.value,
+              setAppBar: true,
+              isMe: true,
+              isMyPixiv: true,
+            ),
           // 11 => HistoryPage(),
           _ => SettingPage(),
         },

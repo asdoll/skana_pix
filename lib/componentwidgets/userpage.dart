@@ -15,9 +15,9 @@ import 'package:skana_pix/utils/widgetplugin.dart';
 import 'avatar.dart';
 import 'backarea.dart';
 import 'followbutton.dart';
-import 'followlist.dart';
+import '../view/userview/followlist.dart';
 import 'nullhero.dart';
-import 'userbookmarks.dart';
+import '../view/bookmarkspage.dart';
 
 class UserPage extends StatefulWidget {
   final ArtworkType type;
@@ -25,15 +25,14 @@ class UserPage extends StatefulWidget {
   final int id;
   final bool isMe;
   const UserPage(
-      {Key? key,
+      {super.key,
       required this.id,
       this.heroTag,
       this.type = ArtworkType.ALL,
-      this.isMe = false})
-      : super(key: key);
+      this.isMe = false});
 
   @override
-  _UserPageState createState() => _UserPageState();
+  State<UserPage> createState() => _UserPageState();
 }
 
 class _UserPageState extends State<UserPage> with TickerProviderStateMixin {
@@ -84,9 +83,7 @@ class _UserPageState extends State<UserPage> with TickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
-    return Observer(
-        warnWhenNoObservables: false,
-        builder: (_) {
+    return Obx(() {
           if (isMuted) {
             return Scaffold(
               appBar: AppBar(

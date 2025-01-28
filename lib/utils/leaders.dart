@@ -1,7 +1,7 @@
 import 'package:dio/dio.dart' as d;
 import 'package:get/get.dart';
 import 'package:shadcn_flutter/shadcn_flutter.dart';
-import 'package:skana_pix/componentwidgets/imagelist.dart';
+import 'package:skana_pix/view/imageview/imagelistview.dart';
 import 'package:skana_pix/model/worktypes.dart';
 import 'package:skana_pix/pixiv_dart_api.dart';
 import 'package:url_launcher/url_launcher_string.dart';

@@ -3,7 +3,7 @@ import 'dart:math';
 import 'package:easy_refresh/easy_refresh.dart';
 import 'package:flutter/material.dart';
 import 'package:skana_pix/componentwidgets/headerfooter.dart';
-import 'package:skana_pix/componentwidgets/imagelist.dart';
+import 'package:skana_pix/view/imageview/imagelistview.dart';
 import 'package:skana_pix/componentwidgets/novelpage.dart';
 import 'package:skana_pix/componentwidgets/pixivimage.dart';
 import 'package:skana_pix/controller/histories.dart';
