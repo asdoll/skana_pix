@@ -8,7 +8,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:skana_pix/controller/like_controller.dart';
 import 'package:skana_pix/model/worktypes.dart';
 import 'package:skana_pix/pixiv_dart_api.dart';
-import 'package:skana_pix/view/defaults.dart';
+import 'package:skana_pix/controller/defaults.dart';
 
 import '../utils/text_composition/text_composition.dart';
 
@@ -78,41 +78,41 @@ class UserSetting {
 
   void setDefaults() {
     settings = [
-    '0', //0,darkMode 0:system 1:light 2:dark
-    '0', //1,isAMOLED 0:false 1:true
-    '0', //2,useDynamicColor 0:false 1:true
-    'system', //3,language
-    '4', //4,maxParallelDownload
-    '', //5,downloadPath
-    r'/${id}-p${index}.${ext}', //6,downloadSubPath
-    '0', //7,showOriginal 0:false 1:true
-    '0', //8,showOriginalOnWifi 0:false 1:true
-    '1', //9,checkUpdate 0:false 1:true
-    '', //10,proxy
-    '', //11,blockedTags
-    '', //12,blockedUsers
-    '', //13,blockedCommentUsers
-    '', //14,blockedNovelUsers
-    '0', //15,hideR18 0:false 1:true
-    '0', //16,hideAI 0:false 1:true
-    '1', //17,feedAIBadge 0:false 1:true
-    '1', //18,longPressSaveConfirm 0:false 1:true
-    '1', //19,firstLongPressSave 0:false 1:true
-    '', //20,blockedIllusts
-    '0', //21,saveChoice 0:all 1:ToDir 2:ToGallery
-    '', //22,bookmarkedTags
-    '', //23,bookmarkedNovelTags
-    '', //24,blockedComments
-    '', //25,blockedNovels
-    '', //26,blockedNovelTags
-    'illust', //27,awPrefer
-    '', //28,historyIllustTag
-    '', //29,historyNovelTag
-    '', //30,historyUserTag
-    '0xFF536DFE', //31,seedColor
-    '0', //32,novelDirectEntry 0:false 1:true
-    '1' //33,isHighRefreshRate 0:false 1:true
-  ];
+      '0', //0,darkMode 0:system 1:light 2:dark
+      '0', //1,isAMOLED 0:false 1:true
+      '0', //2,useDynamicColor 0:false 1:true
+      'system', //3,language
+      '4', //4,maxParallelDownload
+      '', //5,downloadPath
+      r'/${id}-p${index}.${ext}', //6,downloadSubPath
+      '0', //7,showOriginal 0:false 1:true
+      '0', //8,showOriginalOnWifi 0:false 1:true
+      '1', //9,checkUpdate 0:false 1:true
+      '', //10,proxy
+      '', //11,blockedTags
+      '', //12,blockedUsers
+      '', //13,blockedCommentUsers
+      '', //14,blockedNovelUsers
+      '0', //15,hideR18 0:false 1:true
+      '0', //16,hideAI 0:false 1:true
+      '1', //17,feedAIBadge 0:false 1:true
+      '1', //18,longPressSaveConfirm 0:false 1:true
+      '1', //19,firstLongPressSave 0:false 1:true
+      '', //20,blockedIllusts
+      '0', //21,saveChoice 0:all 1:ToDir 2:ToGallery
+      '', //22,bookmarkedTags
+      '', //23,bookmarkedNovelTags
+      '', //24,blockedComments
+      '', //25,blockedNovels
+      '', //26,blockedNovelTags
+      'illust', //27,awPrefer
+      '', //28,historyIllustTag
+      '', //29,historyNovelTag
+      '', //30,historyUserTag
+      '0xFF536DFE', //31,seedColor
+      '0', //32,novelDirectEntry 0:false 1:true
+      '1' //33,isHighRefreshRate 0:false 1:true
+    ];
     updateSettings();
   }
 
@@ -134,8 +134,8 @@ class UserSetting {
   void setHighRefreshRate(bool enabled) {
     settings[33] = enabled ? '1' : '0';
     updateSettings();
-    if(DynamicData.isAndroid) {
-      if(enabled){
+    if (DynamicData.isAndroid) {
+      if (enabled) {
         FlutterDisplayMode.setHighRefreshRate();
       } else {
         FlutterDisplayMode.setLowRefreshRate();
@@ -183,7 +183,11 @@ class UserSetting {
   bool get showOriginalOnWifi => settings[8] == '1';
   bool get checkUpdate => settings[9] == '1';
   bool get novelDirectEntry => settings[32] == '1';
-  bool get isDarkMode => settings[0] == '2' || settings[0] == '0' && WidgetsBinding.instance.platformDispatcher.platformBrightness == Brightness.dark;
+  bool get isDarkMode =>
+      settings[0] == '2' ||
+      settings[0] == '0' &&
+          WidgetsBinding.instance.platformDispatcher.platformBrightness ==
+              Brightness.dark;
   bool get isAMOLED => settings[1] == '1';
   bool get useDynamicColor => settings[2] == '1';
   bool get longPressSaveConfirm => settings[18] == '1';
@@ -255,7 +259,7 @@ class UserSetting {
 
   void addBlockedComments(List<String> comments) {
     for (var comment in comments) {
-        if (!localManager.blockedComments.contains(comment)) {
+      if (!localManager.blockedComments.contains(comment)) {
         localManager.blockedComments.add(comment);
         localManager.blockedComments.refresh();
       }
@@ -431,7 +435,7 @@ class UserSetting {
     updateSettings();
   }
 
-  void removeBlockedIllusts(List<String> illusts) { 
+  void removeBlockedIllusts(List<String> illusts) {
     for (var illust in illusts) {
       localManager.blockedIllusts.remove(illust);
       localManager.blockedIllusts.refresh();
@@ -604,7 +608,9 @@ class UserSetting {
       case ArtworkType.NOVEL:
         return localManager.historyNovelTag;
       case ArtworkType.ALL:
-        return localManager.historyIllustTag + localManager.historyNovelTag + localManager.historyUserTag;
+        return localManager.historyIllustTag +
+            localManager.historyNovelTag +
+            localManager.historyUserTag;
       case ArtworkType.USER:
         return localManager.historyUserTag;
     }
@@ -612,7 +618,7 @@ class UserSetting {
 
   void setFromMap(Map<String, dynamic> map) {
     for (var i = 0; i < settings.length; i++) {
-      if(map.containsKey(i.toString())){
+      if (map.containsKey(i.toString())) {
         settings[i] = map[i.toString()];
       }
     }
@@ -627,16 +633,17 @@ class UserSetting {
     // settings[int.parse(key)] = value;
     // updateSettings();
   }
-
 }
 
 var settings = UserSetting();
 
 class TextConfigManager {
   static final _box = Hive.box("textConfigData");
-  static TextCompositionConfig get config => TextCompositionConfig.fromJSON(_box.toMap().cast<String, dynamic>());
-  static set config(TextCompositionConfig config) => _box.putAll(config.toJSON());
-  static Future<void> init() async{
+  static TextCompositionConfig get config =>
+      TextCompositionConfig.fromJSON(_box.toMap().cast<String, dynamic>());
+  static set config(TextCompositionConfig config) =>
+      _box.putAll(config.toJSON());
+  static Future<void> init() async {
     await Hive.initFlutter("textConfigData");
     await Hive.openBox("textConfigData");
   }

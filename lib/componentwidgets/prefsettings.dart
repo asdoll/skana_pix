@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:skana_pix/pixiv_dart_api.dart';
 import 'package:get/get.dart';
-import 'package:skana_pix/view/defaults.dart';
+import 'package:skana_pix/controller/defaults.dart';
 
 class PreferenceSettings extends StatefulWidget {
   const PreferenceSettings({super.key});
@@ -11,11 +11,6 @@ class PreferenceSettings extends StatefulWidget {
 }
 
 class _PreferenceSettingsState extends State<PreferenceSettings> {
-  @override
-  void initState() {
-    super.initState();
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(

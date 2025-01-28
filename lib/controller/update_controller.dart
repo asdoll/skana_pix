@@ -6,7 +6,7 @@ import 'package:flutter/foundation.dart';
 import 'package:get/get.dart';
 import 'package:skana_pix/controller/logging.dart';
 import 'package:skana_pix/model/boardinfo.dart';
-import 'package:skana_pix/view/defaults.dart';
+import 'package:skana_pix/controller/defaults.dart';
 
 class BoardController extends GetxController {
   RxList<BoardInfo> boardList = RxList.empty();

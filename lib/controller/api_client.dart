@@ -23,9 +23,6 @@ import 'res.dart';
 import 'saves.dart';
 import 'settings.dart';
 
-part 'novel_apis.dart';
-part 'illust_apis.dart';
-
 class ApiClient extends BaseClient {
   Account account;
   PDio pDio;

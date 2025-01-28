@@ -4,7 +4,7 @@ import 'package:skana_pix/controller/account_controller.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 import '../componentwidgets/webview.dart';
 import '../utils/applinks.dart';
-import 'defaults.dart';
+import '../controller/defaults.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -14,14 +14,13 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
-
   @override
   Widget build(BuildContext context) {
     return Obx(() {
       if (accountController.isLoading.value) {
         return buildLoading(context);
       } else if (!accountController.waitingForAuth.value) {
-      return buildLogin(context);
+        return buildLogin(context);
       } else {
         return buildWaiting(context);
       }
@@ -173,30 +172,30 @@ class _LoginPageState extends State<LoginPage> {
                   crossAxisAlignment: CrossAxisAlignment.end,
                   children: [
                     OutlineButton(
-                  child: Text("Cancel".tr),
-                  onPressed: () {
-                    exitLogin = true;
-                    Get.back();
-                  },
-                ),
-                const SizedBox(height: 16),
-                PrimaryButton(
-                  child: Text("Continue with Webview".tr),
-                  onPressed: () {
-                    exitLogin = false;
-                    useExternal = false;
-                    Get.back();
-                  },
-                ),
-                const SizedBox(height: 16),
-                PrimaryButton(
-                  child: Text("Continue with External Browser".tr),
-                  onPressed: () {
-                    exitLogin = false;
-                    useExternal = true;
-                    Get.back();
-                  },
-                ),
+                      child: Text("Cancel".tr),
+                      onPressed: () {
+                        exitLogin = true;
+                        Get.back();
+                      },
+                    ),
+                    const SizedBox(height: 16),
+                    PrimaryButton(
+                      child: Text("Continue with Webview".tr),
+                      onPressed: () {
+                        exitLogin = false;
+                        useExternal = false;
+                        Get.back();
+                      },
+                    ),
+                    const SizedBox(height: 16),
+                    PrimaryButton(
+                      child: Text("Continue with External Browser".tr),
+                      onPressed: () {
+                        exitLogin = false;
+                        useExternal = true;
+                        Get.back();
+                      },
+                    ),
                   ],
                 )
               ]);
@@ -233,5 +232,4 @@ class _LoginPageState extends State<LoginPage> {
       launchUrlString(url);
     }
   }
-
 }

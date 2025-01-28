@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:skana_pix/controller/account_controller.dart';
+import 'package:skana_pix/controller/theme_controller.dart';
 import 'package:skana_pix/controller/update_controller.dart';
 import 'package:skana_pix/controller/page_index_controller.dart';
 import 'package:skana_pix/pixiv_dart_api.dart';
@@ -14,7 +15,6 @@ import 'package:flutter_displaymode/flutter_displaymode.dart';
 import 'package:skana_pix/utils/applinks.dart';
 import 'package:skana_pix/utils/translate.dart';
 import 'package:skana_pix/view/homepage.dart';
-import 'package:skana_pix/view/defaults.dart';
 import 'package:shadcn_flutter/shadcn_flutter.dart';
 
 import 'controller/like_controller.dart';
@@ -34,13 +34,13 @@ Future<void> main() async {
     Get.addTranslations(TranslateMap.translation);
     Get.updateLocale(settings.localeObj());
     handleLinks();
-    pageIndexController = Get.put(PageIndexController(),permanent: true);
-    accountController = Get.put(AccountController(),permanent: true);
-    localManager = Get.put(LocalManager(),permanent: true);
+    pageIndexController = Get.put(PageIndexController(), permanent: true);
+    accountController = Get.put(AccountController(), permanent: true);
+    localManager = Get.put(LocalManager(), permanent: true);
     localManager.init();
-    likeController = Get.put(LikeController(),permanent: true);
-    boardController = Get.put(BoardController(),permanent: true);
-    updateController = Get.put(UpdateController(),permanent: true);
+    likeController = Get.put(LikeController(), permanent: true);
+    boardController = Get.put(BoardController(), permanent: true);
+    updateController = Get.put(UpdateController(), permanent: true);
     if (Platform.isWindows || Platform.isLinux) {
       sqfliteFfiInit();
       databaseFactory = databaseFactoryFfi;
@@ -63,7 +63,7 @@ class _MyAppState extends State<MyApp> {
   @override
   void initState() {
     super.initState();
-    if(Platform.isAndroid && settings.isHighRefreshRate) {
+    if (Platform.isAndroid && settings.isHighRefreshRate) {
       FlutterDisplayMode.setHighRefreshRate();
     }
   }

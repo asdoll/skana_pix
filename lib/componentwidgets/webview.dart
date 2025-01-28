@@ -1,6 +1,6 @@
 import 'package:shadcn_flutter/shadcn_flutter.dart';
 import 'package:get/get.dart';
-import 'package:skana_pix/view/defaults.dart';
+import 'package:skana_pix/controller/theme_controller.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 

@@ -18,7 +18,7 @@ import '../componentwidgets/searchbar.dart';
 import 'imageview/imagesearchresult.dart';
 import '../componentwidgets/usercard.dart';
 import '../model/worktypes.dart';
-import 'defaults.dart';
+import '../controller/defaults.dart';
 
 class SearchPage extends StatefulWidget {
   const SearchPage({super.key});

@@ -6,7 +6,7 @@ import 'package:skana_pix/model/worktypes.dart';
 import 'package:skana_pix/pixiv_dart_api.dart';
 import 'package:skana_pix/utils/filters.dart';
 import 'package:skana_pix/utils/leaders.dart';
-import 'package:skana_pix/view/defaults.dart';
+import 'package:skana_pix/controller/defaults.dart';
 
 enum ListType {
   single,

@@ -4,7 +4,7 @@ import 'package:get/get.dart';
 import 'package:skana_pix/componentwidgets/chip.dart';
 import 'package:skana_pix/controller/like_controller.dart';
 
-import 'defaults.dart';
+import '../controller/defaults.dart';
 import '../componentwidgets/novelresult.dart';
 import 'imageview/imagesearchresult.dart';
 

@@ -5,7 +5,7 @@ import 'package:skana_pix/pixiv_dart_api.dart';
 import 'package:get/get.dart';
 import 'package:blur/blur.dart';
 import 'package:shadcn_flutter/shadcn_flutter.dart';
-import '../view/defaults.dart';
+import '../controller/defaults.dart';
 import '../view/imageview/imagelistview.dart';
 import 'nullhero.dart';
 import 'pixivimage.dart';
@@ -299,8 +299,8 @@ class _IllustCardState extends State<IllustCard> {
     return Stack(
       children: <Widget>[
         Padding(
-          padding: const EdgeInsets.only(
-              left: 8.0, right: 36.0, top: 4, bottom: 4),
+          padding:
+              const EdgeInsets.only(left: 8.0, right: 36.0, top: 4, bottom: 4),
           child:
               Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
             Text(
@@ -308,16 +308,14 @@ class _IllustCardState extends State<IllustCard> {
               maxLines: 1,
               overflow: TextOverflow.clip,
               style: Theme.of(context).typography.textSmall,
-              strutStyle:
-                  const StrutStyle(forceStrutHeight: true, leading: 0),
+              strutStyle: const StrutStyle(forceStrutHeight: true, leading: 0),
             ),
             Text(
               illust.author.name,
               maxLines: 1,
               overflow: TextOverflow.clip,
               style: Theme.of(context).typography.textSmall,
-              strutStyle:
-                  const StrutStyle(forceStrutHeight: true, leading: 0),
+              strutStyle: const StrutStyle(forceStrutHeight: true, leading: 0),
             )
           ]),
         ),

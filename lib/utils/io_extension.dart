@@ -11,7 +11,7 @@ import 'package:permission_handler/permission_handler.dart';
 import 'package:skana_pix/pixiv_dart_api.dart';
 import 'package:image_gallery_saver_plus/image_gallery_saver_plus.dart';
 import 'package:skana_pix/utils/leaders.dart';
-import '../view/defaults.dart';
+import '../controller/defaults.dart';
 import 'safplugin.dart';
 
 extension FSExt on FileSystemEntity {

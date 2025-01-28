@@ -15,7 +15,7 @@ import 'package:skana_pix/pixiv_dart_api.dart';
 import 'package:skana_pix/view/homepage.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 
-import '../about.dart';
+import 'about.dart';
 import '../../componentwidgets/avatar.dart';
 import 'boardpage.dart';
 import '../mytagspage.dart';

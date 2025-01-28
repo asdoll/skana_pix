@@ -14,7 +14,7 @@ import 'package:skana_pix/utils/text_composition/text_composition.dart';
 import 'package:skana_pix/utils/translate.dart';
 import 'package:skana_pix/utils/widgetplugin.dart';
 import '../model/worktypes.dart';
-import '../view/defaults.dart';
+import '../controller/defaults.dart';
 import 'avatar.dart';
 import 'commentpage.dart';
 import 'followbutton.dart';

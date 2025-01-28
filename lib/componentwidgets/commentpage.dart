@@ -5,7 +5,7 @@ import 'package:skana_pix/componentwidgets/headerfooter.dart';
 import 'package:skana_pix/componentwidgets/pixivimage.dart';
 import 'package:skana_pix/controller/like_controller.dart';
 import 'package:skana_pix/pixiv_dart_api.dart';
-import 'package:skana_pix/view/defaults.dart';
+import 'package:skana_pix/controller/defaults.dart';
 
 import '../model/worktypes.dart';
 import 'avatar.dart';
