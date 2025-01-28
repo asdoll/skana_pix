@@ -373,7 +373,7 @@ class _IllustDetailContentState extends State<IllustDetailContent> {
       case 2:
         {
           await Clipboard.setData(ClipboardData(text: f.name));
-          Leader.showTextToast("Copied to clipboard".tr);
+          Leader.showToast("Copied to clipboard".tr);
         }
     }
   }

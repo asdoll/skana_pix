@@ -1,6 +1,15 @@
 import 'package:dio/dio.dart' as d;
 import 'package:get/get.dart';
-import 'package:shadcn_flutter/shadcn_flutter.dart';
+import 'package:shadcn_flutter/shadcn_flutter.dart'
+    show
+        Widget,
+        BuildContext,
+        Alignment,
+        SurfaceCard,
+        Basic,
+        ToastOverlay,
+        Text;
+import 'package:shadcn_flutter/shadcn_flutter.dart' as shadcn;
 import 'package:skana_pix/view/imageview/imagelistview.dart';
 import 'package:skana_pix/model/worktypes.dart';
 import 'package:skana_pix/pixiv_dart_api.dart';
@@ -14,7 +23,7 @@ import '../componentwidgets/userpage.dart';
 
 class Leader {
   static showBasicToast(Widget? title, Widget? subtitle, Widget? trailing) {
-    showToast(
+    shadcn.showToast(
         context: Get.context!,
         builder: (BuildContext context, ToastOverlay overlay) {
           return SurfaceCard(
@@ -28,8 +37,8 @@ class Leader {
         });
   }
 
-  static showTextToast(String text) {
-    showToast(
+  static showToast(String text) {
+    shadcn.showToast(
         context: Get.context!,
         builder: (BuildContext context, ToastOverlay overlay) {
           return SurfaceCard(
@@ -47,17 +56,6 @@ class Leader {
         return true;
       }
     }
-    // if (link.host == "script" && link.scheme == "pixez") {
-    //   Navigator.of(context).push(MaterialPageRoute(builder: (context) {
-    //     return SaveEvalPage(
-    //       eval: link.queryParameters["code"] != null
-    //           ? String.fromCharCodes(
-    //               base64Decode(link.queryParameters["code"]!))
-    //           : null,
-    //     );
-    //   }));
-    //   return true;
-    // }
     if (link.host == "i.pximg.net") {
       final id = link.pathSegments.last.split(".").first.split("_").first;
       Get.to(() => IllustPageLite(id), preventDuplicates: false);
@@ -77,7 +75,7 @@ class Leader {
         try {
           launchUrlString(link.toString());
         } catch (e) {
-          Leader.showTextToast(e.toString());
+          Leader.showToast(e.toString());
         }
       }
       return true;
@@ -144,7 +142,7 @@ class Leader {
       try {
         Get.to(() => IllustPageLite(idSource), preventDuplicates: false);
       } catch (e) {
-        Leader.showTextToast(e.toString());
+        Leader.showToast(e.toString());
       }
       return true;
     } else if (link.host.contains('user')) {
@@ -158,7 +156,7 @@ class Leader {
                 ),
             preventDuplicates: false);
       } catch (e) {
-        Leader.showTextToast(e.toString());
+        Leader.showToast(e.toString());
       }
       return true;
     } else if (link.host.contains("novel")) {
@@ -167,7 +165,7 @@ class Leader {
             preventDuplicates: false);
         return true;
       } catch (e) {
-        Leader.showTextToast(e.toString());
+        Leader.showToast(e.toString());
       }
     } else if (link.host.contains('pixiv')) {
       if (link.path.contains("artworks")) {
@@ -179,7 +177,7 @@ class Leader {
                 preventDuplicates: false);
             return true;
           } catch (e) {
-            Leader.showTextToast(e.toString());
+            Leader.showToast(e.toString());
           }
         }
       }
@@ -196,7 +194,7 @@ class Leader {
                 preventDuplicates: false);
             return true;
           } catch (e) {
-            Leader.showTextToast(e.toString());
+            Leader.showToast(e.toString());
           }
         }
       }
@@ -206,7 +204,7 @@ class Leader {
           Get.to(() => IllustPageLite(id.toString()), preventDuplicates: false);
           return true;
         } catch (e) {
-          Leader.showTextToast(e.toString());
+          Leader.showToast(e.toString());
         }
       }
       if (link.queryParameters['id'] != null) {
@@ -224,7 +222,7 @@ class Leader {
           }
           return true;
         } catch (e) {
-          Leader.showTextToast(e.toString());
+          Leader.showToast(e.toString());
         }
       }
       if (link.pathSegments.length >= 2) {
@@ -257,7 +255,7 @@ class Leader {
                 preventDuplicates: false);
             return true;
           } catch (e) {
-            Leader.showTextToast(e.toString());
+            Leader.showToast(e.toString());
           }
         }
       }

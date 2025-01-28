@@ -438,7 +438,7 @@ class _NovelCardState extends State<NovelCard> {
       case 2:
         {
           await Clipboard.setData(ClipboardData(text: f.name));
-          Leader.showTextToast("Copied to clipboard".tr);
+          Leader.showToast("Copied to clipboard".tr);
         }
     }
   }

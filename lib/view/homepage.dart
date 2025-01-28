@@ -10,7 +10,7 @@ import 'package:skana_pix/view/rankingpage.dart';
 import 'package:skana_pix/view/recompage.dart';
 import 'package:shadcn_flutter/shadcn_flutter.dart';
 import 'package:skana_pix/view/searchpage.dart';
-import 'package:skana_pix/view/settingscreen.dart';
+import 'package:skana_pix/view/settings/settingpage.dart';
 import 'package:skana_pix/view/spotlightpage.dart';
 import 'package:skana_pix/view/userview/followlist.dart';
 

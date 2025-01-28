@@ -1,5 +1,4 @@
 import 'package:get/get.dart';
-import 'package:skana_pix/controller/api_client.dart';
 import 'package:skana_pix/controller/connector.dart';
 import 'package:skana_pix/controller/logging.dart';
 import 'package:skana_pix/controller/settings.dart';
@@ -22,7 +21,7 @@ class LikeController extends GetxController {
     if (res.success) {
       illusts[id] = state == 0 ? 2 : 0;
     } else {
-      Leader.showTextToast("Network Error".tr);
+      Leader.showToast("Network Error".tr);
       illusts[id] = state;
     }
     illusts.refresh();
@@ -41,7 +40,7 @@ class LikeController extends GetxController {
     if (res.success) {
       novels[id] = state == 0 ? 2 : 0;
     } else {
-      Leader.showTextToast("Network Error".tr);
+      Leader.showToast("Network Error".tr);
       novels[id] = state;
     }
     novels.refresh();
@@ -57,7 +56,7 @@ class LikeController extends GetxController {
     if (res.success) {
       users[id] = state == 0 ? 2 : 0;
     } else {
-      Leader.showTextToast("Network Error".tr);
+      Leader.showToast("Network Error".tr);
       users[id] = state;
     }
     users.refresh();
@@ -132,7 +131,6 @@ class LocalManager extends GetxController {
     historyIllustTag.refresh();
     historyNovelTag.refresh();
     historyUserTag.refresh();
-
   }
 
   void add(String param, List<String> value) {
@@ -282,4 +280,3 @@ class LocalManager extends GetxController {
     }
   }
 }
-

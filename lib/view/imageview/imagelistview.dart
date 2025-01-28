@@ -463,8 +463,7 @@ class _IllustPageState extends State<IllustPage> {
                                     await Clipboard.setData(ClipboardData(
                                         text:
                                             "https://www.pixiv.net/artworks/${widget.illust.id}"));
-                                    Leader.showTextToast(
-                                        "Copied to clipboard".tr);
+                                    Leader.showToast("Copied to clipboard".tr);
                                   },
                                 ),
                                 MenuButton(

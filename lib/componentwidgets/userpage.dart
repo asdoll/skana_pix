@@ -1,15 +1,16 @@
-import 'package:bot_toast/bot_toast.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:icon_decoration/icon_decoration.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:skana_pix/componentwidgets/userdetail.dart';
-import 'package:skana_pix/componentwidgets/userworks.dart';
+import 'package:skana_pix/view/userview/userworks.dart';
 import 'package:skana_pix/controller/caches.dart';
+import 'package:skana_pix/controller/like_controller.dart';
 import 'package:skana_pix/model/worktypes.dart';
 import 'package:skana_pix/pixiv_dart_api.dart';
 import 'package:get/get.dart';
+import 'package:skana_pix/utils/leaders.dart';
 import 'package:skana_pix/utils/widgetplugin.dart';
 
 import 'avatar.dart';
@@ -84,78 +85,78 @@ class _UserPageState extends State<UserPage> with TickerProviderStateMixin {
   @override
   Widget build(BuildContext context) {
     return Obx(() {
-          if (isMuted) {
-            return Scaffold(
-              appBar: AppBar(
-                backgroundColor: Colors.transparent,
-                elevation: 0.0,
-              ),
-              extendBodyBehindAppBar: true,
-              extendBody: true,
-              body: Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: <Widget>[
-                    Text('X_X'),
-                    Text('${widget.id}'),
-                    FilledButton.tonal(
-                        onPressed: () {
-                          settings.removeBlockedUsers([widget.id.toString()]);
-                          setState(() {
-                            isMuted = false;
-                          });
-                        },
-                        child: Text("Unblock".tr)),
-                  ],
-                ),
-              ),
-            );
-          }
+      if (isMuted) {
+        return Scaffold(
+          appBar: AppBar(
+            backgroundColor: Colors.transparent,
+            elevation: 0.0,
+          ),
+          extendBodyBehindAppBar: true,
+          extendBody: true,
+          body: Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: <Widget>[
+                Text('X_X'),
+                Text('${widget.id}'),
+                FilledButton.tonal(
+                    onPressed: () {
+                      settings.removeBlockedUsers([widget.id.toString()]);
+                      setState(() {
+                        isMuted = false;
+                      });
+                    },
+                    child: Text("Unblock".tr)),
+              ],
+            ),
+          ),
+        );
+      }
 
-          if (isError && userDetail == null) {
-            return Scaffold(
-              appBar: AppBar(),
-              body: Container(
-                  child: Center(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  mainAxisSize: MainAxisSize.max,
-                  children: <Widget>[
-                    Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: Text(
-                        "Network Error".tr,
-                      ),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: MaterialButton(
-                        color: Theme.of(context).colorScheme.primary,
-                        onPressed: () {
-                          firstLoad();
-                        },
-                        child: Text("Retry".tr),
-                      ),
-                    )
-                  ],
+      if (isError && userDetail == null) {
+        return Scaffold(
+          appBar: AppBar(),
+          body: Container(
+              child: Center(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              mainAxisAlignment: MainAxisAlignment.center,
+              mainAxisSize: MainAxisSize.max,
+              children: <Widget>[
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Text(
+                    "Network Error".tr,
+                  ),
                 ),
-              )),
-            );
-          }
-          if (userDetail == null) {
-            return Scaffold(
-              appBar: AppBar(),
-              body: Container(
-                  child: Center(
-                child: CircularProgressIndicator(
-                  color: Theme.of(context).colorScheme.primary,
-                ),
-              )),
-            );
-          }
-          return _buildBody(context);
-        });
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: MaterialButton(
+                    color: Theme.of(context).colorScheme.primary,
+                    onPressed: () {
+                      firstLoad();
+                    },
+                    child: Text("Retry".tr),
+                  ),
+                )
+              ],
+            ),
+          )),
+        );
+      }
+      if (userDetail == null) {
+        return Scaffold(
+          appBar: AppBar(),
+          body: Container(
+              child: Center(
+            child: CircularProgressIndicator(
+              color: Theme.of(context).colorScheme.primary,
+            ),
+          )),
+        );
+      }
+      return _buildBody(context);
+    });
   }
 
   Widget _buildBody(BuildContext context) {
@@ -165,13 +166,13 @@ class _UserPageState extends State<UserPage> with TickerProviderStateMixin {
           controller: _scrollController,
           body: TabBarView(controller: _tabController, children: [
             WorksPage(
-                id: userDetail!.id,
-                type: type,
-                portal: '/works-${userDetail!.id}'),
+              id: userDetail!.id,
+              type: type,
+            ),
             BookmarksPage(
-                id: userDetail!.id,
-                type: type,
-                portal: '/bookmarks-${userDetail!.id}'),
+              id: userDetail!.id,
+              type: type,
+            ),
             UserDetailPage(userDetail!),
           ]).paddingTop(102 + MediaQuery.of(context).padding.top),
           headerSliverBuilder:
@@ -323,7 +324,7 @@ class _UserPageState extends State<UserPage> with TickerProviderStateMixin {
   }
 
   Widget _buildBackground(BuildContext context) {
-    return Container(
+    return SizedBox(
         width: MediaQuery.of(context).size.width,
         height: userDetail?.backgroundImage != null
             ? MediaQuery.of(context).size.width / 2
@@ -384,10 +385,10 @@ class _UserPageState extends State<UserPage> with TickerProviderStateMixin {
         switch (index) {
           case 0:
             if (widget.isMe) {
-              BotToast.showText(text: "You can't follow yourself".tr);
+              Leader.showToast("You can't follow yourself".tr);
               return;
             }
-            follow("private");
+            followUser(userDetail!.id.toString(), "add", "private");
 
             break;
           case 1:
@@ -401,13 +402,13 @@ class _UserPageState extends State<UserPage> with TickerProviderStateMixin {
                         TextButton(
                           child: Text("Ok".tr),
                           onPressed: () {
-                            Navigator.of(context).pop("OK");
+                            Get.back(result: "OK");
                           },
                         ),
                         TextButton(
                           child: Text("Cancel".tr),
                           onPressed: () {
-                            Navigator.of(context).pop();
+                            Get.back();
                           },
                         )
                       ],
@@ -418,7 +419,7 @@ class _UserPageState extends State<UserPage> with TickerProviderStateMixin {
                 setState(() {
                   isMuted = true;
                 });
-                Navigator.of(context).pop();
+                Get.back();
               }
             }
             break;
@@ -426,7 +427,7 @@ class _UserPageState extends State<UserPage> with TickerProviderStateMixin {
             {
               Clipboard.setData(ClipboardData(
                   text: 'painter:${userDetail?.name ?? ''}\npid:${widget.id}'));
-              BotToast.showText(text: "Copied to clipboard".tr);
+              Leader.showToast("Copied to clipboard".tr);
               break;
             }
           default:
@@ -453,7 +454,7 @@ class _UserPageState extends State<UserPage> with TickerProviderStateMixin {
   }
 
   Widget _buildFakeNameFollow(BuildContext context) {
-    return Container(
+    return SizedBox(
       width: MediaQuery.of(context).size.width,
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 16.0),
@@ -485,7 +486,7 @@ class _UserPageState extends State<UserPage> with TickerProviderStateMixin {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
               NullHero(
-                tag: userDetail?.name ?? "" + widget.heroTag.toString(),
+                tag: userDetail?.name ?? "${widget.heroTag}",
                 child: Text(
                   userDetail?.name ?? "",
                   style: Theme.of(context).textTheme.titleLarge,
@@ -493,15 +494,8 @@ class _UserPageState extends State<UserPage> with TickerProviderStateMixin {
               ),
               InkWell(
                 onTap: () {
-                  Navigator.of(context)
-                      .push(MaterialPageRoute(builder: (BuildContext context) {
-                    return Scaffold(
-                      appBar: AppBar(
-                        title: Text("Followed".tr),
-                      ),
-                      body: FollowList(id: widget.id),
-                    );
-                  }));
+                  Get.to(() =>
+                      FollowList(id: widget.id.toString(), setAppBar: true));
                 },
                 child: Text(
                   userDetail == null
@@ -557,89 +551,79 @@ class _UserPageState extends State<UserPage> with TickerProviderStateMixin {
     );
   }
 
-  Container _buildAvatarFollow(BuildContext context) {
-    return Container(
-      child: Observer(
-        warnWhenNoObservables: false,
-        builder: (_) => Row(
-          mainAxisSize: MainAxisSize.max,
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          crossAxisAlignment: CrossAxisAlignment.end,
-          children: <Widget>[
-            Padding(
-              padding:
-                  const EdgeInsets.symmetric(horizontal: 16.0, vertical: 0.0),
-              child: NullHero(
-                tag: userDetail!.avatar + widget.heroTag.toString(),
-                child: PainterAvatar(
-                  url: userDetail!.avatar,
-                  size: Size(80, 80),
-                  onTap: () {
-                    showDialog(
-                        context: context,
-                        builder: (context) {
-                          return AlertDialog(
-                            title: Text("Save".tr),
-                            content: ClipRRect(
-                              borderRadius: BorderRadius.circular(12),
-                              child: CachedNetworkImage(
-                                imageUrl: userDetail!.avatar,
-                                fit: BoxFit.cover,
-                                cacheManager: imagesCacheManager,
-                              ),
+  Widget _buildAvatarFollow(BuildContext context) {
+    return SizedBox(
+      child: Row(
+        mainAxisSize: MainAxisSize.max,
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        crossAxisAlignment: CrossAxisAlignment.end,
+        children: <Widget>[
+          Padding(
+            padding:
+                const EdgeInsets.symmetric(horizontal: 16.0, vertical: 0.0),
+            child: NullHero(
+              tag: userDetail!.avatar + widget.heroTag.toString(),
+              child: PainterAvatar(
+                url: userDetail!.avatar,
+                size: 80,
+                onTap: () {
+                  showDialog(
+                      context: context,
+                      builder: (context) {
+                        return AlertDialog(
+                          title: Text("Save".tr),
+                          content: ClipRRect(
+                            borderRadius: BorderRadius.circular(12),
+                            child: CachedNetworkImage(
+                              imageUrl: userDetail!.avatar,
+                              fit: BoxFit.cover,
+                              cacheManager: imagesCacheManager,
                             ),
-                            actions: [
-                              TextButton(
-                                  onPressed: () async {
-                                    Navigator.of(context).pop();
-                                  },
-                                  child: Text("Cancel".tr)),
-                              TextButton(
-                                  onPressed: () async {
-                                    Navigator.of(context).pop();
-                                    await _saveUserC(context);
-                                  },
-                                  child: Text("Ok".tr)),
-                            ],
-                          );
-                        });
-                  },
-                  id: userDetail!.id,
-                ),
+                          ),
+                          actions: [
+                            TextButton(
+                                onPressed: () async {
+                                  Navigator.of(context).pop();
+                                },
+                                child: Text("Cancel".tr)),
+                            TextButton(
+                                onPressed: () async {
+                                  Navigator.of(context).pop();
+                                  await _saveUserC(context);
+                                },
+                                child: Text("Ok".tr)),
+                          ],
+                        );
+                      });
+                },
+                id: userDetail!.id,
               ),
             ),
-            Container(
-              child: userDetail == null
-                  ? Container(
-                      padding: const EdgeInsets.only(right: 16.0, bottom: 4.0),
-                      child: CircularProgressIndicator(
-                        color: Theme.of(context).colorScheme.secondary,
-                      ),
-                    )
-                  : Padding(
-                      padding: const EdgeInsets.only(right: 16.0, bottom: 4.0),
-                      child: UserFollowButton(
-                        liked: userDetail!.isFollowed,
-                        onPressed: () async {
-                          if (widget.isMe) {
-                            BotToast.showText(
-                                text: "You can't follow yourself".tr);
-                            return;
-                          }
-                          follow("public");
-                        },
-                      ),
+          ),
+          Container(
+            child: userDetail == null
+                ? Container(
+                    padding: const EdgeInsets.only(right: 16.0, bottom: 4.0),
+                    child: CircularProgressIndicator(
+                      color: Theme.of(context).colorScheme.secondary,
                     ),
-            )
-          ],
-        ),
+                  )
+                : Padding(
+                    padding: const EdgeInsets.only(right: 16.0, bottom: 4.0),
+                    child: UserFollowButton(
+                      liked: userDetail!.isFollowed,
+                      id: userDetail!.id.toString(),
+                    ),
+                  ),
+          )
+        ],
       ),
     );
   }
 
   _saveUserBg(BuildContext context, String url) async {
     try {
-      saveUrl(url, context: context);
+      saveUrl(url);
     } catch (e) {
       log.e(e);
     }
@@ -660,41 +644,10 @@ class _UserPageState extends State<UserPage> with TickerProviderStateMixin {
         .replaceAll("<", "");
     String fileName = "${replaceAll}_${userDetail!.id}.${meme}";
     try {
-      saveUrl(url, filenm: fileName, context: context);
+      saveUrl(url, filenm: fileName);
     } catch (e) {
       log.e(e);
     }
-  }
-
-  bool isFollowing = false;
-
-  void follow(String type) async {
-    if (isFollowing) return;
-    setState(() {
-      isFollowing = true;
-    });
-    var method = userDetail!.isFollowed ? "delete" : "add";
-    var res = await followUser(userDetail!.id.toString(), method, type);
-    if (res.error) {
-      if (mounted) {
-        BotToast.showText(text: "Network Error".tr);
-      }
-    } else {
-      if (method == "add" && type == "private") {
-        BotToast.showText(text: "Followed privately".tr);
-      } else {
-        BotToast.showText(
-            text: userDetail!.isFollowed ? "Unfollowed".tr : "Followed".tr);
-      }
-      userDetail!.isFollowed = !userDetail!.isFollowed;
-    }
-    setState(() {
-      isFollowing = false;
-    });
-    // UserInfoPage.followCallbacks[widget.illust.author.id.toString()]
-    //     ?.call(widget.illust.author.isFollowed);
-    // UserPreviewWidget.followCallbacks[widget.illust.author.id.toString()]
-    //      ?.call(widget.illust.author.isFollowed);
   }
 
   firstLoad() {
@@ -702,14 +655,13 @@ class _UserPageState extends State<UserPage> with TickerProviderStateMixin {
       if (value.success) {
         setState(() {
           userDetail = value.data;
-          isMuted = settings.blockedUsers.contains(userDetail!.name);
+          isMuted = localManager.blockedUsers.contains(userDetail!.name);
         });
       } else {
         setState(() {
           if (value.errorMessage != null &&
               value.errorMessage!.contains("timeout")) {
-            BotToast.showText(
-                text: "Network Error. Please refresh to try again.".tr);
+            Leader.showToast("Network Error. Please refresh to try again.".tr);
           }
         });
       }
@@ -721,34 +673,8 @@ class _UserPageState extends State<UserPage> with TickerProviderStateMixin {
   }
 }
 
-class StickyTabBarDelegate extends SliverPersistentHeaderDelegate {
-  final TabBar child;
-
-  StickyTabBarDelegate({required this.child});
-
-  @override
-  Widget build(
-      BuildContext context, double shrinkOffset, bool overlapsContent) {
-    return Container(
-      child: this.child,
-      color: Theme.of(context).cardColor,
-    );
-  }
-
-  @override
-  double get maxExtent => this.child.preferredSize.height;
-
-  @override
-  double get minExtent => this.child.preferredSize.height;
-
-  @override
-  bool shouldRebuild(SliverPersistentHeaderDelegate oldDelegate) {
-    return false;
-  }
-}
-
 class ColoredTabBar extends Container implements PreferredSizeWidget {
-  ColoredTabBar(this.color, this.tabBar);
+  ColoredTabBar(this.color, this.tabBar, {super.key});
 
   final Color color;
   final TabBar tabBar;

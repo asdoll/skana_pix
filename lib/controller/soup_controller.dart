@@ -5,7 +5,6 @@ import 'package:easy_refresh/easy_refresh.dart';
 import 'package:get/get.dart';
 import 'package:html/dom.dart' as dom;
 import 'package:html/parser.dart';
-import 'package:skana_pix/controller/api_client.dart';
 import 'package:skana_pix/controller/connector.dart';
 import 'package:skana_pix/controller/logging.dart';
 import 'package:skana_pix/controller/settings.dart';
@@ -36,7 +35,7 @@ class SoupFetcher extends GetxController {
         _fetchEn(url);
       }
     } on Exception {
-      Leader.showTextToast("404 NOT FOUND");
+      Leader.showToast("404 NOT FOUND");
     } catch (e) {
       return;
     }
@@ -171,7 +170,6 @@ extension ElementExt on dom.Element {
   }
 }
 
-
 class SpotlightStoreBase extends GetxController {
   RxList<SpotlightArticle> articles = RxList.empty();
   String? nextUrl;
@@ -185,7 +183,8 @@ class SpotlightStoreBase extends GetxController {
     isLoading = true;
     nextUrl = null;
     try {
-      SpotlightResponse response = await ConnectManager().apiClient.getSpotlightArticles("all");
+      SpotlightResponse response =
+          await ConnectManager().apiClient.getSpotlightArticles("all");
       if (response.nextUrl != null && response.nextUrl == "error") {
         controller.finishRefresh(IndicatorResult.fail);
         return false;

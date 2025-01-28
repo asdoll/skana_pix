@@ -59,7 +59,7 @@ class _NewVersionPageState extends State<NewVersionPage> {
                 InkWell(
                   onTap: () async {
                     if (updateController.updateUrl.isEmpty) {
-                      Leader.showTextToast('No download link'.tr);
+                      Leader.showToast('No download link'.tr);
                       return;
                     }
                     await launchUrlString(updateController.updateUrl);

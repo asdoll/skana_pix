@@ -8,13 +8,15 @@ class FollowList extends StatefulWidget {
   final bool isNovel;
   final bool setAppBar;
   final bool isMe;
+  final bool isMyPixiv;
 
   const FollowList(
       {super.key,
       required this.id,
       this.isNovel = false,
       this.setAppBar = false,
-      this.isMe = false});
+      this.isMe = false,
+      this.isMyPixiv = false});
 
   @override
   State<FollowList> createState() => _FollowListState();
@@ -23,24 +25,36 @@ class FollowList extends StatefulWidget {
 class _FollowListState extends State<FollowList> {
   @override
   Widget build(BuildContext context) {
+    UserListType userListType;
+    if (widget.isMe) {
+      if (widget.isMyPixiv) {
+        userListType = UserListType.mymypixiv;
+      } else {
+        userListType = UserListType.myfollowing;
+      }
+    } else {
+      if (widget.isMyPixiv) {
+        userListType = UserListType.usermypixiv;
+      } else {
+        userListType = UserListType.following;
+      }
+    }
     // ignore: unused_local_variable
     ListUserController controller = Get.put(
-        ListUserController(
-            userListType:
-                widget.isMe ? UserListType.myfollowing : UserListType.following,
-            id: widget.id),
+        ListUserController(userListType: userListType, id: widget.id),
         tag: "${widget.isMe ? "myfollowing" : widget.id}userlist");
 
     return Scaffold(
       headers: [
         if (widget.setAppBar)
           AppBar(
-            title: Text(widget.isMe ? "My Follow".tr : "Following".tr),
+            title: Text(widget.isMyPixiv ? "My Pixiv".tr : "Following".tr),
           ),
         if (widget.setAppBar) const Divider()
       ],
       child: UserList(
-          controllerTag: "${widget.isMe ? "myfollowing" : widget.id}userlist"),
+          controllerTag:
+              widget.id + (widget.isMyPixiv ? "_mypixiv" : "_following")),
     );
   }
 }

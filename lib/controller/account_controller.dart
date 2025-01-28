@@ -23,7 +23,7 @@ class AccountController extends GetxController {
     waitingForAuth.value = false;
     var res = await ConnectManager().apiClient.loginWithCode(code);
     if (res.error) {
-      Leader.showTextToast(res.errorMessage!);
+      Leader.showToast(res.errorMessage!);
       isLoading.value = false;
     } else {
       isLoggedIn.value = true;

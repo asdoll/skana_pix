@@ -73,15 +73,8 @@ class _UserDetailPageState extends State<UserDetailPage> {
                       child: TextButton(
                           child: Text(detail.totalFollowUsers.toString()),
                           onPressed: () {
-                            Get.to(() => Scaffold(
-                                  headers: [
-                                    AppBar(
-                                      title: Text("Followed".tr),
-                                    )
-                                  ],
-                                  child:
-                                      FollowList(id: detail.id.toString(), isNovel: false),
-                                ));
+                            Get.to(() => FollowList(
+                                id: detail.id.toString(), setAppBar: true));
                           }))
                 ]),
                 TableRow(cells: [
@@ -90,17 +83,10 @@ class _UserDetailPageState extends State<UserDetailPage> {
                       child: TextButton(
                           child: Text(detail.myPixivUsers.toString()),
                           onPressed: () {
-                            Get.to(() => Scaffold(
-                                  headers: [
-                                    AppBar(
-                                      title: Text("Followed".tr),
-                                    )
-                                  ],
-                                  child: FollowList(
-                                    id: detail.id.toString(),
-                                    isMyPixiv: true,
-                                  ),
-                                ));
+                            Get.to(() => FollowList(
+                                isMyPixiv: true,
+                                id: detail.id.toString(),
+                                setAppBar: true));
                           })),
                 ]),
                 TableRow(cells: [

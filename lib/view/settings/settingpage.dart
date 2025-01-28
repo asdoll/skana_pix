@@ -5,24 +5,24 @@ import 'package:get/get.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:skana_pix/controller/account_controller.dart';
 import 'package:skana_pix/controller/update_controller.dart';
-import 'package:skana_pix/view/blocklistpage.dart';
+import 'package:skana_pix/view/settings/blocklistpage.dart';
 import 'package:skana_pix/view/userview/followlist.dart';
 import 'package:skana_pix/view/bookmarkspage.dart';
-import 'package:skana_pix/view/newversion.dart';
+import 'package:skana_pix/view/settings/newversion.dart';
 import 'package:skana_pix/componentwidgets/prefsettings.dart';
 import 'package:skana_pix/model/worktypes.dart';
 import 'package:skana_pix/pixiv_dart_api.dart';
 import 'package:skana_pix/view/homepage.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 
-import 'about.dart';
-import '../componentwidgets/avatar.dart';
+import '../about.dart';
+import '../../componentwidgets/avatar.dart';
 import 'boardpage.dart';
-import 'mytagspage.dart';
-import '../componentwidgets/dataexport.dart';
-import '../componentwidgets/historypage.dart';
-import '../componentwidgets/themepage.dart';
-import 'loginpage.dart';
+import '../mytagspage.dart';
+import 'dataexport.dart';
+import '../../componentwidgets/historypage.dart';
+import '../../componentwidgets/themepage.dart';
+import '../loginpage.dart';
 
 class SettingPage extends StatefulWidget {
   const SettingPage({super.key});
@@ -164,11 +164,6 @@ class _SettingPageState extends State<SettingPage> {
                 Divider(),
                 Column(
                   children: <Widget>[
-                    // ListTile(
-                    //   leading: Icon(Icons.save_alt),
-                    //   title: Text("Download Manager".i18n),
-                    //   onTap: () => Leader.push(context, DownloadsPage()),
-                    // ),
                     ListTile(
                       leading: Icon(Icons.history),
                       title: Text("History".tr),

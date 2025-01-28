@@ -102,7 +102,7 @@ class _DataExportState extends State<DataExport> {
         InkWell(
           onTap: () {
             historyManager.clearIllusts();
-            Leader.showTextToast("Cleared".tr);
+            Leader.showToast("Cleared".tr);
           },
           child: Basic(
             title: Text("Clear Illust History".tr),
@@ -111,7 +111,7 @@ class _DataExportState extends State<DataExport> {
         InkWell(
           onTap: () {
             historyManager.clearNovels();
-            Leader.showTextToast("Cleared".tr);
+            Leader.showToast("Cleared".tr);
           },
           child: Basic(
             title: Text("Clear Novel History".tr),

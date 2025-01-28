@@ -16,7 +16,8 @@ enum ListType {
   recom,
   search,
   userbookmarks,
-  mybookmarks
+  mybookmarks,
+  works
 }
 
 class ListIllustController extends GetxController {
@@ -104,11 +105,17 @@ class ListIllustController extends GetxController {
               .search(tag, searchOptions.value ?? SearchOptions());
         }
       case ListType.userbookmarks:
-        return ConnectManager().apiClient.getUserBookmarks(
-            id.toString(), nexturl.isEmpty ? null : nexturl.value);
+        return ConnectManager()
+            .apiClient
+            .getUserBookmarks(id, nexturl.isEmpty ? null : nexturl.value);
       case ListType.mybookmarks:
         return ConnectManager().apiClient.getBookmarkedIllusts(
             restrict.value, nexturl.isEmpty ? null : nexturl.value);
+      case ListType.works:
+        return ConnectManager().apiClient.getUserIllusts(
+            id,
+            type == ArtworkType.ILLUST ? "illust" : "manga",
+            nexturl.isEmpty ? null : nexturl.value);
     }
   }
 
@@ -162,7 +169,7 @@ class ListIllustController extends GetxController {
           message = "${message.substring(0, 20)}...";
         }
         error = message.obs;
-        Leader.showTextToast(message);
+        Leader.showToast(message);
         refreshController?.finishRefresh(IndicatorResult.fail);
       }
     });
@@ -188,7 +195,7 @@ class ListIllustController extends GetxController {
           message = "${message.substring(0, 20)}...";
         }
         error = message.obs;
-        Leader.showTextToast(message);
+        Leader.showToast(message);
         refreshController?.finishLoad(IndicatorResult.fail);
       }
     });
@@ -260,6 +267,10 @@ class ListNovelController extends GetxController {
               .apiClient
               .searchNovels(tag, searchOptions ?? SearchOptions());
         }
+      case ListType.works:
+        return ConnectManager()
+            .apiClient
+            .getUserNovels(id, nexturl.isEmpty ? null : nexturl.value);
     }
   }
 
@@ -297,7 +308,7 @@ class ListNovelController extends GetxController {
           message = "${message.substring(0, 20)}...";
         }
         error = message.obs;
-        Leader.showTextToast(message);
+        Leader.showToast(message);
         refreshController?.finishRefresh(IndicatorResult.fail);
       }
     });
@@ -320,18 +331,14 @@ class ListNovelController extends GetxController {
           return;
         }
         error = message.obs;
-        Leader.showTextToast(message);
+        Leader.showToast(message);
         refreshController?.finishLoad(IndicatorResult.fail);
       }
     });
   }
 }
 
-enum UserListType {
-  recom,
-  following,
-  myfollowing,
-}
+enum UserListType { recom, usermypixiv, following, myfollowing, mymypixiv }
 
 class ListUserController extends GetxController {
   RxList<UserPreview> users = RxList.empty();
@@ -369,6 +376,12 @@ class ListUserController extends GetxController {
             .apiClient
             .getFollowing(id.toString(), restrict.value, nexturl.value);
         break;
+      case UserListType.mymypixiv:
+      case UserListType.usermypixiv:
+        res = await ConnectManager()
+            .apiClient
+            .getMypixiv(id.toString(), nexturl.value);
+        break;
     }
     return res;
   }
@@ -391,7 +404,7 @@ class ListUserController extends GetxController {
           return;
         }
         error.value = message;
-        Leader.showTextToast(message);
+        Leader.showToast(message);
         refreshController?.finishLoad(IndicatorResult.fail);
       }
     });
@@ -431,7 +444,7 @@ class ListUserController extends GetxController {
           message = "${message.substring(0, 20)}...";
         }
         error.value = message;
-        Leader.showTextToast(message);
+        Leader.showToast(message);
         refreshController?.finishLoad(IndicatorResult.fail);
       }
     });
@@ -484,7 +497,7 @@ class HotTagsController extends GetxController {
         tags.refresh();
         refreshController.finishRefresh();
       } else {
-        Leader.showTextToast("Network error".tr);
+        Leader.showToast("Network error".tr);
         refreshController.finishRefresh(IndicatorResult.fail);
       }
     });

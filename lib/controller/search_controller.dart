@@ -1,5 +1,4 @@
 import 'package:get/get.dart';
-import 'package:skana_pix/controller/api_client.dart';
 import 'package:skana_pix/controller/connector.dart';
 import 'package:skana_pix/controller/exceptions.dart';
 import 'package:skana_pix/controller/logging.dart';

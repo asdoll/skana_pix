@@ -224,7 +224,7 @@ class _ImageViewPageState extends State<ImageViewPage> {
                                 sharePositionOrigin:
                                     box!.localToGlobal(Offset.zero) & box.size);
                           } else {
-                            Leader.showTextToast("can not find image cache");
+                            Leader.showToast("can not find image cache");
                           }
                         });
                   }),

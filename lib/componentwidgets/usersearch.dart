@@ -1,4 +1,3 @@
-import 'package:bot_toast/bot_toast.dart';
 import 'package:easy_refresh/easy_refresh.dart';
 import 'package:flutter/material.dart';
 import 'package:skana_pix/pixiv_dart_api.dart';
@@ -20,7 +19,7 @@ class UserResultPage extends StatefulWidget {
 }
 
 class _UserResultPageState extends State<UserResultPage> {
- late ScrollController _scrollController;
+  late ScrollController _scrollController;
   late ObservableList<UserPreview> users;
   late EasyRefreshController easyRefreshController;
 
@@ -159,7 +158,8 @@ class _UserResultPageState extends State<UserResultPage> {
       easyRefreshController.finishLoad(IndicatorResult.noMore);
       return Res.error("No more data");
     }
-    Res<List<UserPreview>> res = await ConnectManager().apiClient.searchUsers(widget.word, nextUrl);
+    Res<List<UserPreview>> res =
+        await ConnectManager().apiClient.searchUsers(widget.word, nextUrl);
     if (!res.error) {
       nextUrl = res.subData;
       nextUrl ??= "end";

@@ -120,7 +120,7 @@ String getExtensionName(String url) {
 void saveUrl(String url, {String? filenm}) async {
   if (DynamicData.isIOS && (await Permission.photosAddOnly.status.isDenied)) {
     if (await Permission.storage.request().isDenied) {
-      Leader.showTextToast("Permission denied".tr);
+      Leader.showToast("Permission denied".tr);
       return;
     }
   }
@@ -135,15 +135,14 @@ void saveUrl(String url, {String? filenm}) async {
     }
     await ImageGallerySaverPlus.saveImage(await file.readAsBytes(),
         quality: 100, name: fileName);
-    Leader.showTextToast("Saved".tr);
+    Leader.showToast("Saved".tr);
   }
 }
 
-void saveImage(Illust illust,
-    {List<bool>? indexes, String? quality}) async {
+void saveImage(Illust illust, {List<bool>? indexes, String? quality}) async {
   if (DynamicData.isIOS && (await Permission.photosAddOnly.status.isDenied)) {
     if (await Permission.storage.request().isDenied) {
-      Leader.showTextToast("Permission denied".tr);
+      Leader.showToast("Permission denied".tr);
       return;
     }
   }
@@ -180,7 +179,7 @@ void saveImage(Illust illust,
       }
       await ImageGallerySaverPlus.saveImage(await file.readAsBytes(),
           quality: 100, name: fileName);
-      Leader.showTextToast("${illust.title} ${"Saved".tr}");
+      Leader.showToast("${illust.title} ${"Saved".tr}");
     }
   }
 }
@@ -202,19 +201,20 @@ Future<void> importSettings() async {
   final decoder = JsonDecoder();
   final map = decoder.convert(json);
   settings.setFromMap(map);
-  Leader.showTextToast("Imported".tr);
+  Leader.showToast("Imported".tr);
 }
 
 Future<void> exportSettings() async {
   final json = settings.toJson();
-  final result = await SAFPlugin.createFile("settings.json", "application/json");
-  Leader.showTextToast(result??"empty");
+  final result =
+      await SAFPlugin.createFile("settings.json", "application/json");
+  Leader.showToast(result ?? "empty");
   if (result == null) return;
   await SAFPlugin.writeUri(result, utf8.encode(json));
-  Leader.showTextToast("Exported".tr);
+  Leader.showToast("Exported".tr);
 }
 
 Future<void> resetSettings() async {
   settings.clearSettings();
-  Leader.showTextToast("Reseted".tr);
+  Leader.showToast("Reseted".tr);
 }
