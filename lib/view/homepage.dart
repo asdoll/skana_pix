@@ -58,8 +58,7 @@ class _HomePageState extends State<HomePage> {
                             },
                             children: [
                               NavigationLabel(child: Text('Recommend'.tr)),
-                              buildButton(
-                                  'Illust'.tr, BootstrapIcons.image),
+                              buildButton('Illust'.tr, BootstrapIcons.image),
                               buildButton('Manga'.tr, BootstrapIcons.images),
                               buildButton('Novel'.tr, BootstrapIcons.book),
                               const NavigationGap(10),
@@ -73,12 +72,13 @@ class _HomePageState extends State<HomePage> {
                               buildButton('Ranking'.tr, BootstrapIcons.list),
                               buildButton('Pixivision'.tr, BootstrapIcons.info),
                               buildButton('Search'.tr, BootstrapIcons.search),
-                              buildButton('Bookmarks'.tr, BootstrapIcons.bookmark),
+                              buildButton(
+                                  'Bookmarks'.tr, BootstrapIcons.bookmark),
                               buildButton('My Tags'.tr, BootstrapIcons.tags),
-                              buildButton('Following'.tr, BootstrapIcons.person),
+                              buildButton(
+                                  'Following'.tr, BootstrapIcons.person),
                               buildButton('History'.tr, BootstrapIcons.clock),
                               buildButton('Settings'.tr, BootstrapIcons.gear),
-
                             ],
                           ),
                         );
@@ -109,9 +109,7 @@ class _HomePageState extends State<HomePage> {
           9 => MyTagsPage(),
           10 => FollowList(
               id: accountController.userid.value,
-              setAppBar: true,
               isMe: true,
-              isMyPixiv: true,
             ),
           // 11 => HistoryPage(),
           _ => SettingPage(),

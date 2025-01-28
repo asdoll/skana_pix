@@ -6,7 +6,7 @@ import 'package:skana_pix/controller/like_controller.dart';
 
 import 'defaults.dart';
 import '../componentwidgets/novelresult.dart';
-import '../componentwidgets/searchresult.dart';
+import 'imageview/imagesearchresult.dart';
 
 class MyTagsPage extends StatefulWidget {
   const MyTagsPage({super.key});
@@ -60,7 +60,7 @@ class _MyTagsPageState extends State<MyTagsPage> {
                                       f: f,
                                       type: "bookmarkedTags",
                                       onTap: () => Get.to(
-                                          () => ResultPage(word: f),
+                                          () => IllustResultPage(word: f),
                                           preventDuplicates: false)),
                                 Chip(
                                     child: AnimatedSwitcher(
@@ -93,7 +93,7 @@ class _MyTagsPageState extends State<MyTagsPage> {
                                       f: f,
                                       type: "bookmarkedTags",
                                       onTap: () => Get.to(
-                                          () => ResultPage(word: f),
+                                          () => IllustResultPage(word: f),
                                           preventDuplicates: false)),
                               ],
                             ),

@@ -6,7 +6,6 @@ import 'package:skana_pix/view/userview/userlist.dart';
 class FollowList extends StatefulWidget {
   final String id;
   final bool isNovel;
-  final bool isMyPixiv;
   final bool setAppBar;
   final bool isMe;
 
@@ -14,7 +13,6 @@ class FollowList extends StatefulWidget {
       {super.key,
       required this.id,
       this.isNovel = false,
-      this.isMyPixiv = false,
       this.setAppBar = false,
       this.isMe = false});
 
@@ -23,28 +21,26 @@ class FollowList extends StatefulWidget {
 }
 
 class _FollowListState extends State<FollowList> {
-
   @override
   Widget build(BuildContext context) {
     // ignore: unused_local_variable
-    ListUserController controller = Get.put(ListUserController(userListType: widget.isMyPixiv ? UserListType.mypixiv : widget.isMe ? UserListType.myfollowing : UserListType.following, id: widget.id),tag: "${widget.isMyPixiv ? "mypixiv" : widget.isMe ? "myfollowing" : widget.id}userlist");
-    
+    ListUserController controller = Get.put(
+        ListUserController(
+            userListType:
+                widget.isMe ? UserListType.myfollowing : UserListType.following,
+            id: widget.id),
+        tag: "${widget.isMe ? "myfollowing" : widget.id}userlist");
+
     return Scaffold(
       headers: [
-        if(widget.setAppBar)
+        if (widget.setAppBar)
           AppBar(
-              title: Text(widget.isMyPixiv
-                  ? "My Pixiv".tr
-                  : widget.isMe
-                      ? "My Follow".tr
-                      : "Following".tr),
-            ),
-        if(widget.setAppBar)
-        const Divider()
-          ],
-      
-      child: UserList(controllerTag: "${widget.isMyPixiv ? "mypixiv" : widget.isMe ? "myfollowing" : widget.id}userlist"),
+            title: Text(widget.isMe ? "My Follow".tr : "Following".tr),
+          ),
+        if (widget.setAppBar) const Divider()
+      ],
+      child: UserList(
+          controllerTag: "${widget.isMe ? "myfollowing" : widget.id}userlist"),
     );
   }
 }
-

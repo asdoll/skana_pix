@@ -22,7 +22,6 @@ import 'mytagspage.dart';
 import '../componentwidgets/dataexport.dart';
 import '../componentwidgets/historypage.dart';
 import '../componentwidgets/themepage.dart';
-import '../utils/leaders.dart';
 import 'loginpage.dart';
 
 class SettingPage extends StatefulWidget {
@@ -55,7 +54,7 @@ class _SettingPageState extends State<SettingPage> {
                         Icons.palette,
                       ),
                       onPressed: () {
-                        Leader.push(context, ThemePage(), root: true);
+                        Get.to(() => ThemePage());
                       },
                     ),
                   ],
@@ -145,27 +144,15 @@ class _SettingPageState extends State<SettingPage> {
                           ListTile(
                             leading: Icon(Icons.bookmark),
                             title: Text("Favorite Tags".tr),
-                            onTap: () => Leader.pushWithScaffold(
-                                context, MyTagsPage(),
-                                root: true),
+                            onTap: () => Get.to(() => MyTagsPage()),
                           ),
                           ListTile(
                             leading: Icon(Icons.star_rate_rounded),
                             title: Text("Following".tr),
                             onTap: () => Get.to(() => FollowList(
-                                    id: accountController.userid.value,
-                                  setAppBar: true,
-                                  isMe: true,
-                                )),
-                          ),
-                          ListTile(
-                            leading: Icon(Icons.people_rounded),
-                            title: Text("My Pixiv".tr),
-                            onTap: () => Get.to(() => FollowList(
                                   id: accountController.userid.value,
                                   setAppBar: true,
                                   isMe: true,
-                                  isMyPixiv: true,
                                 )),
                           ),
                         ],
@@ -185,14 +172,12 @@ class _SettingPageState extends State<SettingPage> {
                     ListTile(
                       leading: Icon(Icons.history),
                       title: Text("History".tr),
-                      onTap: () =>
-                          Leader.push(context, HistoryPage(), root: true),
+                      onTap: () => Get.to(() => HistoryPage()),
                     ),
                     ListTile(
                       leading: Icon(Icons.block),
                       title: Text("Block List".tr),
-                      onTap: () =>
-                          Leader.push(context, BlockListPage(), root: true),
+                      onTap: () => Get.to(() => BlockListPage()),
                     ),
                     Obx(() {
                       if (!accountController.isLoggedIn.value) {
@@ -210,12 +195,10 @@ class _SettingPageState extends State<SettingPage> {
                     ListTile(
                       leading: Icon(Icons.settings),
                       title: Text("Preference Settings".tr),
-                      onTap: () => Leader.push(context, PreferenceSettings(),
-                          root: true),
+                      onTap: () => Get.to(() => PreferenceSettings()),
                     ),
                     ListTile(
-                      onTap: () =>
-                          Leader.push(context, DataExport(), root: true),
+                      onTap: () => Get.to(() => DataExport()),
                       title: Text("App Data".tr),
                       leading: Icon(Icons.folder_open_rounded),
                     ),
@@ -227,8 +210,7 @@ class _SettingPageState extends State<SettingPage> {
                     ListTile(
                       leading: Icon(Icons.message),
                       title: Text("About".tr),
-                      onTap: () =>
-                          Leader.push(context, AboutPage(), root: true),
+                      onTap: () => Get.to(() => AboutPage()),
                     ),
                     Obx(() => boardController.needBoardSection.value
                         ? ListTile(
@@ -240,8 +222,7 @@ class _SettingPageState extends State<SettingPage> {
                     ListTile(
                       leading: Icon(Icons.update),
                       title: Text("Check updates".tr),
-                      onTap: () =>
-                          Leader.push(context, NewVersionPage(), root: true),
+                      onTap: () => Get.to(() => NewVersionPage()),
                       trailing: Visibility(
                         visible: updateController.hasNewVersion.value,
                         child: NewVersionChip(),
@@ -337,7 +318,7 @@ class _SettingPageState extends State<SettingPage> {
     switch (result) {
       case "OK":
         {
-          ConnectManager().logout();
+          accountController.logout();
           Get.offAll(() => HomePage());
         }
         break;

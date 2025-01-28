@@ -23,7 +23,7 @@ class _UserListState extends State<UserList> {
     EasyRefreshController easyRefreshController = EasyRefreshController(
         controlFinishLoad: true, controlFinishRefresh: true);
     controller.refreshController = easyRefreshController;
-    MTab tab = Get.put(MTab(),tag: widget.controllerTag);
+    MTab tab = Get.put(MTab(), tag: widget.controllerTag);
     return EasyRefresh(
       controller: easyRefreshController,
       header: DefaultHeaderFooter.header(context),
@@ -39,12 +39,17 @@ class _UserListState extends State<UserList> {
                 tabs: [
                   Text("public".tr),
                   Text("private".tr),
+                  Text("My Pixiv".tr)
                 ],
                 index: tab.index.value,
                 onChanged: (index) {
                   tab.index.value = index;
-                  controller.restrict.value = index == 0 ? "public" : "private";
-                  controller.reset();
+                  controller.restrict.value = index == 0
+                      ? "public"
+                      : index == 1
+                          ? "private"
+                          : "mypixiv";
+                  controller.refreshController?.callRefresh();
                 },
               ),
             ),

@@ -11,7 +11,7 @@ import 'package:skana_pix/utils/leaders.dart';
 import 'avatar.dart';
 import 'commentpage.dart';
 import 'followbutton.dart';
-import 'searchresult.dart';
+import '../view/imageview/imagesearchresult.dart';
 import 'selecthtml.dart';
 import 'userpage.dart';
 
@@ -385,7 +385,7 @@ class _IllustDetailContentState extends State<IllustDetailContent> {
       },
       onTap: () {
         Get.to(
-            () => ResultPage(
+            () => IllustResultPage(
                   word: f.name,
                   translatedName: f.translatedName ?? "",
                 ),

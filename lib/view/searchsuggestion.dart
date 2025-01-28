@@ -10,7 +10,7 @@ import 'package:get/get.dart';
 
 import '../utils/leaders.dart';
 import '../componentwidgets/novelresult.dart';
-import '../componentwidgets/searchresult.dart';
+import 'imageview/imagesearchresult.dart';
 import 'souppage.dart';
 
 class SearchSuggestionPage extends StatefulWidget {
@@ -175,7 +175,7 @@ class _SearchSuggestionPageState extends State<SearchSuggestionPage> {
                                         tags[index].translatedName ?? "",
                                   );
                                 }
-                                return ResultPage(
+                                return IllustResultPage(
                                   word: tags[index].name,
                                   translatedName:
                                       tags[index].translatedName ?? "",
@@ -292,7 +292,7 @@ class _SearchSuggestionPageState extends State<SearchSuggestionPage> {
                 word: word,
               );
             }
-            return ResultPage(
+            return IllustResultPage(
               word: word,
             );
           }));

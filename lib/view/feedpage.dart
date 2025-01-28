@@ -32,7 +32,7 @@ class _FeedIllustState extends State<FeedIllust> {
                   setState(() {
                     tab = 0;
                   });
-                  feedIllustController.reset();
+                  feedIllustController.refreshController?.callRefresh();
                 }),
             TabButton(
                 child: Text("Public".tr),
@@ -41,7 +41,7 @@ class _FeedIllustState extends State<FeedIllust> {
                   setState(() {
                     tab = 1;
                   });
-                  feedIllustController.reset();
+                  feedIllustController.refreshController?.callRefresh();
                 }),
             TabButton(
                 child: Text("Private".tr),
@@ -50,7 +50,7 @@ class _FeedIllustState extends State<FeedIllust> {
                   setState(() {
                     tab = 2;
                   });
-                  feedIllustController.reset();
+                  feedIllustController.refreshController?.callRefresh();
                 })
           ],
         ),
@@ -90,7 +90,7 @@ class _FeedNovelState extends State<FeedNovel> {
                   setState(() {
                     tab = 0;
                   });
-                  feedNovelController.reset();
+                  feedNovelController.refreshController?.callRefresh();
                 }),
             TabButton(
                 child: Text("Public".tr),
@@ -99,7 +99,7 @@ class _FeedNovelState extends State<FeedNovel> {
                   setState(() {
                     tab = 1;
                   });
-                  feedNovelController.reset();
+                  feedNovelController.refreshController?.callRefresh();
                 }),
             TabButton(
                 child: Text("Private".tr),
@@ -108,7 +108,7 @@ class _FeedNovelState extends State<FeedNovel> {
                   setState(() {
                     tab = 2;
                   });
-                  feedNovelController.reset();
+                  feedNovelController.refreshController?.callRefresh();
                 }),
           ],
         ),

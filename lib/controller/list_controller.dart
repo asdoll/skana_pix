@@ -1,8 +1,10 @@
 import 'package:easy_refresh/easy_refresh.dart';
 import 'package:get/get.dart';
+import 'package:shadcn_flutter/shadcn_flutter.dart';
 import 'package:skana_pix/controller/like_controller.dart';
 import 'package:skana_pix/model/worktypes.dart';
 import 'package:skana_pix/pixiv_dart_api.dart';
+import 'package:skana_pix/utils/filters.dart';
 import 'package:skana_pix/utils/leaders.dart';
 import 'package:skana_pix/view/defaults.dart';
 
@@ -32,7 +34,8 @@ class ListIllustController extends GetxController {
   String dateTime;
   RxString restrict = "public".obs;
   ListType controllerType;
-  SearchOptions? searchOptions;
+  Rx<SearchOptions?> searchOptions = Rxn<SearchOptions>();
+  DateTimeRange? dateTimeRange;
   static RxList<int> historyIds = RxList.empty();
 
   bool get showMangaBadage => type != ArtworkType.MANGA;
@@ -98,16 +101,14 @@ class ListIllustController extends GetxController {
         } else {
           return ConnectManager()
               .apiClient
-              .search(tag, searchOptions ?? SearchOptions());
+              .search(tag, searchOptions.value ?? SearchOptions());
         }
       case ListType.userbookmarks:
-        return ConnectManager()
-            .apiClient
-            .getUserBookmarks(id.toString(), nexturl.isEmpty ? null : nexturl.value);
+        return ConnectManager().apiClient.getUserBookmarks(
+            id.toString(), nexturl.isEmpty ? null : nexturl.value);
       case ListType.mybookmarks:
-        return ConnectManager()
-            .apiClient
-            .getBookmarkedIllusts(restrict.value, nexturl.isEmpty ? null : nexturl.value);
+        return ConnectManager().apiClient.getBookmarkedIllusts(
+            restrict.value, nexturl.isEmpty ? null : nexturl.value);
     }
   }
 
@@ -122,8 +123,23 @@ class ListIllustController extends GetxController {
     error.value = "";
     page.value = 1;
     nexturl.value = "";
-    searchOptions = null;
+    searchOptions.value = null;
+    searchOptions.refresh();
     firstLoad();
+  }
+
+  List<Illust> filterIllusts(List<Illust> datas) {
+    if (!["all", "illust", "manga"].contains(restrict.value)) {
+      restrict.value = "all";
+    }
+    if (restrict.value == "all") {
+      return checkIllusts(datas);
+    }
+    if (illusts.length < 10 && nexturl.value != "end") {
+      nextPage();
+    }
+    datas.retainWhere((element) => element.type == restrict.value);
+    return checkIllusts(datas);
   }
 
   void firstLoad() {
@@ -131,7 +147,7 @@ class ListIllustController extends GetxController {
       isLoading.value = false;
       isFirstLoading.value = false;
       if (value.success) {
-        illusts.addAll(value.data);
+        illusts.addAll(filterIllusts(value.data));
         illusts.refresh();
         nexturl.value = value.subData ?? "end";
         refreshController?.finishRefresh();
@@ -159,7 +175,7 @@ class ListIllustController extends GetxController {
         page.value++;
         nexturl.value = value.subData ?? "end";
         refreshController?.finishLoad();
-        illusts.addAll(value.data);
+        illusts.addAll(filterIllusts(value.data));
         illusts.refresh();
       } else {
         var message = value.errorMessage ??
@@ -223,23 +239,26 @@ class ListNovelController extends GetxController {
         return ConnectManager().apiClient.getNovelRanking(
             tag, dateTime, nexturl.isEmpty ? null : nexturl.value);
       case ListType.userbookmarks:
-        return ConnectManager()
-            .apiClient
-            .getUserBookmarksNovel(id.toString(), nexturl.isEmpty ? null : nexturl.value);
+        return ConnectManager().apiClient.getUserBookmarksNovel(
+            id.toString(), nexturl.isEmpty ? null : nexturl.value);
       case ListType.mybookmarks:
+        return ConnectManager().apiClient.getBookmarkedNovels(
+            restrict.value, nexturl.isEmpty ? null : nexturl.value);
+
+      case ListType.related:
         return ConnectManager()
             .apiClient
-            .getBookmarkedNovels(restrict.value, nexturl.isEmpty ? null : nexturl.value);
-      
-      case ListType.related:
-        return ConnectManager().apiClient.relatedNovels(id, nexturl.isEmpty ? null : nexturl.value);
+            .relatedNovels(id, nexturl.isEmpty ? null : nexturl.value);
       case ListType.feed:
-        return ConnectManager().apiClient.getNovelFollowing(restrict.value, nexturl.isEmpty ? null : nexturl.value);
+        return ConnectManager().apiClient.getNovelFollowing(
+            restrict.value, nexturl.isEmpty ? null : nexturl.value);
       case ListType.search:
         if (nexturl.isNotEmpty) {
           return ConnectManager().apiClient.getNovelsWithNextUrl(nexturl.value);
         } else {
-          return ConnectManager().apiClient.searchNovels(tag, searchOptions ?? SearchOptions());
+          return ConnectManager()
+              .apiClient
+              .searchNovels(tag, searchOptions ?? SearchOptions());
         }
     }
   }
@@ -263,7 +282,7 @@ class ListNovelController extends GetxController {
       isLoading.value = false;
       isFirstLoading.value = false;
       if (value.success) {
-        novels.addAll(value.data);
+        novels.addAll(checkNovels(value.data));
         novels.refresh();
         nexturl.value = value.subData ?? "end";
         refreshController?.finishRefresh();
@@ -291,7 +310,7 @@ class ListNovelController extends GetxController {
         page.value++;
         nexturl.value = value.subData ?? "end";
         refreshController?.finishLoad();
-        novels.addAll(value.data);
+        novels.addAll(checkNovels(value.data));
         novels.refresh();
       } else {
         var message = value.errorMessage ??
@@ -311,9 +330,9 @@ class ListNovelController extends GetxController {
 enum UserListType {
   recom,
   following,
-  mypixiv,
   myfollowing,
 }
+
 class ListUserController extends GetxController {
   RxList<UserPreview> users = RxList.empty();
   RxString nexturl = "".obs;
@@ -340,14 +359,15 @@ class ListUserController extends GetxController {
     Res<List<UserPreview>> res;
     switch (userListType) {
       case UserListType.recom:
-        res = await ConnectManager().apiClient.getRecommendationUsers(nexturl.value);
+        res = await ConnectManager()
+            .apiClient
+            .getRecommendationUsers(nexturl.value);
         break;
       case UserListType.myfollowing:
       case UserListType.following:
-        res = await ConnectManager().apiClient.getFollowing(id.toString(), restrict.value, nexturl.value);
-        break;
-      case UserListType.mypixiv:
-        res = await ConnectManager().apiClient.getMypixiv(id.toString(), nexturl.value);
+        res = await ConnectManager()
+            .apiClient
+            .getFollowing(id.toString(), restrict.value, nexturl.value);
         break;
     }
     return res;

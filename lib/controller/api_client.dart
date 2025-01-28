@@ -328,6 +328,7 @@ class ApiClient extends BaseClient {
 
   Future<Res<List<UserPreview>>> getFollowing(String uid, String type,
       [String? nextUrl]) async {
+    if (type == "mypixiv") return getMypixiv(uid, nextUrl);
     var path = nextUrl ??
         "/v1/user/following?filter=for_android&user_id=$uid&restrict=$type";
     var res = await apiGet(path);

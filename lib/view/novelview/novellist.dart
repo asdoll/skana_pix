@@ -44,7 +44,7 @@ class _NovelListState extends State<NovelList> {
                   Text("Error".tr),
                   Button.primary(
                     onPressed: () {
-                      controller.reset();
+                      refreshController.callRefresh();
                     },
                     child: Text("Retry".tr),
                   )

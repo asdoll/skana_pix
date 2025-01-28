@@ -8,7 +8,7 @@ import 'package:url_launcher/url_launcher_string.dart';
 
 import '../componentwidgets/novelpage.dart';
 import '../componentwidgets/novelseries.dart';
-import '../componentwidgets/searchresult.dart';
+import '../view/imageview/imagesearchresult.dart';
 import '../view/souppage.dart';
 import '../componentwidgets/userpage.dart';
 
@@ -43,7 +43,7 @@ class Leader {
     if (link.path.contains("novel") && link.path.contains("series")) {
       final id = int.tryParse(link.pathSegments.last);
       if (id != null) {
-        Leader.push(context, NovelSeriesPage(id), root: true);
+        Get.to(() => NovelSeriesPage(id), preventDuplicates: false);
         return true;
       }
     }
@@ -60,9 +60,7 @@ class Leader {
     // }
     if (link.host == "i.pximg.net") {
       final id = link.pathSegments.last.split(".").first.split("_").first;
-      Navigator.of(context).push(MaterialPageRoute(builder: (context) {
-        return IllustPageLite(id);
-      }));
+      Get.to(() => IllustPageLite(id), preventDuplicates: false);
       return true;
     }
     if (link.host == "pixiv.me") {
@@ -78,17 +76,19 @@ class Leader {
       } catch (e) {
         try {
           launchUrlString(link.toString());
-        } catch (e) {}
+        } catch (e) {
+          Leader.showTextToast(e.toString());
+        }
       }
       return true;
     }
     if (link.host.contains("pixivision.net")) {
-      Leader.push(
-          context,
-          SoupPage(
-              url: link.toString().replaceAll("pixez://", "https://"),
-              spotlight: null),
-          root: true);
+      Get.to(
+          () => SoupPage(
+                url: link.toString().replaceAll("pixez://", "https://"),
+                spotlight: null,
+              ),
+          preventDuplicates: false);
       return true;
     }
     if (link.scheme == "pixiv") {
@@ -142,36 +142,32 @@ class Leader {
     if (link.host.contains('illusts')) {
       var idSource = link.pathSegments.last;
       try {
-        int id = int.parse(idSource);
-        Navigator.of(context, rootNavigator: true)
-            .push(MaterialPageRoute(builder: (context) {
-          return IllustPageLite(id.toString());
-        }));
-      } catch (e) {}
+        Get.to(() => IllustPageLite(idSource), preventDuplicates: false);
+      } catch (e) {
+        Leader.showTextToast(e.toString());
+      }
       return true;
     } else if (link.host.contains('user')) {
       var idSource = link.pathSegments.last;
       try {
         int id = int.parse(idSource);
-        Navigator.of(context, rootNavigator: true)
-            .push(MaterialPageRoute(builder: (context) {
-          return UserPage(
-            id: id,
-            type: ArtworkType.ALL,
-          );
-        }));
-      } catch (e) {}
+        Get.to(
+            () => UserPage(
+                  id: id,
+                  type: ArtworkType.ALL,
+                ),
+            preventDuplicates: false);
+      } catch (e) {
+        Leader.showTextToast(e.toString());
+      }
       return true;
     } else if (link.host.contains("novel")) {
       try {
-        int id = int.parse(link.pathSegments.last);
-        Navigator.of(context, rootNavigator: true)
-            .push(MaterialPageRoute(builder: (context) {
-          return NovelPageLite(id.toString());
-        }));
+        Get.to(() => NovelPageLite(link.pathSegments.last),
+            preventDuplicates: false);
         return true;
       } catch (e) {
-        log.e(e.toString());
+        Leader.showTextToast(e.toString());
       }
     } else if (link.host.contains('pixiv')) {
       if (link.path.contains("artworks")) {
@@ -179,14 +175,11 @@ class Leader {
         int index = paths.indexOf("artworks");
         if (index != -1) {
           try {
-            int id = int.parse(paths[index + 1]);
-            Navigator.of(context, rootNavigator: true)
-                .push(MaterialPageRoute(builder: (context) {
-              return IllustPageLite(id.toString());
-            }));
+            Get.to(() => IllustPageLite(paths[index + 1]),
+                preventDuplicates: false);
             return true;
           } catch (e) {
-            log.e(e.toString());
+            Leader.showTextToast(e.toString());
           }
         }
       }
@@ -195,115 +188,80 @@ class Leader {
         int index = paths.indexOf("users");
         if (index != -1) {
           try {
-            int id = int.parse(paths[index + 1]);
-            Navigator.of(context, rootNavigator: true).push(MaterialPageRoute(
-                builder: (context) => UserPage(
-                      id: id,
+            Get.to(
+                () => UserPage(
+                      id: int.parse(paths[index + 1]),
                       type: ArtworkType.ALL,
-                    )));
+                    ),
+                preventDuplicates: false);
             return true;
           } catch (e) {
-            log.e(e);
+            Leader.showTextToast(e.toString());
           }
         }
       }
       if (link.queryParameters['illust_id'] != null) {
         try {
           var id = link.queryParameters['illust_id'];
-          Leader.push(context, IllustPageLite(id.toString()), root: true);
+          Get.to(() => IllustPageLite(id.toString()), preventDuplicates: false);
           return true;
-        } catch (e) {}
+        } catch (e) {
+          Leader.showTextToast(e.toString());
+        }
       }
       if (link.queryParameters['id'] != null) {
         try {
           var id = link.queryParameters['id'];
           if (!link.path.contains("novel")) {
-            Navigator.of(context, rootNavigator: true)
-                .push(MaterialPageRoute(builder: (context) {
-              return UserPage(
-                id: int.parse(id!),
-                type: ArtworkType.ALL,
-              );
-            }));
+            Get.to(
+                () => UserPage(
+                      id: int.parse(id!),
+                      type: ArtworkType.ALL,
+                    ),
+                preventDuplicates: false);
           } else {
-            Navigator.of(context, rootNavigator: true)
-                .push(MaterialPageRoute(builder: (context) {
-              return NovelPageLite(id!);
-            }));
+            Get.to(() => NovelPageLite(id!), preventDuplicates: false);
           }
           return true;
-        } catch (e) {}
+        } catch (e) {
+          Leader.showTextToast(e.toString());
+        }
       }
       if (link.pathSegments.length >= 2) {
         String i = link.pathSegments[link.pathSegments.length - 2];
         if (i == "i") {
           try {
             int id = int.parse(link.pathSegments[link.pathSegments.length - 1]);
-            Leader.push(context, IllustPageLite(id.toString()), root: true);
+            Get.to(() => IllustPageLite(id.toString()),
+                preventDuplicates: false);
             return true;
           } catch (e) {}
         } else if (i == "u") {
           try {
             int id = int.parse(link.pathSegments[link.pathSegments.length - 1]);
-            Navigator.of(context, rootNavigator: true)
-                .push(MaterialPageRoute(builder: (context) {
-              return UserPage(
-                id: id,
-                type: ArtworkType.ALL,
-              );
-            }));
+            Get.to(
+                () => UserPage(
+                      id: id,
+                      type: ArtworkType.ALL,
+                    ),
+                preventDuplicates: false);
             return true;
           } catch (e) {}
         } else if (i == "tags") {
           try {
             String tag = link.pathSegments[link.pathSegments.length - 1];
-            Navigator.of(context, rootNavigator: true)
-                .push(MaterialPageRoute(builder: (context) {
-              return ResultPage(
-                word: tag,
-              );
-            }));
+            Get.to(
+                () => IllustResultPage(
+                      word: tag,
+                    ),
+                preventDuplicates: false);
             return true;
-          } catch (e) {}
+          } catch (e) {
+            Leader.showTextToast(e.toString());
+          }
         }
       }
     }
     return false;
-  }
-
-  static Future<dynamic> pushWithScaffold(context, Widget widget,
-      {Widget? icon, Widget? title, bool root = false}) {
-    if (root) {
-      return Navigator.of(context, rootNavigator: true).push(MaterialPageRoute(
-        builder: (context) => Scaffold(
-          child: widget,
-        ),
-      ));
-    }
-    return Navigator.of(context).push(MaterialPageRoute(
-        builder: (context) => Scaffold(
-              child: widget,
-            )));
-  }
-
-  static Future<dynamic> push(
-    context,
-    Widget widget, {
-    Widget? icon,
-    Widget? title,
-    bool forceSkipWrap = false,
-    bool root = false,
-  }) {
-    if (root) {
-      return Navigator.of(context, rootNavigator: true).push(MaterialPageRoute(
-        builder: (context) => Scaffold(
-          child: widget,
-        ),
-      ));
-    }
-    return Navigator.of(context).push(MaterialPageRoute(
-        builder: (context) => Scaffold(
-              child: widget,
-            )));
   }
 }

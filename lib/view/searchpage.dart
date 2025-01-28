@@ -15,7 +15,7 @@ import 'package:get/get.dart';
 import '../componentwidgets/novelresult.dart';
 import '../componentwidgets/pixivimage.dart';
 import '../componentwidgets/searchbar.dart';
-import '../componentwidgets/searchresult.dart';
+import 'imageview/imagesearchresult.dart';
 import '../componentwidgets/usercard.dart';
 import '../model/worktypes.dart';
 import 'defaults.dart';
@@ -177,10 +177,9 @@ class _SearchRecommmendUserPageState extends State<SearchRecommmendUserPage> {
                                         return ScaleTransition(
                                             scale: anim, child: child);
                                       },
-                                      child: Icon(
-                                          !controller.tagExpand.value
-                                              ? Icons.expand_more
-                                              : Icons.expand_less),
+                                      child: Icon(!controller.tagExpand.value
+                                          ? Icons.expand_more
+                                          : Icons.expand_less),
                                     ),
                                     onPressed: () {
                                       controller.tagExpand.value =
@@ -362,7 +361,7 @@ class _SearchRecommendPageState extends State<SearchRecommendPage> {
                                       f: f,
                                       type: "historyIllustTag",
                                       onTap: () => Get.to(
-                                          () => ResultPage(
+                                          () => IllustResultPage(
                                                 word: f,
                                               ),
                                           preventDuplicates: false)),
@@ -410,7 +409,7 @@ class _SearchRecommendPageState extends State<SearchRecommendPage> {
                                       f: f,
                                       type: "historyIllustTag",
                                       onTap: () => Get.to(
-                                          () => ResultPage(
+                                          () => IllustResultPage(
                                                 word: f,
                                               ),
                                           preventDuplicates: false)),
@@ -504,7 +503,7 @@ class _SearchRecommendPageState extends State<SearchRecommendPage> {
                               word: hotTagsController.tags[index].tag.name,
                             );
                           }
-                          return ResultPage(
+                          return IllustResultPage(
                             word: hotTagsController.tags[index].tag.name,
                           );
                         }));

@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:skana_pix/controller/account_controller.dart';
 import 'package:skana_pix/pixiv_dart_api.dart';
 
 import 'package:path_provider/path_provider.dart';
@@ -51,6 +52,7 @@ class ConnectManager {
     apiClient.account = Account.empty();
     apiClient = ApiClient.empty();
     removeUserData();
+    accountController.init();
   }
 
   static void updateFollow(String uid, bool isFollowed,

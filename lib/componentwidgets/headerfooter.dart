@@ -1,6 +1,7 @@
 import 'package:easy_refresh/easy_refresh.dart';
 import 'package:shadcn_flutter/shadcn_flutter.dart';
 import 'package:get/get.dart';
+
 class DefaultHeaderFooter {
   static Header header(BuildContext context,
       {IndicatorPosition position = IndicatorPosition.above,
@@ -8,15 +9,15 @@ class DefaultHeaderFooter {
     return ClassicHeader(
       position: position,
       safeArea: safeArea,
-      dragText: 'Pull to refresh',
-      armedText: 'Release ready',
-      readyText: 'Refreshing...',
-      processingText: 'Refreshing...',
-      processedText: 'Succeeded',
-      noMoreText: 'No more',
-      failedText: 'Failed',
+      dragText: 'Pull to refresh'.tr,
+      armedText: 'Release ready'.tr,
+      readyText: 'Refreshing...'.tr,
+      processingText: 'Refreshing...'.tr,
+      processedText: 'Succeeded'.tr,
+      noMoreText: 'No more'.tr,
+      failedText: 'Failed'.tr,
       showText: true,
-      messageText: 'Last updated at %T',
+      messageText: '${'Last updated at'.tr} %T',
     );
   }
 

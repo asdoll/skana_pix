@@ -32,9 +32,8 @@ class _ImageWaterfallState extends State<ImageWaterfall> {
       onLoad: controller.noNextPage ? null : controller.nextPage,
       header: DefaultHeaderFooter.header(context),
       callLoadOverOffset: controller.callLoadOverOffset,
-      footer: controller.noNextPage
-          ? null
-          : DefaultHeaderFooter.footer(context),
+      footer:
+          controller.noNextPage ? null : DefaultHeaderFooter.footer(context),
       child: Obx(
         () {
           if (controller.error.isNotEmpty && controller.illusts.isEmpty) {
@@ -44,7 +43,7 @@ class _ImageWaterfallState extends State<ImageWaterfall> {
                   Text("Error".tr),
                   Button.primary(
                     onPressed: () {
-                      controller.reset();
+                      refreshController.callRefresh();
                     },
                     child: Text("Retry".tr),
                   )
