@@ -1,6 +1,8 @@
 import 'dart:convert';
 
+import 'package:easy_refresh/easy_refresh.dart';
 import 'package:flutter/services.dart';
+import 'package:get/get.dart';
 import 'package:skana_pix/pixiv_dart_api.dart';
 
 import '../utils/safplugin.dart';
@@ -138,3 +140,109 @@ class HistoryManager {
 }
 
 final historyManager = HistoryManager();
+
+class HistoryIllust extends GetxController {
+  RxList<IllustHistory> illusts = RxList.empty();
+  RxList<IllustHistory> searchResult = RxList.empty();
+  RxBool isLoading = false.obs;
+  EasyRefreshController? refreshController;
+
+  void load() async {
+    if (isLoading.value) return;
+    try {
+      isLoading.value = true;
+      var his = await historyManager.getIllusts();
+      illusts.clear();
+      illusts.addAll(his);
+      illusts.refresh();
+      searchResult.clear();
+      searchResult.addAll(his.reversed);
+      searchResult.refresh();
+      isLoading.value = false;
+      refreshController?.finishRefresh();
+    } catch (e) {
+      isLoading.value = false;
+      refreshController?.finishRefresh(IndicatorResult.fail);
+    }
+  }
+
+  void clear() async {
+    await historyManager.clearIllusts();
+    illusts.clear();
+    searchResult.clear();
+    illusts.refresh();
+    searchResult.refresh();
+  }
+
+  void remove(int illustId) async {
+    await historyManager.removeIllust(illustId);
+    illusts.removeWhere((element) => element.illustId == illustId);
+    searchResult.removeWhere((element) => element.illustId == illustId);
+    illusts.refresh();
+    searchResult.refresh();
+  }
+
+  void search(String searchText) {
+    var tmp = illusts
+        .where((obj) =>
+            obj.title!.toLowerCase().contains(searchText.toLowerCase()) ||
+            obj.userName!.toLowerCase().contains(searchText.toLowerCase()))
+        .toList();
+    searchResult.clear();
+    searchResult.addAll(tmp.reversed);
+    searchResult.refresh();
+  }
+}
+
+class HistoryNovel extends GetxController {
+  RxList<NovelHistory> novels = RxList.empty();
+  RxList<NovelHistory> searchResult = RxList.empty();
+  RxBool isLoading = false.obs;
+  EasyRefreshController? refreshController;
+
+  void load() async {
+    if (isLoading.value) return;
+    try {
+      isLoading.value = true;
+      var his = await historyManager.getNovels();
+      novels.clear();
+      novels.addAll(his);
+      novels.refresh();
+      searchResult.clear();
+      searchResult.addAll(his.reversed);
+      searchResult.refresh();
+      isLoading.value = false;
+      refreshController?.finishRefresh();
+    } catch (e) {
+      isLoading.value = false;
+      refreshController?.finishRefresh(IndicatorResult.fail);
+    }
+  }
+
+  void clear() async {
+    await historyManager.clearNovels();
+    novels.clear();
+    searchResult.clear();
+    novels.refresh();
+    searchResult.refresh();
+  }
+
+  void remove(int novelId) async {
+    await historyManager.removeNovel(novelId);
+    novels.removeWhere((element) => element.novelId == novelId);
+    searchResult.removeWhere((element) => element.novelId == novelId);
+    novels.refresh();
+    searchResult.refresh();
+  }
+
+  void search(String searchText) {
+    var tmp = novels
+        .where((obj) =>
+            obj.title.toLowerCase().contains(searchText.toLowerCase()) ||
+            obj.userName.toLowerCase().contains(searchText.toLowerCase()))
+        .toList();
+    searchResult.clear();
+    searchResult.addAll(tmp.reversed);
+    searchResult.refresh();
+  }
+}

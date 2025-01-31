@@ -7,18 +7,17 @@ import 'package:skana_pix/componentwidgets/chip.dart';
 import 'package:skana_pix/componentwidgets/headerfooter.dart';
 import 'package:skana_pix/controller/list_controller.dart';
 import 'package:skana_pix/view/imageview/imagelistview.dart';
-import 'package:skana_pix/componentwidgets/usersearch.dart';
+import 'package:skana_pix/view/userview/usersearch.dart';
 import 'package:skana_pix/controller/like_controller.dart';
 import 'package:skana_pix/pixiv_dart_api.dart';
 import 'package:get/get.dart';
 
-import '../componentwidgets/novelresult.dart';
+import 'novelview/novelresult.dart';
 import '../componentwidgets/pixivimage.dart';
 import '../componentwidgets/searchbar.dart';
 import 'imageview/imagesearchresult.dart';
 import '../componentwidgets/usercard.dart';
 import '../model/worktypes.dart';
-import '../controller/defaults.dart';
 
 class SearchPage extends StatefulWidget {
   const SearchPage({super.key});
@@ -568,7 +567,7 @@ class _SearchRecommendPageState extends State<SearchRecommendPage> {
                   gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                       crossAxisCount: rowCount)),
             ),
-            if (DynamicData.isAndroid)
+            if (GetPlatform.isAndroid)
               SliverToBoxAdapter(
                 child: Container(
                   height: (MediaQuery.of(context).size.width / 3) - 16,

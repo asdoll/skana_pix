@@ -9,7 +9,7 @@ import 'package:flutter/material.dart'
 import 'package:skana_pix/utils/leaders.dart';
 
 import 'avatar.dart';
-import 'commentpage.dart';
+import '../view/commentpage.dart';
 import 'followbutton.dart';
 import '../view/imageview/imagesearchresult.dart';
 import 'selecthtml.dart';

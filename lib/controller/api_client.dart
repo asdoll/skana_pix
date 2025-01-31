@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:io';
 import 'dart:math';
 
 import 'package:dio/dio.dart';
@@ -20,7 +21,6 @@ import '../model/spotlight.dart';
 import 'PDio.dart';
 import 'bases.dart';
 import 'res.dart';
-import 'saves.dart';
 import 'settings.dart';
 
 class ApiClient extends BaseClient {
@@ -946,5 +946,37 @@ class ApiClient extends BaseClient {
       return Res.fromErrorRes(res);
     }
     return Res([Novel.fromJson(res.data["novel"])]);
+  }
+}
+
+class Savers {
+  static void createPathIfNotExists(String path) {
+    final dir = Directory(path);
+    if (!dir.existsSync()) {
+      dir.createSync(recursive: true);
+    }
+  }
+
+  static Future<bool> writeAccountJson(Account account) async {
+    try {
+      final encoder = JsonEncoder.withIndent(' ' * 4);
+      final file = File(BasePath.accountJsonPath);
+      await file.writeAsString(encoder.convert(account.toJson()));
+      return true;
+    } on FileSystemException catch (e) {
+      log.e("Error writing account json: $e");
+      return false;
+    }
+  }
+
+  static Future<bool> writeText(String path, String text) async {
+    try {
+      final file = File(path);
+      await file.writeAsString(text);
+      return true;
+    } on FileSystemException catch (e) {
+      log.e("Error writing text: $e");
+      return false;
+    }
   }
 }

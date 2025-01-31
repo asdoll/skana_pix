@@ -12,11 +12,11 @@ import 'package:skana_pix/utils/widgetplugin.dart';
 
 import '../model/worktypes.dart';
 import 'avatar.dart';
-import 'commentpage.dart';
+import '../view/commentpage.dart';
 import 'followbutton.dart';
 import 'novelpage.dart';
-import 'novelresult.dart';
-import 'novelseries.dart';
+import '../view/novelview/novelresult.dart';
+import '../view/novelview/novelseries.dart';
 import 'pixivimage.dart';
 import 'selecthtml.dart';
 
@@ -337,7 +337,7 @@ class _NovelCardState extends State<NovelCard> {
               onPressed: () {
                 Get.to(() => CommentPage(
                     id: recomNovelsController.novels[widget.index].id,
-                    type: ArtworkType.NOVEL));
+                    type: ArtworkType.NOVEL),preventDuplicates: false);
               },
               child: Text("Show comments".tr)),
         ],

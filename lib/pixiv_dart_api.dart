@@ -1,11 +1,8 @@
-library pixiv_dart_api;
-
 export 'controller/PDio.dart';
 export 'controller/api_client.dart';
 export 'controller/bases.dart';
 export 'controller/logging.dart';
 export 'controller/res.dart';
-export 'controller/saves.dart';
 export 'controller/exceptions.dart';
 export 'controller/settings.dart';
 export 'controller/connector.dart';

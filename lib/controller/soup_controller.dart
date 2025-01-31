@@ -17,8 +17,8 @@ class SoupFetcher extends GetxController {
   SoupFetcher();
 
   final soupDio = dio.Dio(dio.BaseOptions(headers: {
-    HttpHeaders.acceptLanguageHeader: settings.locale.contains('zh')
-        ? (settings.locale == "zh_TW" ? 'zh-TW,zh;q=0.9' : 'zh-CN,zh;q=0.9')
+    HttpHeaders.acceptLanguageHeader: settings.getLocale().contains('zh')
+        ? (settings.getLocale() == "zh_TW" ? 'zh-TW,zh;q=0.9' : 'zh-CN,zh;q=0.9')
         : 'en-US,en;q=0.9',
     'user-agent':
         'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/85.0.4183.26 Safari/537.36 Edg/85.0.564.13',
@@ -29,7 +29,7 @@ class SoupFetcher extends GetxController {
 
   fetch(String url) async {
     try {
-      if (settings.locale.contains('zh')) {
+      if (settings.getLocale().contains('zh')) {
         _fetchCNTW(url);
       } else {
         _fetchEn(url);

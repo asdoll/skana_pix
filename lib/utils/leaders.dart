@@ -16,7 +16,7 @@ import 'package:skana_pix/pixiv_dart_api.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 
 import '../componentwidgets/novelpage.dart';
-import '../componentwidgets/novelseries.dart';
+import '../view/novelview/novelseries.dart';
 import '../view/imageview/imagesearchresult.dart';
 import '../view/souppage.dart';
 import '../componentwidgets/userpage.dart';

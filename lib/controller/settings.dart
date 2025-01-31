@@ -2,13 +2,13 @@ import 'dart:convert';
 import 'dart:ui';
 
 import 'package:flutter_displaymode/flutter_displaymode.dart';
+import 'package:get/get.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:shadcn_flutter/shadcn_flutter.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:skana_pix/controller/like_controller.dart';
 import 'package:skana_pix/model/worktypes.dart';
 import 'package:skana_pix/pixiv_dart_api.dart';
-import 'package:skana_pix/controller/defaults.dart';
 
 import '../utils/text_composition/text_composition.dart';
 
@@ -17,8 +17,8 @@ class UserSetting {
 
   List<String> settings = [
     '0', //0,darkMode 0:system 1:light 2:dark
-    '0', //1,isAMOLED 0:false 1:true
-    '0', //2,useDynamicColor 0:false 1:true
+    '0', //1,not in use
+    '0', //2,not in use
     'system', //3,language
     '4', //4,maxParallelDownload
     '', //5,downloadPath
@@ -109,7 +109,7 @@ class UserSetting {
       '', //28,historyIllustTag
       '', //29,historyNovelTag
       '', //30,historyUserTag
-      '0xFF536DFE', //31,seedColor
+      'zinc', //31,seedColor
       '0', //32,novelDirectEntry 0:false 1:true
       '1' //33,isHighRefreshRate 0:false 1:true
     ];
@@ -121,7 +121,7 @@ class UserSetting {
     setDefaults();
   }
 
-  String get locale => getLocale();
+  String get locale => settings[3];
 
   Locale localeObj() {
     List<String> loc = getLocale().split('_');
@@ -134,7 +134,7 @@ class UserSetting {
   void setHighRefreshRate(bool enabled) {
     settings[33] = enabled ? '1' : '0';
     updateSettings();
-    if (DynamicData.isAndroid) {
+    if (GetPlatform.isAndroid) {
       if (enabled) {
         FlutterDisplayMode.setHighRefreshRate();
       } else {
@@ -160,21 +160,10 @@ class UserSetting {
     return settings[3];
   }
 
-  void setLocale(Locale? loc) {
-    if (loc == null) {
-      settings[3] = 'system';
-      return;
-    }
-    if (loc.languageCode == 'und' || loc.languageCode.isEmpty) {
-      settings[3] = 'en_US';
-    }
-    if (loc.countryCode == null || loc.countryCode!.isEmpty) {
-      if (loc.languageCode == 'zh') {
-        settings[3] = 'zh_CN';
-      }
-      settings[3] = 'en_US';
-    }
-    settings[3] = "${loc.languageCode}_${loc.countryCode}";
+  void setLocale(String loc) {
+    settings[3] = loc;
+    updateSettings();
+    Get.updateLocale(localeObj());
   }
 
   String get awPrefer => settings[27];

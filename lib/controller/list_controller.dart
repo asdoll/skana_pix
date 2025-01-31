@@ -6,7 +6,6 @@ import 'package:skana_pix/model/worktypes.dart';
 import 'package:skana_pix/pixiv_dart_api.dart';
 import 'package:skana_pix/utils/filters.dart';
 import 'package:skana_pix/utils/leaders.dart';
-import 'package:skana_pix/controller/defaults.dart';
 
 enum ListType {
   single,
@@ -41,7 +40,7 @@ class ListIllustController extends GetxController {
 
   bool get showMangaBadage => type != ArtworkType.MANGA;
 
-  double get callLoadOverOffset => DynamicData.isIOS ? 2 : 5;
+  double get callLoadOverOffset => GetPlatform.isIOS ? 2 : 5;
 
   bool get noNextPage => controllerType == ListType.single;
 
@@ -216,7 +215,8 @@ class ListNovelController extends GetxController {
   String dateTime;
   ListType controllerType;
   String id;
-  SearchOptions? searchOptions;
+  DateTimeRange? dateTimeRange;
+  Rx<SearchOptions?> searchOptions = Rxn<SearchOptions>();
   bool get noNextPage => controllerType == ListType.single;
 
   ListNovelController(
@@ -265,7 +265,7 @@ class ListNovelController extends GetxController {
         } else {
           return ConnectManager()
               .apiClient
-              .searchNovels(tag, searchOptions ?? SearchOptions());
+              .searchNovels(tag, searchOptions.value ?? SearchOptions());
         }
       case ListType.works:
         return ConnectManager()
@@ -338,7 +338,7 @@ class ListNovelController extends GetxController {
   }
 }
 
-enum UserListType { recom, usermypixiv, following, myfollowing, mymypixiv }
+enum UserListType { recom, usermypixiv, following, myfollowing, mymypixiv,search }
 
 class ListUserController extends GetxController {
   RxList<UserPreview> users = RxList.empty();
@@ -381,6 +381,11 @@ class ListUserController extends GetxController {
         res = await ConnectManager()
             .apiClient
             .getMypixiv(id.toString(), nexturl.value);
+        break;
+      case UserListType.search:
+        res = await ConnectManager()
+            .apiClient
+            .searchUsers(id, nexturl.value);
         break;
     }
     return res;

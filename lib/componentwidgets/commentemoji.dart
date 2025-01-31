@@ -1,6 +1,6 @@
 import 'package:shadcn_flutter/shadcn_flutter.dart';
 
-import 'commentpage.dart';
+import '../view/commentpage.dart';
 
 class CommentEmojiText extends StatefulWidget {
   final String text;

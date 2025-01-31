@@ -4,8 +4,7 @@ import 'package:get/get.dart';
 import 'package:skana_pix/componentwidgets/chip.dart';
 import 'package:skana_pix/controller/like_controller.dart';
 
-import '../controller/defaults.dart';
-import '../componentwidgets/novelresult.dart';
+import 'novelview/novelresult.dart';
 import 'imageview/imagesearchresult.dart';
 
 class MyTagsPage extends StatefulWidget {
@@ -158,7 +157,7 @@ class _MyTagsPageState extends State<MyTagsPage> {
                 ),
               ),
             )),
-          if (DynamicData.isAndroid)
+          if (GetPlatform.isAndroid)
             SliverToBoxAdapter(
               child: Container(
                 height: (MediaQuery.of(context).size.width / 3) - 16,
@@ -299,7 +298,7 @@ class _MyTagsPageState extends State<MyTagsPage> {
               ),
             ),
           ),
-          if (DynamicData.isAndroid)
+          if (GetPlatform.isAndroid)
             SliverToBoxAdapter(
               child: Container(
                 height: (MediaQuery.of(context).size.width / 3) - 16,

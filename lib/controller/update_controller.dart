@@ -6,7 +6,13 @@ import 'package:flutter/foundation.dart';
 import 'package:get/get.dart';
 import 'package:skana_pix/controller/logging.dart';
 import 'package:skana_pix/model/boardinfo.dart';
-import 'package:skana_pix/controller/defaults.dart';
+
+class Constants {
+  static const String appName = 'SkanaPix';
+  static const String appVersion = '1.0.3';
+  static const isGooglePlay =
+      bool.fromEnvironment("IS_GOOGLEPLAY", defaultValue: false);
+}
 
 class BoardController extends GetxController {
   RxList<BoardInfo> boardList = RxList.empty();
@@ -45,12 +51,12 @@ class BoardController extends GetxController {
     if (kDebugMode) {
       return "android.json";
     }
-    if (DynamicData.isAndroid) {
+    if (GetPlatform.isAndroid) {
       if (Constants.isGooglePlay) {
         return "android_play.json";
       }
       return "android.json";
-    } else if (DynamicData.isIOS) {
+    } else if (GetPlatform.isIOS) {
       return "ios.json";
     }
     return "";

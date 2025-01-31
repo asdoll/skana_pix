@@ -11,7 +11,6 @@ import 'package:permission_handler/permission_handler.dart';
 import 'package:skana_pix/pixiv_dart_api.dart';
 import 'package:image_gallery_saver_plus/image_gallery_saver_plus.dart';
 import 'package:skana_pix/utils/leaders.dart';
-import '../controller/defaults.dart';
 import 'safplugin.dart';
 
 extension FSExt on FileSystemEntity {
@@ -89,7 +88,7 @@ void removeUserData() {
 }
 
 void saveFile(File file, [String? name]) async {
-  if (!DynamicData.isMobile) {
+  if (!GetPlatform.isMobile) {
     var fileName = file.path.split('/').last;
     final FileSaveLocation? result =
         await getSaveLocation(suggestedName: name ?? fileName);
@@ -118,7 +117,7 @@ String getExtensionName(String url) {
 }
 
 void saveUrl(String url, {String? filenm}) async {
-  if (DynamicData.isIOS && (await Permission.photosAddOnly.status.isDenied)) {
+  if (GetPlatform.isIOS && (await Permission.photosAddOnly.status.isDenied)) {
     if (await Permission.storage.request().isDenied) {
       Leader.showToast("Permission denied".tr);
       return;
@@ -140,7 +139,7 @@ void saveUrl(String url, {String? filenm}) async {
 }
 
 void saveImage(Illust illust, {List<bool>? indexes, String? quality}) async {
-  if (DynamicData.isIOS && (await Permission.photosAddOnly.status.isDenied)) {
+  if (GetPlatform.isIOS && (await Permission.photosAddOnly.status.isDenied)) {
     if (await Permission.storage.request().isDenied) {
       Leader.showToast("Permission denied".tr);
       return;

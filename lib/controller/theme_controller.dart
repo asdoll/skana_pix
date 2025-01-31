@@ -1,4 +1,5 @@
 import 'package:flutter/services.dart';
+import 'package:get/get.dart';
 import 'package:shadcn_flutter/shadcn_flutter.dart';
 import 'package:skana_pix/controller/logging.dart';
 import 'package:skana_pix/controller/settings.dart';
@@ -129,4 +130,29 @@ List<String> getThemeNames() {
     'orange',
     'gray'
   ];
+}
+
+class ThemeController extends GetxController {
+  RxString themeName = settings.themeName.obs;
+  RxString darkMode = settings.darkMode.obs;
+  RxBool isAMOLED = settings.isAMOLED.obs;
+  List<String> themeNames = getThemeNames();
+  List<ColorScheme> themeColors = getThemeNames()
+      .map((e) => getTheme(e, settings.isDarkMode).colorScheme)
+      .toList();
+
+  void changeTheme(String theme) {
+    settings.settings[31] = theme;
+    settings.updateSettings();
+    themeName.value = theme;
+    ThemeManager.instance.updateValue(getTheme(theme, settings.isDarkMode));
+  }
+
+  void changeDarkMode(String darkMode) {
+    settings.settings[0] = darkMode;
+    settings.updateSettings();
+    this.darkMode.value = settings.darkMode;
+    ThemeManager.instance
+        .updateValue(getTheme(settings.themeName, settings.isDarkMode));
+  }
 }

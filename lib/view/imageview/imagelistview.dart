@@ -10,7 +10,6 @@ import 'package:skana_pix/controller/like_controller.dart';
 import 'package:skana_pix/controller/list_controller.dart';
 import 'package:skana_pix/pixiv_dart_api.dart';
 import 'package:skana_pix/utils/leaders.dart';
-import 'package:skana_pix/controller/defaults.dart';
 
 import '../../model/worktypes.dart';
 import '../../componentwidgets/avatar.dart';
@@ -109,7 +108,7 @@ class _ImageListViewPageState extends State<ImageListViewPage> {
             ),
             if (listController.index.value < length - 1 &&
                 length > 1 &&
-                DynamicData.isDesktop)
+                GetPlatform.isDesktop)
               Positioned(
                 right: 0,
                 top: 0,
@@ -124,7 +123,7 @@ class _ImageListViewPageState extends State<ImageListViewPage> {
               ),
             if (listController.index.value != 0 &&
                 length > 1 &&
-                DynamicData.isDesktop)
+                GetPlatform.isDesktop)
               Positioned(
                 left: 0,
                 top: 0,

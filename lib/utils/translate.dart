@@ -390,6 +390,7 @@ class TranslateMap {
           "Feed:Novel": "动态:小说",
           "Pixivision": "Pixivision",
           "My Tags": "我的标签",
+          "Color Theme": "颜色主题",
         },
         "zh_TW": {
           "Search": "搜索",
@@ -778,6 +779,7 @@ class TranslateMap {
           "Feed:Novel": "動態:小說",
           "Pixivision": "Pixivision",
           "My Tags": "我的標籤",
+          "Color Theme": "顏色主題",
         },
       };
 }

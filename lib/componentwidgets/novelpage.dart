@@ -1,36 +1,40 @@
 import 'dart:io';
-
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart'
+    show AdaptiveTextSelectionToolbar, InkWell, SelectionArea;
+import 'package:shadcn_flutter/shadcn_flutter.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_xlider/flutter_xlider.dart';
 import 'package:get/get.dart';
-import 'package:path/path.dart';
+import 'package:path/path.dart' as path;
 import 'package:share_plus/share_plus.dart';
+import 'package:skana_pix/componentwidgets/backarea.dart';
 import 'package:skana_pix/componentwidgets/staricon.dart';
 import 'package:skana_pix/componentwidgets/userpage.dart';
 import 'package:skana_pix/controller/histories.dart';
+import 'package:skana_pix/controller/like_controller.dart';
+import 'package:skana_pix/controller/list_controller.dart';
+import 'package:skana_pix/controller/novel_controller.dart';
 import 'package:skana_pix/pixiv_dart_api.dart';
+import 'package:skana_pix/utils/leaders.dart';
 import 'package:skana_pix/utils/text_composition/text_composition.dart';
 import 'package:skana_pix/utils/translate.dart';
 import 'package:skana_pix/utils/widgetplugin.dart';
 import '../model/worktypes.dart';
-import '../controller/defaults.dart';
 import 'avatar.dart';
-import 'commentpage.dart';
+import '../view/commentpage.dart';
 import 'followbutton.dart';
-import 'loading.dart';
-import 'novelresult.dart';
-import 'novelseries.dart';
+import '../view/novelview/novelresult.dart';
+import '../view/novelview/novelseries.dart';
 import 'pixivimage.dart';
 import 'selecthtml.dart';
 
 class NovelViewerPage extends StatefulWidget {
   final Novel novel;
 
-  NovelViewerPage(this.novel, {super.key});
+  const NovelViewerPage(this.novel, {super.key});
 
   @override
-  _NovelViewerPageState createState() => _NovelViewerPageState();
+  State<NovelViewerPage> createState() => _NovelViewerPageState();
 }
 
 class _NovelViewerPageState extends State<NovelViewerPage> {
@@ -44,27 +48,22 @@ class _NovelViewerPageState extends State<NovelViewerPage> {
     super.initState();
     config = TextConfigManager.config;
     historyManager.addNovel(widget.novel);
-    _novelStore = NovelStore(widget.novel);
+    _novelStore =
+        Get.put(NovelStore(widget.novel), tag: widget.novel.id.toString());
     _novelStore.fetch();
   }
 
   @override
   void dispose() {
     TextConfigManager.config = config;
+    Get.delete<NovelStore>(tag: widget.novel.id.toString());
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        toolbarHeight: 0.0,
-        systemOverlayStyle: SystemUiOverlayStyle.light
-            .copyWith(systemNavigationBarColor: config.backgroundColor),
-      ),
-      body: Observer(
-        builder: (_) {
-          return TextCompositionPage(
+      child: Obx(() => TextCompositionPage(
             controller: TextComposition(
                 config: config,
                 loadChapter: (e) => _novelStore.fetch(),
@@ -78,58 +77,26 @@ class _NovelViewerPageState extends State<NovelViewerPage> {
                 },
                 name: widget.novel.title,
                 menuBuilder: (textComposition) {
-                  return Container(
-                      child: Column(
+                  return Column(
                     children: [
                       _buildAppBar(context),
                       Spacer(),
                       _buildBottomRow(
                           context,
-                          Theme.of(context).colorScheme.surfaceContainer,
-                          Theme.of(context).colorScheme.onSurface,
+                          Theme.of(context).colorScheme.background,
+                          Theme.of(context).colorScheme.foreground,
                           textComposition),
                     ],
-                  ));
+                  );
                 }),
-          );
-        },
-      ),
-    );
-  }
-
-  _buildFailPage(BuildContext context) {
-    return SafeArea(
-      child: Column(
-        mainAxisSize: MainAxisSize.max,
-        mainAxisAlignment: MainAxisAlignment.center,
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: <Widget>[
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Center(
-              child:
-                  Text(":(", style: Theme.of(context).textTheme.headlineMedium),
-            ),
-          ),
-          TextButton(
-              onPressed: () {
-                _novelStore.fetch();
-              },
-              child: Text("Retry".tr)),
-          Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Text('Network error'.tr,
-                style: Theme.of(context).textTheme.labelSmall),
-          ),
-        ],
-      ),
+          )),
     );
   }
 
   _buildAppBar(BuildContext context) {
     return AppBar(
-      backgroundColor: Theme.of(context).colorScheme.surfaceContainer,
-      leading: const BackButton(),
+      backgroundColor: Theme.of(context).colorScheme.background,
+      leading: [CommonBackArea()],
       title: Text(
         widget.novel.title.atMost8,
         style: const TextStyle(
@@ -137,48 +104,40 @@ class _NovelViewerPageState extends State<NovelViewerPage> {
           overflow: TextOverflow.ellipsis,
         ),
       ),
-      actions: [
+      trailing: [
         StarIcon(
           id: widget.novel.id.toString(),
           type: ArtworkType.NOVEL,
           size: 20,
           liked: widget.novel.isBookmarked,
         ),
-        IconButton(
+        IconButton.ghost(
             onPressed: () => buildShowModalBottomSheet(context),
             icon: Icon(Icons.info_outline_rounded)),
-        IconButton(
+        IconButton.ghost(
           icon: Icon(Icons.settings),
           onPressed: () => showDialog(
             context: context,
             builder: (context) => AlertDialog(
-              contentPadding: EdgeInsets.zero,
-              content: Container(
+              padding: EdgeInsets.zero,
+              content: SizedBox(
                 width: 520,
                 child: configSettingBuilder(context, config,
                     (Color color, void Function(Color color) onChange) {
-                  showDialog(
+                  showColorPickerDialog(
+                    title: Text("Pick A Color".tr),
                     context: context,
-                    builder: (context) => AlertDialog(
-                      title: Text("Pick A Color".tr),
-                      content: SingleChildScrollView(
-                        child: ColorPicker(
-                          pickerColor: color,
-                          onColorChanged: onChange,
-                          labelTypes: [],
-                          pickerAreaHeightPercent: 0.8,
-                          portraitOnly: true,
-                          hexInputBar: true,
-                        ),
-                      ),
-                    ),
+                    color: ColorDerivative.fromColor(color),
+                    onColorChanged: (value) {
+                      onChange(value.toColor());
+                    },
                   );
                 }, (e, ee) {}, (e, ee) {}),
               ),
             ),
           ),
         ),
-        IconButton(
+        IconButton.ghost(
           icon: Icon(Icons.more_vert),
           onPressed: () {
             _showMessage(context);
@@ -237,19 +196,19 @@ class _NovelViewerPageState extends State<NovelViewerPage> {
                         decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(3),
                           color: bgColor,
-                          border: Border.all(
-                              color: color.withOpacity(0.65), width: 1),
+                          border:
+                              Border.all(color: color.withAlpha(65), width: 1),
                         ),
                       ),
                     ),
                     trackBar: FlutterSliderTrackBar(
                       inactiveTrackBar: BoxDecoration(
                         borderRadius: BorderRadius.circular(20),
-                        color: color.withOpacity(0.5),
+                        color: color.withAlpha(50),
                       ),
                       activeTrackBar: BoxDecoration(
                         borderRadius: BorderRadius.circular(4),
-                        color: Theme.of(context).primaryColor,
+                        color: Theme.of(context).colorScheme.primary,
                       ),
                     ),
                     touchSize: 30,
@@ -275,7 +234,7 @@ class _NovelViewerPageState extends State<NovelViewerPage> {
                                 style: TextStyle(
                                   fontWeight: FontWeight.bold,
                                   fontFamily: composition.config.fontFamily,
-                                  color: color.withOpacity(0.7),
+                                  color: color.withAlpha(70),
                                   fontSize: 18,
                                 ),
                               ),
@@ -326,7 +285,9 @@ class _NovelViewerPageState extends State<NovelViewerPage> {
                           onTap: () {
                             if (_novelStore.novelWebResponse!.seriesNavigation
                                     ?.prevNovel ==
-                                null) return;
+                                null) {
+                              return;
+                            }
                             Navigator.of(context, rootNavigator: true)
                                 .pushReplacement(MaterialPageRoute(
                                     builder: (BuildContext context) =>
@@ -355,7 +316,9 @@ class _NovelViewerPageState extends State<NovelViewerPage> {
                           onTap: () {
                             if (_novelStore.novelWebResponse!.seriesNavigation
                                     ?.nextNovel ==
-                                null) return;
+                                null) {
+                              return;
+                            }
                             Navigator.of(context, rootNavigator: true)
                                 .pushReplacement(MaterialPageRoute(
                                     builder: (BuildContext context) =>
@@ -405,14 +368,9 @@ class _NovelViewerPageState extends State<NovelViewerPage> {
   }
 
   Future buildShowModalBottomSheet(BuildContext context) {
-    return showModalBottomSheet(
-      isScrollControlled: false,
+    return openSheet(
       context: context,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(
-          top: Radius.circular(16),
-        ),
-      ),
+      position: OverlayPosition.bottom,
       builder: (_) {
         return Container(
           decoration: BoxDecoration(
@@ -445,8 +403,8 @@ class _NovelViewerPageState extends State<NovelViewerPage> {
             padding: const EdgeInsets.only(
                 left: 16.0, right: 16.0, top: 12.0, bottom: 8.0),
             child: Text(
-              "${widget.novel.title}",
-              style: Theme.of(context).textTheme.titleMedium,
+              widget.novel.title,
+              style: Theme.of(context).typography.h3,
             ),
           ),
           Padding(
@@ -494,12 +452,12 @@ class _NovelViewerPageState extends State<NovelViewerPage> {
                   height: 22,
                   padding: const EdgeInsets.symmetric(horizontal: 14),
                   decoration: BoxDecoration(
-                    color: Theme.of(context).colorScheme.secondaryContainer,
+                    color: Theme.of(context).colorScheme.secondary,
                     borderRadius: const BorderRadius.all(Radius.circular(12.5)),
                   ),
                   child: Text(
                     "Series:${widget.novel.seriesTitle}",
-                    style: Theme.of(context).textTheme.titleSmall,
+                    style: Theme.of(context).typography.h4,
                   ),
                 ),
               ),
@@ -510,7 +468,7 @@ class _NovelViewerPageState extends State<NovelViewerPage> {
             padding: const EdgeInsets.symmetric(horizontal: 16.0),
             child: Text(
               widget.novel.createDate.toShortTime(),
-              style: Theme.of(context).textTheme.labelSmall,
+              style: Theme.of(context).typography.textSmall,
             ),
           ),
           Padding(
@@ -523,7 +481,7 @@ class _NovelViewerPageState extends State<NovelViewerPage> {
                 children: [
                   if (widget.novel.isAi)
                     Text("AI-generated".tr,
-                        style: Theme.of(context).textTheme.bodySmall!.copyWith(
+                        style: Theme.of(context).typography.textSmall.copyWith(
                             color: Theme.of(context).colorScheme.secondary)),
                   for (var f in widget.novel.tags) buildRow(context, f)
                 ],
@@ -531,8 +489,6 @@ class _NovelViewerPageState extends State<NovelViewerPage> {
           Padding(
             padding: const EdgeInsets.all(8.0),
             child: Card(
-              shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8.0)),
               child: Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: SelectionArea(
@@ -549,39 +505,14 @@ class _NovelViewerPageState extends State<NovelViewerPage> {
           ),
           TextButton(
               onPressed: () {
-                Navigator.of(context).push(MaterialPageRoute(
-                    builder: (BuildContext context) => CommentPage(
-                        id: widget.novel.id, type: ArtworkType.NOVEL)));
+                Get.to(
+                    CommentPage(id: widget.novel.id, type: ArtworkType.NOVEL),
+                    preventDuplicates: false);
               },
               child: Text("Show comments".tr)),
         ],
       ),
     );
-  }
-
-  bool isFollowing = false;
-
-  void follow() async {
-    if (isFollowing) return;
-    setState(() {
-      isFollowing = true;
-    });
-    var method = widget.novel.author.isFollowed ? "delete" : "add";
-    var res = await followUser(widget.novel.author.id.toString(), method);
-    if (res.error) {
-      if (mounted) {
-        BotToast.showText(text: "Network Error".tr);
-      }
-    } else {
-      widget.novel.author.isFollowed = !widget.novel.author.isFollowed;
-    }
-    setState(() {
-      isFollowing = false;
-    });
-    // UserInfoPage.followCallbacks[widget.illust.author.id.toString()]
-    //     ?.call(widget.illust.author.isFollowed);
-    // UserPreviewWidget.followCallbacks[widget.illust.author.id.toString()]
-    //     ?.call(widget.illust.author.isFollowed);
   }
 
   Widget buildRow(BuildContext context, Tag f) {
@@ -601,7 +532,7 @@ class _NovelViewerPageState extends State<NovelViewerPage> {
         height: 22,
         padding: const EdgeInsets.symmetric(horizontal: 14),
         decoration: BoxDecoration(
-          color: Theme.of(context).colorScheme.secondaryContainer,
+          color: Theme.of(context).colorScheme.secondary,
           borderRadius: const BorderRadius.all(Radius.circular(12.5)),
         ),
         child: RichText(
@@ -611,15 +542,15 @@ class _NovelViewerPageState extends State<NovelViewerPage> {
                 children: [
                   TextSpan(
                     text: " ",
-                    style: Theme.of(context).textTheme.bodySmall,
+                    style: Theme.of(context).typography.textSmall,
                   ),
                   TextSpan(
-                      text: "${f.translatedName ?? "~"}",
-                      style: Theme.of(context).textTheme.bodySmall)
+                      text: f.translatedName ?? "~",
+                      style: Theme.of(context).typography.textSmall)
                 ],
                 style: Theme.of(context)
-                    .textTheme
-                    .bodySmall!
+                    .typography
+                    .textSmall
                     .copyWith(color: Theme.of(context).colorScheme.secondary))),
       ),
     );
@@ -629,35 +560,35 @@ class _NovelViewerPageState extends State<NovelViewerPage> {
     switch (await showDialog(
         context: context,
         builder: (BuildContext context) {
-          return SimpleDialog(
+          return AlertDialog(
             title: RichText(
               text: TextSpan(children: [
                 TextSpan(
                     text: f.name,
-                    style: Theme.of(context).textTheme.bodyLarge!.copyWith(
+                    style: Theme.of(context).typography.textLarge.copyWith(
                         color: Theme.of(context).colorScheme.primary)),
                 if (f.translatedName != null)
                   TextSpan(
                       text: "\n${"${f.translatedName}"}",
-                      style: Theme.of(context).textTheme.bodyLarge!)
+                      style: Theme.of(context).typography.textLarge)
               ]),
             ),
-            children: <Widget>[
-              SimpleDialogOption(
+            actions: <Widget>[
+              PrimaryButton(
                 onPressed: () {
-                  Navigator.pop(context, 0);
+                  Get.back(result: 0);
                 },
                 child: Text("Block".tr),
               ),
-              SimpleDialogOption(
+              PrimaryButton(
                 onPressed: () {
-                  Navigator.pop(context, 1);
+                  Get.back(result: 1);
                 },
                 child: Text("Bookmark".tr),
               ),
-              SimpleDialogOption(
+              PrimaryButton(
                 onPressed: () {
-                  Navigator.pop(context, 2);
+                  Get.back(result: 2);
                 },
                 child: Text("Copy".tr),
               ),
@@ -666,21 +597,18 @@ class _NovelViewerPageState extends State<NovelViewerPage> {
         })) {
       case 0:
         {
-          settings.addBlockedNovelTags([f.name]);
+          localManager.add("blockedNovels", [f.name]);
         }
         break;
       case 1:
         {
-          settings.addBookmarkedNovelTags([f.name]);
+          localManager.add("bookmarkedNovels", [f.name]);
         }
         break;
       case 2:
         {
           await Clipboard.setData(ClipboardData(text: f.name));
-          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-            duration: Duration(seconds: 1),
-            content: Text("Copied to clipboard".tr),
-          ));
+          Leader.showToast("Copied to clipboard".tr);
         }
     }
   }
@@ -689,27 +617,6 @@ class _NovelViewerPageState extends State<NovelViewerPage> {
       SelectableRegionState editableTextState, BuildContext context) {
     final List<ContextMenuButtonItem> buttonItems =
         editableTextState.contextMenuButtonItems;
-    // if (supportTranslate) {
-    //   buttonItems.insert(
-    //     buttonItems.length,
-    //     ContextMenuButtonItem(
-    //       label: I18n.of(context).translate,
-    //       onPressed: () async {
-    //         final selectionText = _selectedText;
-    //         if (Platform.isIOS) {
-    //           final box = context.findRenderObject() as RenderBox?;
-    //           final pos = box != null
-    //               ? box.localToGlobal(Offset.zero) & box.size
-    //               : null;
-    //           Share.share(selectionText, sharePositionOrigin: pos);
-    //           return;
-    //         }
-    //         await SupportorPlugin.start(selectionText);
-    //         ContextMenuController.removeAny();
-    //       },
-    //     ),
-    //   );
-    // }
     return AdaptiveTextSelectionToolbar.buttonItems(
       anchors: editableTextState.contextMenuAnchors,
       buttonItems: buttonItems,
@@ -743,17 +650,16 @@ class _NovelViewerPageState extends State<NovelViewerPage> {
   }
 
   Future _showMessage(BuildContext context) {
-    return showModalBottomSheet(
+    return openSheet(
         context: context,
-        shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.vertical(top: Radius.circular(16.0))),
+        position: OverlayPosition.bottom,
         builder: (context) {
           return SafeArea(
             child: Column(
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
-                ListTile(
+                Basic(
                   subtitle: Text(
                     widget.novel.author.name,
                     maxLines: 2,
@@ -766,13 +672,12 @@ class _NovelViewerPageState extends State<NovelViewerPage> {
                     url: widget.novel.author.avatar,
                     id: widget.novel.author.id,
                     onTap: () {
-                      Navigator.of(context)
-                          .push(MaterialPageRoute(builder: (context) {
-                        return UserPage(
-                          id: widget.novel.author.id,
-                          type: ArtworkType.NOVEL,
-                        );
-                      }));
+                      Get.to(
+                          UserPage(
+                            id: widget.novel.author.id,
+                            type: ArtworkType.NOVEL,
+                          ),
+                          preventDuplicates: false);
                     },
                   ),
                 ),
@@ -791,18 +696,22 @@ class _NovelViewerPageState extends State<NovelViewerPage> {
                 buildListTile(
                     _novelStore.novelWebResponse!.seriesNavigation?.nextNovel,
                     context),
-                if (DynamicData.isAndroid)
-                  ListTile(
-                    title: Text("Export".tr),
-                    leading: Icon(Icons.folder_zip),
+                if (GetPlatform.isAndroid)
+                  InkWell(
+                    child: Basic(
+                      title: Text("Export".tr),
+                      leading: Icon(Icons.folder_zip),
+                    ),
                     onTap: () {
                       _export(context);
                     },
                   ),
-                ListTile(
-                  title: Text("Share".tr),
-                  leading: Icon(
-                    Icons.share,
+                InkWell(
+                  child: Basic(
+                    title: Text("Share".tr),
+                    leading: Icon(
+                      Icons.share,
+                    ),
                   ),
                   onTap: () {
                     Navigator.of(context).pop();
@@ -817,25 +726,27 @@ class _NovelViewerPageState extends State<NovelViewerPage> {
   }
 
   Widget buildListTile(SimpleNovel? relNovel, BuildContext context) {
-    if (relNovel == null)
-      return ListTile(
+    if (relNovel == null) {
+      return Basic(
         title: Text("No more".tr),
       );
-    return ListTile(
-      title: Text(relNovel.title, maxLines: 2, overflow: TextOverflow.ellipsis),
-      onTap: () {
-        Navigator.of(context, rootNavigator: true).pushReplacement(
-            MaterialPageRoute(
-                builder: (BuildContext context) =>
-                    NovelPageLite(relNovel.id.toString())));
-      },
-    );
+    }
+    return InkWell(
+        onTap: () {
+          Navigator.of(context).push(MaterialPageRoute(
+              builder: (BuildContext context) =>
+                  NovelPageLite(relNovel.id.toString())));
+        },
+        child: Basic(
+          title: Text(relNovel.title,
+              maxLines: 2, overflow: TextOverflow.ellipsis),
+        ));
   }
 
   void _export(BuildContext context) async {
     if (_novelStore.stringContent.isEmpty) return;
-    String targetPath =
-        join(BasePath.cachePath, "share_cache", "${widget.novel.title}.txt");
+    String targetPath = path.join(
+        BasePath.cachePath, "share_cache", "${widget.novel.title}.txt");
     File file = File(targetPath);
     if (!file.existsSync()) {
       file.createSync(recursive: true);
@@ -848,54 +759,80 @@ class _NovelViewerPageState extends State<NovelViewerPage> {
   }
 }
 
-class NovelStore {
-  final Novel novel;
-  late String stringContent;
-  List<String> result = [];
-  String? errorMessage;
-  NovelWebResponse? novelWebResponse;
-  TextSpan? textSpan;
-
-  NovelStore(this.novel);
-
-  Future<List<String>> fetch() async {
-    errorMessage = null;
-    try {
-      Res<NovelWebResponse> response =
-          await ConnectManager().apiClient.getNovelContent(novel.id.toString());
-      if (response.error) {
-        throw BadResponseException(response.errMsg);
-      }
-      novelWebResponse = response.data;
-      stringContent = novelWebResponse!.text;
-      result = stringContent.split(RegExp(r"\n\s*|\s{2,}"));
-      if (result.isEmpty) {
-        throw BadResponseException("No content");
-      }
-      return result;
-    } catch (e) {
-      log.e(e.toString());
-      errorMessage = e.toString();
-    }
-    return result;
-  }
-}
-
 class NovelPageLite extends StatefulWidget {
   final String id;
   const NovelPageLite(this.id, {super.key});
   @override
-  _NovelPageLiteState createState() => _NovelPageLiteState();
+  State<NovelPageLite> createState() => _NovelPageLiteState();
 }
 
-class _NovelPageLiteState extends LoadingState<NovelPageLite, Novel> {
+class _NovelPageLiteState extends State<NovelPageLite> {
   @override
-  Widget buildContent(BuildContext context, Novel data) {
-    return NovelViewerPage(data);
-  }
-
-  @override
-  Future<Res<Novel>> loadData() {
-    return getNovelById(widget.id);
+  Widget build(BuildContext context) {
+    ListNovelController controller = Get.put(
+        ListNovelController(controllerType: ListType.single, id: widget.id),
+        tag: "novel_${widget.id}");
+    controller.reset();
+    return Obx(
+      () => localManager.blockedNovels.contains(widget.id)
+          ? Scaffold(
+              child: Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      "Blocked".tr,
+                      style: Theme.of(context).typography.h2,
+                    ).paddingBottom(16),
+                    PrimaryButton(
+                        onPressed: () {
+                          localManager.delete("blockedNovels", [widget.id]);
+                        },
+                        child: Text("Unblock".tr)),
+                  ],
+                ),
+              ),
+            )
+          : controller.error == null
+              ? controller.isLoading.value
+                  ? Scaffold(
+                      headers: [
+                        AppBar(
+                          title: Text("Loading".tr),
+                        ),
+                        const Divider()
+                      ],
+                      child: Center(
+                        child: CircularProgressIndicator(),
+                      ),
+                    )
+                  : Scaffold(
+                      headers: [
+                        AppBar(
+                          title: Text(controller.novels.first.title),
+                        ),
+                        const Divider()
+                      ],
+                      child: NovelViewerPage(controller.novels.first),
+                    )
+              : Scaffold(
+                  child: Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(
+                          "Error".tr,
+                          style: Theme.of(context).typography.h2,
+                        ).paddingBottom(16),
+                        PrimaryButton(
+                            onPressed: () {
+                              controller.reset();
+                            },
+                            child: Text("Retry".tr)),
+                      ],
+                    ),
+                  ),
+                ),
+    );
   }
 }

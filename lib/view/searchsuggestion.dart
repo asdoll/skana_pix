@@ -3,13 +3,13 @@ import 'package:flutter/material.dart' show InkWell;
 import 'package:skana_pix/view/imageview/imagelistview.dart';
 import 'package:skana_pix/componentwidgets/novelpage.dart';
 import 'package:skana_pix/componentwidgets/userpage.dart';
-import 'package:skana_pix/componentwidgets/usersearch.dart';
+import 'package:skana_pix/view/userview/usersearch.dart';
 import 'package:skana_pix/controller/search_controller.dart';
 import 'package:skana_pix/model/worktypes.dart';
 import 'package:get/get.dart';
 
 import '../utils/leaders.dart';
-import '../componentwidgets/novelresult.dart';
+import 'novelview/novelresult.dart';
 import 'imageview/imagesearchresult.dart';
 import 'souppage.dart';
 

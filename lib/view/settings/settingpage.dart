@@ -9,7 +9,7 @@ import 'package:skana_pix/view/settings/blocklistpage.dart';
 import 'package:skana_pix/view/userview/followlist.dart';
 import 'package:skana_pix/view/bookmarkspage.dart';
 import 'package:skana_pix/view/settings/newversion.dart';
-import 'package:skana_pix/componentwidgets/prefsettings.dart';
+import 'package:skana_pix/view/settings/prefsettings.dart';
 import 'package:skana_pix/model/worktypes.dart';
 import 'package:skana_pix/pixiv_dart_api.dart';
 import 'package:skana_pix/view/homepage.dart';
@@ -20,8 +20,8 @@ import '../../componentwidgets/avatar.dart';
 import 'boardpage.dart';
 import '../mytagspage.dart';
 import 'dataexport.dart';
-import '../../componentwidgets/historypage.dart';
-import '../../componentwidgets/themepage.dart';
+import '../historypage.dart';
+import 'themepage.dart';
 import '../loginpage.dart';
 
 class SettingPage extends StatefulWidget {

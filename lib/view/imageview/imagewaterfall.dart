@@ -24,10 +24,12 @@ class _ImageWaterfallState extends State<ImageWaterfall> {
     EasyRefreshController refreshController = EasyRefreshController(
         controlFinishLoad: true, controlFinishRefresh: true);
     controller.refreshController = refreshController;
+    if (controller.illusts.isEmpty) controller.reset();
     return EasyRefresh(
+      fit: StackFit.passthrough,
       controller: refreshController,
       scrollController: globalScrollController,
-      refreshOnStart: true,
+      refreshOnStart: false,
       onRefresh: controller.reset,
       onLoad: controller.noNextPage ? null : controller.nextPage,
       header: DefaultHeaderFooter.header(context),
@@ -52,6 +54,14 @@ class _ImageWaterfallState extends State<ImageWaterfall> {
             );
           }
           if (controller.illusts.isEmpty) {
+            if (controller.isLoading.value) {
+              return Center(
+                child: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: CircularProgressIndicator(size: 64),
+                ),
+              );
+            }
             return Center(
               child: Padding(
                 padding: const EdgeInsets.all(8.0),

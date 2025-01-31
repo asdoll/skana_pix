@@ -4,8 +4,6 @@ import 'package:skana_pix/controller/account_controller.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 import '../componentwidgets/webview.dart';
 import '../utils/applinks.dart';
-import '../controller/defaults.dart';
-
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
 
@@ -159,7 +157,7 @@ class _LoginPageState extends State<LoginPage> {
   void onContinue() async {
     bool useExternal = true;
     bool exitLogin = false;
-    if (DynamicData.isMobile) {
+    if (GetPlatform.isMobile) {
       await showDialog(
         context: context,
         barrierDismissible: true,

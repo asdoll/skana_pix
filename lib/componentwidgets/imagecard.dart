@@ -5,7 +5,6 @@ import 'package:skana_pix/pixiv_dart_api.dart';
 import 'package:get/get.dart';
 import 'package:blur/blur.dart';
 import 'package:shadcn_flutter/shadcn_flutter.dart';
-import '../controller/defaults.dart';
 import '../view/imageview/imagelistview.dart';
 import 'nullhero.dart';
 import 'pixivimage.dart';
@@ -272,7 +271,7 @@ class _IllustCardState extends State<IllustCard> {
   }
 
   _buildLongPressToSaveHint(Illust illust) async {
-    if (DynamicData.isIOS) {
+    if (GetPlatform.isIOS) {
       if (settings.firstLongPressSave) {
         settings.set("firstLongPressSave", false);
         await showDialog(

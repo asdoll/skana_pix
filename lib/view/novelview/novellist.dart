@@ -23,10 +23,11 @@ class _NovelListState extends State<NovelList> {
     ListNovelController controller =
         Get.find<ListNovelController>(tag: widget.controllerTag);
     controller.refreshController = refreshController;
+    if(controller.novels.isEmpty) controller.reset();
     return EasyRefresh(
       controller: refreshController,
       scrollController: globalScrollController,
-      refreshOnStart: true,
+      refreshOnStart: false,
       onRefresh: controller.reset,
       callRefreshOverOffset: 10,
       onLoad: controller.noNextPage ? null : controller.nextPage,
@@ -53,6 +54,14 @@ class _NovelListState extends State<NovelList> {
             );
           }
           if (controller.novels.isEmpty) {
+            if (controller.isLoading.value) {
+              return Center(
+                child: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: CircularProgressIndicator(size: 64),
+                ),
+              );
+            }
             return Center(
               child: Padding(
                 padding: const EdgeInsets.all(8.0),
