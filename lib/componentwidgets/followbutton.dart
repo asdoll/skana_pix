@@ -17,12 +17,12 @@ class _UserFollowButtonState extends State<UserFollowButton> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: 32,
+      height: 40,
       color: Colors.transparent,
       child: Obx(() {
         switch (likeController.users[widget.id] ?? liked) {
           case 0:
-            return IconButton.outline(
+            return IconButton.primary(
                 onPressed: () {
                   likeController.toggleUser(widget.id, liked);
                 },
@@ -32,14 +32,14 @@ class _UserFollowButtonState extends State<UserFollowButton> {
                     child: Text(
                       "Follow".tr,
                       style: const TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.w400,
+                        fontSize: 16,
+                        fontWeight: FontWeight.w500,
                       ),
                     ),
                   ),
                 ));
           case 1:
-            return IconButton.primary(
+            return IconButton.secondary(
                 icon: const Center(
               child: Padding(
                 padding: EdgeInsets.symmetric(horizontal: 20),
@@ -48,7 +48,7 @@ class _UserFollowButtonState extends State<UserFollowButton> {
               ),
             ));
           default:
-            return IconButton.outline(
+            return IconButton.primary(
                 onPressed: () {
                   likeController.toggleUser(widget.id, liked);
                 },
@@ -58,8 +58,8 @@ class _UserFollowButtonState extends State<UserFollowButton> {
                     child: Text(
                       "Following".tr,
                       style: TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.w400,
+                        fontSize: 16,
+                        fontWeight: FontWeight.w500,
                       ),
                     ),
                   ),

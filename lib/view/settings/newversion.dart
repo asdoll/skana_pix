@@ -1,6 +1,8 @@
 import 'package:easy_refresh/easy_refresh.dart';
 import 'package:shadcn_flutter/shadcn_flutter.dart';
 import 'package:flutter/material.dart' show InkWell;
+import 'package:skana_pix/componentwidgets/backarea.dart';
+import 'package:skana_pix/componentwidgets/headerfooter.dart';
 import 'package:skana_pix/controller/update_controller.dart';
 import 'package:skana_pix/pixiv_dart_api.dart';
 import 'package:get/get.dart';
@@ -22,7 +24,12 @@ class _NewVersionPageState extends State<NewVersionPage> {
       headers: [
         AppBar(
           title: Text('Check updates'.tr),
+          padding: EdgeInsets.all(10),
+          leading: [
+            const NormalBackButton(),
+          ],
         ),
+        const Divider()
       ],
       child: Obx(() => EasyRefresh(
           controller: controller,
@@ -30,33 +37,40 @@ class _NewVersionPageState extends State<NewVersionPage> {
             await updateController.check();
             controller.finishRefresh();
           },
+          header: DefaultHeaderFooter.header(context),
           refreshOnStart: updateController.hasNewVersion.value,
           child: ListView(
+            padding: EdgeInsets.zero,
             children: [
-              Basic(
+              Card(
+                  child: Basic(
                 title: Text('Current Version'.tr),
                 subtitle: Text(updateController.getVersion()),
-              ),
-              if (updateController.hasNewVersion.value)
-                Basic(
+              )),
+              Card(
+                child: Basic(
                   title: Text('Latest Version'.tr),
                   subtitle: Text(updateController.updateVersion),
                 ),
+              ),
               if (updateController.hasNewVersion.value)
-                Basic(
+                Card(
+                    child: Basic(
                   title: Text('Release Date'.tr),
                   subtitle: Text(updateController.updateDate.isNotEmpty
                       ? DateTime.parse(updateController.updateDate)
                           .toShortTime()
                       : ""),
-                ),
+                )),
               if (updateController.hasNewVersion.value)
-                Basic(
+                Card(
+                    child: Basic(
                   title: Text('Release Notes'.tr),
                   subtitle: Text(updateController.updateDescription),
-                ),
+                )),
               if (updateController.hasNewVersion.value)
-                InkWell(
+                Card(
+                    child: InkWell(
                   onTap: () async {
                     if (updateController.updateUrl.isEmpty) {
                       Leader.showToast('No download link'.tr);
@@ -67,15 +81,17 @@ class _NewVersionPageState extends State<NewVersionPage> {
                   child: Basic(
                     title: Text('Download'.tr),
                   ),
-                ),
-              InkWell(
-                onTap: () async {
-                  await updateController.check();
-                },
-                child: Basic(
-                  title: Text('Check for updates'.tr),
-                ),
-              ),
+                )),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  PrimaryButton(
+                      onPressed: () async {
+                        await controller.callRefresh();
+                      },
+                      child: Text('Check for updates'.tr)),
+                ],
+              ).paddingSymmetric(vertical: 10),
             ],
           ))),
     );

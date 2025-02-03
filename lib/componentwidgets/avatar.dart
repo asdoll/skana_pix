@@ -48,7 +48,7 @@ class _PainterAvatarState extends State<PainterAvatar> {
         },
         child: Avatar(
           backgroundColor: Theme.of(context).colorScheme.card,
-          initials: Avatar.getInitials(widget.id.toString()),
+          initials: "",
           size: widget.size,
           provider: CachedNetworkImageProvider(widget.url,
               cacheManager: imagesCacheManager),

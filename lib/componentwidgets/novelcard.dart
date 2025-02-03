@@ -4,6 +4,7 @@ import 'package:flutter/services.dart';
 import 'package:skana_pix/componentwidgets/staricon.dart';
 import 'package:skana_pix/controller/like_controller.dart';
 import 'package:skana_pix/controller/list_controller.dart';
+import 'package:skana_pix/controller/theme_controller.dart';
 import 'package:skana_pix/pixiv_dart_api.dart';
 import 'package:get/get.dart';
 import 'package:skana_pix/utils/leaders.dart';
@@ -81,7 +82,7 @@ class _NovelCardState extends State<NovelCard> {
                                 recomNovelsController
                                     .novels[widget.index].title,
                                 overflow: TextOverflow.ellipsis,
-                                style: Theme.of(context).typography.textLarge,
+                                style: mtc.theme.value.typography.textLarge,
                                 maxLines: 3,
                               ),
                             ),
@@ -95,11 +96,11 @@ class _NovelCardState extends State<NovelCard> {
                                     recomNovelsController.novels[widget.index]
                                         .author.name.atMost8,
                                     maxLines: 1,
-                                    style: Theme.of(context)
+                                    style: mtc.theme.value
                                         .typography
                                         .textSmall
                                         .copyWith(
-                                            color: Theme.of(context)
+                                            color: mtc.theme.value
                                                 .colorScheme
                                                 .secondary),
                                   ),
@@ -110,7 +111,7 @@ class _NovelCardState extends State<NovelCard> {
                                         Icon(
                                           Icons.sticky_note_2_outlined,
                                           size: 12,
-                                          color: Theme.of(context)
+                                          color: mtc.theme.value
                                               .typography
                                               .textSmall
                                               .color,
@@ -120,7 +121,7 @@ class _NovelCardState extends State<NovelCard> {
                                         ),
                                         Text(
                                           '${recomNovelsController.novels[widget.index].length}',
-                                          style: Theme.of(context)
+                                          style: mtc.theme.value
                                               .typography
                                               .textSmall,
                                         )
@@ -145,7 +146,7 @@ class _NovelCardState extends State<NovelCard> {
                                       .novels[widget.index].tags)
                                     Text(
                                       f.name,
-                                      style: Theme.of(context)
+                                      style: mtc.theme.value
                                           .typography
                                           .textSmall,
                                     )
@@ -176,7 +177,7 @@ class _NovelCardState extends State<NovelCard> {
                       ),
                       Text(
                           '${recomNovelsController.novels[widget.index].totalBookmarks}',
-                          style: Theme.of(context).typography.textSmall)
+                          style: mtc.theme.value.typography.textSmall)
                     ],
                   ),
                 )
@@ -193,18 +194,23 @@ class _NovelCardState extends State<NovelCard> {
       context: context,
       position: OverlayPosition.bottom,
       builder: (_) {
-        return m.Scaffold(
-          floatingActionButton: m.IconButton(
-            onPressed: () {
-              Get.back();
-              Get.to(
-                  () => NovelViewerPage(
-                      recomNovelsController.novels[widget.index]),
-                  preventDuplicates: false);
-            },
-            icon: Icon(Icons.menu_book_rounded),
-          ),
-          body: SingleChildScrollView(child: _buildFirstView(context)),
+        return Scaffold(
+          footers: [
+            IconButton.primary(
+              shape: ButtonShape.circle,
+              size: ButtonSize(1.2),
+              onPressed: () {
+                Get.back();
+                Get.to(
+                    () => NovelViewerPage(
+                        recomNovelsController.novels[widget.index]),
+                    preventDuplicates: false);
+              },
+              icon: Icon(Icons.menu_book_rounded),
+            ).withAlign(Alignment(0.85,0.9)).paddingBottom(Get.mediaQuery.size.height*0.05)
+          ],
+          floatingFooter: true,
+          child: SingleChildScrollView(child: _buildFirstView(context)),
         );
       },
     );
@@ -212,7 +218,7 @@ class _NovelCardState extends State<NovelCard> {
 
   Widget _buildFirstView(BuildContext context) {
     return Padding(
-      padding: EdgeInsets.only(top: MediaQuery.of(context).padding.top),
+      padding: EdgeInsets.only(top: Get.mediaQuery.padding.top),
       child: Column(
         children: [
           Container(
@@ -231,7 +237,7 @@ class _NovelCardState extends State<NovelCard> {
                 left: 16.0, right: 16.0, top: 12.0, bottom: 8.0),
             child: Text(
               recomNovelsController.novels[widget.index].title,
-              style: Theme.of(context).typography.h3,
+              style: mtc.theme.value.typography.h3,
             ),
           ),
           Padding(
@@ -282,12 +288,12 @@ class _NovelCardState extends State<NovelCard> {
                   height: 22,
                   padding: const EdgeInsets.symmetric(horizontal: 14),
                   decoration: BoxDecoration(
-                    color: Theme.of(context).colorScheme.secondary,
+                    color: mtc.theme.value.colorScheme.secondary,
                     borderRadius: const BorderRadius.all(Radius.circular(12.5)),
                   ),
                   child: Text(
                     "Series:${recomNovelsController.novels[widget.index].seriesTitle}",
-                    style: Theme.of(context).typography.textSmall,
+                    style: mtc.theme.value.typography.textSmall,
                   ),
                 ),
               ),
@@ -299,7 +305,7 @@ class _NovelCardState extends State<NovelCard> {
             child: Text(
               recomNovelsController.novels[widget.index].createDate
                   .toShortTime(),
-              style: Theme.of(context).typography.textSmall,
+              style: mtc.theme.value.typography.textSmall,
             ),
           ),
           Padding(
@@ -312,8 +318,8 @@ class _NovelCardState extends State<NovelCard> {
                 children: [
                   if (recomNovelsController.novels[widget.index].isAi)
                     Text("AI-generated".tr,
-                        style: Theme.of(context).typography.textSmall.copyWith(
-                            color: Theme.of(context).colorScheme.secondary)),
+                        style: mtc.theme.value.typography.textSmall.copyWith(
+                            color: mtc.theme.value.colorScheme.secondary)),
                   for (var f in recomNovelsController.novels[widget.index].tags)
                     buildRow(context, f)
                 ],
@@ -335,9 +341,11 @@ class _NovelCardState extends State<NovelCard> {
           ),
           TextButton(
               onPressed: () {
-                Get.to(() => CommentPage(
-                    id: recomNovelsController.novels[widget.index].id,
-                    type: ArtworkType.NOVEL),preventDuplicates: false);
+                Get.to(
+                    () => CommentPage(
+                        id: recomNovelsController.novels[widget.index].id,
+                        type: ArtworkType.NOVEL),
+                    preventDuplicates: false);
               },
               child: Text("Show comments".tr)),
         ],
@@ -362,7 +370,7 @@ class _NovelCardState extends State<NovelCard> {
         height: 22,
         padding: const EdgeInsets.symmetric(horizontal: 14),
         decoration: BoxDecoration(
-          color: Theme.of(context).colorScheme.secondary,
+          color: mtc.theme.value.colorScheme.secondary,
           borderRadius: const BorderRadius.all(Radius.circular(12.5)),
         ),
         child: RichText(
@@ -372,16 +380,16 @@ class _NovelCardState extends State<NovelCard> {
                 children: [
                   TextSpan(
                     text: " ",
-                    style: Theme.of(context).typography.textSmall,
+                    style: mtc.theme.value.typography.textSmall,
                   ),
                   TextSpan(
                       text: f.translatedName ?? "~",
-                      style: Theme.of(context).typography.textSmall)
+                      style: mtc.theme.value.typography.textSmall)
                 ],
-                style: Theme.of(context)
+                style: mtc.theme.value
                     .typography
                     .textSmall
-                    .copyWith(color: Theme.of(context).colorScheme.secondary))),
+                    .copyWith(color: mtc.theme.value.colorScheme.secondary))),
       ),
     );
   }
@@ -395,12 +403,12 @@ class _NovelCardState extends State<NovelCard> {
               text: TextSpan(children: [
                 TextSpan(
                     text: f.name,
-                    style: Theme.of(context).typography.textLarge.copyWith(
-                        color: Theme.of(context).colorScheme.primary)),
+                    style: mtc.theme.value.typography.textLarge.copyWith(
+                        color: mtc.theme.value.colorScheme.primary)),
                 if (f.translatedName != null)
                   TextSpan(
                       text: "\n${"${f.translatedName}"}",
-                      style: Theme.of(context).typography.textLarge)
+                      style: mtc.theme.value.typography.textLarge)
               ]),
             ),
             actions: <Widget>[
@@ -464,7 +472,7 @@ class _NovelCardState extends State<NovelCard> {
           Icon(Icons.bookmark, size: 12),
           Text(
             "${novel.totalBookmarks}",
-            style: TextStyle(color: Theme.of(context).colorScheme.primary),
+            style: TextStyle(color: mtc.theme.value.colorScheme.primary),
           ),
           Padding(
             padding: const EdgeInsets.only(left: 8.0),
@@ -472,7 +480,7 @@ class _NovelCardState extends State<NovelCard> {
           ),
           Text(
             "${novel.totalViews}",
-            style: TextStyle(color: Theme.of(context).colorScheme.primary),
+            style: TextStyle(color: mtc.theme.value.colorScheme.primary),
           ),
         ],
       ),

@@ -10,6 +10,7 @@ import 'package:skana_pix/controller/like_controller.dart';
 import 'package:skana_pix/controller/list_controller.dart';
 import 'package:skana_pix/pixiv_dart_api.dart';
 import 'package:skana_pix/utils/leaders.dart';
+import 'package:skana_pix/utils/widgetplugin.dart';
 
 import '../../model/worktypes.dart';
 import '../../componentwidgets/avatar.dart';
@@ -75,7 +76,6 @@ class _ImageListViewPageState extends State<ImageListViewPage> {
 
   @override
   Widget build(BuildContext context) {
-    controller = PageController(initialPage: widget.index);
     historyManager.addIllust(listController.illusts[widget.index]);
 
     var length = listController.illusts.length;
@@ -305,7 +305,7 @@ class _IllustPageState extends State<IllustPage> {
                     );
                   }, childCount: relatedListController.illusts.length),
                   gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: 3)),
+                      crossAxisCount: 3)).sliverPadding(EdgeInsets.all(8)),
             ],
           ),
         );

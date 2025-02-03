@@ -33,3 +33,18 @@ class _CommonBackAreaState extends State<CommonBackArea> {
     );
   }
 }
+
+class NormalBackButton extends StatelessWidget {
+  const NormalBackButton({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return OutlineButton(
+      density: ButtonDensity.icon,
+      onPressed: () {
+        Get.back();
+      },
+      child: const Icon(Icons.arrow_back),
+    );
+  }
+}

@@ -9,6 +9,7 @@ import 'package:skana_pix/controller/update_controller.dart';
 import 'package:skana_pix/controller/page_index_controller.dart';
 import 'package:skana_pix/pixiv_dart_api.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:bot_toast/bot_toast.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 import 'package:flutter_displaymode/flutter_displaymode.dart';
 
@@ -34,13 +35,14 @@ Future<void> main() async {
     Get.addTranslations(TranslateMap.translation);
     Get.updateLocale(settings.localeObj());
     handleLinks();
-    pageIndexController = Get.put(PageIndexController(), permanent: true);
+    homeController = Get.put(HomeController(), permanent: true);
     accountController = Get.put(AccountController(), permanent: true);
     localManager = Get.put(LocalManager(), permanent: true);
     localManager.init();
     likeController = Get.put(LikeController(), permanent: true);
     boardController = Get.put(BoardController(), permanent: true);
     updateController = Get.put(UpdateController(), permanent: true);
+    mtc = Get.put(MiniThemeController(), permanent: true);
     if (Platform.isWindows || Platform.isLinux) {
       sqfliteFfiInit();
       databaseFactory = databaseFactoryFfi;
@@ -76,7 +78,8 @@ class _MyAppState extends State<MyApp> {
         SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
         return ShadcnApp(
           title: 'Skana_pix',
-          navigatorObservers: [GetObserver()],
+          builder: BotToastInit(),
+          navigatorObservers: [GetObserver(), BotToastNavigatorObserver()],
           theme: value,
           home: const HomePage(),
           navigatorKey: Get.key,

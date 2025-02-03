@@ -1,15 +1,7 @@
 import 'package:dio/dio.dart' as d;
 import 'package:get/get.dart';
-import 'package:shadcn_flutter/shadcn_flutter.dart'
-    show
-        Widget,
-        BuildContext,
-        Alignment,
-        SurfaceCard,
-        Basic,
-        ToastOverlay,
-        Text;
-import 'package:shadcn_flutter/shadcn_flutter.dart' as shadcn;
+import 'package:shadcn_flutter/shadcn_flutter.dart';
+import 'package:bot_toast/bot_toast.dart';
 import 'package:skana_pix/view/imageview/imagelistview.dart';
 import 'package:skana_pix/model/worktypes.dart';
 import 'package:skana_pix/pixiv_dart_api.dart';
@@ -22,29 +14,15 @@ import '../view/souppage.dart';
 import '../componentwidgets/userpage.dart';
 
 class Leader {
-  static showBasicToast(Widget? title, Widget? subtitle, Widget? trailing) {
-    shadcn.showToast(
-        context: Get.context!,
-        builder: (BuildContext context, ToastOverlay overlay) {
-          return SurfaceCard(
-            child: Basic(
-              title: title,
-              subtitle: subtitle,
-              trailing: trailing,
-              trailingAlignment: Alignment.center,
-            ),
-          );
-        });
-  }
-
   static showToast(String text) {
-    shadcn.showToast(
-        context: Get.context!,
-        builder: (BuildContext context, ToastOverlay overlay) {
-          return SurfaceCard(
-            child: Text(text),
-          );
-        });
+    BotToast.cleanAll();
+    BotToast.defaultOption.customText.align = const Alignment(0,0.9);
+    BotToast.showCustomText(
+      toastBuilder: (cancelFunc) => SurfaceCard(
+        padding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+        child: Text(text).small(),
+      ),
+    );
   }
 
   static Future<bool> pushWithUri(BuildContext context, Uri link) async {
@@ -63,7 +41,7 @@ class Leader {
     }
     if (link.host == "pixiv.me") {
       try {
-        showBasicToast(Text("Pixiv me..."), null, null);
+        showToast("Pixiv me...");
         var dio = d.Dio();
         d.Response response = await dio.getUri(link);
         if (response.isRedirect == true) {

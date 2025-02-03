@@ -24,12 +24,10 @@ class _ImageWaterfallState extends State<ImageWaterfall> {
     EasyRefreshController refreshController = EasyRefreshController(
         controlFinishLoad: true, controlFinishRefresh: true);
     controller.refreshController = refreshController;
-    if (controller.illusts.isEmpty) controller.reset();
     return EasyRefresh(
-      fit: StackFit.passthrough,
       controller: refreshController,
       scrollController: globalScrollController,
-      refreshOnStart: false,
+      refreshOnStart: true,
       onRefresh: controller.reset,
       onLoad: controller.noNextPage ? null : controller.nextPage,
       header: DefaultHeaderFooter.header(context),
@@ -54,25 +52,24 @@ class _ImageWaterfallState extends State<ImageWaterfall> {
             );
           }
           if (controller.illusts.isEmpty) {
-            if (controller.isLoading.value) {
+            if (!controller.isFirstLoading.value &&
+                !controller.isLoading.value) {
               return Center(
                 child: Padding(
                   padding: const EdgeInsets.all(8.0),
-                  child: CircularProgressIndicator(size: 64),
+                  child: Text('[ ]', style: Theme.of(context).typography.h1),
                 ),
               );
             }
-            return Center(
-              child: Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Text('[ ]', style: Theme.of(context).typography.h1),
-              ),
-            );
           }
           return WaterfallFlow.builder(
+            padding: const EdgeInsets.only(top: 8),
+            controller: globalScrollController,
             gridDelegate: SliverWaterfallFlowDelegateWithFixedCrossAxisCount(
               crossAxisCount:
                   context.orientation == Orientation.portrait ? 2 : 4,
+              mainAxisSpacing: 8.0,
+              crossAxisSpacing: 8.0,
             ),
             itemBuilder: (BuildContext context, int index) {
               return IllustCard(

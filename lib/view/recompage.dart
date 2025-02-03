@@ -5,22 +5,37 @@ import 'package:skana_pix/view/imageview/imagewaterfall.dart';
 import 'package:shadcn_flutter/shadcn_flutter.dart';
 import 'package:skana_pix/view/novelview/novellist.dart';
 
-class RecomImagesPage extends StatefulWidget {
-  final ArtworkType type;
-
-  const RecomImagesPage(this.type, {super.key});
+class RecomIllustsPage extends StatefulWidget {
+  const RecomIllustsPage({super.key});
   @override
-  State<RecomImagesPage> createState() => _RecomImagesPageState();
+  State<RecomIllustsPage> createState() => _RecomIllustsPageState();
 }
 
-class _RecomImagesPageState extends State<RecomImagesPage> {
+class _RecomIllustsPageState extends State<RecomIllustsPage> {
   @override
   Widget build(BuildContext context) {
     // ignore: unused_local_variable
     ListIllustController recomImagesController = Get.put(
-        ListIllustController(controllerType: ListType.recom, type: widget.type),
-        tag: "recom_${widget.type.name}");
-    return ImageWaterfall(controllerTag: "recom_${widget.type.name}");
+        ListIllustController(controllerType: ListType.recom, type: ArtworkType.ILLUST),
+        tag: "recom_illust");
+    return ImageWaterfall(controllerTag: "recom_illust");
+  }
+}
+
+class RecomMangasPage extends StatefulWidget {
+  const RecomMangasPage({super.key});
+  @override
+  State<RecomMangasPage> createState() => _RecomMangasPageState();
+}
+
+class _RecomMangasPageState extends State<RecomMangasPage> {
+  @override
+  Widget build(BuildContext context) {
+    // ignore: unused_local_variable
+    ListIllustController recomImagesController = Get.put(
+        ListIllustController(controllerType: ListType.recom, type: ArtworkType.MANGA),
+        tag: "recom_manga");
+    return ImageWaterfall(controllerTag: "recom_manga");
   }
 }
 

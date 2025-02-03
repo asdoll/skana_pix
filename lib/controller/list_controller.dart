@@ -122,7 +122,6 @@ class ListIllustController extends GetxController {
     if (likeController.illusts.length > 500) {
       likeController.illusts.clear();
     }
-    isFirstLoading.value = true;
     isLoading.value = false;
     illusts.clear();
     illusts.refresh();
@@ -278,7 +277,6 @@ class ListNovelController extends GetxController {
     if (likeController.novels.length > 100) {
       likeController.novels.clear();
     }
-    isFirstLoading.value = true;
     isLoading.value = false;
     novels.clear();
     novels.refresh();
@@ -419,7 +417,6 @@ class ListUserController extends GetxController {
     if (likeController.users.length > 100) {
       likeController.users.clear();
     }
-    isFirstLoading.value = true;
     isLoading.value = false;
     users.clear();
     users.refresh();

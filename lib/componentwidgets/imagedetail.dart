@@ -69,8 +69,8 @@ class _IllustDetailContentState extends State<IllustDetailContent> {
         _buildCaptionArea(_illust),
         _buildCommentTextArea(context, _illust),
         Padding(
-          padding: const EdgeInsets.only(left: 16.0, right: 16.0, bottom: 4.0),
-          child: Text("Related artworks".tr),
+          padding: const EdgeInsets.only(left: 8.0),
+          child: Text("Related artworks".tr).small(),
         ),
       ],
     );
@@ -193,7 +193,7 @@ class _IllustDetailContentState extends State<IllustDetailContent> {
       child: Text(
         text,
         style: TextStyle(
-            color: Theme.of(context).colorScheme.secondary, fontSize: 12),
+            color: Theme.of(context).colorScheme.mutedForeground, fontSize: 12),
       ),
     );
   }
@@ -295,8 +295,8 @@ class _IllustDetailContentState extends State<IllustDetailContent> {
             Get.to(() => CommentPage(id: data.id), preventDuplicates: false);
           },
           child: Center(
-            child: Padding(
-              padding: const EdgeInsets.only(top: 8.0, bottom: 8.0),
+            child: Card(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
               child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   mainAxisSize: MainAxisSize.min,
@@ -311,10 +311,9 @@ class _IllustDetailContentState extends State<IllustDetailContent> {
                     ),
                     Text(
                       "Show comments".tr,
-                      style: Theme.of(context).typography.textSmall,
-                    ),
+                    ).xSmall(),
                   ]),
-            ),
+            ).paddingSymmetric(vertical: 16),
           ),
         ),
       ),
@@ -395,7 +394,7 @@ class _IllustDetailContentState extends State<IllustDetailContent> {
         height: 25,
         padding: const EdgeInsets.symmetric(horizontal: 14),
         decoration: BoxDecoration(
-          color: Theme.of(context).colorScheme.secondaryForeground,
+          color: Get.theme.colorScheme.primary,
           borderRadius: const BorderRadius.all(Radius.circular(12.5)),
         ),
         child: Column(
@@ -424,7 +423,7 @@ class _IllustDetailContentState extends State<IllustDetailContent> {
                                 .copyWith(fontSize: 12))
                     ],
                     style: Theme.of(context).typography.textSmall.copyWith(
-                        color: Theme.of(context).colorScheme.primary,
+                        color: Theme.of(context).colorScheme.primaryForeground,
                         fontSize: 12))),
           ],
         ),

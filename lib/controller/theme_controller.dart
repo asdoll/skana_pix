@@ -34,6 +34,7 @@ class ThemeManager {
 
   void updateValue(ThemeData themes) {
     theme.value = themes;
+    mtc.callback(themes);
     SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
       systemNavigationBarColor: Colors.transparent,
       statusBarBrightness:
@@ -131,6 +132,19 @@ List<String> getThemeNames() {
     'gray'
   ];
 }
+
+class MiniThemeController extends GetxController {
+  Rx<ThemeData> theme = getTheme('zinc', false).obs;
+
+  MiniThemeController();
+
+  void callback(ThemeData theme) {
+    this.theme.value = theme;
+    this.theme.refresh();
+  }
+}
+
+late MiniThemeController mtc;
 
 class ThemeController extends GetxController {
   RxString themeName = settings.themeName.obs;

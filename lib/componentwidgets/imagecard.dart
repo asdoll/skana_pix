@@ -5,6 +5,7 @@ import 'package:skana_pix/pixiv_dart_api.dart';
 import 'package:get/get.dart';
 import 'package:blur/blur.dart';
 import 'package:shadcn_flutter/shadcn_flutter.dart';
+import 'package:skana_pix/utils/widgetplugin.dart';
 import '../view/imageview/imagelistview.dart';
 import 'nullhero.dart';
 import 'pixivimage.dart';
@@ -102,11 +103,11 @@ class _IllustCardState extends State<IllustCard> {
         ? NullHero(
             tag: tag,
             child: PixivImage(illust.images.first.squareMedium,
-                fit: BoxFit.fitWidth),
+                fit: BoxFit.fitWidth).rounded(8),
           )
         : NullHero(
             tag: tag,
-            child: PixivImage(illust.images.first.medium, fit: BoxFit.fitWidth),
+            child: PixivImage(illust.images.first.medium, fit: BoxFit.fitWidth).rounded(8),
           );
   }
 
@@ -199,14 +200,14 @@ class _IllustCardState extends State<IllustCard> {
 
   Widget _buildAIBadge() {
     return Padding(
-      padding: EdgeInsets.all(4.0),
+      padding: EdgeInsets.all(1.0),
       child: Container(
         decoration: const BoxDecoration(
-          color: Color.fromRGBO(255, 255, 255, 0.2),
+          color: Color.fromRGBO(255, 255, 255, 0.4),
           borderRadius: BorderRadius.all(Radius.circular(4.0)),
         ),
         child: const Padding(
-          padding: EdgeInsets.symmetric(vertical: 2.0, horizontal: 2.0),
+          padding: EdgeInsets.symmetric(vertical: 2.0, horizontal: 4.0),
           child: Text(
             "AI",
             style: TextStyle(color: Colors.white),
@@ -218,14 +219,14 @@ class _IllustCardState extends State<IllustCard> {
 
   Widget _buildR18Badge() {
     return Padding(
-      padding: EdgeInsets.all(4.0),
+      padding: EdgeInsets.all(1.0),
       child: Container(
         decoration: const BoxDecoration(
-          color: Color.fromRGBO(255, 255, 255, 0.2),
+          color: Color.fromRGBO(255, 255, 255, 0.4),
           borderRadius: BorderRadius.all(Radius.circular(4.0)),
         ),
         child: const Padding(
-          padding: EdgeInsets.symmetric(vertical: 2.0, horizontal: 2.0),
+          padding: EdgeInsets.symmetric(vertical: 2.0, horizontal: 4.0),
           child: Text(
             "R18",
             style: TextStyle(color: Colors.white),
@@ -237,14 +238,14 @@ class _IllustCardState extends State<IllustCard> {
 
   Widget _buildUgoiraBadge() {
     return Padding(
-      padding: EdgeInsets.all(4.0),
+      padding: EdgeInsets.all(1.0),
       child: Container(
         decoration: const BoxDecoration(
-          color: Color.fromRGBO(255, 255, 255, 0.2),
+          color: Color.fromRGBO(255, 255, 255, 0.4),
           borderRadius: BorderRadius.all(Radius.circular(4.0)),
         ),
         child: const Padding(
-          padding: EdgeInsets.symmetric(vertical: 2.0, horizontal: 2.0),
+          padding: EdgeInsets.symmetric(vertical: 2.0, horizontal: 4.0),
           child: Text(
             "ugoira",
             style: TextStyle(color: Colors.white),
@@ -299,21 +300,21 @@ class _IllustCardState extends State<IllustCard> {
       children: <Widget>[
         Padding(
           padding:
-              const EdgeInsets.only(left: 8.0, right: 36.0, top: 4, bottom: 4),
+              const EdgeInsets.only(left: 8.0, right: 36.0, top: 8, bottom: 2),
           child:
               Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
             Text(
               illust.title,
               maxLines: 1,
               overflow: TextOverflow.clip,
-              style: Theme.of(context).typography.textSmall,
+              style: Theme.of(context).typography.xSmall.copyWith(fontWeight: FontWeight.w500),
               strutStyle: const StrutStyle(forceStrutHeight: true, leading: 0),
-            ),
+            ).paddingOnly(bottom: 4),
             Text(
               illust.author.name,
               maxLines: 1,
               overflow: TextOverflow.clip,
-              style: Theme.of(context).typography.textSmall,
+              style: Theme.of(context).typography.xSmall.copyWith(color: Theme.of(context).colorScheme.mutedForeground, fontWeight: FontWeight.w500),
               strutStyle: const StrutStyle(forceStrutHeight: true, leading: 0),
             )
           ]),
@@ -333,15 +334,15 @@ class _IllustCardState extends State<IllustCard> {
       child: Align(
         alignment: Alignment.topRight,
         child: Padding(
-          padding: EdgeInsets.all(4.0),
+          padding: EdgeInsets.all(1.0),
           child: Container(
             decoration: const BoxDecoration(
-              color: Color.fromRGBO(255, 255, 255, 0.2),
+              color: Color.fromRGBO(255, 255, 255, 0.4),
               borderRadius: BorderRadius.all(Radius.circular(4.0)),
             ),
             child: Padding(
               padding:
-                  const EdgeInsets.symmetric(vertical: 2.0, horizontal: 2.0),
+                  const EdgeInsets.symmetric(vertical: 2.0, horizontal: 4.0),
               child: cardText(illust),
             ),
           ),

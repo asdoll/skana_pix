@@ -74,6 +74,7 @@ dependencies:
   logger: ^2.5.0
   shadcn_flutter: ^0.0.24
   get: ^4.6.6
+  bot_toast: ^4.1.3
 
 
 dev_dependencies:

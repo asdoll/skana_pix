@@ -105,19 +105,19 @@ class LocalManager extends GetxController {
   RxList<String> historyUserTag = RxList<String>();
 
   void init() {
-    blockedUsers = settings.settings[12].split(';').obs;
-    blockedTags = settings.settings[11].split(';').obs;
-    blockedCommentUsers = settings.settings[13].split(';').obs;
-    blockedNovelUsers = settings.settings[14].split(';').obs;
-    bookmarkedTags = settings.settings[22].split(';').obs;
-    bookmarkedNovelTags = settings.settings[23].split(';').obs;
-    blockedComments = settings.settings[24].split(';').obs;
-    blockedNovels = settings.settings[25].split(';').obs;
-    blockedNovelTags = settings.settings[26].split(';').obs;
-    blockedIllusts = settings.settings[20].split(';').obs;
-    historyIllustTag = settings.settings[28].split(';').obs;
-    historyNovelTag = settings.settings[29].split(';').obs;
-    historyUserTag = settings.settings[30].split(';').obs;
+    blockedUsers = settings.settings[12].split(';').where((e) => e.isNotEmpty).toList().obs;
+    blockedTags = settings.settings[11].split(';').where((e) => e.isNotEmpty).toList().obs;
+    blockedCommentUsers = settings.settings[13].split(';').where((e) => e.isNotEmpty).toList().obs;
+    blockedNovelUsers = settings.settings[14].split(';').where((e) => e.isNotEmpty).toList().obs;
+    bookmarkedTags = settings.settings[22].split(';').where((e) => e.isNotEmpty).toList().obs;
+    bookmarkedNovelTags = settings.settings[23].split(';').where((e) => e.isNotEmpty).toList().obs;
+    blockedComments = settings.settings[24].split(';').where((e) => e.isNotEmpty).toList().obs;
+    blockedNovels = settings.settings[25].split(';').where((e) => e.isNotEmpty).toList().obs;
+    blockedNovelTags = settings.settings[26].split(';').where((e) => e.isNotEmpty).toList().obs;
+    blockedIllusts = settings.settings[20].split(';').where((e) => e.isNotEmpty).toList().obs;
+    historyIllustTag = settings.settings[28].split(';').where((e) => e.isNotEmpty).toList().obs;
+    historyNovelTag = settings.settings[29].split(';').where((e) => e.isNotEmpty).toList().obs;
+    historyUserTag = settings.settings[30].split(';').where((e) => e.isNotEmpty).toList().obs;
     blockedUsers.refresh();
     blockedTags.refresh();
     blockedCommentUsers.refresh();

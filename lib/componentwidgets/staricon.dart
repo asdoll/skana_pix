@@ -13,7 +13,7 @@ class StarIcon extends StatefulWidget {
     super.key,
     required this.id,
     required this.type,
-    this.size = 40,
+    this.size = 48,
     this.liked = false,
   });
 

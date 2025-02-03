@@ -1,16 +1,19 @@
 import 'package:get/get.dart';
 import 'package:skana_pix/controller/account_controller.dart';
+import 'package:skana_pix/controller/mini_controllers.dart';
 import 'package:skana_pix/controller/page_index_controller.dart';
 import 'package:skana_pix/controller/settings.dart';
 import 'package:skana_pix/model/worktypes.dart';
 import 'package:skana_pix/view/bookmarkspage.dart';
 import 'package:skana_pix/view/feedpage.dart';
+import 'package:skana_pix/view/historypage.dart';
 import 'package:skana_pix/view/mytagspage.dart';
 import 'package:skana_pix/view/rankingpage.dart';
 import 'package:skana_pix/view/recompage.dart';
 import 'package:shadcn_flutter/shadcn_flutter.dart';
 import 'package:skana_pix/view/searchpage.dart';
 import 'package:skana_pix/view/settings/settingpage.dart';
+import 'package:skana_pix/view/settings/themepage.dart';
 import 'package:skana_pix/view/spotlightpage.dart';
 import 'package:skana_pix/view/userview/followlist.dart';
 
@@ -26,6 +29,14 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
+    globalScrollController.addListener(() {
+      if (globalScrollController.offset < context.height) {
+        homeController.showBackArea.value = false;
+      } else {
+        homeController.showBackArea.value = true;
+      }
+    });
+
     return Obx(() {
       if (!accountController.isLoggedIn.value) {
         return Scaffold(
@@ -36,7 +47,11 @@ class _HomePageState extends State<HomePage> {
       return Scaffold(
         headers: [
           AppBar(
-            title: Text(pages[pageIndexController.pageIndex.value].tr),
+            title: Text(getTitle(pages[homeController.pageIndex.value]).tr),
+            subtitle: getSubtitle(pages[homeController.pageIndex.value])
+                    .isNotEmpty
+                ? Text(getSubtitle(pages[homeController.pageIndex.value]).tr)
+                : null,
             padding: EdgeInsets.all(10),
             leading: [
               OutlineButton(
@@ -51,9 +66,9 @@ class _HomePageState extends State<HomePage> {
                           alignment: Alignment.center,
                           padding: const EdgeInsets.symmetric(vertical: 30),
                           child: NavigationSidebar(
-                            index: pageIndexController.pageIndex.value,
+                            index: homeController.pageIndex.value,
                             onSelected: (index) {
-                              pageIndexController.pageIndex.value = index;
+                              homeController.pageIndex.value = index;
                               closeDrawer(context);
                             },
                             children: [
@@ -88,12 +103,47 @@ class _HomePageState extends State<HomePage> {
                 child: const Icon(Icons.menu),
               ),
             ],
+            trailing: [
+              if (homeController.pageIndex.value == 12)
+                IconButton.ghost(
+                  icon: const Icon(
+                    Icons.palette,
+                  ),
+                  onPressed: () {
+                    Get.to(() => ThemePage());
+                  },
+                ),
+            ],
           ),
           const Divider(),
         ],
-        child: switch (pageIndexController.pageIndex.value) {
-          0 => RecomImagesPage(ArtworkType.ILLUST),
-          1 => RecomImagesPage(ArtworkType.MANGA),
+        footers: [
+          AnimatedSwitcher(
+            duration: const Duration(milliseconds: 300),
+            child: (homeController.pageIndex.value < 11 &&
+                    homeController.showBackArea.value)
+                ? Button(
+                    style: ButtonStyle.card(
+                        size: ButtonSize.small, density: ButtonDensity.dense),
+                    onPressed: () {
+                      globalScrollController.animateTo(0,
+                          duration: const Duration(milliseconds: 300),
+                          curve: Curves.easeInOut);
+                    },
+                    child: Icon(
+                      Icons.arrow_upward,
+                      size: 30,
+                    ).paddingOnly(right: 6, top: 1, bottom: 1),
+                  )
+                    .withAlign(Alignment(1.05, 0.9))
+                    .paddingOnly(bottom: Get.mediaQuery.size.height * 0.05)
+                : Container(),
+          )
+        ],
+        floatingFooter: true,
+        child: switch (homeController.pageIndex.value) {
+          0 => RecomIllustsPage(),
+          1 => RecomMangasPage(),
           2 => RecomNovelsPage(),
           3 => FeedIllust(),
           4 => FeedNovel(),
@@ -111,7 +161,7 @@ class _HomePageState extends State<HomePage> {
               id: accountController.userid.value,
               isMe: true,
             ),
-          // 11 => HistoryPage(),
+          11 => HistoryPage(),
           _ => SettingPage(),
         },
       );
@@ -123,5 +173,19 @@ class _HomePageState extends State<HomePage> {
       label: Text(label),
       child: Icon(icon),
     );
+  }
+
+  String getTitle(String s) {
+    if (s.contains(":")) {
+      return s.split(":")[0];
+    }
+    return s;
+  }
+
+  String getSubtitle(String s) {
+    if (s.contains(":")) {
+      return s.split(":")[1];
+    }
+    return "";
   }
 }

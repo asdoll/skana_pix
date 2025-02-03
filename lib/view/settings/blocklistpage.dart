@@ -1,5 +1,6 @@
 import 'package:shadcn_flutter/shadcn_flutter.dart';
 import 'package:get/get.dart';
+import 'package:skana_pix/componentwidgets/backarea.dart';
 import 'package:skana_pix/componentwidgets/chip.dart';
 import 'package:skana_pix/controller/like_controller.dart';
 
@@ -11,7 +12,6 @@ class BlockListPage extends StatefulWidget {
 }
 
 class _BlockListPageState extends State<BlockListPage> {
-
   @override
   Widget build(BuildContext context) {
     return Obx(() {
@@ -19,7 +19,12 @@ class _BlockListPageState extends State<BlockListPage> {
         headers: [
           AppBar(
             title: Text('Block List'.tr),
+            padding: EdgeInsets.all(10),
+            leading: [
+              const NormalBackButton(),
+            ],
           ),
+          const Divider()
         ],
         child: Padding(
           padding: const EdgeInsets.all(8.0),
@@ -28,157 +33,128 @@ class _BlockListPageState extends State<BlockListPage> {
               crossAxisAlignment: CrossAxisAlignment.stretch,
               mainAxisAlignment: MainAxisAlignment.start,
               children: <Widget>[
-                Row(
-                  children: [
-                    Text("Tags".tr),
-                    IconButton.ghost(
-                        onPressed: () {
-                          _showBanTagAddDialog(false);
-                        },
-                        icon: Icon(Icons.add))
-                  ],
-                ),
-                Wrap(
-                  spacing: 2.0,
-                  runSpacing: 2.0,
-                  direction: Axis.horizontal,
-                  children: localManager.blockedTags
-                      .map((f) => PixChip(f: f, type: "blockedTags", isSetting: true))
-                      .toList(),
-                ),
-                Divider(),
-                Row(
-                  children: [
-                    Text("Novel Tags".tr),
-                    IconButton.ghost(
+                Card(
+                    child: Basic(
+                  title: Text("Tags".tr),
+                  titleSpacing: 6,
+                  trailing: IconButton.ghost(
+                      onPressed: () {
+                        _showBanTagAddDialog(false);
+                      },
+                      icon: Icon(Icons.add)),
+                  content: Wrap(
+                    spacing: 2.0,
+                    runSpacing: 2.0,
+                    direction: Axis.horizontal,
+                    children: localManager.blockedTags
+                        .map((f) =>
+                            PixChip(f: f, type: "blockedTags", isSetting: true))
+                        .toList(),
+                  ),
+                )),
+                Card(
+                    child: Basic(
+                  title: Text("Novel Tags".tr),
+                  titleSpacing: 6,
+                  trailing: IconButton.ghost(
                         onPressed: () {
                           _showBanTagAddDialog(true);
                         },
-                        icon: Icon(Icons.add))
-                  ],
-                ),
-                Wrap(
-                  spacing: 2.0,
-                  runSpacing: 2.0,
-                  direction: Axis.horizontal,
-                  children: localManager.blockedNovelTags
-                      .map((f) => PixChip(f: f, type: "blockedNovelTags", isSetting: true))
+                        icon: Icon(Icons.add)),
+                  content: Wrap(
+                    spacing: 2.0,
+                    runSpacing: 2.0,
+                    direction: Axis.horizontal,
+                    children: localManager.blockedNovelTags
+                      .map((f) => PixChip(
+                          f: f, type: "blockedNovelTags", isSetting: true))
                       .toList(),
-                ),
-                Divider(),
-                Row(
-                  children: [
-                    Text("Pianters".tr),
-                    Opacity(
-                      opacity: 0.0,
-                      child:
-                          IconButton.ghost(onPressed: () {}, icon: Icon(Icons.add)),
-                    )
-                  ],
-                ),
-                Wrap(
-                  spacing: 2.0,
-                  runSpacing: 2.0,
-                  direction: Axis.horizontal,
-                  children: localManager.blockedUsers
-                      .map((f) => PixChip(f: f, type: "blockedUsers", isSetting: true))
+                  ),
+                )),
+                Card(
+                    child: Basic(
+                  title: Text("Pianters".tr),
+                  titleSpacing: 6,
+                  content: Wrap(
+                    spacing: 2.0,
+                    runSpacing: 2.0,
+                    direction: Axis.horizontal,
+                    children: localManager.blockedUsers
+                      .map((f) =>
+                          PixChip(f: f, type: "blockedUsers", isSetting: true))
                       .toList(),
-                ),
-                Divider(),
-                Row(
-                  children: [
-                    Text("Authors".tr),
-                    Opacity(
-                      opacity: 0.0,
-                      child:
-                          IconButton.ghost(onPressed: () {}, icon: Icon(Icons.add)),
-                    )
-                  ],
-                ),
-                Wrap(
-                  spacing: 2.0,
-                  runSpacing: 2.0,
-                  direction: Axis.horizontal,
-                  children: localManager.blockedNovelUsers
-                      .map((f) => PixChip(f: f, type: "blockedNovelUsers", isSetting: true))
+                  ),
+                )),
+                Card(
+                    child: Basic(
+                  title: Text("Authors".tr),
+                  titleSpacing: 6,
+                  content: Wrap(
+                    spacing: 2.0,
+                    runSpacing: 2.0,
+                    direction: Axis.horizontal,
+                    children: localManager.blockedNovelUsers
+                      .map((f) =>
+                          PixChip(f: f, type: "blockedNovelUsers", isSetting: true))
                       .toList(),
-                ),
-                Divider(),
-                Row(
-                  children: [
-                    Text("Commentors".tr),
-                    Opacity(
-                      opacity: 0.0,
-                      child:
-                          IconButton.ghost(onPressed: () {}, icon: Icon(Icons.add)),
-                    )
-                  ],
-                ),
-                Wrap(
-                  spacing: 2.0,
-                  runSpacing: 2.0,
-                  direction: Axis.horizontal,
-                  children: localManager.blockedCommentUsers
-                      .map((f) => PixChip(f: f, type: "blockedCommentUsers", isSetting: true))
+                  ),
+                )),
+                Card(
+                    child: Basic(
+                  title: Text("Commentors".tr),
+                  titleSpacing: 6,
+                  content: Wrap(
+                    spacing: 2.0,
+                    runSpacing: 2.0,
+                    direction: Axis.horizontal,
+                    children: localManager.blockedCommentUsers
+                      .map((f) =>
+                          PixChip(f: f, type: "blockedCommentUsers", isSetting: true))
                       .toList(),
-                ),
-                Divider(),
-                Row(
-                  children: [
-                    Text("Illusts".tr),
-                    Opacity(
-                      opacity: 0.0,
-                      child:
-                          IconButton.ghost(onPressed: () {}, icon: Icon(Icons.add)),
-                    )
-                  ],
-                ),
-                Wrap(
-                  spacing: 2.0,
-                  runSpacing: 2.0,
-                  direction: Axis.horizontal,
-                  children: localManager.blockedIllusts
-                      .map((f) => PixChip(f: f, type: "blockedIllusts", isSetting: true))
+                  ),
+                )),
+                Card(
+                    child: Basic(
+                  title: Text("Illusts".tr),
+                  titleSpacing: 6,
+                  content: Wrap(
+                    spacing: 2.0,
+                    runSpacing: 2.0,
+                    direction: Axis.horizontal,
+                    children: localManager.blockedIllusts
+                      .map((f) =>
+                          PixChip(f: f, type: "blockedIllusts", isSetting: true))
                       .toList(),
-                ),
-                Divider(),
-                Row(
-                  children: [
-                    Text("Novels".tr),
-                    Opacity(
-                      opacity: 0.0,
-                      child:
-                          IconButton.ghost(onPressed: () {}, icon: Icon(Icons.add)),
-                    )
-                  ],
-                ),
-                Wrap(
-                  spacing: 2.0,
-                  runSpacing: 2.0,
-                  direction: Axis.horizontal,
-                  children: localManager.blockedNovels
-                      .map((f) => PixChip(f: f, type: "blockedNovels", isSetting: true))
+                  ),
+                )),
+                Card(
+                    child: Basic(
+                  title: Text("Novels".tr),
+                  titleSpacing: 6,
+                  content: Wrap(
+                    spacing: 2.0,
+                    runSpacing: 2.0,
+                    direction: Axis.horizontal,
+                    children: localManager.blockedNovels
+                      .map((f) =>
+                          PixChip(f: f, type: "blockedNovels", isSetting: true))
                       .toList(),
-                ),
-                Divider(),
-                Row(
-                  children: [
-                    Text("Comments".tr),
-                    Opacity(
-                      opacity: 0.0,
-                      child:
-                          IconButton.ghost(onPressed: () {}, icon: Icon(Icons.add)),
-                    )
-                  ],
-                ),
-                Wrap(
-                  spacing: 2.0,
-                  runSpacing: 2.0,
-                  direction: Axis.horizontal,
-                  children: localManager.blockedComments
-                      .map((f) => PixChip(f: f, type: "blockedComments", isSetting: true))
+                  ),
+                )),
+                Card(
+                    child: Basic(
+                  title: Text("Comments".tr),
+                  titleSpacing: 6,
+                  content: Wrap(
+                    spacing: 2.0,
+                    runSpacing: 2.0,
+                    direction: Axis.horizontal,
+                    children: localManager.blockedComments
+                      .map((f) =>
+                          PixChip(f: f, type: "blockedComments", isSetting: true))
                       .toList(),
-                ),
+                  ),
+                )),
               ],
             ),
           ),
@@ -196,8 +172,7 @@ class _BlockListPageState extends State<BlockListPage> {
             title: Text("Add".tr),
             content: TextField(
               controller: controller,
-              placeholder: Text(
-                  isNovel ? "Novel Tag".tr : "Tag".tr,
+              placeholder: Text(isNovel ? "Novel Tag".tr : "Tag".tr,
                   style: TextStyle(fontSize: 12)),
             ),
             actions: <Widget>[
@@ -217,12 +192,11 @@ class _BlockListPageState extends State<BlockListPage> {
           );
         });
     if (result != null && result is String && result.isNotEmpty) {
-        if (isNovel) {
-          localManager.add("blockedNovelTags", [result]);
-        } else {
-          localManager.add("blockedTags", [result]);
-        }
+      if (isNovel) {
+        localManager.add("blockedNovelTags", [result]);
+      } else {
+        localManager.add("blockedTags", [result]);
+      }
     }
   }
-
 }

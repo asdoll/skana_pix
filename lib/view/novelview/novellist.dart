@@ -23,13 +23,11 @@ class _NovelListState extends State<NovelList> {
     ListNovelController controller =
         Get.find<ListNovelController>(tag: widget.controllerTag);
     controller.refreshController = refreshController;
-    if(controller.novels.isEmpty) controller.reset();
     return EasyRefresh(
       controller: refreshController,
+      refreshOnStart: true,
       scrollController: globalScrollController,
-      refreshOnStart: false,
       onRefresh: controller.reset,
-      callRefreshOverOffset: 10,
       onLoad: controller.noNextPage ? null : controller.nextPage,
       header: DefaultHeaderFooter.header(context),
       footer:
@@ -54,25 +52,23 @@ class _NovelListState extends State<NovelList> {
             );
           }
           if (controller.novels.isEmpty) {
-            if (controller.isLoading.value) {
+            if (!controller.isFirstLoading.value && !controller.isLoading.value) {
               return Center(
                 child: Padding(
                   padding: const EdgeInsets.all(8.0),
-                  child: CircularProgressIndicator(size: 64),
+                  child: Text('[ ]', style: Theme.of(context).typography.h1),
                 ),
               );
             }
-            return Center(
-              child: Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Text('[ ]', style: Theme.of(context).typography.h1),
-              ),
-            );
           }
           return WaterfallFlow.builder(
+            padding: const EdgeInsets.only(top: 8),
+            controller: globalScrollController,
             gridDelegate: SliverWaterfallFlowDelegateWithFixedCrossAxisCount(
               crossAxisCount:
                   context.orientation == Orientation.portrait ? 1 : 2,
+              mainAxisSpacing: 8.0,
+              crossAxisSpacing: 8.0,
             ),
             itemBuilder: (BuildContext context, int index) {
               return NovelCard(index, widget.controllerTag);

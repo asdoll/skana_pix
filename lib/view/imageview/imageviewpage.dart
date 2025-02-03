@@ -1,6 +1,5 @@
 import 'dart:io';
 
-import 'package:flutter/material.dart' show BottomAppBar;
 import 'package:path/path.dart' as path;
 import 'package:shadcn_flutter/shadcn_flutter.dart';
 import 'package:flutter/services.dart';
@@ -105,8 +104,8 @@ class _ImageViewPageState extends State<ImageViewPage> {
 
   Widget _buildBottom(BuildContext context) {
     if (_fullScreen) {
-      return BottomAppBar(
-        color: Colors.transparent,
+      return AppBar(
+        backgroundColor: Colors.transparent,
         child: Row(
           children: [
             IconButton.ghost(
@@ -125,8 +124,8 @@ class _ImageViewPageState extends State<ImageViewPage> {
         ),
       );
     }
-    return BottomAppBar(
-      color: Colors.transparent,
+    return AppBar(
+      backgroundColor: Colors.transparent,
       child: Visibility(
         visible: true,
         child: Row(
