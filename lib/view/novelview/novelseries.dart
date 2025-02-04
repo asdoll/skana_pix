@@ -9,7 +9,7 @@ import 'package:skana_pix/controller/novel_controller.dart';
 import 'package:skana_pix/model/worktypes.dart';
 import 'package:get/get.dart';
 import '../../componentwidgets/avatar.dart';
-import '../../componentwidgets/novelpage.dart';
+import 'novelpage.dart';
 import '../../componentwidgets/pixivimage.dart';
 
 class NovelSeriesPage extends StatefulWidget {

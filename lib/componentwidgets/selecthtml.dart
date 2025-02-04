@@ -25,6 +25,7 @@ class _SelectableHtmlState extends State<SelectableHtml> {
         }
         return null;
       },
+      textStyle: TextStyle(fontSize: 14),
       onTapUrl: (String url) async {
         try {
           log.d("html tap url: $url");

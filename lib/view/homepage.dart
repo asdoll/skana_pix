@@ -1,4 +1,5 @@
 import 'package:get/get.dart';
+import 'package:skana_pix/componentwidgets/searchbar.dart';
 import 'package:skana_pix/controller/account_controller.dart';
 import 'package:skana_pix/controller/mini_controllers.dart';
 import 'package:skana_pix/controller/page_index_controller.dart';
@@ -47,7 +48,9 @@ class _HomePageState extends State<HomePage> {
       return Scaffold(
         headers: [
           AppBar(
-            title: Text(getTitle(pages[homeController.pageIndex.value]).tr),
+            title: (homeController.pageIndex.value == 7)
+                ? SearchBar1(searchPageController.getAwType(searchPageController.selectedIndex.value))
+                : Text(getTitle(pages[homeController.pageIndex.value]).tr),
             subtitle: getSubtitle(pages[homeController.pageIndex.value])
                     .isNotEmpty
                 ? Text(getSubtitle(pages[homeController.pageIndex.value]).tr)

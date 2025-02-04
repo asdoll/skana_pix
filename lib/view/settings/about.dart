@@ -2,6 +2,7 @@ import 'package:flutter/material.dart' show InkWell;
 import 'package:shadcn_flutter/shadcn_flutter.dart';
 import 'package:get/get.dart';
 import 'package:skana_pix/componentwidgets/backarea.dart';
+import 'package:skana_pix/controller/update_controller.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 
 class AboutPage extends StatefulWidget {
@@ -31,7 +32,7 @@ class _AboutPageState extends State<AboutPage> {
         Card(
           child: Basic(
             title: Text('Version'.tr),
-            subtitle: Text('1.0.0'),
+            subtitle: Text(updateController.getVersion()),
           ),
         ),
         Card(

@@ -5,6 +5,7 @@ import 'package:skana_pix/controller/list_controller.dart';
 import 'package:skana_pix/controller/mini_controllers.dart';
 import 'package:skana_pix/model/worktypes.dart';
 import 'package:get/get.dart';
+import 'package:skana_pix/utils/widgetplugin.dart';
 import 'package:skana_pix/view/imageview/imagewaterfall.dart';
 import 'package:skana_pix/view/novelview/novellist.dart';
 
@@ -29,7 +30,7 @@ class _BookmarksPageState extends State<BookmarksPage> {
             index: mtab.index.value,
             children: [
               TabButton(
-                child: Text("Artwork".tr),
+                child: Text("Illust".tr),
                 onPressed: () {
                   mtab.index.value = 0;
                 },
@@ -43,19 +44,15 @@ class _BookmarksPageState extends State<BookmarksPage> {
             ],
           ),
           Expanded(
-            child: IndexedStack(
-              index: mtab.index.value,
-              children: [
-                BookmarkContent(
-                  id: widget.id,
-                  type: ArtworkType.ILLUST,
+            child: (mtab.index.value == 0)
+                ? BookmarkContent(
+                    id: widget.id,
+                    type: ArtworkType.ILLUST,
+                  )
+                : BookmarkContent(
+                    id: widget.id,
+                    type: ArtworkType.NOVEL,
                 ),
-                BookmarkContent(
-                  id: widget.id,
-                  type: ArtworkType.NOVEL,
-                ),
-              ],
-            ),
           ),
         ],
       );
@@ -83,7 +80,7 @@ class _BookmarkContentState extends State<BookmarkContent> {
                 controllerType: ListType.mybookmarks, type: widget.type),
             tag: "mybookmarks_${widget.id}");
         MTab mtab = Get.put(MTab(), tag: "mybookmarks_${widget.id}");
-        return Column(
+        return Obx(() => Column(
           children: [
             Tabs(
               index: mtab.index.value,
@@ -96,19 +93,19 @@ class _BookmarkContentState extends State<BookmarkContent> {
                 controller.restrict.value = index == 0 ? 'public' : 'private';
                 controller.refreshController?.callRefresh();
               },
-            ),
+            ).paddingTop(10),
             Expanded(
               child: ImageWaterfall(controllerTag: "mybookmarks_${widget.id}"),
             ),
           ],
-        );
+        ));
       } else {
         ListNovelController controller = Get.put(
             ListNovelController(controllerType: ListType.mybookmarks),
             tag: "mybookmarks_${widget.id}");
         MTab mtab = Get.put(MTab(), tag: "mybookmarks_${widget.id}");
-        return Column(
-          children: [
+        return Obx(() => Column(
+          children: [ 
             Tabs(
               index: mtab.index.value,
               tabs: [Text("Public".tr), Text("Private".tr)],
@@ -117,12 +114,12 @@ class _BookmarkContentState extends State<BookmarkContent> {
                 controller.restrict.value = index == 0 ? 'public' : 'private';
                 controller.refreshController?.callRefresh();
               },
-            ),
+            ).paddingTop(10),
             Expanded(
               child: NovelList(controllerTag: "mybookmarks_${widget.id}"),
             ),
           ],
-        );
+        ));
       }
     } else {
       if (widget.type == ArtworkType.ILLUST) {
@@ -132,14 +129,14 @@ class _BookmarkContentState extends State<BookmarkContent> {
                 type: widget.type,
                 id: widget.id.toString()),
             tag: "userbookmarks_${widget.id}");
-        return ImageWaterfall(controllerTag: "userbookmarks_${widget.id}");
+        return Obx(() => ImageWaterfall(controllerTag: "userbookmarks_${widget.id}"));
       } else {
         ListNovelController controller = Get.put(
             ListNovelController(
                 controllerType: ListType.userbookmarks,
                 id: widget.id.toString()),
             tag: "userbookmarks_${widget.id}");
-        return NovelList(controllerTag: "userbookmarks_${widget.id}");
+        return Obx(() => NovelList(controllerTag: "userbookmarks_${widget.id}"));
       }
     }
   }

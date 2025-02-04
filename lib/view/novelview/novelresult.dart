@@ -1,10 +1,12 @@
 import 'package:flutter/cupertino.dart';
 import 'package:shadcn_flutter/shadcn_flutter.dart';
+import 'package:skana_pix/componentwidgets/backarea.dart';
 import 'package:skana_pix/controller/account_controller.dart';
 import 'package:skana_pix/controller/list_controller.dart';
 import 'package:skana_pix/pixiv_dart_api.dart';
 import 'package:get/get.dart';
 import 'package:skana_pix/view/novelview/novellist.dart';
+
 class NovelResultPage extends StatefulWidget {
   final String word;
   final String translatedName;
@@ -24,13 +26,13 @@ class _NovelResultPageState extends State<NovelResultPage> {
         tag: "search_${widget.word}");
     controller.searchOptions.value = SearchOptions();
     controller.searchOptions.refresh();
-
     return Scaffold(headers: [
       AppBar(
         title: Text(
           widget.translatedName.isEmpty ? widget.word : widget.translatedName,
           overflow: TextOverflow.ellipsis,
         ),
+        leading: [const NormalBackButton()],
         trailing: <Widget>[
           IconButton.ghost(
               icon: Icon(Icons.date_range),
@@ -39,33 +41,50 @@ class _NovelResultPageState extends State<NovelResultPage> {
                 await showDialog(
                     context: context,
                     builder: (context) {
-                      return DatePickerDialog(
-                          initialViewType: CalendarViewType.date,
-                          selectionMode: CalendarSelectionMode.range,
-                          viewMode: context.width < 500
-                              ? CalendarSelectionMode.single
-                              : CalendarSelectionMode.range,
-                          initialValue: controller.dateTimeRange == null
-                              ? null
-                              : CalendarValue.range(
-                                  controller.dateTimeRange!.start,
-                                  controller.dateTimeRange!.end,
-                                ),
-                          stateBuilder: (date) {
-                            if (date.isBefore(DateTime(2007, 9))) {
-                              return DateState.disabled;
-                            } //pixiv于2007年9月10日由上谷隆宏等人首次推出第一个测试版...
-                            if (date.isAfter(DateTime.now())) {
-                              return DateState.disabled;
-                            }
-                            return DateState.enabled;
-                          },
-                          onChanged: (value) {
-                            if (value == null) return;
-                            final range = value.toRange();
-                            dateTimeRange =
-                                DateTimeRange(range.start, range.end);
-                          });
+                      return AlertDialog(
+                        content: DatePickerDialog(
+                            initialViewType: CalendarViewType.date,
+                            selectionMode: CalendarSelectionMode.range,
+                            viewMode: context.width < 500
+                                ? CalendarSelectionMode.single
+                                : CalendarSelectionMode.range,
+                            initialValue: controller.dateTimeRange == null
+                                ? null
+                                : CalendarValue.range(
+                                    controller.dateTimeRange!.start,
+                                    controller.dateTimeRange!.end,
+                                  ),
+                            stateBuilder: (date) {
+                              if (date.isBefore(DateTime(2007, 9))) {
+                                return DateState.disabled;
+                              } //pixiv于2007年9月10日由上谷隆宏等人首次推出第一个测试版...
+                              if (date.isAfter(DateTime.now())) {
+                                return DateState.disabled;
+                              }
+                              return DateState.enabled;
+                            },
+                            onChanged: (value) {
+                              if (value == null) return;
+                              final range = value.toRange();
+                              dateTimeRange =
+                                  DateTimeRange(range.start, range.end);
+                            }),
+                        actions: [
+                          OutlineButton(
+                            child: Text("Cancel".tr),
+                            onPressed: () {
+                              dateTimeRange = null;
+                              Get.back();
+                            },
+                          ),
+                          PrimaryButton(
+                            child: Text("Confirm".tr),
+                            onPressed: () {
+                              Get.back();
+                            },
+                          )
+                        ],
+                      );
                     });
                 if (dateTimeRange != null) {
                   controller.dateTimeRange = dateTimeRange;

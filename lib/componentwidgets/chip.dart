@@ -38,7 +38,7 @@ class PixChip extends StatelessWidget {
       context: context,
       builder: (context) {
         return AlertDialog(
-          title: Text("Delete".tr),
+          title: Text("Delete".tr).withAlign(Alignment.centerLeft),
           content: Text("${'Delete'.tr}?"),
           actions: <Widget>[
             TextButton(

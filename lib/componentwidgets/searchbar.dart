@@ -2,7 +2,6 @@ import 'package:flutter/material.dart' show InkWell;
 import 'package:shadcn_flutter/shadcn_flutter.dart';
 import 'package:skana_pix/model/worktypes.dart';
 import 'package:get/get.dart';
-import 'package:skana_pix/utils/widgetplugin.dart';
 
 import '../view/searchsuggestion.dart';
 
@@ -33,17 +32,14 @@ class _SearchBar1State extends State<SearchBar1> {
     return SizedBox(
       height: 48,
       child: Card(
-        padding: EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+        padding: EdgeInsets.symmetric(horizontal: 16),
         fillColor: Colors.gray.shade400,
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            Container(
-              margin: const EdgeInsets.only(left: 8, right: 2),
-              child: IconButton.ghost(
-                icon: Icon(Icons.search),
-                onPressed: () {},
-              ),
+            IconButton.ghost(
+              icon: Icon(Icons.search),
+              onPressed: () {},
             ),
             Expanded(
               child: InkWell(
@@ -75,6 +71,6 @@ class _SearchBar1State extends State<SearchBar1> {
           ],
         ),
       ),
-    ).paddingTop(10);
+    );
   }
 }

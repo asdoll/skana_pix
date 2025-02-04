@@ -5,7 +5,7 @@ import 'package:shadcn_flutter/shadcn_flutter.dart';
 import 'package:skana_pix/componentwidgets/headerfooter.dart';
 import 'package:skana_pix/controller/mini_controllers.dart';
 import 'package:skana_pix/view/imageview/imagelistview.dart';
-import 'package:skana_pix/componentwidgets/novelpage.dart';
+import 'package:skana_pix/view/novelview/novelpage.dart';
 import 'package:skana_pix/componentwidgets/pixivimage.dart';
 import 'package:skana_pix/controller/histories.dart';
 import 'package:get/get.dart';
@@ -123,15 +123,15 @@ class _IllustsHistoryState extends State<IllustsHistory> {
                                   context: context,
                                   builder: (context) {
                                     return AlertDialog(
-                                      title: Text("${"Delete".tr}?"),
+                                      title: Text("${"Delete".tr}?").withAlign(Alignment.centerLeft),
                                       actions: <Widget>[
-                                        TextButton(
+                                        OutlineButton(
                                           child: Text("Cancel".tr),
                                           onPressed: () {
                                             Get.back();
                                           },
                                         ),
-                                        TextButton(
+                                        PrimaryButton(
                                           child: Text("Ok".tr),
                                           onPressed: () {
                                             Get.back(result: "OK");
@@ -223,15 +223,15 @@ class _NovelsHistoryState extends State<NovelsHistory> {
                                   context: context,
                                   builder: (context) {
                                     return AlertDialog(
-                                      title: Text("${"Delete".tr}?"),
+                                      title: Text("${"Delete".tr}?").withAlign(Alignment.centerLeft),
                                       actions: <Widget>[
-                                        TextButton(
+                                        OutlineButton(
                                           child: Text("Cancel".tr),
                                           onPressed: () {
                                             Get.back();
                                           },
                                         ),
-                                        TextButton(
+                                        PrimaryButton(
                                           child: Text("Ok".tr),
                                           onPressed: () {
                                             Get.back(result: "OK");

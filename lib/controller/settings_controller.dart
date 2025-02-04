@@ -1,5 +1,6 @@
 import 'package:get/get.dart';
 import 'package:skana_pix/pixiv_dart_api.dart';
+import 'package:skana_pix/utils/widgetplugin.dart';
 
 class PrefsController extends GetxController {
   RxString language = settings.locale.obs;
@@ -12,6 +13,7 @@ class PrefsController extends GetxController {
   RxBool novelDirectEntry = (settings.settings[32] == "1").obs;
   RxBool checkUpdate = (settings.settings[9] == "1").obs;
   RxBool isHighRefreshRate = (settings.settings[33] == "1").obs;
+  RxString orientation = settings.settings[1].obs;
 
   void changeLanguage(String? value) {
     if (value != null) {
@@ -74,5 +76,14 @@ class PrefsController extends GetxController {
     isHighRefreshRate.value = v;
     settings.settings[33] = v ? "1" : "0";
     settings.updateSettings();
+  }
+
+  void setOrientation(String? value) {
+    if (value != null) {
+      orientation.value = value;
+      settings.settings[1] = value;
+      settings.updateSettings();
+      resetOrientation();
+    }
   }
 }

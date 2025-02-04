@@ -17,7 +17,7 @@ class UserSetting {
 
   List<String> settings = [
     '0', //0,darkMode 0:system 1:light 2:dark
-    '0', //1,not in use
+    '0', //1,orientation 0:portrait 1:landscape 2:auto
     '0', //2,not in use
     'system', //3,language
     '4', //4,maxParallelDownload

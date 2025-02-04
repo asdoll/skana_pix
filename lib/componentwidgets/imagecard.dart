@@ -57,7 +57,7 @@ class _IllustCardState extends State<IllustCard> {
           context: context,
           builder: (context) {
             return AlertDialog(
-              title: Text("Save".tr),
+              title: Text("Save".tr).withAlign(Alignment.centerLeft),
               content: Text(illust.title),
               actions: <Widget>[
                 TextButton(
@@ -279,7 +279,7 @@ class _IllustCardState extends State<IllustCard> {
             context: context,
             builder: (context) {
               return AlertDialog(
-                title: Text('长按保存'),
+                title: Text('长按保存').withAlign(Alignment.centerLeft),
                 content: Text('长按卡片将会保存插画到相册'),
                 actions: <Widget>[
                   TextButton(
@@ -321,7 +321,7 @@ class _IllustCardState extends State<IllustCard> {
         ),
         Align(
           alignment: Alignment.centerRight,
-          child: StarIcon(id: illust.id.toString(), type: widget.type),
+          child: StarIcon(id: illust.id.toString(), type: widget.type).paddingOnly(right: 8,top: 8),
         )
       ],
     );

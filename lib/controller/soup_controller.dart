@@ -179,7 +179,7 @@ class SpotlightStoreBase extends GetxController {
   bool isLoading = false;
 
   Future<bool> fetch() async {
-    if (isLoading) return false;
+    articles.clear();
     isLoading = true;
     nextUrl = null;
     try {

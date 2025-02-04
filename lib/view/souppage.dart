@@ -29,10 +29,13 @@ class _SoupPageState extends State<SoupPage> {
   Widget build(BuildContext context) {
     SoupFetcher soupFetcher =
         Get.put(SoupFetcher(), tag: "soupFetcher_${widget.heroTag}");
+    soupFetcher.fetch(widget.url);
     return Obx(() {
       return NestedScrollView(
           body: soupFetcher.amWorks.isEmpty
-              ? CircularProgressIndicator()
+              ? Center(
+                  child: CircularProgressIndicator(),
+                )
               : ListView.builder(
                   itemBuilder: (BuildContext context, int index) {
                     return Builder(builder: (context) {
@@ -42,7 +45,7 @@ class _SoupPageState extends State<SoupPage> {
                         return Card(
                           child: Padding(
                             padding: const EdgeInsets.all(8.0),
-                            child: Text(soupFetcher.description),
+                            child: Text(soupFetcher.description).h3(),
                           ),
                         );
                       }
@@ -64,7 +67,6 @@ class _SoupPageState extends State<SoupPage> {
                               Row(
                                 crossAxisAlignment: CrossAxisAlignment.center,
                                 children: [
-                                  SizedBox(width: 20),
                                   PainterAvatar(
                                     url: amWork.userImage!,
                                     id: int.parse(Uri.parse(amWork.userLink!)
@@ -80,14 +82,14 @@ class _SoupPageState extends State<SoupPage> {
                                     crossAxisAlignment:
                                         CrossAxisAlignment.start,
                                     children: [
-                                      Text(trimSize(amWork.title!)),
+                                      Text(trimSize(amWork.title!)).h4(),
                                       SizedBox(height: 4),
-                                      Text(amWork.user!),
+                                      Text(amWork.user!,style: Theme.of(context).typography.textSmall.copyWith(color: Theme.of(context).colorScheme.mutedForeground)),
                                     ],
                                   ),
                                 ],
                               ).paddingVertical(8),
-                              PixivImage(amWork.showImage!),
+                              PixivImage(amWork.showImage!).rounded(8),
                             ],
                           ),
                         ),
@@ -113,7 +115,7 @@ class _SoupPageState extends State<SoupPage> {
                   pinned: true,
                   expandedHeight: 200.0,
                   flexibleSpace: FlexibleSpaceBar(
-                    titlePadding: EdgeInsets.symmetric(horizontal: 10),
+                    titlePadding: EdgeInsets.symmetric(horizontal: 40),
                     centerTitle: true,
                     title: Stack(
                       children: <Widget>[
@@ -127,14 +129,14 @@ class _SoupPageState extends State<SoupPage> {
                               ..color =
                                   Theme.of(context).colorScheme.background,
                           ),
-                        ),
+                        ).medium(),
                         // Solid text as fill.
                         Text(
                           widget.spotlight!.pureTitle,
                           style: TextStyle(
                             color: Theme.of(context).colorScheme.foreground,
                           ),
-                        ),
+                        ).medium(),
                       ],
                     ),
                     background: NullHero(

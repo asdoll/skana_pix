@@ -248,7 +248,7 @@ class _IllustDetailContentState extends State<IllustDetailContent> {
         padding: const EdgeInsets.symmetric(vertical: 6.0, horizontal: 14),
         child: Container(
           decoration: BoxDecoration(
-            color: Theme.of(context).colorScheme.secondaryForeground,
+            color: Theme.of(context).colorScheme.secondary,
             borderRadius: BorderRadius.all(Radius.circular(16)),
           ),
           child: Padding(
@@ -336,9 +336,9 @@ class _IllustDetailContentState extends State<IllustDetailContent> {
                       text: "\n${"${f.translatedName}"}",
                       style: Theme.of(context).typography.textSmall)
               ]),
-            ),
+            ).withAlign(Alignment.centerLeft),
             actions: <Widget>[
-              PrimaryButton(
+              OutlineButton(
                 onPressed: () {
                   Get.back(result: 0);
                 },

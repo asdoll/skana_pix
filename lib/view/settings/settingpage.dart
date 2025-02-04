@@ -30,13 +30,13 @@ class _SettingPageState extends State<SettingPage> {
   @override
   Widget build(BuildContext context) {
     boardController.fetchBoard();
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: <Widget>[
+    return CustomScrollView(
+      slivers: <Widget>[
         Obx(() {
           if (accountController.isLoggedIn.value) {
-            return Card(
-                child: Basic(
+            return SliverToBoxAdapter(
+                child: Card(
+                    child: Basic(
               leading: PainterAvatar(
                   url: ConnectManager().apiClient.account.user.profileImg,
                   id: int.parse(
@@ -50,55 +50,65 @@ class _SettingPageState extends State<SettingPage> {
               content: Text(
                 ConnectManager().apiClient.account.user.email,
               ),
-            ));
+            )));
           }
           return Container();
         }),
-        Button(
-            alignment: Alignment.centerLeft,
-            onPressed: () => Get.to(BlockListPage()),
-            style: ButtonStyle.card(),
-            child: Basic(
-              leading: Icon(Icons.block),
-              title: Text("Block List".tr),
-            )),
+        SliverToBoxAdapter(
+            child: Button(
+                alignment: Alignment.centerLeft,
+                onPressed: () => Get.to(BlockListPage()),
+                style: ButtonStyle.card(),
+                child: Basic(
+                  leading: Icon(Icons.block),
+                  title: Text("Block List".tr),
+                ))),
         if (accountController.isLoggedIn.value)
-          Button(
-            alignment: Alignment.centerLeft,
-            onPressed: () =>
-                launchUrlString("https://www.pixiv.net/setting_user.php"),
-            style: ButtonStyle.card(),
-            child: Basic(
-              leading: Icon(Icons.account_box),
-              title: Text("Account Settings".tr),
+          SliverToBoxAdapter(
+            child: Button(
+              alignment: Alignment.centerLeft,
+              onPressed: () =>
+                  launchUrlString("https://www.pixiv.net/setting_user.php"),
+              style: ButtonStyle.card(),
+              child: Basic(
+                leading: Icon(Icons.account_box),
+                title: Text("Account Settings".tr),
+              ),
             ),
           ),
-        Button(
-            alignment: Alignment.centerLeft,
-            onPressed: () => Get.to(PreferenceSettings()),
-            style: ButtonStyle.card(),
-            child: Basic(
-              leading: Icon(Icons.settings),
-              title: Text("Preference Settings".tr),
-            )),
-        Button(
-            alignment: Alignment.centerLeft,
-            onPressed: () => Get.to(DataExport()),
-            style: ButtonStyle.card(),
-            child: Basic(
-              leading: Icon(Icons.folder_open_rounded),
-              title: Text("App Data".tr),
-            )),
-        Button(
-            alignment: Alignment.centerLeft,
-            onPressed: () => Get.to(AboutPage()),
-            style: ButtonStyle.card(),
-            child: Basic(
-              leading: Icon(Icons.message),
-              title: Text("About".tr),
-            )),
+        SliverToBoxAdapter(
+          child: Button(
+              alignment: Alignment.centerLeft,
+              onPressed: () => Get.to(PreferenceSettings()),
+              style: ButtonStyle.card(),
+              child: Basic(
+                leading: Icon(Icons.settings),
+                title: Text("Preference Settings".tr),
+              )),
+        ),
+        SliverToBoxAdapter(
+          child: Button(
+              alignment: Alignment.centerLeft,
+              onPressed: () => Get.to(DataExport()),
+              style: ButtonStyle.card(),
+              child: Basic(
+                leading: Icon(Icons.folder_open_rounded),
+                title: Text("App Data".tr),
+              )),
+        ),
+        SliverToBoxAdapter(
+          child: Button(
+              alignment: Alignment.centerLeft,
+              onPressed: () => Get.to(AboutPage()),
+              style: ButtonStyle.card(),
+              child: Basic(
+                leading: Icon(Icons.message),
+                title: Text("About".tr),
+              )),
+        ),
         Obx(() => boardController.needBoardSection.value
-            ? Button(
+            ? SliverToBoxAdapter(
+                child: Button(
                 alignment: Alignment.centerLeft,
                 onPressed: () => Get.to(BoardPage()),
                 style: ButtonStyle.card(),
@@ -106,23 +116,26 @@ class _SettingPageState extends State<SettingPage> {
                   leading: Icon(Icons.article),
                   title: Text("Bulletin Board".tr),
                 ),
-              )
-            : Container()),
-        Button(
-          alignment: Alignment.centerLeft,
-          onPressed: () => Get.to(NewVersionPage()),
-          style: ButtonStyle.card(),
-          child: Basic(
-            leading: Icon(Icons.update),
-            title: Text("Check updates".tr),
-            trailing: Visibility(
-              visible: updateController.hasNewVersion.value,
-              child: NewVersionChip(),
+              ))
+            : SliverToBoxAdapter()),
+        SliverToBoxAdapter(
+          child: Button(
+            alignment: Alignment.centerLeft,
+            onPressed: () => Get.to(NewVersionPage()),
+            style: ButtonStyle.card(),
+            child: Basic(
+              leading: Icon(Icons.update),
+              title: Text("Check updates".tr),
+              trailing: Visibility(
+                visible: updateController.hasNewVersion.value,
+                child: NewVersionChip(),
+              ),
             ),
           ),
         ),
         Obx(() => accountController.isLoggedIn.value
-            ? Button(
+            ? SliverToBoxAdapter(
+                child: Button(
                 alignment: Alignment.centerLeft,
                 onPressed: () => _showLogoutDialog(context),
                 style: ButtonStyle.card(),
@@ -130,8 +143,9 @@ class _SettingPageState extends State<SettingPage> {
                   leading: Icon(Icons.logout),
                   title: Text("Logout".tr),
                 ),
-              )
-            : Button(
+              ))
+            : SliverToBoxAdapter(
+                child: Button(
                 alignment: Alignment.centerLeft,
                 onPressed: () => Get.offAll(() => LoginPage()),
                 style: ButtonStyle.card(),
@@ -139,7 +153,7 @@ class _SettingPageState extends State<SettingPage> {
                   leading: Icon(Icons.login),
                   title: Text("Login".tr),
                 ),
-              ))
+              )))
       ],
     );
   }
@@ -149,19 +163,19 @@ class _SettingPageState extends State<SettingPage> {
         context: context,
         builder: (context) {
           return AlertDialog(
-            title: Text("Logout".tr,textAlign: TextAlign.left),
+            title: Text("Logout".tr).toAlign(Alignment.centerLeft),
             content: Text("Are you sure you want to logout?".tr),
             actions: <Widget>[
               OutlineButton(
                 child: Text("Cancel".tr),
                 onPressed: () {
-                  Navigator.of(context).pop("CANCEL");
+                  Get.back(result: "CANCEL");
                 },
               ),
               PrimaryButton(
                 child: Text("Ok".tr),
                 onPressed: () {
-                  Navigator.of(context).pop("OK");
+                  Get.back(result: "OK");
                 },
               ),
             ],

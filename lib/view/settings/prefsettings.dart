@@ -19,7 +19,7 @@ class _PreferenceSettingsState extends State<PreferenceSettings> {
         headers: [
           AppBar(
             title: Text('Preference Settings'.tr),
-           padding: EdgeInsets.all(10),
+            padding: EdgeInsets.all(10),
             leading: [
               const NormalBackButton(),
             ],
@@ -84,6 +84,34 @@ class _PreferenceSettingsState extends State<PreferenceSettings> {
                   ),
                 )),
               ),
+              if (GetPlatform.isAndroid)
+                SliverToBoxAdapter(
+                  child: Card(
+                      child: Basic(
+                    title: Text("Main orientation".tr),
+                    trailing: Select<String>(
+                      value: controller.orientation.value,
+                      itemBuilder: (context, item) {
+                        switch (item) {
+                          case '0':
+                            return Text("Portrait".tr);
+                          case '1':
+                            return Text('Landscape'.tr);
+                          case _:
+                            return Text('Auto'.tr);
+                        }
+                      },
+                      onChanged: (value) => controller.setOrientation(value),
+                      children: [
+                        SelectItemButton(
+                            value: '0', child: Text('Portrait'.tr)),
+                        SelectItemButton(
+                            value: '1', child: Text('Landscape'.tr)),
+                        SelectItemButton(value: '2', child: Text('Auto'.tr))
+                      ],
+                    ),
+                  )),
+                ),
               SliverToBoxAdapter(
                 child: Card(
                     child: Basic(

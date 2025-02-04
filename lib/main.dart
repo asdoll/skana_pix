@@ -4,12 +4,14 @@ import 'dart:io';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:skana_pix/controller/account_controller.dart';
+import 'package:skana_pix/controller/mini_controllers.dart';
 import 'package:skana_pix/controller/theme_controller.dart';
 import 'package:skana_pix/controller/update_controller.dart';
 import 'package:skana_pix/controller/page_index_controller.dart';
 import 'package:skana_pix/pixiv_dart_api.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:bot_toast/bot_toast.dart';
+import 'package:skana_pix/utils/widgetplugin.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 import 'package:flutter_displaymode/flutter_displaymode.dart';
 
@@ -42,7 +44,11 @@ Future<void> main() async {
     likeController = Get.put(LikeController(), permanent: true);
     boardController = Get.put(BoardController(), permanent: true);
     updateController = Get.put(UpdateController(), permanent: true);
+    updateController.check();
     mtc = Get.put(MiniThemeController(), permanent: true);
+    searchPageController = Get.put(SearchPageController(), permanent: true);
+    
+    homeController.init();
     if (Platform.isWindows || Platform.isLinux) {
       sqfliteFfiInit();
       databaseFactory = databaseFactoryFfi;
@@ -76,6 +82,7 @@ class _MyAppState extends State<MyApp> {
       valueListenable: appValueNotifier.theme,
       builder: (context, value, child) {
         SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
+        resetOrientation();
         return ShadcnApp(
           title: 'Skana_pix',
           builder: BotToastInit(),
@@ -87,6 +94,7 @@ class _MyAppState extends State<MyApp> {
             GlobalMaterialLocalizations.delegate,
             GlobalWidgetsLocalizations.delegate,
             GlobalCupertinoLocalizations.delegate,
+            ShadcnLocalizationsDelegate(),
           ],
           supportedLocales: [
             const Locale('en', 'US'),

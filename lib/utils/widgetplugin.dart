@@ -1,4 +1,6 @@
+import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
+import 'package:skana_pix/controller/settings.dart';
 
 extension WidgetExtension on Widget {
   Widget padding(EdgeInsetsGeometry padding) {
@@ -90,5 +92,19 @@ class Parser {
 
   static Color stringToColor(String color) {
     return Color(int.parse(color, radix: 16) + 0xFF000000);
+  }
+}
+
+void resetOrientation() {
+  if (settings.settings[1] == '0') {
+    SystemChrome.setPreferredOrientations([
+      DeviceOrientation.portraitUp,
+      DeviceOrientation.portraitDown,
+    ]);
+  } else if (settings.settings[1] == '1') {
+    SystemChrome.setPreferredOrientations(
+        [DeviceOrientation.landscapeLeft, DeviceOrientation.landscapeRight]);
+  } else {
+    SystemChrome.setPreferredOrientations(DeviceOrientation.values);
   }
 }

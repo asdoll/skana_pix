@@ -15,7 +15,7 @@ import '../model/worktypes.dart';
 import 'avatar.dart';
 import '../view/commentpage.dart';
 import 'followbutton.dart';
-import 'novelpage.dart';
+import '../view/novelview/novelpage.dart';
 import '../view/novelview/novelresult.dart';
 import '../view/novelview/novelseries.dart';
 import 'pixivimage.dart';
@@ -82,9 +82,8 @@ class _NovelCardState extends State<NovelCard> {
                                 recomNovelsController
                                     .novels[widget.index].title,
                                 overflow: TextOverflow.ellipsis,
-                                style: mtc.theme.value.typography.textLarge,
                                 maxLines: 3,
-                              ),
+                              ).textSmall(),
                             ),
                             Padding(
                               padding:
@@ -96,14 +95,10 @@ class _NovelCardState extends State<NovelCard> {
                                     recomNovelsController.novels[widget.index]
                                         .author.name.atMost8,
                                     maxLines: 1,
-                                    style: mtc.theme.value
-                                        .typography
-                                        .textSmall
-                                        .copyWith(
-                                            color: mtc.theme.value
-                                                .colorScheme
-                                                .secondary),
-                                  ),
+                                    style: TextStyle(
+                                        color: mtc.theme.value.colorScheme
+                                            .mutedForeground),
+                                  ).xSmall(),
                                   Padding(
                                     padding: EdgeInsets.only(left: 8),
                                     child: Row(
@@ -111,19 +106,22 @@ class _NovelCardState extends State<NovelCard> {
                                         Icon(
                                           Icons.sticky_note_2_outlined,
                                           size: 12,
-                                          color: mtc.theme.value
-                                              .typography
-                                              .textSmall
-                                              .color,
+                                          color: mtc
+                                              .theme.value.colorScheme.primary,
                                         ),
                                         const SizedBox(
                                           width: 2,
                                         ),
                                         Text(
                                           '${recomNovelsController.novels[widget.index].length}',
-                                          style: mtc.theme.value
-                                              .typography
-                                              .textSmall,
+                                          style: mtc
+                                              .theme.value.typography.textSmall
+                                              .copyWith(
+                                                  color: mtc
+                                                      .theme
+                                                      .value
+                                                      .colorScheme
+                                                      .mutedForeground),
                                         )
                                       ],
                                     ),
@@ -144,12 +142,7 @@ class _NovelCardState extends State<NovelCard> {
                                     Container(),
                                   for (var f in recomNovelsController
                                       .novels[widget.index].tags)
-                                    Text(
-                                      f.name,
-                                      style: mtc.theme.value
-                                          .typography
-                                          .textSmall,
-                                    )
+                                    Text("${f.name} ").xSmall()
                                 ],
                               ),
                             ),
@@ -171,13 +164,15 @@ class _NovelCardState extends State<NovelCard> {
                         id: recomNovelsController.novels[widget.index].id
                             .toString(),
                         type: ArtworkType.NOVEL,
-                        size: 20,
+                        size: 32,
                         liked: recomNovelsController
                             .novels[widget.index].isBookmarked,
-                      ),
+                      ).paddingOnly(top: 8),
                       Text(
                           '${recomNovelsController.novels[widget.index].totalBookmarks}',
-                          style: mtc.theme.value.typography.textSmall)
+                          style: mtc.theme.value.typography.textSmall.copyWith(
+                            color: mtc.theme.value.colorScheme.mutedForeground,
+                          ))
                     ],
                   ),
                 )
@@ -194,23 +189,27 @@ class _NovelCardState extends State<NovelCard> {
       context: context,
       position: OverlayPosition.bottom,
       builder: (_) {
-        return Scaffold(
-          footers: [
-            IconButton.primary(
-              shape: ButtonShape.circle,
-              size: ButtonSize(1.2),
-              onPressed: () {
-                Get.back();
-                Get.to(
-                    () => NovelViewerPage(
-                        recomNovelsController.novels[widget.index]),
-                    preventDuplicates: false);
-              },
-              icon: Icon(Icons.menu_book_rounded),
-            ).withAlign(Alignment(0.85,0.9)).paddingBottom(Get.mediaQuery.size.height*0.05)
-          ],
-          floatingFooter: true,
-          child: SingleChildScrollView(child: _buildFirstView(context)),
+        return SizedBox(
+          height: Get.mediaQuery.size.height * 0.6,
+          child: Scaffold(
+            footers: [
+              IconButton.primary(
+                size: ButtonSize(1.2),
+                onPressed: () {
+                  Get.back();
+                  Get.to(
+                      () => NovelViewerPage(
+                          recomNovelsController.novels[widget.index]),
+                      preventDuplicates: false);
+                },
+                icon: Icon(Icons.menu_book_rounded),
+              )
+                  .withAlign(Alignment(0.85, 0.9))
+                  .paddingBottom(Get.mediaQuery.size.height * 0.05)
+            ],
+            floatingFooter: true,
+            child: SingleChildScrollView(child: _buildFirstView(context)),
+          ),
         );
       },
     );
@@ -237,8 +236,7 @@ class _NovelCardState extends State<NovelCard> {
                 left: 16.0, right: 16.0, top: 12.0, bottom: 8.0),
             child: Text(
               recomNovelsController.novels[widget.index].title,
-              style: mtc.theme.value.typography.h3,
-            ),
+            ).h4(),
           ),
           Padding(
             padding: const EdgeInsets.only(
@@ -258,14 +256,10 @@ class _NovelCardState extends State<NovelCard> {
                     child: Text(
                       recomNovelsController
                           .novels[widget.index].author.name.atMost8,
-                      style: const TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
+                    ).xSmall(),
                   ),
                 ]),
-                const SizedBox(width: 8),
+                const SizedBox(width: 16),
                 UserFollowButton(
                   id: recomNovelsController.novels[widget.index].author.id
                       .toString(),
@@ -285,16 +279,15 @@ class _NovelCardState extends State<NovelCard> {
                       recomNovelsController.novels[widget.index].seriesId!));
                 },
                 child: Container(
-                  height: 22,
+                  height: 26,
                   padding: const EdgeInsets.symmetric(horizontal: 14),
                   decoration: BoxDecoration(
                     color: mtc.theme.value.colorScheme.secondary,
-                    borderRadius: const BorderRadius.all(Radius.circular(12.5)),
+                    borderRadius: const BorderRadius.all(Radius.circular(12)),
                   ),
                   child: Text(
                     "Series:${recomNovelsController.novels[widget.index].seriesTitle}",
-                    style: mtc.theme.value.typography.textSmall,
-                  ),
+                  ).textSmall().semiBold(),
                 ),
               ),
             ),
@@ -324,30 +317,51 @@ class _NovelCardState extends State<NovelCard> {
                     buildRow(context, f)
                 ],
               )),
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Card(
-              child: Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: m.SelectionArea(
-                  contextMenuBuilder: (context, editableTextState) {
-                    return _buildSelectionMenu(editableTextState, context);
-                  },
-                  child: SelectableHtml(
-                      data: recomNovelsController.novels[widget.index].caption),
+          if (recomNovelsController.novels[widget.index].caption
+              .trim()
+              .isNotEmpty)
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Card(
+                child: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: m.SelectionArea(
+                    contextMenuBuilder: (context, editableTextState) {
+                      return _buildSelectionMenu(editableTextState, context);
+                    },
+                    child: SelectableHtml(
+                        data:
+                            recomNovelsController.novels[widget.index].caption),
+                  ),
                 ),
               ),
             ),
-          ),
-          TextButton(
-              onPressed: () {
-                Get.to(
-                    () => CommentPage(
-                        id: recomNovelsController.novels[widget.index].id,
-                        type: ArtworkType.NOVEL),
-                    preventDuplicates: false);
-              },
-              child: Text("Show comments".tr)),
+          Button(
+            onPressed: () {
+              Get.to(
+                  () => CommentPage(
+                      id: recomNovelsController.novels[widget.index].id,
+                      type: ArtworkType.NOVEL),
+                  preventDuplicates: false);
+            },
+            style: ButtonStyle.card(density: ButtonDensity.dense),
+            child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(
+                    Icons.comment,
+                    size: 16,
+                    color: mtc.theme.value.colorScheme.primary,
+                  ),
+                  SizedBox(
+                    width: 4,
+                  ),
+                  Text(
+                    "Show comments".tr,
+                  ).xSmall(),
+                ]),
+          ).paddingSymmetric(vertical: 16),
         ],
       ),
     );
@@ -386,10 +400,8 @@ class _NovelCardState extends State<NovelCard> {
                       text: f.translatedName ?? "~",
                       style: mtc.theme.value.typography.textSmall)
                 ],
-                style: mtc.theme.value
-                    .typography
-                    .textSmall
-                    .copyWith(color: mtc.theme.value.colorScheme.secondary))),
+                style: mtc.theme.value.typography.textSmall.copyWith(
+                    color: mtc.theme.value.colorScheme.secondaryForeground))),
       ),
     );
   }
@@ -403,28 +415,28 @@ class _NovelCardState extends State<NovelCard> {
               text: TextSpan(children: [
                 TextSpan(
                     text: f.name,
-                    style: mtc.theme.value.typography.textLarge.copyWith(
-                        color: mtc.theme.value.colorScheme.primary)),
+                    style: mtc.theme.value.typography.textLarge
+                        .copyWith(color: mtc.theme.value.colorScheme.primary)),
                 if (f.translatedName != null)
                   TextSpan(
                       text: "\n${"${f.translatedName}"}",
                       style: mtc.theme.value.typography.textLarge)
               ]),
-            ),
+            ).withAlign(Alignment.centerLeft),
             actions: <Widget>[
-              TextButton(
+              OutlineButton(
                 onPressed: () {
                   Get.back(result: 0);
                 },
                 child: Text("Block".tr),
               ),
-              TextButton(
+              PrimaryButton(
                 onPressed: () {
                   Get.back(result: 1);
                 },
                 child: Text("Bookmark".tr),
               ),
-              TextButton(
+              PrimaryButton(
                 onPressed: () {
                   Get.back(result: 2);
                 },
@@ -469,19 +481,25 @@ class _NovelCardState extends State<NovelCard> {
         spacing: 2,
         runSpacing: 0,
         children: [
-          Icon(Icons.bookmark, size: 12),
-          Text(
-            "${novel.totalBookmarks}",
-            style: TextStyle(color: mtc.theme.value.colorScheme.primary),
+          Icon(
+            Icons.bookmark,
+            size: 14,
+            color: mtc.theme.value.colorScheme.primary,
           ),
+          Text("${novel.totalBookmarks}",
+              style: mtc.theme.value.typography.textSmall.copyWith(
+                  color: mtc.theme.value.colorScheme.mutedForeground)),
           Padding(
             padding: const EdgeInsets.only(left: 8.0),
-            child: Icon(Icons.remove_red_eye_rounded, size: 12),
+            child: Icon(
+              Icons.remove_red_eye_rounded,
+              size: 14,
+              color: mtc.theme.value.colorScheme.primary,
+            ),
           ),
-          Text(
-            "${novel.totalViews}",
-            style: TextStyle(color: mtc.theme.value.colorScheme.primary),
-          ),
+          Text("${novel.totalViews}",
+              style: mtc.theme.value.typography.textSmall.copyWith(
+                  color: mtc.theme.value.colorScheme.mutedForeground)),
         ],
       ),
     );

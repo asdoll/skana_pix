@@ -76,7 +76,9 @@ class _ImageListViewPageState extends State<ImageListViewPage> {
 
   @override
   Widget build(BuildContext context) {
-    historyManager.addIllust(listController.illusts[widget.index]);
+    if (listController.illusts.isNotEmpty && widget.index >= listController.illusts.length) {
+      historyManager.addIllust(listController.illusts[widget.index]);
+    }
 
     var length = listController.illusts.length;
     if (listController.nexturl.isNotEmpty) {
@@ -287,25 +289,28 @@ class _IllustPageState extends State<IllustPage> {
                 child: IllustDetailContent(illust: widget.illust),
               ),
               SliverGrid(
-                  delegate: SliverChildBuilderDelegate(
-                      (BuildContext context, int index) {
-                    return InkWell(
-                      onTap: () {
-                        Get.to(
-                            () => ImageListViewPage(
-                                controllerTag: "related_${widget.illust.id}",
-                                index: index),
-                            preventDuplicates: false);
-                      },
-                      child: PixivImage(
-                        relatedListController
-                            .illusts[index].images.first.squareMedium,
-                        enableMemoryCache: false,
-                      ),
-                    );
-                  }, childCount: relatedListController.illusts.length),
-                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: 3)).sliverPadding(EdgeInsets.all(8)),
+                      delegate: SliverChildBuilderDelegate(
+                          (BuildContext context, int index) {
+                        return InkWell(
+                          onTap: () {
+                            Get.to(
+                                () => ImageListViewPage(
+                                    controllerTag:
+                                        "related_${widget.illust.id}",
+                                    index: index),
+                                preventDuplicates: false);
+                          },
+                          child: PixivImage(
+                            relatedListController
+                                .illusts[index].images.first.squareMedium,
+                            enableMemoryCache: false,
+                          ),
+                        );
+                      }, childCount: relatedListController.illusts.length),
+                      gridDelegate:
+                          const SliverGridDelegateWithFixedCrossAxisCount(
+                              crossAxisCount: 3))
+                  .sliverPadding(EdgeInsets.all(8)),
             ],
           ),
         );
@@ -504,59 +509,53 @@ class _IllustPageState extends State<IllustPage> {
           return StatefulBuilder(builder: (context, setDialogState) {
             return SafeArea(
               child: AlertDialog(
-                content: Column(
-                  children: [
-                    Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 16),
-                      child: Text(illust.title),
-                    ),
-                    Expanded(
-                      child: GridView.builder(
-                        itemBuilder: (context, index) {
-                          final data = illust.images[index];
-                          return Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: InkWell(
-                              onTap: () {
-                                setDialogState(() {
-                                  indexs[index] = !indexs[index];
-                                });
-                              },
-                              onLongPress: () {
-                                Get.to(() => ImageViewPage(
-                                    illust.images.map((e) => e.large).toList(),
-                                    initialPage: index));
-                              },
-                              child: Stack(
-                                children: [
-                                  PixivImage(
-                                    data.squareMedium,
-                                    placeWidget: Center(
-                                      child: Text(index.toString()),
-                                    ),
-                                  ),
-                                  Align(
-                                      alignment: Alignment.bottomRight,
-                                      child: Visibility(
-                                          visible: indexs[index],
-                                          child: Padding(
-                                            padding: const EdgeInsets.all(4.0),
-                                            child: Icon(
-                                              Icons.check_circle,
-                                              color: Colors.green,
-                                            ),
-                                          ))),
-                                ],
+                title: Text(illust.title).withAlign(Alignment.centerLeft),
+                content: SizedBox(
+                  height: context.height / 1.5,
+                  child: GridView.builder(
+                    itemBuilder: (context, index) {
+                      final data = illust.images[index];
+                      return Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: InkWell(
+                          onTap: () {
+                            setDialogState(() {
+                              indexs[index] = !indexs[index];
+                            });
+                          },
+                          onLongPress: () {
+                            Get.to(() => ImageViewPage(
+                                illust.images.map((e) => e.large).toList(),
+                                initialPage: index));
+                          },
+                          child: Stack(
+                            children: [
+                              PixivImage(
+                                data.squareMedium,
+                                placeWidget: Center(
+                                  child: Text(index.toString()),
+                                ),
                               ),
-                            ),
-                          );
-                        },
-                        itemCount: illust.images.length,
-                        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                            crossAxisCount: 3),
-                      ),
-                    ),
-                  ],
+                              Align(
+                                  alignment: Alignment.bottomRight,
+                                  child: Visibility(
+                                      visible: indexs[index],
+                                      child: Padding(
+                                        padding: const EdgeInsets.all(4.0),
+                                        child: Icon(
+                                          Icons.check_circle,
+                                          color: Colors.green,
+                                        ),
+                                      ))),
+                            ],
+                          ),
+                        ),
+                      );
+                    },
+                    itemCount: illust.images.length,
+                    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                        crossAxisCount: 3),
+                  ),
                 ),
                 actions: [
                   PrimaryButton(
@@ -610,6 +609,9 @@ class _IllustPageLiteState extends State<IllustPageLite> {
             id: widget.id,
             type: ArtworkType.ILLUST),
         tag: "illust_${widget.id}");
-    return ImageListViewPage(controllerTag: "illust_${widget.id}", index: 0);
+    controller.reset();
+    return Obx(() => controller.isLoading.value
+        ? Container()
+        : ImageListViewPage(controllerTag: "illust_${widget.id}", index: 0));
   }
 }

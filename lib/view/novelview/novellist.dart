@@ -5,6 +5,7 @@ import 'package:skana_pix/componentwidgets/headerfooter.dart';
 import 'package:skana_pix/componentwidgets/novelcard.dart';
 import 'package:skana_pix/controller/list_controller.dart';
 import 'package:skana_pix/controller/mini_controllers.dart';
+import 'package:skana_pix/utils/widgetplugin.dart';
 import 'package:waterfall_flow/waterfall_flow.dart';
 
 class NovelList extends StatefulWidget {
@@ -40,7 +41,7 @@ class _NovelListState extends State<NovelList> {
             return Center(
               child: Column(
                 children: [
-                  Text("Error".tr),
+                  Text("Error".tr).h3().paddingTop(context.height / 4),
                   Button.primary(
                     onPressed: () {
                       refreshController.callRefresh();

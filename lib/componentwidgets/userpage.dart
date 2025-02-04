@@ -1,7 +1,19 @@
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart'
+    show
+        CollapseMode,
+        FlexibleSpaceBar,
+        InkWell,
+        PopupMenuButton,
+        PopupMenuItem,
+        SelectionArea,
+        Tab,
+        TabBar,
+        TabBarView,
+        TabController;
 import 'package:flutter/services.dart';
 import 'package:icon_decoration/icon_decoration.dart';
+import 'package:shadcn_flutter/shadcn_flutter.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:skana_pix/componentwidgets/userdetail.dart';
 import 'package:skana_pix/view/userview/userworks.dart';
@@ -87,19 +99,13 @@ class _UserPageState extends State<UserPage> with TickerProviderStateMixin {
     return Obx(() {
       if (isMuted) {
         return Scaffold(
-          appBar: AppBar(
-            backgroundColor: Colors.transparent,
-            elevation: 0.0,
-          ),
-          extendBodyBehindAppBar: true,
-          extendBody: true,
-          body: Center(
+          child: Center(
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: <Widget>[
                 Text('X_X'),
                 Text('${widget.id}'),
-                FilledButton.tonal(
+                PrimaryButton(
                     onPressed: () {
                       settings.removeBlockedUsers([widget.id.toString()]);
                       setState(() {
@@ -115,8 +121,7 @@ class _UserPageState extends State<UserPage> with TickerProviderStateMixin {
 
       if (isError && userDetail == null) {
         return Scaffold(
-          appBar: AppBar(),
-          body: Container(
+          child: Container(
               child: Center(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.center,
@@ -131,8 +136,7 @@ class _UserPageState extends State<UserPage> with TickerProviderStateMixin {
                 ),
                 Padding(
                   padding: const EdgeInsets.all(8.0),
-                  child: MaterialButton(
-                    color: Theme.of(context).colorScheme.primary,
+                  child: PrimaryButton(
                     onPressed: () {
                       firstLoad();
                     },
@@ -146,13 +150,7 @@ class _UserPageState extends State<UserPage> with TickerProviderStateMixin {
       }
       if (userDetail == null) {
         return Scaffold(
-          appBar: AppBar(),
-          body: Container(
-              child: Center(
-            child: CircularProgressIndicator(
-              color: Theme.of(context).colorScheme.primary,
-            ),
-          )),
+          child: Center(child: CircularProgressIndicator()),
         );
       }
       return _buildBody(context);
@@ -160,26 +158,23 @@ class _UserPageState extends State<UserPage> with TickerProviderStateMixin {
   }
 
   Widget _buildBody(BuildContext context) {
-    return Container(
-      child: Scaffold(
-        body: NestedScrollView(
-          controller: _scrollController,
-          body: TabBarView(controller: _tabController, children: [
-            WorksPage(
-              id: userDetail!.id,
-              type: type,
-            ),
-            BookmarksPage(
-              id: userDetail!.id,
-              type: type,
-            ),
-            UserDetailPage(userDetail!),
-          ]).paddingTop(102 + MediaQuery.of(context).padding.top),
-          headerSliverBuilder:
-              (BuildContext context, bool? innerBoxIsScrolled) {
-            return _HeaderSlivers(innerBoxIsScrolled, context);
-          },
-        ),
+    return Scaffold(
+      child: NestedScrollView(
+        controller: _scrollController,
+        body: TabBarView(controller: _tabController, children: [
+          WorksPage(
+            id: userDetail!.id,
+            type: type,
+          ),
+          BookmarksPage(
+            id: userDetail!.id,
+            type: type,
+          ),
+          UserDetailPage(userDetail!),
+        ]).paddingTop(102 + MediaQuery.of(context).padding.top),
+        headerSliverBuilder: (BuildContext context, bool? innerBoxIsScrolled) {
+          return _HeaderSlivers(innerBoxIsScrolled, context);
+        },
       ),
     );
   }
@@ -200,8 +195,8 @@ class _UserPageState extends State<UserPage> with TickerProviderStateMixin {
           leading: CommonBackArea(),
           actions: <Widget>[
             Builder(builder: (context) {
-              return IconButton(
-                  icon: const DecoratedIcon(
+              return PrimaryButton(
+                  child: const DecoratedIcon(
                     icon: Icon(Icons.share),
                     decoration: IconDecoration(border: IconBorder(width: 1.5)),
                   ),
@@ -218,40 +213,34 @@ class _UserPageState extends State<UserPage> with TickerProviderStateMixin {
           ],
           flexibleSpace: FlexibleSpaceBar(
             collapseMode: CollapseMode.pin,
-            background: Container(
-              color: Theme.of(context).cardColor,
-              child: Stack(
-                children: <Widget>[
-                  _buildBackground(context),
-                  _buildFakeBg(context),
-                  Align(
-                    alignment: Alignment.bottomCenter,
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: <Widget>[
-                        _buildHeader(context),
-                        Container(
-                          color: Theme.of(context).cardColor,
-                          child: Column(
-                            children: <Widget>[
-                              _buildNameFollow(context),
-                              _buildComment(context),
-                              Tab(
-                                text: " ",
-                              )
-                            ],
-                          ),
-                        ),
-                      ],
-                    ),
-                  )
-                ],
-              ),
+            background: Stack(
+              children: <Widget>[
+                _buildBackground(context),
+                _buildFakeBg(context),
+                Align(
+                  alignment: Alignment.bottomCenter,
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: <Widget>[
+                      _buildHeader(context),
+                      Column(
+                        children: <Widget>[
+                          _buildNameFollow(context),
+                          _buildComment(context),
+                          Tab(
+                            text: " ",
+                          )
+                        ],
+                      ),
+                    ],
+                  ),
+                )
+              ],
             ),
           ),
           bottom: ColoredTabBar(
-            Theme.of(context).cardColor,
+            Theme.of(context).colorScheme.card,
             TabBar(
               controller: _tabController,
               onTap: (index) {
@@ -302,10 +291,8 @@ class _UserPageState extends State<UserPage> with TickerProviderStateMixin {
         children: <Widget>[
           Container(
             height: 55,
-            color: Theme.of(context).cardColor,
           ),
           Container(
-            color: Theme.of(context).cardColor,
             child: Column(
               children: <Widget>[
                 _buildFakeNameFollow(context),
@@ -337,7 +324,8 @@ class _UserPageState extends State<UserPage> with TickerProviderStateMixin {
                           context: context,
                           builder: (context) {
                             return AlertDialog(
-                              title: Text("Save".tr),
+                              title: Text("Save".tr)
+                                  .withAlign(Alignment.centerLeft),
                               content: ClipRRect(
                                 borderRadius: BorderRadius.circular(12),
                                 child: CachedNetworkImage(
@@ -347,12 +335,12 @@ class _UserPageState extends State<UserPage> with TickerProviderStateMixin {
                                 ),
                               ),
                               actions: [
-                                TextButton(
+                                OutlineButton(
                                     onPressed: () async {
                                       Navigator.of(context).pop();
                                     },
                                     child: Text("Cancel".tr)),
-                                TextButton(
+                                PrimaryButton(
                                     onPressed: () async {
                                       Navigator.of(context).pop();
                                       await _saveUserBg(context,
@@ -397,20 +385,21 @@ class _UserPageState extends State<UserPage> with TickerProviderStateMixin {
                   context: context,
                   builder: (context) {
                     return AlertDialog(
-                      title: Text('${"Block User".tr}?'),
+                      title: Text('${"Block User".tr}?')
+                          .withAlign(Alignment.centerLeft),
                       actions: <Widget>[
-                        TextButton(
+                        OutlineButton(
+                          child: Text("Cancel".tr),
+                          onPressed: () {
+                            Get.back();
+                          },
+                        ),
+                        PrimaryButton(
                           child: Text("Ok".tr),
                           onPressed: () {
                             Get.back(result: "OK");
                           },
                         ),
-                        TextButton(
-                          child: Text("Cancel".tr),
-                          onPressed: () {
-                            Get.back();
-                          },
-                        )
                       ],
                     );
                   });
@@ -463,13 +452,11 @@ class _UserPageState extends State<UserPage> with TickerProviderStateMixin {
             children: <Widget>[
               Text(
                 userDetail?.name ?? "",
-                style: Theme.of(context).textTheme.titleLarge,
               ),
               Text(
                 userDetail == null
                     ? ""
                     : '${userDetail!.totalFollowUsers} ${"Follow".tr}',
-                style: Theme.of(context).textTheme.bodySmall,
               )
             ]),
       ),
@@ -478,7 +465,6 @@ class _UserPageState extends State<UserPage> with TickerProviderStateMixin {
 
   Widget _buildNameFollow(BuildContext context) {
     return Container(
-      color: Theme.of(context).cardColor,
       width: MediaQuery.of(context).size.width,
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 16.0),
@@ -489,7 +475,6 @@ class _UserPageState extends State<UserPage> with TickerProviderStateMixin {
                 tag: userDetail?.name ?? "${widget.heroTag}",
                 child: Text(
                   userDetail?.name ?? "",
-                  style: Theme.of(context).textTheme.titleLarge,
                 ),
               ),
               InkWell(
@@ -501,7 +486,6 @@ class _UserPageState extends State<UserPage> with TickerProviderStateMixin {
                   userDetail == null
                       ? ""
                       : '${userDetail!.totalFollowUsers} ${"Follow".tr}',
-                  style: Theme.of(context).textTheme.bodySmall,
                 ),
               )
             ]),
@@ -511,7 +495,6 @@ class _UserPageState extends State<UserPage> with TickerProviderStateMixin {
 
   Widget _buildComment(BuildContext context) {
     return Container(
-      color: Theme.of(context).cardColor,
       width: MediaQuery.of(context).size.width,
       height: 60,
       child: Padding(
@@ -520,7 +503,6 @@ class _UserPageState extends State<UserPage> with TickerProviderStateMixin {
           child: SingleChildScrollView(
             child: Text(
               userDetail == null ? "" : userDetail!.comment,
-              style: Theme.of(context).textTheme.bodySmall,
               overflow: TextOverflow.ellipsis,
             ),
           ),
@@ -538,9 +520,7 @@ class _UserPageState extends State<UserPage> with TickerProviderStateMixin {
           alignment: Alignment.bottomCenter,
           child: SizedBox(
             height: 55.0,
-            child: Container(
-              color: Theme.of(context).cardColor,
-            ),
+            child: Container(),
           ),
         ),
         Align(
@@ -571,7 +551,8 @@ class _UserPageState extends State<UserPage> with TickerProviderStateMixin {
                       context: context,
                       builder: (context) {
                         return AlertDialog(
-                          title: Text("Save".tr),
+                          title:
+                              Text("Save".tr).withAlign(Alignment.centerLeft),
                           content: ClipRRect(
                             borderRadius: BorderRadius.circular(12),
                             child: CachedNetworkImage(
@@ -581,12 +562,12 @@ class _UserPageState extends State<UserPage> with TickerProviderStateMixin {
                             ),
                           ),
                           actions: [
-                            TextButton(
+                            OutlineButton(
                                 onPressed: () async {
                                   Navigator.of(context).pop();
                                 },
                                 child: Text("Cancel".tr)),
-                            TextButton(
+                            PrimaryButton(
                                 onPressed: () async {
                                   Navigator.of(context).pop();
                                   await _saveUserC(context);
@@ -604,9 +585,7 @@ class _UserPageState extends State<UserPage> with TickerProviderStateMixin {
             child: userDetail == null
                 ? Container(
                     padding: const EdgeInsets.only(right: 16.0, bottom: 4.0),
-                    child: CircularProgressIndicator(
-                      color: Theme.of(context).colorScheme.secondary,
-                    ),
+                    child: CircularProgressIndicator(),
                   )
                 : Padding(
                     padding: const EdgeInsets.only(right: 16.0, bottom: 4.0),

@@ -2,10 +2,11 @@ import 'dart:math';
 
 import 'package:easy_refresh/easy_refresh.dart';
 import 'package:shadcn_flutter/shadcn_flutter.dart';
-import 'package:flutter/material.dart' show InkWell;
+import 'package:flutter/material.dart' as m;
 import 'package:skana_pix/componentwidgets/chip.dart';
 import 'package:skana_pix/componentwidgets/headerfooter.dart';
 import 'package:skana_pix/controller/list_controller.dart';
+import 'package:skana_pix/controller/mini_controllers.dart';
 import 'package:skana_pix/view/imageview/imagelistview.dart';
 import 'package:skana_pix/view/userview/usersearch.dart';
 import 'package:skana_pix/controller/like_controller.dart';
@@ -14,7 +15,6 @@ import 'package:get/get.dart';
 
 import 'novelview/novelresult.dart';
 import '../componentwidgets/pixivimage.dart';
-import '../componentwidgets/searchbar.dart';
 import 'imageview/imagesearchresult.dart';
 import '../componentwidgets/usercard.dart';
 import '../model/worktypes.dart';
@@ -29,67 +29,57 @@ class SearchPage extends StatefulWidget {
 class _SearchPageState extends State<SearchPage> {
   @override
   Widget build(BuildContext context) {
-    SearchPageController searchPageController = Get.put(SearchPageController());
     return Obx(() {
       return Scaffold(
         headers: [
-          PreferredSize(
-            preferredSize:
-                const Size.fromHeight(100), // here the desired height
-            child: AppBar(
-              title: SearchBar1(
-                  getAwType(searchPageController.selectedIndex.value)),
-              child: TabList(
-                children: [
-                  TabButton(
-                    child: Text('Illust•Manga'.tr),
-                    onPressed: () {
-                      searchPageController.selectedIndex.value = 0;
-                    },
-                  ),
-                  TabButton(
-                    child: Text('Novel'.tr),
-                    onPressed: () {
-                      searchPageController.selectedIndex.value = 1;
-                    },
-                  ),
-                  TabButton(
-                    child: Text('User'.tr),
-                    onPressed: () {
-                      searchPageController.selectedIndex.value = 2;
-                    },
-                  ),
-                ],
+          TabList(
+            index: searchPageController.selectedIndex.value,
+            children: [
+              TabButton(
+                child: Text('Illust•Manga'.tr),
+                onPressed: () {
+                  searchPageController.selectedIndex.value = 0;
+                },
               ),
-            ),
-          )
+              TabButton(
+                child: Text('Novel'.tr),
+                onPressed: () {
+                  searchPageController.selectedIndex.value = 1;
+                },
+              ),
+              TabButton(
+                child: Text('User'.tr),
+                onPressed: () {
+                  searchPageController.selectedIndex.value = 2;
+                },
+              ),
+            ],
+          ),
         ],
-        child: IndexedStack(
-          index: searchPageController.selectedIndex.value,
-          children: [
-            SearchRecommendPage(ArtworkType.ILLUST),
-            SearchRecommendPage(ArtworkType.NOVEL),
-            SearchRecommmendUserPage(),
-          ],
-        ),
+        child: (searchPageController.selectedIndex.value == 2)
+            ? SearchRecommmendUserPage()
+            : (searchPageController.selectedIndex.value == 0)
+                ? _RecommendIllust()
+                : (searchPageController.selectedIndex.value == 1)
+                    ? _RecommendNovel()
+                    : Container(),
       );
     });
   }
+}
 
-  ArtworkType getAwType(int index) {
-    switch (index) {
-      case 0:
-        return ArtworkType.ILLUST;
-      case 1:
-        return ArtworkType.NOVEL;
-      default:
-        return ArtworkType.ALL;
-    }
+class _RecommendIllust extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return SearchRecommendPage(ArtworkType.ILLUST);
   }
 }
 
-class SearchPageController extends GetxController {
-  RxInt selectedIndex = (settings.awPrefer == "novel") ? 1.obs : 0.obs;
+class _RecommendNovel extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return SearchRecommendPage(ArtworkType.NOVEL);
+  }
 }
 
 class SearchRecommmendUserPage extends StatefulWidget {
@@ -210,20 +200,21 @@ class _SearchRecommmendUserPageState extends State<SearchRecommmendUserPage> {
                 ),
               if (localManager.historyUserTag.isNotEmpty)
                 SliverToBoxAdapter(
-                  child: InkWell(
+                  child: m.InkWell(
                     onTap: () {
                       showDialog(
                           context: context,
                           builder: (context) {
                             return AlertDialog(
-                              title: Text("Clean history?".tr),
+                              title: Text("Clean history?".tr)
+                                  .withAlign(Alignment.centerLeft),
                               actions: [
-                                TextButton(
+                                OutlineButton(
                                     onPressed: () {
                                       Get.back();
                                     },
                                     child: Text("Cancel".tr)),
-                                TextButton(
+                                PrimaryButton(
                                     onPressed: () {
                                       settings
                                           .clearHistoryTag(ArtworkType.USER);
@@ -266,12 +257,7 @@ class _SearchRecommmendUserPageState extends State<SearchRecommmendUserPage> {
               SliverToBoxAdapter(
                 child: Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                  child: Text(
-                    "Recommended Users".tr,
-                    style: TextStyle(
-                        fontSize: 16.0,
-                        color: Theme.of(context).typography.h2.color),
-                  ),
+                  child: Text("Recommended Users".tr).h4(),
                 ),
               ),
               SliverList(
@@ -299,7 +285,8 @@ class _SearchRecommendPageState extends State<SearchRecommendPage> {
   @override
   Widget build(BuildContext context) {
     EasyRefreshController refreshController =
-        EasyRefreshController(controlFinishRefresh: true);
+        EasyRefreshController(controlFinishRefresh: true,
+            controlFinishLoad: true);
     HotTagsController hotTagsController = Get.put(
         HotTagsController(widget.type, refreshController),
         tag: "hotTags_${widget.type.name}");
@@ -307,10 +294,10 @@ class _SearchRecommendPageState extends State<SearchRecommendPage> {
     final rowCount = max(3, (context.width / 200).floor());
     return Obx(
       () => EasyRefresh(
-        onRefresh: () => hotTagsController.reset(),
+        onRefresh: hotTagsController.reset,
         header: DefaultHeaderFooter.header(context),
         controller: refreshController,
-        refreshOnStart: hotTagsController.tags.isEmpty,
+        refreshOnStart: true,
         child: CustomScrollView(
           slivers: [
             SliverPadding(padding: EdgeInsets.only(top: 16.0)),
@@ -320,17 +307,12 @@ class _SearchRecommendPageState extends State<SearchRecommendPage> {
                     localManager.historyNovelTag.isNotEmpty)
               SliverToBoxAdapter(
                   child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                padding: const EdgeInsets.only(left: 16.0, bottom: 16.0),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   crossAxisAlignment: CrossAxisAlignment.end,
                   children: [
-                    Text(
-                      "History".tr,
-                      style: TextStyle(
-                          fontSize: 16.0,
-                          color: Theme.of(context).typography.h4.color),
-                    ),
+                    Text("History".tr).h4(),
                   ],
                 ),
               )),
@@ -348,7 +330,7 @@ class _SearchRecommendPageState extends State<SearchRecommendPage> {
                       ? Padding(
                           padding: const EdgeInsets.symmetric(horizontal: 5.0),
                           child: Wrap(
-                            runSpacing: 0.0,
+                            runSpacing: 5.0,
                             spacing: 5.0,
                             children: [
                               if (widget.type == ArtworkType.ILLUST)
@@ -378,6 +360,7 @@ class _SearchRecommendPageState extends State<SearchRecommendPage> {
                                               ),
                                           preventDuplicates: false)),
                               Chip(
+                                  style: ButtonStyle.primary(),
                                   child: AnimatedSwitcher(
                                     duration: Duration(milliseconds: 300),
                                     transitionBuilder: (child, anim) {
@@ -399,8 +382,8 @@ class _SearchRecommendPageState extends State<SearchRecommendPage> {
                       : Padding(
                           padding: const EdgeInsets.symmetric(horizontal: 5.0),
                           child: Wrap(
-                            runSpacing: 0.0,
-                            spacing: 3.0,
+                            runSpacing: 5.0,
+                            spacing: 5.0,
                             children: [
                               if (widget.type == ArtworkType.ILLUST)
                                 for (var f in localManager.historyIllustTag)
@@ -432,61 +415,52 @@ class _SearchRecommendPageState extends State<SearchRecommendPage> {
                 widget.type == ArtworkType.NOVEL &&
                     localManager.historyNovelTag.isNotEmpty)
               SliverToBoxAdapter(
-                  child: InkWell(
-                onTap: () {
-                  showDialog(
-                      context: context,
-                      builder: (context) {
-                        return AlertDialog(
-                          title: Text("Clean history?".tr),
-                          actions: [
-                            TextButton(
-                                onPressed: () {
-                                  Get.back();
-                                },
-                                child: Text("Cancel".tr)),
-                            TextButton(
-                                onPressed: () {
-                                  localManager.clear("historyIllustTag");
-                                  localManager.clear("historyNovelTag");
-                                  Get.back();
-                                },
-                                child: Text("Ok".tr)),
-                          ],
-                        );
-                      });
-                },
-                child: Center(
-                  child: Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        Icon(
-                          Icons.delete_outline,
-                          size: 18.0,
-                          color: Theme.of(context).colorScheme.primary,
-                        ),
-                        Text(
-                          "Clear search history".tr,
-                          style: Theme.of(context).typography.medium.copyWith(
-                              color: Theme.of(context).colorScheme.primary),
-                        )
-                      ],
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Button(
+                      style: ButtonStyle.card(density: ButtonDensity.dense),
+                      onPressed: () {
+                        showDialog(
+                            context: context,
+                            builder: (context) {
+                              return AlertDialog(
+                                title: Text("Clean history?".tr)
+                                    .withAlign(Alignment.centerLeft),
+                                actions: [
+                                  OutlineButton(
+                                      onPressed: () {
+                                        Get.back();
+                                      },
+                                      child: Text("Cancel".tr)),
+                                  PrimaryButton(
+                                      onPressed: () {
+                                        if (widget.type == ArtworkType.ILLUST) {
+                                          localManager
+                                              .clear("historyIllustTag");
+                                        } else if (widget.type ==
+                                            ArtworkType.NOVEL) {
+                                          localManager.clear("historyNovelTag");
+                                        }
+                                        Get.back();
+                                      },
+                                      child: Text("Ok".tr)),
+                                ],
+                              );
+                            });
+                      },
+                      child: Basic(
+                        leading: Icon(Icons.delete_outline),
+                        title: Text("Clear search history".tr).textSmall(),
+                      ),
                     ),
-                  ),
-                ),
-              )),
+                  ],
+                ).paddingAll(16.0),
+              ),
             SliverToBoxAdapter(
               child: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                child: Text(
-                  "Recommended Tags".tr,
-                  style: TextStyle(
-                      fontSize: 16.0,
-                      color: Theme.of(context).typography.h2.color),
-                ),
+                child: Text("Recommended Tags".tr).h4(),
               ),
             ),
             SliverPadding(
@@ -495,8 +469,7 @@ class _SearchRecommendPageState extends State<SearchRecommendPage> {
                   delegate: SliverChildBuilderDelegate((context, index) {
                     return GestureDetector(
                       onTap: () {
-                        Navigator.of(context, rootNavigator: true)
-                            .push(MaterialPageRoute(builder: (_) {
+                        Get.to(() {
                           if (widget.type == ArtworkType.NOVEL) {
                             return NovelResultPage(
                               word: hotTagsController.tags[index].tag.name,
@@ -505,17 +478,16 @@ class _SearchRecommendPageState extends State<SearchRecommendPage> {
                           return IllustResultPage(
                             word: hotTagsController.tags[index].tag.name,
                           );
-                        }));
+                        });
                       },
                       onLongPress: () {
-                        Navigator.of(context, rootNavigator: true)
-                            .push(MaterialPageRoute(builder: (_) {
+                        Get.to(() {
                           return IllustPageLite(hotTagsController
                               .tags[index].illust.id
                               .toString());
-                        }));
+                        });
                       },
-                      child: Card(
+                      child: m.Card(
                         clipBehavior: Clip.antiAlias,
                         child: Stack(
                           children: <Widget>[

@@ -31,12 +31,13 @@ class ListIllustController extends GetxController {
   EasyRefreshController? refreshController;
   String id;
   String tag;
-  String dateTime;
+  Rx<DateTime?> dateTime = Rxn<DateTime>();
   RxString restrict = "public".obs;
   ListType controllerType;
   Rx<SearchOptions?> searchOptions = Rxn<SearchOptions>();
   DateTimeRange? dateTimeRange;
   static RxList<int> historyIds = RxList.empty();
+  RxInt tagIndex = 0.obs;
 
   bool get showMangaBadage => type != ArtworkType.MANGA;
 
@@ -56,8 +57,7 @@ class ListIllustController extends GetxController {
       {required this.controllerType,
       required this.type,
       this.id = "",
-      this.tag = "",
-      this.dateTime = ""});
+      this.tag = ""});
 
   Future<Res<List<Illust>>> loadData() async {
     if (isLoading.value) {
@@ -80,9 +80,12 @@ class ListIllustController extends GetxController {
         return ConnectManager().apiClient.getFollowingArtworks(
             restrict.value, nexturl.isEmpty ? null : nexturl.value);
       case ListType.ranking:
-        return ConnectManager()
-            .apiClient
-            .getRanking(tag, nexturl.isEmpty ? null : nexturl.value);
+        return ConnectManager().apiClient.getRanking(
+            type == ArtworkType.ILLUST
+                ? modeIllust[tagIndex.value]
+                : modeManga[tagIndex.value],
+            dateTime.value == null ? null : toRequestDate(dateTime.value!),
+            nexturl.isEmpty ? null : nexturl.value);
       case ListType.recom:
         if (type == ArtworkType.ILLUST) {
           return ConnectManager()
@@ -134,6 +137,8 @@ class ListIllustController extends GetxController {
   }
 
   List<Illust> filterIllusts(List<Illust> datas) {
+    if (controllerType == ListType.userbookmarks || controllerType == ListType.mybookmarks || controllerType == ListType.works) return checkIllusts(datas);
+
     if (!["all", "illust", "manga"].contains(restrict.value)) {
       restrict.value = "all";
     }
@@ -148,6 +153,11 @@ class ListIllustController extends GetxController {
   }
 
   void firstLoad() {
+    if (isFirstLoading.value) {
+      if (controllerType == ListType.search) {
+        localManager.add("historyIllustTag", [tag]);
+      }
+    }
     loadData().then((value) {
       isLoading.value = false;
       isFirstLoading.value = false;
@@ -211,18 +221,16 @@ class ListNovelController extends GetxController {
   RxInt page = 1.obs;
   EasyRefreshController? refreshController;
   String tag;
-  String dateTime;
+  Rx<DateTime?> dateTime = Rxn<DateTime>();
   ListType controllerType;
   String id;
   DateTimeRange? dateTimeRange;
   Rx<SearchOptions?> searchOptions = Rxn<SearchOptions>();
   bool get noNextPage => controllerType == ListType.single;
+  RxInt tagIndex = 0.obs;
 
   ListNovelController(
-      {required this.controllerType,
-      this.tag = "",
-      this.dateTime = "",
-      this.id = ""});
+      {required this.controllerType, this.tag = "", this.id = ""});
 
   Future<Res<List<Novel>>> loadData() async {
     if (isLoading.value) {
@@ -243,7 +251,9 @@ class ListNovelController extends GetxController {
             .getRecommendNovels(nexturl.isEmpty ? null : nexturl.value);
       case ListType.ranking:
         return ConnectManager().apiClient.getNovelRanking(
-            tag, dateTime, nexturl.isEmpty ? null : nexturl.value);
+            modeNovel[tagIndex.value],
+            dateTime.value == null ? null : toRequestDate(dateTime.value!),
+            nexturl.isEmpty ? null : nexturl.value);
       case ListType.userbookmarks:
         return ConnectManager().apiClient.getUserBookmarksNovel(
             id.toString(), nexturl.isEmpty ? null : nexturl.value);
@@ -287,6 +297,11 @@ class ListNovelController extends GetxController {
   }
 
   void firstLoad() {
+    if (isFirstLoading.value) {
+      if (controllerType == ListType.search) {
+        localManager.add("historyNovelTag", [tag]);
+      }
+    }
     loadData().then((value) {
       isLoading.value = false;
       isFirstLoading.value = false;
@@ -336,7 +351,14 @@ class ListNovelController extends GetxController {
   }
 }
 
-enum UserListType { recom, usermypixiv, following, myfollowing, mymypixiv,search }
+enum UserListType {
+  recom,
+  usermypixiv,
+  following,
+  myfollowing,
+  mymypixiv,
+  search
+}
 
 class ListUserController extends GetxController {
   RxList<UserPreview> users = RxList.empty();
@@ -381,15 +403,18 @@ class ListUserController extends GetxController {
             .getMypixiv(id.toString(), nexturl.value);
         break;
       case UserListType.search:
-        res = await ConnectManager()
-            .apiClient
-            .searchUsers(id, nexturl.value);
+        res = await ConnectManager().apiClient.searchUsers(id, nexturl.value);
         break;
     }
     return res;
   }
 
   void firstLoad() {
+    if (isFirstLoading.value) {
+      if (userListType == UserListType.search) {
+        localManager.add("historyUserTag", [id]);
+      }
+    }
     loadData().then((value) {
       isLoading.value = false;
       if (value.success) {
@@ -455,27 +480,23 @@ class ListUserController extends GetxController {
 
 class RankingPageController extends GetxController {
   RxInt index = 0.obs;
-  RxInt tagIndex = 0.obs;
-  RxList<String> tagList = RxList.empty();
-  Rx<DateTime> dateTime = DateTime.now().obs;
+
+  void init() {
+    switch (settings.awPrefer) {
+      case "illust":
+        setIndex(0);
+        break;
+      case "manga":
+        setIndex(1);
+        break;
+      case "novel":
+        setIndex(2);
+        break;
+    }
+  }
 
   void setIndex(int i) {
     index.value = i;
-    switch (i) {
-      case 0:
-        tagIndex.value = 0;
-        tagList.value = modeIllust;
-        break;
-      case 1:
-        tagIndex.value = 0;
-        tagList.value = modeMange;
-        break;
-      case 2:
-        tagIndex.value = 0;
-        tagList.value = modeNovel;
-        break;
-    }
-    tagList.refresh();
   }
 }
 
@@ -489,7 +510,6 @@ class HotTagsController extends GetxController {
   HotTagsController(this.type, this.refreshController);
 
   void reset() {
-    if (isLoading.value) return;
     isLoading.value = true;
     loadData().then((value) {
       isLoading.value = false;
@@ -503,6 +523,7 @@ class HotTagsController extends GetxController {
         refreshController.finishRefresh(IndicatorResult.fail);
       }
     });
+    refreshController.finishRefresh();
   }
 
   Future<Res<List<TrendingTag>>> loadData() async {
@@ -514,7 +535,7 @@ class HotTagsController extends GetxController {
   }
 }
 
-String? toRequestDate(DateTime dateTime) {
+String toRequestDate(DateTime dateTime) {
   return "${dateTime.year}-${dateTime.month}-${dateTime.day}";
 }
 
@@ -532,7 +553,7 @@ final modeIllust = [
   "week_r18",
   "week_r18g"
 ];
-final modeMange = [
+final modeManga = [
   "day_manga",
   "week_manga",
   "month_manga",

@@ -1,7 +1,9 @@
 import 'package:shadcn_flutter/shadcn_flutter.dart';
 import 'package:flutter/material.dart' show InkWell;
+import 'package:skana_pix/componentwidgets/backarea.dart';
+import 'package:skana_pix/utils/widgetplugin.dart';
 import 'package:skana_pix/view/imageview/imagelistview.dart';
-import 'package:skana_pix/componentwidgets/novelpage.dart';
+import 'package:skana_pix/view/novelview/novelpage.dart';
 import 'package:skana_pix/componentwidgets/userpage.dart';
 import 'package:skana_pix/view/userview/usersearch.dart';
 import 'package:skana_pix/controller/search_controller.dart';
@@ -99,7 +101,7 @@ class _SearchSuggestionPageState extends State<SearchSuggestionPage> {
                               title: Text(_filter.text),
                               subtitle: Text("Artwork ID".tr),
                             ),
-                          );
+                          ).paddingVertical(2);
                         }
                         if (index == 1) {
                           return InkWell(
@@ -111,7 +113,7 @@ class _SearchSuggestionPageState extends State<SearchSuggestionPage> {
                               title: Text(_filter.text),
                               subtitle: Text("Novel ID".tr),
                             ),
-                          );
+                          ).paddingVertical(2);
                         }
                         if (index == 2) {
                           return InkWell(
@@ -124,7 +126,7 @@ class _SearchSuggestionPageState extends State<SearchSuggestionPage> {
                               title: Text(_filter.text),
                               subtitle: Text("Artist ID".tr),
                             ),
-                          );
+                          ).paddingVertical(2);
                         }
                         if (index == 3 && _filter.text.length < 5) {
                           return InkWell(
@@ -138,11 +140,11 @@ class _SearchSuggestionPageState extends State<SearchSuggestionPage> {
                               title: Text(_filter.text),
                               subtitle: Text("Pixivision".tr),
                             ),
-                          );
+                          ).paddingVertical(2);
                         }
                         return Basic();
                       }, childCount: 4),
-                    ),
+                    ).sliverPadding(EdgeInsets.only(left: 8)),
                     visible: idV,
                   ),
                   if (_suggestionStore.autoWords.isNotEmpty)
@@ -187,9 +189,9 @@ class _SearchSuggestionPageState extends State<SearchSuggestionPage> {
                             title: Text(tags[index].name),
                             subtitle: Text(tags[index].translatedName ?? ""),
                           ),
-                        );
+                        ).paddingVertical(2);
                       }, childCount: _suggestionStore.autoWords.length),
-                    ),
+                    ).sliverPadding(EdgeInsets.only(left: 8)),
                 ],
               ),
             ),
@@ -202,39 +204,8 @@ class _SearchSuggestionPageState extends State<SearchSuggestionPage> {
   AppBar _buildAppBar(context) {
     return AppBar(
       title: _textField(context, TextInputType.text, focusNode),
-      trailing: <Widget>[
-        IconButton.outline(
-          icon: Icon(Icons.close),
-          onPressed: () {
-            _filter.clear();
-          },
-        ),
-        Select<String>(
-          itemBuilder: (context, value) {
-            return Text(value.tr);
-          },
-          children: [
-            SelectItemButton(value: "Artwork", child: Text("Artwork".tr)),
-            SelectItemButton(value: "Novel", child: Text("Novel".tr)),
-            SelectItemButton(value: "User", child: Text("User".tr)),
-          ],
-          onChanged: (value) {
-            setState(() {
-              if (value == null) return;
-              switch (value) {
-                case "Artwork":
-                  type = ArtworkType.ILLUST;
-                  break;
-                case "Novel":
-                  type = ArtworkType.NOVEL;
-                  break;
-                case "User":
-                  type = ArtworkType.USER;
-                  break;
-              }
-            });
-          },
-        ),
+      leading: [
+        const NormalBackButton(),
       ],
     );
   }
@@ -246,9 +217,15 @@ class _SearchSuggestionPageState extends State<SearchSuggestionPage> {
         focusNode: node,
         keyboardType: inputType,
         autofocus: true,
+        trailing: IconButton.ghost(
+          icon: Icon(Icons.close),
+          onPressed: () {
+            _filter.clear();
+          },
+        ),
         style: Theme.of(context)
             .typography
-            .h3
+            .xSmall
             .copyWith(color: Theme.of(context).colorScheme.input),
         onTap: () {
           FocusScope.of(context).requestFocus(node);
@@ -280,8 +257,7 @@ class _SearchSuggestionPageState extends State<SearchSuggestionPage> {
         onSubmitted: (s) {
           var word = s.trim();
           if (word.isEmpty) return;
-          Navigator.of(context, rootNavigator: true)
-              .push(MaterialPageRoute(builder: (context) {
+          Get.to(() {
             if (type == ArtworkType.NOVEL) {
               return NovelResultPage(
                 word: word,
@@ -295,8 +271,8 @@ class _SearchSuggestionPageState extends State<SearchSuggestionPage> {
             return IllustResultPage(
               word: word,
             );
-          }));
+          });
         },
-        placeholder: Text("Enter keywords or links".tr));
+        placeholder: Text("Enter keywords or links".tr).xSmall());
   }
 }

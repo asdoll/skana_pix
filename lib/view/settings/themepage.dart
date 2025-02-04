@@ -1,4 +1,5 @@
 import 'package:shadcn_flutter/shadcn_flutter.dart';
+import 'package:skana_pix/componentwidgets/backarea.dart';
 import 'package:skana_pix/controller/theme_controller.dart';
 import 'package:get/get.dart';
 
@@ -18,6 +19,10 @@ class _ThemePageState extends State<ThemePage> {
             headers: [
               AppBar(
                 title: Text("Skin".tr),
+                padding: EdgeInsets.all(10),
+                leading: [
+                  const NormalBackButton(),
+                ],
               ),
               const Divider()
             ],
@@ -26,7 +31,7 @@ class _ThemePageState extends State<ThemePage> {
                 SliverToBoxAdapter(
                   child: Card(
                       child: Basic(
-                    title: const Text("AMOLED"),
+                    title: Text("Dark Mode".tr),
                     trailing: Select<String>(
                       value: controller.darkMode.value,
                       itemBuilder: (context, item) => item == "0"
@@ -39,6 +44,10 @@ class _ThemePageState extends State<ThemePage> {
                         SelectItemButton(value: '1', child: Text("Light".tr)),
                         SelectItemButton(value: '2', child: Text("Dark".tr))
                       ],
+                      onChanged: (value) {
+                        if(value == null) return;
+                        controller.changeDarkMode(value);
+                      },
                     ),
                   )),
                 ),

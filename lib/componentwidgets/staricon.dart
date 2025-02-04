@@ -13,7 +13,7 @@ class StarIcon extends StatefulWidget {
     super.key,
     required this.id,
     required this.type,
-    this.size = 48,
+    this.size = 36,
     this.liked = false,
   });
 
@@ -32,6 +32,8 @@ class _StarIconState extends State<StarIcon> {
         height: widget.size,
         color: Colors.transparent,
         child: IconButton.ghost(
+          density: ButtonDensity.compact,
+          size: ButtonSize(widget.size / 36),
           onPressed: () {
             likeController.toggle(widget.id, widget.type, liked);
           },
