@@ -2,7 +2,6 @@ import 'package:flutter/material.dart' show InkWell;
 import 'package:get/get.dart';
 import 'package:shadcn_flutter/shadcn_flutter.dart';
 import 'package:skana_pix/pixiv_dart_api.dart';
-import 'package:skana_pix/utils/translate.dart';
 import 'package:skana_pix/utils/widgetplugin.dart';
 import '../model/worktypes.dart';
 import 'avatar.dart';
@@ -66,6 +65,7 @@ class _PainterCardState extends State<PainterCard> {
 
   _buildPreviewSlivers(BuildContext context) {
     return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
         for (var i = 0; i < 3; i++)
           Expanded(
@@ -81,7 +81,6 @@ class _PainterCardState extends State<PainterCard> {
 
   Widget buildCardNovel(BuildContext context, Novel novel) {
     return Container(
-      padding: const EdgeInsets.all(4.0),
       child: AspectRatio(
         aspectRatio: 1.0,
         child: Stack(
@@ -100,15 +99,14 @@ class _PainterCardState extends State<PainterCard> {
               ),
             ),
             Align(
-              alignment: Alignment.bottomCenter,
+              alignment: Alignment.center,
               child: Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: Text(
                   novel.title,
-                  style: Theme.of(context).typography.h3,
                   maxLines: 3,
                   overflow: TextOverflow.ellipsis,
-                ),
+                ).textSmall(),
               ),
             )
           ],
@@ -118,14 +116,11 @@ class _PainterCardState extends State<PainterCard> {
   }
 
   Widget buildCardIllust(BuildContext context, Illust illust) {
-    return Container(
-      padding: const EdgeInsets.all(4.0),
-      child: AspectRatio(
-        aspectRatio: 1.0,
-        child: PixivImage(
-          illust.images.first.squareMedium,
-          fit: BoxFit.cover,
-        ),
+    return AspectRatio(
+      aspectRatio: 1.0,
+      child: PixivImage(
+        illust.images.first.squareMedium,
+        fit: BoxFit.cover,
       ),
     ).rounded(8.0);
   }
@@ -150,11 +145,12 @@ class _PainterCardState extends State<PainterCard> {
               },
             ),
           ),
-          Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Center(child: Text(user.name.atMost13)),
+          Expanded(
+            child: Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Text(user.name, maxLines: 1, overflow: TextOverflow.ellipsis).semiBold(),
+            ),
           ),
-          Spacer(),
           UserFollowButton(
             liked: user.isFollowed,
             id: user.id.toString(),

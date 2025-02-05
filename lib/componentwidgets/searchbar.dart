@@ -3,7 +3,7 @@ import 'package:shadcn_flutter/shadcn_flutter.dart';
 import 'package:skana_pix/model/worktypes.dart';
 import 'package:get/get.dart';
 
-import '../view/searchsuggestion.dart';
+import '../view/search/searchsuggestion.dart';
 
 class SearchBar1 extends StatefulWidget {
   final ArtworkType type;

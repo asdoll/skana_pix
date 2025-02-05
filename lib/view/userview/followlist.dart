@@ -54,7 +54,7 @@ class _FollowListState extends State<FollowList> {
       ],
       child: UserList(
           controllerTag:
-              widget.id + (widget.isMyPixiv ? "_mypixiv" : "_following")),
+               "${widget.isMe ? "myfollowing" : widget.id}userlist"),
     );
   }
 }

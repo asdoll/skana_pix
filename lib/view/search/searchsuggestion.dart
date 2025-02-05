@@ -10,10 +10,10 @@ import 'package:skana_pix/controller/search_controller.dart';
 import 'package:skana_pix/model/worktypes.dart';
 import 'package:get/get.dart';
 
-import '../utils/leaders.dart';
-import 'novelview/novelresult.dart';
-import 'imageview/imagesearchresult.dart';
-import 'souppage.dart';
+import '../../utils/leaders.dart';
+import '../novelview/novelresult.dart';
+import '../imageview/imagesearchresult.dart';
+import '../souppage.dart';
 
 class SearchSuggestionPage extends StatefulWidget {
   final String? preword;

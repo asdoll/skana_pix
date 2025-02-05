@@ -388,7 +388,7 @@ class ListUserController extends GetxController {
       case UserListType.recom:
         res = await ConnectManager()
             .apiClient
-            .getRecommendationUsers(nexturl.value);
+            .getRecommendationUsers(nexturl.value.isEmpty ? null : nexturl.value);
         break;
       case UserListType.myfollowing:
       case UserListType.following:
@@ -428,12 +428,12 @@ class ListUserController extends GetxController {
         var message = value.errorMessage ??
             "Network Error. Please refresh to try again.".tr;
         if (message == "No more data") {
-          refreshController?.finishLoad(IndicatorResult.noMore);
+          refreshController?.finishRefresh(IndicatorResult.noMore);
           return;
         }
         error.value = message;
         Leader.showToast(message);
-        refreshController?.finishLoad(IndicatorResult.fail);
+        refreshController?.finishRefresh(IndicatorResult.fail);
       }
     });
   }
@@ -503,11 +503,11 @@ class RankingPageController extends GetxController {
 class HotTagsController extends GetxController {
   RxList<TrendingTag> tags = RxList.empty();
   ArtworkType type;
-  EasyRefreshController refreshController;
+  EasyRefreshController? refreshController;
   RxBool tagExpand = false.obs;
   RxBool isLoading = false.obs;
 
-  HotTagsController(this.type, this.refreshController);
+  HotTagsController(this.type);
 
   void reset() {
     isLoading.value = true;
@@ -517,13 +517,12 @@ class HotTagsController extends GetxController {
         tags.clear();
         tags.addAll(value.data);
         tags.refresh();
-        refreshController.finishRefresh();
+        refreshController?.finishRefresh();
       } else {
         Leader.showToast("Network error".tr);
-        refreshController.finishRefresh(IndicatorResult.fail);
+        refreshController?.finishRefresh(IndicatorResult.fail);
       }
     });
-    refreshController.finishRefresh();
   }
 
   Future<Res<List<TrendingTag>>> loadData() async {

@@ -13,11 +13,11 @@ import 'package:skana_pix/controller/like_controller.dart';
 import 'package:skana_pix/pixiv_dart_api.dart';
 import 'package:get/get.dart';
 
-import 'novelview/novelresult.dart';
-import '../componentwidgets/pixivimage.dart';
-import 'imageview/imagesearchresult.dart';
-import '../componentwidgets/usercard.dart';
-import '../model/worktypes.dart';
+import '../novelview/novelresult.dart';
+import '../../componentwidgets/pixivimage.dart';
+import '../imageview/imagesearchresult.dart';
+import '../../componentwidgets/usercard.dart';
+import '../../model/worktypes.dart';
 
 class SearchPage extends StatefulWidget {
   const SearchPage({super.key});
@@ -93,9 +93,11 @@ class SearchRecommmendUserPage extends StatefulWidget {
 class _SearchRecommmendUserPageState extends State<SearchRecommmendUserPage> {
   @override
   Widget build(BuildContext context) {
-    EasyRefreshController refreshController = EasyRefreshController();
-    ListUserController controller =
-        ListUserController(userListType: UserListType.recom);
+    EasyRefreshController refreshController = EasyRefreshController(
+        controlFinishLoad: true, controlFinishRefresh: true);
+    ListUserController controller = Get.put(
+        ListUserController(userListType: UserListType.recom),
+        tag: "search_user");
     controller.refreshController = refreshController;
     return Scaffold(
       child: EasyRefresh(
@@ -103,7 +105,7 @@ class _SearchRecommmendUserPageState extends State<SearchRecommmendUserPage> {
         controller: refreshController,
         onRefresh: () => controller.reset(),
         onLoad: () => controller.nextPage(),
-        refreshOnStart: controller.users.isEmpty,
+        refreshOnStart: true,
         child: Obx(() {
           return CustomScrollView(
             slivers: [
@@ -260,6 +262,7 @@ class _SearchRecommmendUserPageState extends State<SearchRecommmendUserPage> {
                   child: Text("Recommended Users".tr).h4(),
                 ),
               ),
+              SliverPadding(padding: EdgeInsets.only(top: 8.0)),
               SliverList(
                   delegate: SliverChildBuilderDelegate((context, index) {
                 return PainterCard(user: controller.users[index]);
@@ -284,12 +287,12 @@ class SearchRecommendPage extends StatefulWidget {
 class _SearchRecommendPageState extends State<SearchRecommendPage> {
   @override
   Widget build(BuildContext context) {
-    EasyRefreshController refreshController =
-        EasyRefreshController(controlFinishRefresh: true,
-            controlFinishLoad: true);
+    EasyRefreshController refreshController = EasyRefreshController(
+        controlFinishRefresh: true, controlFinishLoad: true);
     HotTagsController hotTagsController = Get.put(
-        HotTagsController(widget.type, refreshController),
+        HotTagsController(widget.type),
         tag: "hotTags_${widget.type.name}");
+    hotTagsController.refreshController = refreshController;
 
     final rowCount = max(3, (context.width / 200).floor());
     return Obx(
@@ -298,6 +301,7 @@ class _SearchRecommendPageState extends State<SearchRecommendPage> {
         header: DefaultHeaderFooter.header(context),
         controller: refreshController,
         refreshOnStart: true,
+        callRefreshOverOffset: 10,
         child: CustomScrollView(
           slivers: [
             SliverPadding(padding: EdgeInsets.only(top: 16.0)),

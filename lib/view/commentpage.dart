@@ -3,6 +3,7 @@ import 'package:shadcn_flutter/shadcn_flutter.dart';
 import 'package:flutter/material.dart'
     show InkWell, AdaptiveTextSelectionToolbar, SelectionArea;
 import 'package:get/get.dart';
+import 'package:skana_pix/componentwidgets/backarea.dart';
 import 'package:skana_pix/componentwidgets/headerfooter.dart';
 import 'package:skana_pix/componentwidgets/pixivimage.dart';
 import 'package:skana_pix/controller/comment_controller.dart';
@@ -136,7 +137,6 @@ class _CommentPageState extends State<CommentPage> {
         CommentController(
             widget.id.toString(), widget.type, easyRefreshController),
         tag: "comment_${widget.id}_${widget.type}");
-    controller.reset();
 
     return Listener(
       behavior: HitTestBehavior.translucent,
@@ -150,6 +150,10 @@ class _CommentPageState extends State<CommentPage> {
         headers: [
           AppBar(
             title: Text("Comments".tr),
+            padding: EdgeInsets.all(10),
+            leading: [
+              const NormalBackButton(),
+            ],
           ),
           const Divider()
         ],
@@ -162,236 +166,210 @@ class _CommentPageState extends State<CommentPage> {
                     controller: easyRefreshController,
                     header: DefaultHeaderFooter.header(context),
                     onRefresh: () => controller.reset(),
-                    refreshOnStart: false,
+                    refreshOnStart: true,
                     onLoad: () => controller.nextPage(),
-                    child: (controller.comments.isEmpty)
-                        ? Center(
-                            child: Padding(
+                    child: ListView.separated(
+                      itemCount: controller.comments.length,
+                      padding: const EdgeInsets.only(top: 10),
+                      itemBuilder: (context, index) {
+                        return Row(
+                          mainAxisSize: MainAxisSize.max,
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: <Widget>[
+                            Padding(
                               padding: const EdgeInsets.all(8.0),
-                              child: Text('[ ]',
-                                  style: Theme.of(context).typography.h3),
+                              child: PainterAvatar(
+                                url: controller.comments[index].avatar,
+                                id: int.parse(controller.comments[index].uid),
+                              ),
                             ),
-                          )
-                        : ListView.separated(
-                            itemCount: controller.comments.length,
-                            padding: const EdgeInsets.only(top: 10),
-                            itemBuilder: (context, index) {
-                              return Row(
-                                mainAxisSize: MainAxisSize.max,
-                                mainAxisAlignment: MainAxisAlignment.start,
+                            Expanded(
+                              child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
+                                mainAxisSize: MainAxisSize.max,
                                 children: <Widget>[
-                                  Padding(
-                                    padding: const EdgeInsets.all(8.0),
-                                    child: PainterAvatar(
-                                      url: controller.comments[index].avatar,
-                                      id: int.parse(
-                                          controller.comments[index].uid),
-                                    ),
-                                  ),
-                                  Expanded(
-                                    child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      mainAxisSize: MainAxisSize.max,
-                                      children: <Widget>[
-                                        Row(
-                                          mainAxisSize: MainAxisSize.max,
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.spaceBetween,
-                                          children: <Widget>[
-                                            Text(
-                                              controller.comments[index].name,
-                                              maxLines: 1,
-                                              style: TextStyle(
-                                                  color: Theme.of(context)
-                                                      .colorScheme
-                                                      .secondary,
-                                                  overflow:
-                                                      TextOverflow.ellipsis),
-                                            ),
-                                            Row(
-                                              children: [
-                                                InkWell(
-                                                    onTap: () {
-                                                      if (widget.isReplay)
-                                                        return;
-                                                      controller.parentCommentId
-                                                              .value =
-                                                          controller
-                                                              .comments[index]
-                                                              .id;
-                                                      controller
-                                                              .parentCommentName
-                                                              .value =
-                                                          controller
-                                                              .comments[index]
-                                                              .name;
-                                                    },
-                                                    child: Text(
-                                                      widget.isReplay
-                                                          ? ""
-                                                          : "Reply".tr,
-                                                      style: TextStyle(
-                                                          color:
-                                                              Theme.of(context)
-                                                                  .colorScheme
-                                                                  .secondary),
-                                                    )),
-                                                if (!widget.isReplay)
-                                                  Padding(
-                                                    padding: const EdgeInsets
-                                                        .symmetric(
-                                                        horizontal: 12.0),
-                                                    child: InkWell(
-                                                        onTap: () {
-                                                          openSheet(
-                                                              context: context,
-                                                              position:
-                                                                  OverlayPosition
-                                                                      .bottom,
-                                                              builder:
-                                                                  (context) {
-                                                                return Column(
-                                                                  mainAxisSize:
-                                                                      MainAxisSize
-                                                                          .min,
-                                                                  children: [
-                                                                    InkWell(
-                                                                      child:
-                                                                          Basic(
-                                                                        title: Text(
-                                                                            "Block User".tr),
-                                                                      ),
-                                                                      onTap:
-                                                                          () async {
-                                                                        Get.back();
-                                                                        localManager.add(
-                                                                            "blockedCommentUsers",
-                                                                            [
-                                                                              controller.comments[index].name
-                                                                            ]);
-                                                                      },
-                                                                    ),
-                                                                    InkWell(
-                                                                      child:
-                                                                          Basic(
-                                                                        title: Text(
-                                                                            "Block Comment".tr),
-                                                                      ),
-                                                                      onTap:
-                                                                          () {
-                                                                        Get.back();
-                                                                        localManager.add(
-                                                                            "blockedComments",
-                                                                            [
-                                                                              controller.comments[index].comment
-                                                                            ]);
-                                                                      },
-                                                                    ),
-                                                                    Container(
-                                                                      height: context
-                                                                          .mediaQueryPadding
-                                                                          .bottom,
-                                                                    )
-                                                                  ],
-                                                                );
-                                                              });
-                                                        },
-                                                        child: const Icon(
-                                                            Icons.more_horiz)),
-                                                  )
-                                              ],
+                                  Row(
+                                    mainAxisSize: MainAxisSize.max,
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: <Widget>[
+                                      Text(
+                                        controller.comments[index].name,
+                                        maxLines: 1,
+                                        style: TextStyle(
+                                            color: Theme.of(context)
+                                                .colorScheme
+                                                .secondaryForeground,
+                                            overflow: TextOverflow.ellipsis),
+                                      ).semiBold(),
+                                      Row(
+                                        children: [
+                                          PrimaryButton(
+                                              density: ButtonDensity.dense,
+                                              onPressed: () {
+                                                if (widget.isReplay) return;
+                                                controller
+                                                        .parentCommentId.value =
+                                                    controller
+                                                        .comments[index].id;
+                                                controller.parentCommentName
+                                                        .value =
+                                                    controller
+                                                        .comments[index].name;
+                                              },
+                                              child: Text(widget.isReplay
+                                                  ? ""
+                                                  : "Reply".tr)),
+                                          if (!widget.isReplay)
+                                            Padding(
+                                              padding:
+                                                  const EdgeInsets.symmetric(
+                                                      horizontal: 12.0),
+                                              child: GhostButton(
+                                                  density: ButtonDensity.dense,
+                                                  onPressed: () {
+                                                    openSheet(
+                                                        context: context,
+                                                        position:
+                                                            OverlayPosition
+                                                                .bottom,
+                                                        builder: (context) {
+                                                          return Column(
+                                                            mainAxisSize:
+                                                                MainAxisSize
+                                                                    .min,
+                                                            children: [
+                                                              InkWell(
+                                                                child: Basic(
+                                                                  title: Text(
+                                                                      "Block User"
+                                                                          .tr),
+                                                                ),
+                                                                onTap:
+                                                                    () async {
+                                                                  Get.back();
+                                                                  localManager.add(
+                                                                      "blockedCommentUsers",
+                                                                      [
+                                                                        controller
+                                                                            .comments[index]
+                                                                            .name
+                                                                      ]);
+                                                                },
+                                                              ).paddingSymmetric(vertical: 6),
+                                                              InkWell(
+                                                                child: Basic(
+                                                                  title: Text(
+                                                                      "Block Comment"
+                                                                          .tr),
+                                                                ),
+                                                                onTap: () {
+                                                                  Get.back();
+                                                                  localManager.add(
+                                                                      "blockedComments",
+                                                                      [
+                                                                        controller
+                                                                            .comments[index]
+                                                                            .comment
+                                                                      ]);
+                                                                },
+                                                              ).paddingSymmetric(vertical: 6),
+                                                              Container(
+                                                                height: context
+                                                                    .mediaQueryPadding
+                                                                    .bottom,
+                                                              )
+                                                            ],
+                                                          );
+                                                        });
+                                                  },
+                                                  child: const Icon(
+                                                      Icons.more_horiz)),
                                             )
-                                          ],
+                                        ],
+                                      )
+                                    ],
+                                  ),
+                                  if (controller.comments[index].parentComment
+                                          ?.name !=
+                                      null)
+                                    Text(
+                                        'To ${controller.comments[index].parentComment!.name}'),
+                                  if (controller.comments[index].stampUrl ==
+                                      null)
+                                    Padding(
+                                      padding:
+                                          const EdgeInsets.only(right: 4.0),
+                                      child: SelectionArea(
+                                        focusNode: _focusNode,
+                                        contextMenuBuilder:
+                                            (context, selectableRegionState) {
+                                          return _buildSelectionMenu(
+                                              selectableRegionState, context);
+                                        },
+                                        onSelectionChanged: (value) {
+                                          _selectedText =
+                                              value?.plainText ?? "";
+                                        },
+                                        child: CommentEmojiText(
+                                          text: controller
+                                              .comments[index].comment,
                                         ),
-                                        if (controller.comments[index]
-                                                .parentComment?.name !=
-                                            null)
-                                          Text(
-                                              'To ${controller.comments[index].parentComment!.name}'),
-                                        if (controller
-                                                .comments[index].stampUrl ==
-                                            null)
-                                          Padding(
-                                            padding: const EdgeInsets.only(
-                                                right: 4.0),
-                                            child: SelectionArea(
-                                              focusNode: _focusNode,
-                                              contextMenuBuilder: (context,
-                                                  selectableRegionState) {
-                                                return _buildSelectionMenu(
-                                                    selectableRegionState,
-                                                    context);
-                                              },
-                                              onSelectionChanged: (value) {
-                                                _selectedText =
-                                                    value?.plainText ?? "";
-                                              },
-                                              child: CommentEmojiText(
-                                                text: controller
-                                                    .comments[index].comment,
+                                      ),
+                                    ),
+                                  if (controller.comments[index].stampUrl !=
+                                      null)
+                                    Padding(
+                                      padding:
+                                          const EdgeInsets.only(right: 4.0),
+                                      child: PixivImage(
+                                        controller.comments[index].stampUrl!,
+                                        height: 100,
+                                        width: 100,
+                                      ),
+                                    ),
+                                  if (controller.comments[index].hasReplies ==
+                                      true)
+                                    Padding(
+                                      padding:
+                                          const EdgeInsets.only(top:8.0),
+                                      child: Chip(
+                                        child: Text("View Replies".tr),
+                                        onPressed: () async {
+                                          Get.to(
+                                              CommentPage(
+                                                id: controller
+                                                    .comments[index].id,
+                                                isReplay: true,
                                               ),
-                                            ),
-                                          ),
-                                        if (controller
-                                                .comments[index].stampUrl !=
-                                            null)
-                                          Padding(
-                                            padding: const EdgeInsets.only(
-                                                right: 4.0),
-                                            child: PixivImage(
-                                              controller
-                                                  .comments[index].stampUrl!,
-                                              height: 100,
-                                              width: 100,
-                                            ),
-                                          ),
-                                        if (controller
-                                                .comments[index].hasReplies ==
-                                            true)
-                                          Padding(
-                                            padding: const EdgeInsets.only(
-                                                right: 4.0),
-                                            child: Chip(
-                                              child: Text("View Replies".tr),
-                                              onPressed: () async {
-                                                Get.to(
-                                                    CommentPage(
-                                                      id: controller
-                                                          .comments[index].id,
-                                                      isReplay: true,
-                                                    ),
-                                                    preventDuplicates: false);
-                                              },
-                                            ),
-                                          ),
-                                        Padding(
-                                          padding:
-                                              const EdgeInsets.only(top: 8.0),
-                                          child: Text(
-                                            controller.comments[index].date
-                                                .toShortTime(),
-                                            style: Theme.of(context)
-                                                .typography
-                                                .textSmall,
-                                          ),
-                                        )
-                                      ],
+                                              preventDuplicates: false);
+                                        },
+                                      ),
+                                    ),
+                                  Padding(
+                                    padding: const EdgeInsets.only(top: 8.0),
+                                    child: Text(
+                                      controller.comments[index].date
+                                          .toShortTime(),
+                                      style: Theme.of(context)
+                                          .typography
+                                          .textSmall,
                                     ),
                                   )
                                 ],
-                              );
-                            },
-                            separatorBuilder:
-                                (BuildContext context, int index) {
-                              return Padding(
-                                padding:
-                                    const EdgeInsets.symmetric(horizontal: 8.0),
-                                child: Divider(),
-                              );
-                            },
-                          ),
+                              ),
+                            )
+                          ],
+                        ).paddingSymmetric(vertical: 8);
+                      },
+                      separatorBuilder: (BuildContext context, int index) {
+                        return Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                          child: Divider(),
+                        );
+                      },
+                    ),
                   ),
                 ),
                 Align(
@@ -434,7 +412,7 @@ class _CommentPageState extends State<CommentPage> {
                                 ),
                                 child: TextField(
                                   placeholder: Text(
-                                      "${"Reply to".tr} ${controller.parentCommentName.value == "" ? "" : "Artwork".tr}"),
+                                      "${"Reply to".tr} ${controller.parentCommentName.value == "" ? "" : controller.parentCommentName.value}"),
                                   controller: _editController,
                                   trailing: IconButton.ghost(
                                       icon: const Icon(

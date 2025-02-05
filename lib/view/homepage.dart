@@ -12,7 +12,7 @@ import 'package:skana_pix/view/mytagspage.dart';
 import 'package:skana_pix/view/rankingpage.dart';
 import 'package:skana_pix/view/recompage.dart';
 import 'package:shadcn_flutter/shadcn_flutter.dart';
-import 'package:skana_pix/view/searchpage.dart';
+import 'package:skana_pix/view/search/searchpage.dart';
 import 'package:skana_pix/view/settings/settingpage.dart';
 import 'package:skana_pix/view/settings/themepage.dart';
 import 'package:skana_pix/view/spotlightpage.dart';
@@ -49,7 +49,8 @@ class _HomePageState extends State<HomePage> {
         headers: [
           AppBar(
             title: (homeController.pageIndex.value == 7)
-                ? SearchBar1(searchPageController.getAwType(searchPageController.selectedIndex.value))
+                ? SearchBar1(searchPageController
+                    .getAwType(searchPageController.selectedIndex.value))
                 : Text(getTitle(pages[homeController.pageIndex.value]).tr),
             subtitle: getSubtitle(pages[homeController.pageIndex.value])
                     .isNotEmpty
@@ -153,8 +154,7 @@ class _HomePageState extends State<HomePage> {
           5 => RankingPage(),
           6 => SpotlightPage(),
           7 => SearchPage(),
-          8 => BookmarksPage(
-              id: 0,
+          8 => MyBookmarksPage(
               type: settings.awPrefer == "novel"
                   ? ArtworkType.NOVEL
                   : ArtworkType.ILLUST,
