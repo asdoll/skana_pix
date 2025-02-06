@@ -59,7 +59,8 @@ class _NovelViewerPageState extends State<NovelViewerPage> {
   void dispose() {
     TextConfigManager.config = config;
     Get.delete<NovelStore>(tag: widget.novel.id.toString());
-    SystemChrome.setEnabledSystemUIMode(SystemUiMode.manual, overlays: SystemUiOverlay.values);
+    SystemChrome.setEnabledSystemUIMode(SystemUiMode.manual,
+        overlays: SystemUiOverlay.values);
     super.dispose();
   }
 
@@ -67,33 +68,33 @@ class _NovelViewerPageState extends State<NovelViewerPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       child: TextCompositionPage(
-            controller: TextComposition(
-                config: config,
-                loadChapter: (e) => _novelStore.fetch(),
-                chapters: [widget.novel.title],
-                percent: 0.0,
-                onSave: (TextCompositionConfig config, double percent) {
-                  // Global.prefs.setString(TextConfigKey, config);
-                  // searchItem.durContentIndex = (percent * NovelContentTotal).floor();
-                  //print("save config: $config");
-                  //print("save percent: $percent");
-                },
-                name: widget.novel.title,
-                menuBuilder: (textComposition) {
-                  return Column(
-                    children: [
-                      _buildAppBar(context),
-                      Divider(),
-                      Spacer(),
-                      _buildBottomRow(
-                          context,
-                          Theme.of(context).colorScheme.background,
-                          Theme.of(context).colorScheme.foreground,
-                          textComposition),
-                    ],
-                  );
-                }),
-          ),
+        controller: TextComposition(
+            config: config,
+            loadChapter: (e) => _novelStore.fetch(),
+            chapters: [widget.novel.title],
+            percent: 0.0,
+            onSave: (TextCompositionConfig config, double percent) {
+              // Global.prefs.setString(TextConfigKey, config);
+              // searchItem.durContentIndex = (percent * NovelContentTotal).floor();
+              //print("save config: $config");
+              //print("save percent: $percent");
+            },
+            name: widget.novel.title,
+            menuBuilder: (textComposition) {
+              return Column(
+                children: [
+                  _buildAppBar(context),
+                  Divider(),
+                  Spacer(),
+                  _buildBottomRow(
+                      context,
+                      Theme.of(context).colorScheme.background,
+                      Theme.of(context).colorScheme.foreground,
+                      textComposition),
+                ],
+              );
+            }),
+      ),
     );
   }
 
@@ -123,19 +124,19 @@ class _NovelViewerPageState extends State<NovelViewerPage> {
             context: context,
             position: OverlayPosition.bottom,
             builder: (context) => SizedBox(
-              height: context.height> 700 ? 700 : context.height,
+              height: context.height > 700 ? 700 : context.height,
               child: configSettingBuilder(context, config,
                   (Color color, void Function(Color color) onChange) {
                 showColorPickerDialog(
                   title: Text("Pick A Color".tr),
                   context: context,
                   color: ColorDerivative.fromColor(color),
-                    onColorChanged: (value) {
-                      onChange(value.toColor());
-                    },
-                  );
-                }, (e, ee) {}, (e, ee) {}),
-              ),
+                  onColorChanged: (value) {
+                    onChange(value.toColor());
+                  },
+                );
+              }, (e, ee) {}, (e, ee) {}),
+            ),
           ),
         ),
         IconButton.ghost(
@@ -362,7 +363,7 @@ class _NovelViewerPageState extends State<NovelViewerPage> {
     );
   }
 
-Future buildShowModalBottomSheet(BuildContext context) {
+  Future buildShowModalBottomSheet(BuildContext context) {
     return openSheet(
       context: context,
       position: OverlayPosition.bottom,
@@ -421,8 +422,7 @@ Future buildShowModalBottomSheet(BuildContext context) {
                 ]),
                 const SizedBox(width: 16),
                 UserFollowButton(
-                  id: widget.novel.author.id
-                      .toString(),
+                  id: widget.novel.author.id.toString(),
                   liked: widget.novel.author.isFollowed,
                 ),
               ],
@@ -434,8 +434,7 @@ Future buildShowModalBottomSheet(BuildContext context) {
                   left: 16.0, right: 16.0, top: 0.0, bottom: 0.0),
               child: InkWell(
                 onTap: () {
-                  Get.to(() => NovelSeriesPage(
-                      widget.novel.seriesId!));
+                  Get.to(() => NovelSeriesPage(widget.novel.seriesId!));
                 },
                 child: Container(
                   height: 26,
@@ -455,8 +454,7 @@ Future buildShowModalBottomSheet(BuildContext context) {
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16.0),
             child: Text(
-              widget.novel.createDate
-                  .toShortTime(),
+              widget.novel.createDate.toShortTime(),
               style: mtc.theme.value.typography.textSmall,
             ),
           ),
@@ -472,13 +470,10 @@ Future buildShowModalBottomSheet(BuildContext context) {
                     Text("AI-generated".tr,
                         style: mtc.theme.value.typography.textSmall.copyWith(
                             color: mtc.theme.value.colorScheme.secondary)),
-                  for (var f in widget.novel.tags)
-                    buildRow(context, f)
+                  for (var f in widget.novel.tags) buildRow(context, f)
                 ],
               )),
-          if (widget.novel.caption
-              .trim()
-              .isNotEmpty)
+          if (widget.novel.caption.trim().isNotEmpty)
             Padding(
               padding: const EdgeInsets.all(8.0),
               child: Card(
@@ -488,9 +483,7 @@ Future buildShowModalBottomSheet(BuildContext context) {
                     contextMenuBuilder: (context, editableTextState) {
                       return _buildSelectionMenu(editableTextState, context);
                     },
-                    child: SelectableHtml(
-                        data:
-                            widget.novel.caption),
+                    child: SelectableHtml(data: widget.novel.caption),
                   ),
                 ),
               ),
@@ -498,9 +491,8 @@ Future buildShowModalBottomSheet(BuildContext context) {
           Button(
             onPressed: () {
               Get.to(
-                  () => CommentPage(
-                      id: widget.novel.id,
-                      type: ArtworkType.NOVEL),
+                  () =>
+                      CommentPage(id: widget.novel.id, type: ArtworkType.NOVEL),
                   preventDuplicates: false);
             },
             style: ButtonStyle.card(density: ButtonDensity.dense),
@@ -678,10 +670,12 @@ Future buildShowModalBottomSheet(BuildContext context) {
                   subtitle: Text(
                     widget.novel.author.name,
                     maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
                   ),
                   title: Text(
                     widget.novel.title,
                     maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
                   ),
                   leading: PainterAvatar(
                     url: widget.novel.author.avatar,
@@ -695,47 +689,69 @@ Future buildShowModalBottomSheet(BuildContext context) {
                           preventDuplicates: false);
                     },
                   ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                  child: Text('Previous'.tr),
-                ),
-                buildListTile(
-                    _novelStore.novelWebResponse!.seriesNavigation?.prevNovel,
-                    context),
-                Divider(),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                  child: Text('Next'.tr),
-                ),
-                buildListTile(
-                    _novelStore.novelWebResponse!.seriesNavigation?.nextNovel,
-                    context),
+                ).paddingVertical(16),
+                Button(
+                    style: ButtonStyle.card(density: ButtonDensity.dense),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        Text('Previous'.tr).textSmall(),
+                        buildListTile(
+                            _novelStore
+                                .novelWebResponse!.seriesNavigation?.prevNovel,
+                            context),
+                      ],
+                    )),
+                Container(height: 8),
+                Button(
+                    style: ButtonStyle.card(density: ButtonDensity.dense),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        Text('Next'.tr).textSmall(),
+                        buildListTile(
+                            _novelStore
+                                .novelWebResponse!.seriesNavigation?.nextNovel,
+                            context),
+                      ],
+                    )),
+                if (GetPlatform.isAndroid) Container(height: 8),
                 if (GetPlatform.isAndroid)
-                  InkWell(
-                    child: Basic(
-                      title: Text("Export".tr),
-                      leading: Icon(Icons.folder_zip),
+                  Button(
+                    style: ButtonStyle.card(density: ButtonDensity.dense),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        Basic(
+                          title: Text("Export".tr),
+                          leading: Icon(Icons.folder_zip).textSmall(),
+                        ).textSmall(),
+                      ],
                     ),
-                    onTap: () {
+                    onPressed: () {
                       _export(context);
                     },
                   ),
-                InkWell(
-                  child: Basic(
-                    title: Text("Share".tr),
-                    leading: Icon(
-                      Icons.share,
-                    ),
-                  ),
-                  onTap: () {
-                    Navigator.of(context).pop();
+                Container(height: 8),
+                Button(
+                  style: ButtonStyle.card(density: ButtonDensity.dense),
+                  child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        Basic(
+                            title: Text("Share".tr).textSmall(),
+                            leading: Icon(
+                              Icons.share,
+                            )).textSmall(),
+                      ]),
+                  onPressed: () {
+                    Get.back();
                     Share.share(
                         "https://www.pixiv.net/novel/show.php?id=${widget.novel.id}");
                   },
                 ),
               ],
-            ),
+            ).paddingHorizontal(16),
           );
         });
   }
@@ -743,7 +759,7 @@ Future buildShowModalBottomSheet(BuildContext context) {
   Widget buildListTile(SimpleNovel? relNovel, BuildContext context) {
     if (relNovel == null) {
       return Basic(
-        title: Text("No more".tr),
+        title: Text("No more".tr).xSmall(),
       );
     }
     return InkWell(
@@ -753,8 +769,9 @@ Future buildShowModalBottomSheet(BuildContext context) {
                   NovelPageLite(relNovel.id.toString())));
         },
         child: Basic(
-          title: Text(relNovel.title,
-              maxLines: 2, overflow: TextOverflow.ellipsis),
+          title:
+              Text(relNovel.title, maxLines: 2, overflow: TextOverflow.ellipsis)
+                  .xSmall(),
         ));
   }
 
@@ -782,6 +799,12 @@ class NovelPageLite extends StatefulWidget {
 }
 
 class _NovelPageLiteState extends State<NovelPageLite> {
+  @override
+  void dispose() {
+    super.dispose();
+    Get.delete<ListNovelController>(tag: "novel_${widget.id}");
+  }
+
   @override
   Widget build(BuildContext context) {
     ListNovelController controller = Get.put(

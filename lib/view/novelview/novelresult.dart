@@ -19,13 +19,18 @@ class NovelResultPage extends StatefulWidget {
 }
 
 class _NovelResultPageState extends State<NovelResultPage> {
+
+  @override
+  void dispose() {
+    super.dispose();
+    Get.delete<ListNovelController>(tag: "search_${widget.word}");
+  }
+
   @override
   Widget build(BuildContext context) {
     ListNovelController controller = Get.put(
         ListNovelController(controllerType: ListType.search, tag: widget.word),
         tag: "search_${widget.word}");
-    controller.searchOptions.value = SearchOptions();
-    controller.searchOptions.refresh();
     return Scaffold(headers: [
       AppBar(
         title: Text(
@@ -88,9 +93,9 @@ class _NovelResultPageState extends State<NovelResultPage> {
                     });
                 if (dateTimeRange != null) {
                   controller.dateTimeRange = dateTimeRange;
-                  controller.searchOptions.value!.startTime =
+                  controller.searchOptions.value.startTime =
                       dateTimeRange!.start;
-                  controller.searchOptions.value!.endTime = dateTimeRange!.end;
+                  controller.searchOptions.value.endTime = dateTimeRange!.end;
                   controller.searchOptions.refresh();
                   controller.refreshController?.callRefresh();
                 }
@@ -106,9 +111,9 @@ class _NovelResultPageState extends State<NovelResultPage> {
                           children: premiumStarNum.map((List<int> value) {
                             if (value.isEmpty) {
                               return MenuButton(
-                                child: Text("Default"),
+                                child: Text("Default".tr),
                                 onPressed: (context) {
-                                  controller.searchOptions.value!.premiumNum =
+                                  controller.searchOptions.value.premiumNum =
                                       value;
                                   controller.searchOptions.refresh();
                                   controller.refreshController?.callRefresh();
@@ -125,7 +130,7 @@ class _NovelResultPageState extends State<NovelResultPage> {
                               return MenuButton(
                                   child: Text("$minStr$maxStr"),
                                   onPressed: (context) {
-                                    controller.searchOptions.value!.premiumNum =
+                                    controller.searchOptions.value.premiumNum =
                                         value;
                                     controller.searchOptions.refresh();
                                     controller.refreshController?.callRefresh();
@@ -147,7 +152,7 @@ class _NovelResultPageState extends State<NovelResultPage> {
                           return MenuButton(
                             child: Text("$value users入り"),
                             onPressed: (context) {
-                              controller.searchOptions.value!.favoriteNumber =
+                              controller.searchOptions.value.favoriteNumber =
                                   value;
                               controller.searchOptions.refresh();
                               controller.refreshController?.callRefresh();
@@ -155,9 +160,9 @@ class _NovelResultPageState extends State<NovelResultPage> {
                           );
                         } else {
                           return MenuButton(
-                            child: Text("Default"),
+                            child: Text("Default".tr),
                             onPressed: (context) {
-                              controller.searchOptions.value!.favoriteNumber =
+                              controller.searchOptions.value.favoriteNumber =
                                   value;
                               controller.searchOptions.refresh();
                               controller.refreshController?.callRefresh();
@@ -213,7 +218,7 @@ class _NovelResultPageState extends State<NovelResultPage> {
                                       width: double.infinity,
                                       child: CupertinoSlidingSegmentedControl(
                                         groupValue: search_target.indexOf(
-                                            controller.searchOptions.value!
+                                            controller.searchOptions.value
                                                 .searchTarget),
                                         children: <int, Widget>{
                                           0: Text(
@@ -226,7 +231,7 @@ class _NovelResultPageState extends State<NovelResultPage> {
                                               search_target_name_novel[3].tr),
                                         },
                                         onValueChanged: (int? index) {
-                                          controller.searchOptions.value!
+                                          controller.searchOptions.value
                                                   .searchTarget =
                                               search_target[index!];
                                           controller.searchOptions.refresh();
@@ -240,7 +245,7 @@ class _NovelResultPageState extends State<NovelResultPage> {
                                       width: double.infinity,
                                       child: CupertinoSlidingSegmentedControl(
                                         groupValue: search_sort.indexOf(
-                                            controller.searchOptions.value!
+                                            controller.searchOptions.value
                                                 .selectSort),
                                         children: <int, Widget>{
                                           0: Text(search_sort_name[0].tr),
@@ -266,7 +271,7 @@ class _NovelResultPageState extends State<NovelResultPage> {
                                               return;
                                             }
                                           }
-                                          controller.searchOptions.value!
+                                          controller.searchOptions.value
                                               .selectSort = search_sort[index!];
                                           controller.searchOptions.refresh();
                                         },
@@ -277,10 +282,10 @@ class _NovelResultPageState extends State<NovelResultPage> {
                                     title: Text("AI-generated".tr),
                                     trailing: Switch(
                                       value: controller
-                                          .searchOptions.value!.searchAI,
+                                          .searchOptions.value.searchAI,
                                       onChanged: (v) {
                                         controller
-                                            .searchOptions.value!.searchAI = v;
+                                            .searchOptions.value.searchAI = v;
                                         controller.searchOptions.refresh();
                                       },
                                     ),

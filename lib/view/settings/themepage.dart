@@ -12,6 +12,12 @@ class ThemePage extends StatefulWidget {
 
 class _ThemePageState extends State<ThemePage> {
   @override
+  void dispose() {
+    super.dispose();
+    Get.delete<ThemeController>();
+  }
+
+  @override
   Widget build(BuildContext context) {
     ThemeController controller = Get.put(ThemeController());
 
@@ -45,7 +51,7 @@ class _ThemePageState extends State<ThemePage> {
                         SelectItemButton(value: '2', child: Text("Dark".tr))
                       ],
                       onChanged: (value) {
-                        if(value == null) return;
+                        if (value == null) return;
                         controller.changeDarkMode(value);
                       },
                     ),

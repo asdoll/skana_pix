@@ -2,6 +2,7 @@
 
 import 'package:shadcn_flutter/shadcn_flutter.dart';
 import 'package:skana_pix/controller/list_controller.dart';
+import 'package:skana_pix/controller/logging.dart';
 import 'package:skana_pix/controller/mini_controllers.dart';
 import 'package:skana_pix/model/worktypes.dart';
 import 'package:get/get.dart';
@@ -20,6 +21,12 @@ class BookmarksPage extends StatefulWidget {
 }
 
 class _BookmarksPageState extends State<BookmarksPage> {
+  @override
+  void dispose() {
+    super.dispose();
+    Get.delete<MTab>(tag: "bookmarks_${widget.id}");
+  }
+
   @override
   Widget build(BuildContext context) {
     MTab mtab = Get.put(MTab(), tag: "bookmarks_${widget.id}");
@@ -73,6 +80,20 @@ class BookmarkContent extends StatefulWidget {
 
 class _BookmarkContentState extends State<BookmarkContent> {
   @override
+  void dispose() {
+    super.dispose();
+    try {
+      if (widget.type == ArtworkType.ILLUST) {
+        Get.delete<ListIllustController>(tag: "userbookmarks_${widget.id}");
+      } else {
+        Get.delete<ListNovelController>(tag: "userbookmarks_${widget.id}");
+      }
+    } catch (e) {
+      log.e(e);
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
     if (widget.type == ArtworkType.ILLUST) {
       ListIllustController controller = Get.put(
@@ -103,9 +124,14 @@ class MyBookmarksPage extends StatefulWidget {
 
 class _MyBookmarksPageState extends State<MyBookmarksPage> {
   @override
+  void dispose() {
+    super.dispose();
+    Get.delete<MTab>(tag: "mybookmarks");
+  }
+
+  @override
   Widget build(BuildContext context) {
     MTab mtab = Get.put(MTab(), tag: "mybookmarks");
-    mtab.index.value = widget.type == ArtworkType.ILLUST ? 0 : 1;
     return Obx(() {
       return Column(
         children: [
@@ -151,6 +177,20 @@ class MyBookmarkContent extends StatefulWidget {
 }
 
 class _MyBookmarkContentState extends State<MyBookmarkContent> {
+  @override
+  void dispose() {
+    super.dispose();
+    try {
+      if (widget.type == ArtworkType.ILLUST) {
+        Get.delete<ListIllustController>(tag: "mybookmarks_illust");
+      } else {
+        Get.delete<ListNovelController>(tag: "mybookmarks_novel");
+      }
+    } catch (e) {
+      log.e(e);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     if (widget.type == ArtworkType.ILLUST) {

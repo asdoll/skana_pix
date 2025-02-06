@@ -20,6 +20,12 @@ class HistoryPage extends StatefulWidget {
 
 class _HistoryPageState extends State<HistoryPage> {
   @override
+  void dispose() {
+    super.dispose();
+    Get.delete<MTab>(tag: "history");
+  }
+
+  @override
   Widget build(BuildContext context) {
     MTab mTab = Get.put(MTab(), tag: "history");
     return Obx(() => Scaffold(
@@ -68,6 +74,12 @@ class IllustsHistory extends StatefulWidget {
 }
 
 class _IllustsHistoryState extends State<IllustsHistory> {
+  @override
+  void dispose() {
+    super.dispose();
+    Get.delete<HistoryIllust>(tag: "history_illust");
+  }
+
   @override
   Widget build(BuildContext context) {
     HistoryIllust controller = Get.put(HistoryIllust(), tag: "history_illust");
@@ -167,6 +179,12 @@ class NovelsHistory extends StatefulWidget {
 }
 
 class _NovelsHistoryState extends State<NovelsHistory> {
+  @override
+  void dispose() {
+    super.dispose();
+    Get.delete<HistoryNovel>(tag: "history_novel");
+  }
+
   @override
   Widget build(BuildContext context) {
     HistoryNovel controller = Get.put(HistoryNovel(), tag: "history_novel");

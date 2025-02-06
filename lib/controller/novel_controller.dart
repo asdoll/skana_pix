@@ -10,13 +10,13 @@ import 'package:skana_pix/utils/leaders.dart';
 
 class NovelSeriesDetailController extends GetxController {
   Rx<NovelSeriesDetail?> novelSeriesDetail = Rxn<NovelSeriesDetail>();
-  EasyRefreshController easyRefreshController;
+  EasyRefreshController? easyRefreshController;
   RxString nextUrl = "".obs;
   String seriesId;
   RxList<Novel> novels = <Novel>[].obs;
   Rx<Novel?> last = Rxn<Novel>();
   NovelSeriesDetailController(
-      {required this.seriesId, required this.easyRefreshController});
+      {required this.seriesId});
 
   void nextPage() {
     loadData().then((value) {
@@ -59,20 +59,20 @@ class NovelSeriesDetailController extends GetxController {
         novels.refresh();
         last.value = value.data.last;
         last.refresh();
-        easyRefreshController.finishRefresh();
+        easyRefreshController?.finishRefresh();
       } else {
         if (value.errorMessage != null &&
             value.errorMessage!.contains("timeout")) {
           Leader.showToast("Network Error. Please refresh to try again.".tr);
         }
-        easyRefreshController.finishRefresh(IndicatorResult.fail);
+        easyRefreshController?.finishRefresh(IndicatorResult.fail);
       }
     });
   }
 
   Future<Res<NovelSeriesResponse>> loadData() async {
     if (nextUrl.value == "end") {
-      easyRefreshController.finishLoad(IndicatorResult.noMore);
+      easyRefreshController?.finishLoad(IndicatorResult.noMore);
       return Res.error("No more data");
     }
     Res<NovelSeriesResponse> res = await ConnectManager()
@@ -82,9 +82,9 @@ class NovelSeriesDetailController extends GetxController {
       nextUrl.value = res.subData ?? "end";
     }
     if (nextUrl.value == "end") {
-      easyRefreshController.finishLoad(IndicatorResult.noMore);
+      easyRefreshController?.finishLoad(IndicatorResult.noMore);
     } else {
-      easyRefreshController.finishLoad();
+      easyRefreshController?.finishLoad();
     }
     return res;
   }

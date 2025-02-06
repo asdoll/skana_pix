@@ -26,6 +26,12 @@ class SoupPage extends StatefulWidget {
 
 class _SoupPageState extends State<SoupPage> {
   @override
+  void dispose() {
+    super.dispose();
+    Get.delete<SoupFetcher>(tag: "soupFetcher_${widget.heroTag}");
+  }
+
+  @override
   Widget build(BuildContext context) {
     SoupFetcher soupFetcher =
         Get.put(SoupFetcher(), tag: "soupFetcher_${widget.heroTag}");

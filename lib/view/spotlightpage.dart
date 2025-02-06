@@ -16,12 +16,19 @@ class SpotlightPage extends StatefulWidget {
 
 class _SpotlightPageState extends State<SpotlightPage> {
   @override
+  void dispose() {
+    super.dispose();
+    Get.delete<SpotlightStoreBase>();
+  }
+
+  @override
   Widget build(BuildContext context) {
     final ScrollController controller = ScrollController();
     final EasyRefreshController refreshController = EasyRefreshController(
         controlFinishLoad: true, controlFinishRefresh: true);
-    SpotlightStoreBase spotlightStore = Get.put(SpotlightStoreBase(refreshController));
-    return Obx(() { 
+    SpotlightStoreBase spotlightStore = Get.put(SpotlightStoreBase());
+    spotlightStore.controller = refreshController;
+    return Obx(() {
       return EasyRefresh(
           onLoad: () => spotlightStore.next(),
           onRefresh: () => spotlightStore.fetch(),

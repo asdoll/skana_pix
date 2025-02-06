@@ -14,6 +14,13 @@ class FeedIllust extends StatefulWidget {
 
 class _FeedIllustState extends State<FeedIllust> {
   int tab = 0;
+
+  @override
+  void dispose() {
+    super.dispose();
+    Get.delete<ListIllustController>(tag: "feedillust");
+  }
+
   @override
   Widget build(BuildContext context) {
     ListIllustController feedIllustController = Get.put(
@@ -71,6 +78,11 @@ class FeedNovel extends StatefulWidget {
 
 class _FeedNovelState extends State<FeedNovel> {
   int tab = 0;
+  @override
+  void dispose() {
+    super.dispose();
+    Get.delete<ListNovelController>(tag: "feednovel");
+  }
 
   @override
   Widget build(BuildContext context) {

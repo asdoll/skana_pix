@@ -18,6 +18,12 @@ class WorksPage extends StatefulWidget {
 
 class _WorksPageState extends State<WorksPage> {
   @override
+  void dispose() {
+    super.dispose();
+    Get.delete<MTab>(tag: "works_${widget.id}");
+  }
+
+  @override
   Widget build(BuildContext context) {
     MTab mtab = Get.put(MTab(), tag: "works_${widget.id}");
     return Obx(() {
@@ -82,6 +88,18 @@ class WorkContent extends StatefulWidget {
 }
 
 class _WorkContentState extends State<WorkContent> {
+  @override
+  void dispose() {
+    super.dispose();
+    if (widget.type == ArtworkType.ILLUST || widget.type == ArtworkType.MANGA) {
+      Get.delete<ListIllustController>(
+          tag: "works_${widget.type.name}_${widget.id}");
+    } else {
+      Get.delete<ListNovelController>(
+          tag: "works_${widget.type.name}_${widget.id}");
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     if (widget.type == ArtworkType.ILLUST || widget.type == ArtworkType.MANGA) {

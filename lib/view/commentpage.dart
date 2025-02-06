@@ -57,13 +57,13 @@ final emojisMap = {
 
 class CommentPage extends StatefulWidget {
   final int id;
-  final bool isReplay;
+  final bool isReply;
   final ArtworkType type;
 
   const CommentPage(
       {super.key,
       required this.id,
-      this.isReplay = false,
+      this.isReply = false,
       this.type = ArtworkType.ILLUST});
 
   @override
@@ -85,6 +85,7 @@ class _CommentPageState extends State<CommentPage> {
   void dispose() {
     _editController.dispose();
     _focusNode.dispose();
+    Get.delete<CommentController>(tag: "comment_${widget.id}_${widget.type}");
     super.dispose();
   }
 
@@ -134,8 +135,8 @@ class _CommentPageState extends State<CommentPage> {
     EasyRefreshController easyRefreshController = EasyRefreshController(
         controlFinishLoad: true, controlFinishRefresh: true);
     CommentController controller = Get.put(
-        CommentController(
-            widget.id.toString(), widget.type, easyRefreshController),
+        CommentController(widget.id.toString(), widget.type,
+            easyRefreshController, widget.isReply),
         tag: "comment_${widget.id}_${widget.type}");
 
     return Listener(
@@ -205,88 +206,77 @@ class _CommentPageState extends State<CommentPage> {
                                       ).semiBold(),
                                       Row(
                                         children: [
-                                          PrimaryButton(
-                                              density: ButtonDensity.dense,
-                                              onPressed: () {
-                                                if (widget.isReplay) return;
-                                                controller
-                                                        .parentCommentId.value =
-                                                    controller
-                                                        .comments[index].id;
-                                                controller.parentCommentName
-                                                        .value =
-                                                    controller
-                                                        .comments[index].name;
-                                              },
-                                              child: Text(widget.isReplay
-                                                  ? ""
-                                                  : "Reply".tr)),
-                                          if (!widget.isReplay)
-                                            Padding(
-                                              padding:
-                                                  const EdgeInsets.symmetric(
-                                                      horizontal: 12.0),
-                                              child: GhostButton(
-                                                  density: ButtonDensity.dense,
-                                                  onPressed: () {
-                                                    openSheet(
-                                                        context: context,
-                                                        position:
-                                                            OverlayPosition
-                                                                .bottom,
-                                                        builder: (context) {
-                                                          return Column(
-                                                            mainAxisSize:
-                                                                MainAxisSize
-                                                                    .min,
-                                                            children: [
-                                                              InkWell(
-                                                                child: Basic(
-                                                                  title: Text(
-                                                                      "Block User"
-                                                                          .tr),
-                                                                ),
-                                                                onTap:
-                                                                    () async {
-                                                                  Get.back();
-                                                                  localManager.add(
-                                                                      "blockedCommentUsers",
-                                                                      [
-                                                                        controller
-                                                                            .comments[index]
-                                                                            .name
-                                                                      ]);
-                                                                },
-                                                              ).paddingSymmetric(vertical: 6),
-                                                              InkWell(
-                                                                child: Basic(
-                                                                  title: Text(
-                                                                      "Block Comment"
-                                                                          .tr),
-                                                                ),
-                                                                onTap: () {
-                                                                  Get.back();
-                                                                  localManager.add(
-                                                                      "blockedComments",
-                                                                      [
-                                                                        controller
-                                                                            .comments[index]
-                                                                            .comment
-                                                                      ]);
-                                                                },
-                                                              ).paddingSymmetric(vertical: 6),
-                                                              Container(
-                                                                height: context
-                                                                    .mediaQueryPadding
-                                                                    .bottom,
-                                                              )
-                                                            ],
-                                                          );
-                                                        });
-                                                  },
-                                                  child: const Icon(
-                                                      Icons.more_horiz)),
-                                            )
+                                          if (!widget.isReply)
+                                            PrimaryButton(
+                                                density: ButtonDensity.dense,
+                                                onPressed: () {
+                                                  controller.parentCommentId
+                                                          .value =
+                                                      controller
+                                                          .comments[index].id;
+                                                  controller.parentCommentName
+                                                          .value =
+                                                      controller
+                                                          .comments[index].name;
+                                                },
+                                                child: Text("Reply".tr)),
+                                          Padding(
+                                            padding: const EdgeInsets.symmetric(
+                                                horizontal: 12.0),
+                                            child: GhostButton(
+                                                density: ButtonDensity.dense,
+                                                onPressed: () {
+                                                  showDropdown(
+                                                      context: context,
+                                                      builder: (context) {
+                                                        return DropdownMenu(
+                                                          children: [
+                                                            MenuButton(
+                                                              leading: const Icon(
+                                                                Icons.person_off,
+                                                              ),
+                                                              child: Text(
+                                                                  "Block User"
+                                                                      .tr),
+                                                              onPressed:
+                                                                  (_) async {
+                                                                localManager.add(
+                                                                    "blockedCommentUsers",
+                                                                    [
+                                                                      controller
+                                                                          .comments[
+                                                                              index]
+                                                                          .name
+                                                                    ]);
+                                                              },
+                                                            ),
+                                                            MenuButton(
+                                                              leading: const Icon(
+                                                                Icons.block,
+                                                              ),
+                                                              child: Text(
+                                                                  "Block Comment"
+                                                                      .tr),
+                                                              onPressed:
+                                                                  (_) async {
+                                                                Get.back();
+                                                                localManager.add(
+                                                                    "blockedComments",
+                                                                    [
+                                                                      controller
+                                                                          .comments[
+                                                                              index]
+                                                                          .comment
+                                                                    ]);
+                                                              },
+                                                            ),
+                                                          ],
+                                                        );
+                                                      });
+                                                },
+                                                child: const Icon(
+                                                    Icons.more_horiz)),
+                                          )
                                         ],
                                       )
                                     ],
@@ -332,8 +322,7 @@ class _CommentPageState extends State<CommentPage> {
                                   if (controller.comments[index].hasReplies ==
                                       true)
                                     Padding(
-                                      padding:
-                                          const EdgeInsets.only(top:8.0),
+                                      padding: const EdgeInsets.only(top: 8.0),
                                       child: Chip(
                                         child: Text("View Replies".tr),
                                         onPressed: () async {
@@ -341,7 +330,7 @@ class _CommentPageState extends State<CommentPage> {
                                               CommentPage(
                                                 id: controller
                                                     .comments[index].id,
-                                                isReplay: true,
+                                                isReply: true,
                                               ),
                                               preventDuplicates: false);
                                         },
@@ -381,7 +370,7 @@ class _CommentPageState extends State<CommentPage> {
                           IconButton.ghost(
                             icon: Icon(Icons.book),
                             onPressed: () {
-                              if (widget.isReplay) return;
+                              if (widget.isReply) return;
                               controller.parentCommentId.value = 0;
                               controller.parentCommentName.value = "";
                             },

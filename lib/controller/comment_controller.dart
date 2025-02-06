@@ -15,8 +15,10 @@ class CommentController extends GetxController {
   RxString error = "".obs;
   RxInt parentCommentId = 0.obs;
   RxString parentCommentName = "".obs;
+  bool isReply;
 
-  CommentController(this.id, this.type, this.easyRefreshController);
+  CommentController(
+      this.id, this.type, this.easyRefreshController, this.isReply);
 
   Future<Res<List<Comment>>> loadData() async {
     if (isLoading.value) return Res.error("Loading");
@@ -24,9 +26,18 @@ class CommentController extends GetxController {
       easyRefreshController.finishLoad(IndicatorResult.noMore);
       return Res.error("No more data");
     }
+
     Res<List<Comment>> res = type == ArtworkType.NOVEL
-        ? await ConnectManager().apiClient.getNovelComments(id, nextUrl)
-        : await ConnectManager().apiClient.getComments(id, nextUrl);
+        ? (isReply
+            ? await ConnectManager()
+                .apiClient
+                .getNovelCommentsReplies(id, nextUrl)
+            : await ConnectManager().apiClient.getNovelComments(id, nextUrl))
+        : (isReply
+            ? await ConnectManager()
+                .apiClient
+                .getIllustCommentsReplies(id, nextUrl)
+            : await ConnectManager().apiClient.getComments(id, nextUrl));
     if (!res.error) {
       nextUrl = res.subData;
       nextUrl ??= "end";

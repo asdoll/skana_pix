@@ -173,9 +173,9 @@ extension ElementExt on dom.Element {
 class SpotlightStoreBase extends GetxController {
   RxList<SpotlightArticle> articles = RxList.empty();
   String? nextUrl;
-  EasyRefreshController controller;
+  EasyRefreshController? controller;
 
-  SpotlightStoreBase(this.controller);
+  SpotlightStoreBase();
   bool isLoading = false;
 
   Future<bool> fetch() async {
@@ -186,17 +186,17 @@ class SpotlightStoreBase extends GetxController {
       SpotlightResponse response =
           await ConnectManager().apiClient.getSpotlightArticles("all");
       if (response.nextUrl != null && response.nextUrl == "error") {
-        controller.finishRefresh(IndicatorResult.fail);
+        controller?.finishRefresh(IndicatorResult.fail);
         return false;
       }
       articles.clear();
       articles.addAll(response.spotlightArticles);
       articles.refresh();
       nextUrl = response.nextUrl;
-      controller.finishRefresh(IndicatorResult.success);
+      controller?.finishRefresh(IndicatorResult.success);
       return true;
     } catch (e) {
-      controller.finishRefresh(IndicatorResult.fail);
+      controller?.finishRefresh(IndicatorResult.fail);
       return false;
     } finally {
       isLoading = false;
@@ -211,21 +211,21 @@ class SpotlightStoreBase extends GetxController {
         try {
           SpotlightResponse response = await getNextSpotlightArticles(nextUrl!);
           if (response.nextUrl != null && response.nextUrl == "error") {
-            controller.finishRefresh(IndicatorResult.fail);
+            controller?.finishRefresh(IndicatorResult.fail);
             return false;
           }
           nextUrl = response.nextUrl;
           articles.addAll(response.spotlightArticles);
-          controller.finishLoad(nextUrl == null
+          controller?.finishLoad(nextUrl == null
               ? IndicatorResult.noMore
               : IndicatorResult.success);
           return true;
         } catch (e) {
-          controller.finishLoad(IndicatorResult.fail);
+          controller?.finishLoad(IndicatorResult.fail);
           return false;
         }
       } else {
-        controller.finishLoad(IndicatorResult.noMore);
+        controller?.finishLoad(IndicatorResult.noMore);
         return true;
       }
     } finally {

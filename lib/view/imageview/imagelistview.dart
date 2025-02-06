@@ -601,6 +601,12 @@ class IllustPageLite extends StatefulWidget {
 
 class _IllustPageLiteState extends State<IllustPageLite> {
   @override
+  void dispose() {
+    super.dispose();
+    Get.delete<ListIllustController>(tag: "illust_${widget.id}");
+  }
+
+  @override
   Widget build(BuildContext context) {
     // ignore: unused_local_variable
     ListIllustController controller = Get.put(

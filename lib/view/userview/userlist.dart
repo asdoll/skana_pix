@@ -17,6 +17,13 @@ class UserList extends StatefulWidget {
 
 class _UserListState extends State<UserList> {
   @override
+  void dispose() {
+    super.dispose();
+    Get.delete<ListUserController>(tag: widget.controllerTag);
+    Get.delete<MTab>(tag: widget.controllerTag);
+  }
+
+  @override
   Widget build(BuildContext context) {
     ListUserController controller =
         Get.find<ListUserController>(tag: widget.controllerTag);
@@ -24,47 +31,63 @@ class _UserListState extends State<UserList> {
         controlFinishLoad: true, controlFinishRefresh: true);
     controller.refreshController = easyRefreshController;
     MTab tab = Get.put(MTab(), tag: widget.controllerTag);
-    return EasyRefresh(
-      controller: easyRefreshController,
-      header: DefaultHeaderFooter.header(context),
-      footer: DefaultHeaderFooter.footer(context),
-      onLoad: () => controller.nextPage(),
-      onRefresh: () => controller.reset(),
-      refreshOnStart: true,
-      child: CustomScrollView(
-        slivers: [
-          if (controller.userListType == UserListType.myfollowing)
-            SliverToBoxAdapter(
-              child: Tabs(
-                tabs: [
-                  Text("public".tr),
-                  Text("private".tr),
-                  Text("My Pixiv".tr)
-                ],
+    return Obx(() => Column(
+          children: [
+            if (controller.userListType == UserListType.myfollowing)
+              TabList(
                 index: tab.index.value,
-                onChanged: (index) {
-                  tab.index.value = index;
-                  controller.restrict.value = index == 0
-                      ? "public"
-                      : index == 1
-                          ? "private"
-                          : "mypixiv";
-                  controller.refreshController?.callRefresh();
-                },
+                children: [
+                  TabButton(
+                    child: Text("public".tr),
+                    onPressed: () {
+                      tab.index.value = 0;
+                      controller.restrict.value = "public";
+                      controller.refreshController?.callRefresh();
+                    },
+                  ),
+                  TabButton(
+                    child: Text("private".tr),
+                    onPressed: () {
+                      tab.index.value = 1;
+                      controller.restrict.value = "private";
+                      controller.refreshController?.callRefresh();
+                    },
+                  ),
+                  TabButton(
+                    child: Text("My Pixiv".tr),
+                    onPressed: () {
+                      tab.index.value = 2;
+                      controller.restrict.value = "mypixiv";
+                      controller.refreshController?.callRefresh();
+                    },
+                  ),
+                ],
               ),
-            ),
-          SliverWaterfallFlow(
-            delegate: SliverChildBuilderDelegate((context, index) {
-              return PainterCard(
-                user: controller.users[index],
-              );
-            }, childCount: controller.users.length),
-            gridDelegate:
-                const SliverWaterfallFlowDelegateWithMaxCrossAxisExtent(
-                    maxCrossAxisExtent: 600),
-          )
-        ],
-      ),
-    );
+            SizedBox(height: 10),
+            Expanded(
+                child: EasyRefresh(
+              controller: easyRefreshController,
+              header: DefaultHeaderFooter.header(context),
+              footer: DefaultHeaderFooter.footer(context),
+              onLoad: () => controller.nextPage(),
+              onRefresh: () => controller.reset(),
+              refreshOnStart: true,
+              child: CustomScrollView(
+                slivers: [
+                  SliverWaterfallFlow(
+                    delegate: SliverChildBuilderDelegate((context, index) {
+                      return PainterCard(
+                        user: controller.users[index],
+                      );
+                    }, childCount: controller.users.length),
+                    gridDelegate:
+                        const SliverWaterfallFlowDelegateWithMaxCrossAxisExtent(
+                            maxCrossAxisExtent: 600),
+                  )
+                ],
+              ),
+            ))
+          ],
+        ));
   }
 }

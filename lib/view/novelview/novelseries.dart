@@ -23,14 +23,20 @@ class NovelSeriesPage extends StatefulWidget {
 
 class _NovelSeriesPageState extends State<NovelSeriesPage> {
   @override
+  void dispose() {
+    super.dispose();
+    Get.delete<NovelSeriesDetailController>(tag: "novelseries_${widget.seriesId}");
+  }
+
+  @override
   Widget build(BuildContext context) {
     EasyRefreshController easyRefreshController = EasyRefreshController(
         controlFinishLoad: true, controlFinishRefresh: true);
     NovelSeriesDetailController controller = Get.put(
         NovelSeriesDetailController(
-            seriesId: widget.seriesId.toString(),
-            easyRefreshController: easyRefreshController));
-
+            seriesId: widget.seriesId.toString()),
+        tag: "novelseries_${widget.seriesId}");
+    controller.easyRefreshController = easyRefreshController;
     return Scaffold(
       headers: [
         AppBar(

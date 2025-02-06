@@ -643,6 +643,19 @@ class ApiClient extends BaseClient {
     }
   }
 
+  Future<Res<List<Comment>>> getIllustCommentsReplies(String id, [String? nextUrl]) async {
+    var res = await apiGet(nextUrl ?? "/v2/illust/comment/replies?comment_id=$id");
+    if (res.success) {
+      return Res(
+          (res.data["comments"] as List)
+              .map((e) => Comment.fromJson(e))
+              .toList(),
+          subData: res.data["next_url"]);
+    } else {
+      return Res.error(res.errorMessage);
+    }
+  }
+
   Future<Res<bool>> comment(String id, String content,
       {String? parentId}) async {
     Map<String, String> data;
@@ -913,6 +926,16 @@ class ApiClient extends BaseClient {
   Future<Res<List<Comment>>> getNovelComments(String id,
       [String? nextUrl]) async {
     var res = await apiGet(nextUrl ?? "/v3/novel/comments?novel_id=$id");
+    if (res.error) {
+      return Res.fromErrorRes(res);
+    }
+    return Res(
+        (res.data["comments"] as List).map((e) => Comment.fromJson(e)).toList(),
+        subData: res.data["next_url"]);
+  }
+
+  Future<Res<List<Comment>>> getNovelCommentsReplies(String id, [String? nextUrl]) async {
+    var res = await apiGet(nextUrl ?? "/v2/novel/comment/replies?comment_id=$id");
     if (res.error) {
       return Res.fromErrorRes(res);
     }

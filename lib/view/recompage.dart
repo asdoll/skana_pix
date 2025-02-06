@@ -13,6 +13,13 @@ class RecomIllustsPage extends StatefulWidget {
 
 class _RecomIllustsPageState extends State<RecomIllustsPage> {
   @override
+  void dispose() {
+    super.dispose();
+    Get.delete<ListIllustController>(
+        tag: "recom_illust");
+  }
+
+  @override
   Widget build(BuildContext context) {
     // ignore: unused_local_variable
     ListIllustController recomImagesController = Get.put(
@@ -30,6 +37,13 @@ class RecomMangasPage extends StatefulWidget {
 
 class _RecomMangasPageState extends State<RecomMangasPage> {
   @override
+  void dispose() {
+    super.dispose();
+    Get.delete<ListIllustController>(
+        tag: "recom_manga");
+  }
+
+  @override
   Widget build(BuildContext context) {
     // ignore: unused_local_variable
     ListIllustController recomImagesController = Get.put(
@@ -46,6 +60,13 @@ class RecomNovelsPage extends StatefulWidget {
 }
 
 class _RecomNovelsPageState extends State<RecomNovelsPage> {
+  @override
+  void dispose() {
+    super.dispose();
+    Get.delete<ListNovelController>(
+        tag: "recom_novels");
+  }
+
   @override
   Widget build(BuildContext context) {
     // ignore: unused_local_variable

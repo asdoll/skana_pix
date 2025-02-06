@@ -11,6 +11,13 @@ class PreferenceSettings extends StatefulWidget {
 }
 
 class _PreferenceSettingsState extends State<PreferenceSettings> {
+
+  @override
+  void dispose() {
+    super.dispose();
+    Get.delete<PrefsController>();
+  }
+
   @override
   Widget build(BuildContext context) {
     PrefsController controller = Get.put(PrefsController());

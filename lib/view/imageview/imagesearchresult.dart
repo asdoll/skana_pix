@@ -26,6 +26,12 @@ class IllustResultPage extends StatefulWidget {
 class _IllustResultPageState extends State<IllustResultPage> {
 
   @override
+  void dispose() {
+    Get.delete<ListIllustController>(tag: "search_${widget.word}");
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     ListIllustController controller = Get.put(
         ListIllustController(
@@ -34,8 +40,6 @@ class _IllustResultPageState extends State<IllustResultPage> {
             type: widget.type),
         tag: "search_${widget.word}");
     controller.restrict.value = "all";
-    controller.searchOptions.value = SearchOptions();
-    controller.searchOptions.refresh();
     return Obx(() {
       return Scaffold(headers: [
         AppBar(
@@ -132,9 +136,9 @@ class _IllustResultPageState extends State<IllustResultPage> {
                       });
                   if (dateTimeRange != null) {
                     controller.dateTimeRange = dateTimeRange;
-                    controller.searchOptions.value!.startTime =
+                    controller.searchOptions.value.startTime =
                         dateTimeRange!.start;
-                    controller.searchOptions.value!.endTime =
+                    controller.searchOptions.value.endTime =
                         dateTimeRange!.end;
                     controller.searchOptions.refresh();
                     controller.refreshController?.callRefresh();
@@ -151,9 +155,9 @@ class _IllustResultPageState extends State<IllustResultPage> {
                             children: premiumStarNum.map((List<int> value) {
                               if (value.isEmpty) {
                                 return MenuButton(
-                                  child: Text("Default"),
+                                  child: Text("Default".tr),
                                   onPressed: (context) {
-                                    controller.searchOptions.value!.premiumNum =
+                                    controller.searchOptions.value.premiumNum =
                                         value;
                                     controller.searchOptions.refresh();
                                     controller.refreshController?.callRefresh();
@@ -170,7 +174,7 @@ class _IllustResultPageState extends State<IllustResultPage> {
                                 return MenuButton(
                                     child: Text("$minStr$maxStr"),
                                     onPressed: (context) {
-                                      controller.searchOptions.value!
+                                      controller.searchOptions.value
                                           .premiumNum = value;
                                       controller.searchOptions.refresh();
                                       controller.refreshController
@@ -193,7 +197,7 @@ class _IllustResultPageState extends State<IllustResultPage> {
                             return MenuButton(
                               child: Text("$value users入り"),
                               onPressed: (context) {
-                                controller.searchOptions.value!.favoriteNumber =
+                                controller.searchOptions.value.favoriteNumber =
                                     value;
                                 controller.searchOptions.refresh();
                                 controller.refreshController?.callRefresh();
@@ -201,9 +205,9 @@ class _IllustResultPageState extends State<IllustResultPage> {
                             );
                           } else {
                             return MenuButton(
-                              child: Text("Default"),
+                              child: Text("Default".tr),
                               onPressed: (context) {
-                                controller.searchOptions.value!.favoriteNumber =
+                                controller.searchOptions.value.favoriteNumber =
                                     value;
                                 controller.searchOptions.refresh();
                                 controller.refreshController?.callRefresh();
@@ -259,7 +263,7 @@ class _IllustResultPageState extends State<IllustResultPage> {
                                         width: double.infinity,
                                         child: CupertinoSlidingSegmentedControl(
                                           groupValue: search_target.indexOf(
-                                              controller.searchOptions.value!
+                                              controller.searchOptions.value
                                                   .searchTarget),
                                           children: <int, Widget>{
                                             0: Text(search_target_name[0].tr),
@@ -267,7 +271,7 @@ class _IllustResultPageState extends State<IllustResultPage> {
                                             2: Text(search_target_name[2].tr),
                                           },
                                           onValueChanged: (int? index) {
-                                            controller.searchOptions.value!
+                                            controller.searchOptions.value
                                                     .searchTarget =
                                                 search_target[index!];
                                             controller.searchOptions.refresh();
@@ -281,7 +285,7 @@ class _IllustResultPageState extends State<IllustResultPage> {
                                         width: double.infinity,
                                         child: CupertinoSlidingSegmentedControl(
                                           groupValue: search_sort.indexOf(
-                                              controller.searchOptions.value!
+                                              controller.searchOptions.value
                                                   .selectSort),
                                           children: <int, Widget>{
                                             0: Text(search_sort_name[0].tr),
@@ -307,7 +311,7 @@ class _IllustResultPageState extends State<IllustResultPage> {
                                                 return;
                                               }
                                             }
-                                            controller.searchOptions.value!
+                                            controller.searchOptions.value
                                                     .selectSort =
                                                 search_sort[index!];
                                             controller.searchOptions.refresh();
@@ -319,9 +323,9 @@ class _IllustResultPageState extends State<IllustResultPage> {
                                       title: Text("AI-generated".tr),
                                       trailing: Switch(
                                         value: controller
-                                            .searchOptions.value!.searchAI,
+                                            .searchOptions.value.searchAI,
                                         onChanged: (v) {
-                                          controller.searchOptions.value!
+                                          controller.searchOptions.value
                                               .searchAI = v;
                                           controller.searchOptions.refresh();
                                         },

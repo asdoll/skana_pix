@@ -1,6 +1,7 @@
 import 'package:get/get.dart';
 import 'package:skana_pix/componentwidgets/searchbar.dart';
 import 'package:skana_pix/controller/account_controller.dart';
+import 'package:skana_pix/controller/list_controller.dart';
 import 'package:skana_pix/controller/mini_controllers.dart';
 import 'package:skana_pix/controller/page_index_controller.dart';
 import 'package:skana_pix/controller/settings.dart';
@@ -55,7 +56,12 @@ class _HomePageState extends State<HomePage> {
             subtitle: getSubtitle(pages[homeController.pageIndex.value])
                     .isNotEmpty
                 ? Text(getSubtitle(pages[homeController.pageIndex.value]).tr)
-                : null,
+                : ((homeController.pageIndex.value == 5)
+                    ? Text(rankTagsMap[homeController.tagList(homeController
+                            .workIndex.value)[homeController.tagIndex.value]] ??
+                        homeController.tagList(homeController.workIndex.value)[
+                            homeController.tagIndex.value])
+                    : null),
             padding: EdgeInsets.all(10),
             leading: [
               OutlineButton(
@@ -92,7 +98,7 @@ class _HomePageState extends State<HomePage> {
                               buildButton('Pixivision'.tr, BootstrapIcons.info),
                               buildButton('Search'.tr, BootstrapIcons.search),
                               buildButton(
-                                  'Bookmarks'.tr, BootstrapIcons.bookmark),
+                                  'My Bookmarks'.tr, BootstrapIcons.bookmark),
                               buildButton('My Tags'.tr, BootstrapIcons.tags),
                               buildButton(
                                   'Following'.tr, BootstrapIcons.person),
@@ -115,6 +121,91 @@ class _HomePageState extends State<HomePage> {
                   ),
                   onPressed: () {
                     Get.to(() => ThemePage());
+                  },
+                ),
+              if (homeController.pageIndex.value == 5)
+                IconButton.ghost(
+                  icon: const Icon(
+                    Icons.filter_alt_outlined,
+                  ),
+                  onPressed: () {
+                    showDropdown(
+                      context: context,
+                      builder: (context) {
+                        return DropdownMenu(
+                          children: [
+                            for (int i = 0;
+                                i <
+                                    homeController
+                                        .tagList(homeController.workIndex.value)
+                                        .length;
+                                i++)
+                              MenuButton(
+                                child: Text(rankTagsMap[homeController.tagList(
+                                        homeController.workIndex.value)[i]] ??
+                                    homeController.tagList(
+                                        homeController.workIndex.value)[i]),
+                                onPressed: (context) {
+                                  homeController.tagIndex.value = i;
+                                  homeController.refreshRanking();
+                                },
+                              ),
+                          ],
+                        );
+                      },
+                    );
+                  },
+                ),
+              if (homeController.pageIndex.value == 5)
+                IconButton.ghost(
+                  icon: const Icon(
+                    Icons.calendar_month,
+                  ),
+                  onPressed: () {
+                    showDialog(
+                        context: context,
+                        builder: (context) {
+                          DateTime? date = homeController.dateTime.value;
+                          return AlertDialog(
+                            content: DatePickerDialog(
+                                initialViewType: CalendarViewType.date,
+                                selectionMode: CalendarSelectionMode.single,
+                                initialValue: date == null
+                                    ? null
+                                    : CalendarValue.single(date),
+                                stateBuilder: (date) {
+                                  if (date.isBefore(DateTime(2007, 9))) {
+                                    return DateState.disabled;
+                                  } //pixiv于2007年9月10日由上谷隆宏等人首次推出第一个测试版...
+                                  if (date.isAfter(DateTime.now())) {
+                                    return DateState.disabled;
+                                  }
+                                  return DateState.enabled;
+                                },
+                                onChanged: (value) {
+                                  if (value == null) return;
+                                  final range = value.toSingle();
+                                  date = range.date;
+                                }),
+                            actions: [
+                              OutlineButton(
+                                child: Text("Cancel".tr),
+                                onPressed: () {
+                                  date = null;
+                                  Get.back();
+                                },
+                              ),
+                              PrimaryButton(
+                                child: Text("Confirm".tr),
+                                onPressed: () {
+                                  homeController.dateTime.value = date;
+                                  homeController.refreshRanking();
+                                  Get.back();
+                                },
+                              )
+                            ],
+                          );
+                        });
                   },
                 ),
             ],

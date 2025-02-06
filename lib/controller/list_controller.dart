@@ -2,6 +2,7 @@ import 'package:easy_refresh/easy_refresh.dart';
 import 'package:get/get.dart';
 import 'package:shadcn_flutter/shadcn_flutter.dart';
 import 'package:skana_pix/controller/like_controller.dart';
+import 'package:skana_pix/controller/page_index_controller.dart';
 import 'package:skana_pix/model/worktypes.dart';
 import 'package:skana_pix/pixiv_dart_api.dart';
 import 'package:skana_pix/utils/filters.dart';
@@ -31,13 +32,11 @@ class ListIllustController extends GetxController {
   EasyRefreshController? refreshController;
   String id;
   String tag;
-  Rx<DateTime?> dateTime = Rxn<DateTime>();
   RxString restrict = "public".obs;
   ListType controllerType;
-  Rx<SearchOptions?> searchOptions = Rxn<SearchOptions>();
+  Rx<SearchOptions> searchOptions = SearchOptions().obs;
   DateTimeRange? dateTimeRange;
   static RxList<int> historyIds = RxList.empty();
-  RxInt tagIndex = 0.obs;
 
   bool get showMangaBadage => type != ArtworkType.MANGA;
 
@@ -82,9 +81,11 @@ class ListIllustController extends GetxController {
       case ListType.ranking:
         return ConnectManager().apiClient.getRanking(
             type == ArtworkType.ILLUST
-                ? modeIllust[tagIndex.value]
-                : modeManga[tagIndex.value],
-            dateTime.value == null ? null : toRequestDate(dateTime.value!),
+                ? modeIllust[homeController.tagIndex.value]
+                : modeManga[homeController.tagIndex.value],
+            homeController.dateTime.value == null
+                ? null
+                : toRequestDate(homeController.dateTime.value!),
             nexturl.isEmpty ? null : nexturl.value);
       case ListType.recom:
         if (type == ArtworkType.ILLUST) {
@@ -102,9 +103,7 @@ class ListIllustController extends GetxController {
               .apiClient
               .getIllustsWithNextUrl(nexturl.value);
         } else {
-          return ConnectManager()
-              .apiClient
-              .search(tag, searchOptions.value ?? SearchOptions());
+          return ConnectManager().apiClient.search(tag, searchOptions.value);
         }
       case ListType.userbookmarks:
         return ConnectManager()
@@ -131,13 +130,13 @@ class ListIllustController extends GetxController {
     error.value = "";
     page.value = 1;
     nexturl.value = "";
-    searchOptions.value = null;
-    searchOptions.refresh();
     firstLoad();
   }
 
   List<Illust> filterIllusts(List<Illust> datas) {
-    if (controllerType == ListType.userbookmarks || controllerType == ListType.mybookmarks || controllerType == ListType.works) return checkIllusts(datas);
+    if (controllerType == ListType.userbookmarks ||
+        controllerType == ListType.mybookmarks ||
+        controllerType == ListType.works) return checkIllusts(datas);
 
     if (!["all", "illust", "manga"].contains(restrict.value)) {
       restrict.value = "all";
@@ -221,11 +220,10 @@ class ListNovelController extends GetxController {
   RxInt page = 1.obs;
   EasyRefreshController? refreshController;
   String tag;
-  Rx<DateTime?> dateTime = Rxn<DateTime>();
   ListType controllerType;
   String id;
   DateTimeRange? dateTimeRange;
-  Rx<SearchOptions?> searchOptions = Rxn<SearchOptions>();
+  Rx<SearchOptions> searchOptions = SearchOptions().obs;
   bool get noNextPage => controllerType == ListType.single;
   RxInt tagIndex = 0.obs;
 
@@ -251,8 +249,10 @@ class ListNovelController extends GetxController {
             .getRecommendNovels(nexturl.isEmpty ? null : nexturl.value);
       case ListType.ranking:
         return ConnectManager().apiClient.getNovelRanking(
-            modeNovel[tagIndex.value],
-            dateTime.value == null ? null : toRequestDate(dateTime.value!),
+            modeNovel[homeController.tagIndex.value],
+            homeController.dateTime.value == null
+                ? null
+                : toRequestDate(homeController.dateTime.value!),
             nexturl.isEmpty ? null : nexturl.value);
       case ListType.userbookmarks:
         return ConnectManager().apiClient.getUserBookmarksNovel(
@@ -274,7 +274,7 @@ class ListNovelController extends GetxController {
         } else {
           return ConnectManager()
               .apiClient
-              .searchNovels(tag, searchOptions.value ?? SearchOptions());
+              .searchNovels(tag, searchOptions.value);
         }
       case ListType.works:
         return ConnectManager()
@@ -386,24 +386,23 @@ class ListUserController extends GetxController {
     Res<List<UserPreview>> res;
     switch (userListType) {
       case UserListType.recom:
-        res = await ConnectManager()
-            .apiClient
-            .getRecommendationUsers(nexturl.value.isEmpty ? null : nexturl.value);
+        res = await ConnectManager().apiClient.getRecommendationUsers(
+            nexturl.value.isEmpty ? null : nexturl.value);
         break;
       case UserListType.myfollowing:
       case UserListType.following:
-        res = await ConnectManager()
-            .apiClient
-            .getFollowing(id.toString(), restrict.value, nexturl.value);
+        res = await ConnectManager().apiClient.getFollowing(id.toString(),
+            restrict.value, nexturl.value.isEmpty ? null : nexturl.value);
         break;
       case UserListType.mymypixiv:
       case UserListType.usermypixiv:
-        res = await ConnectManager()
-            .apiClient
-            .getMypixiv(id.toString(), nexturl.value);
+        res = await ConnectManager().apiClient.getMypixiv(
+            id.toString(), nexturl.value.isEmpty ? null : nexturl.value);
         break;
       case UserListType.search:
-        res = await ConnectManager().apiClient.searchUsers(id, nexturl.value);
+        res = await ConnectManager()
+            .apiClient
+            .searchUsers(id, nexturl.value.isEmpty ? null : nexturl.value);
         break;
     }
     return res;
@@ -475,28 +474,6 @@ class ListUserController extends GetxController {
         refreshController?.finishLoad(IndicatorResult.fail);
       }
     });
-  }
-}
-
-class RankingPageController extends GetxController {
-  RxInt index = 0.obs;
-
-  void init() {
-    switch (settings.awPrefer) {
-      case "illust":
-        setIndex(0);
-        break;
-      case "manga":
-        setIndex(1);
-        break;
-      case "novel":
-        setIndex(2);
-        break;
-    }
-  }
-
-  void setIndex(int i) {
-    index.value = i;
   }
 }
 

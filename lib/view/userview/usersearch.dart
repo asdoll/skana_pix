@@ -1,6 +1,5 @@
 import 'package:shadcn_flutter/shadcn_flutter.dart';
 import 'package:skana_pix/controller/list_controller.dart';
-import 'package:skana_pix/pixiv_dart_api.dart';
 import 'package:get/get.dart';
 import 'package:skana_pix/view/userview/userlist.dart';
 
@@ -16,7 +15,12 @@ class UserResultPage extends StatefulWidget {
 }
 
 class _UserResultPageState extends State<UserResultPage> {
-  SearchOptions searchOptions = SearchOptions();
+
+  @override
+  void dispose() {
+    super.dispose();
+    Get.delete<ListUserController>(tag: "search_${widget.word}");
+  }
 
   @override
   Widget build(BuildContext context) {

@@ -425,18 +425,21 @@ class _NovelCardState extends State<NovelCard> {
             ).withAlign(Alignment.centerLeft),
             actions: <Widget>[
               OutlineButton(
+                density: ButtonDensity.dense,
                 onPressed: () {
                   Get.back(result: 0);
                 },
                 child: Text("Block".tr),
               ),
               PrimaryButton(
+                density: ButtonDensity.dense,
                 onPressed: () {
                   Get.back(result: 1);
                 },
                 child: Text("Bookmark".tr),
               ),
               PrimaryButton(
+                density: ButtonDensity.dense,
                 onPressed: () {
                   Get.back(result: 2);
                 },

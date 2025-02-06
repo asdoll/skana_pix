@@ -24,6 +24,12 @@ class FollowList extends StatefulWidget {
 
 class _FollowListState extends State<FollowList> {
   @override
+  void dispose() {
+    super.dispose();
+    Get.delete<ListNovelController>(tag: "${widget.isMe ? "myfollowing" : widget.id}userlist");
+  }
+
+  @override
   Widget build(BuildContext context) {
     UserListType userListType;
     if (widget.isMe) {

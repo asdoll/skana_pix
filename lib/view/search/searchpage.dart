@@ -92,6 +92,12 @@ class SearchRecommmendUserPage extends StatefulWidget {
 
 class _SearchRecommmendUserPageState extends State<SearchRecommmendUserPage> {
   @override
+  void dispose() {
+    super.dispose();
+    Get.delete<ListUserController>(tag: "search_user");
+  }
+
+  @override
   Widget build(BuildContext context) {
     EasyRefreshController refreshController = EasyRefreshController(
         controlFinishLoad: true, controlFinishRefresh: true);
@@ -285,6 +291,12 @@ class SearchRecommendPage extends StatefulWidget {
 }
 
 class _SearchRecommendPageState extends State<SearchRecommendPage> {
+  @override
+  void dispose() {
+    super.dispose();
+    Get.delete<HotTagsController>(tag: "hotTags_${widget.type.name}");
+  }
+
   @override
   Widget build(BuildContext context) {
     EasyRefreshController refreshController = EasyRefreshController(
