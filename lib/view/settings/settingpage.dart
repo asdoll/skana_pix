@@ -18,7 +18,6 @@ import 'about.dart';
 import '../../componentwidgets/avatar.dart';
 import 'boardpage.dart';
 import 'dataexport.dart';
-import '../loginpage.dart';
 
 class SettingPage extends StatefulWidget {
   const SettingPage({super.key});
