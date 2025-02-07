@@ -43,7 +43,7 @@ class SpotlightCard extends StatelessWidget {
                       height: 150.0,
                       width: 150.0,
                     ),
-                  ).rounded(8.0),
+                  ).rounded(8.0).paddingTop(5),
           )
           )
         ),

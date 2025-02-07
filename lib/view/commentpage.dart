@@ -136,9 +136,9 @@ class _CommentPageState extends State<CommentPage> {
         controlFinishLoad: true, controlFinishRefresh: true);
     CommentController controller = Get.put(
         CommentController(widget.id.toString(), widget.type,
-            easyRefreshController, widget.isReply),
+            widget.isReply),
         tag: "comment_${widget.id}_${widget.type}");
-
+    controller.easyRefreshController = easyRefreshController;
     return Listener(
       behavior: HitTestBehavior.translucent,
       onPointerDown: (value) {
@@ -166,9 +166,9 @@ class _CommentPageState extends State<CommentPage> {
                   child: EasyRefresh(
                     controller: easyRefreshController,
                     header: DefaultHeaderFooter.header(context),
-                    onRefresh: () => controller.reset(),
+                    onRefresh: controller.reset,
                     refreshOnStart: true,
-                    onLoad: () => controller.nextPage(),
+                    onLoad: controller.nextPage,
                     child: ListView.separated(
                       itemCount: controller.comments.length,
                       padding: const EdgeInsets.only(top: 10),
@@ -195,7 +195,7 @@ class _CommentPageState extends State<CommentPage> {
                                     mainAxisAlignment:
                                         MainAxisAlignment.spaceBetween,
                                     children: <Widget>[
-                                      Text(
+                                      Expanded(child: Text(
                                         controller.comments[index].name,
                                         maxLines: 1,
                                         style: TextStyle(
@@ -203,7 +203,7 @@ class _CommentPageState extends State<CommentPage> {
                                                 .colorScheme
                                                 .secondaryForeground,
                                             overflow: TextOverflow.ellipsis),
-                                      ).semiBold(),
+                                      ).semiBold(),),
                                       Row(
                                         children: [
                                           if (!widget.isReply)

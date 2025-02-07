@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:easy_refresh/easy_refresh.dart';
 import 'package:flutter/material.dart' show InkWell, SelectionArea;
 import 'package:shadcn_flutter/shadcn_flutter.dart';
@@ -76,7 +78,8 @@ class _ImageListViewPageState extends State<ImageListViewPage> {
 
   @override
   Widget build(BuildContext context) {
-    if (listController.illusts.isNotEmpty && widget.index >= listController.illusts.length) {
+    if (listController.illusts.isNotEmpty &&
+        widget.index <= listController.illusts.length) {
       historyManager.addIllust(listController.illusts[widget.index]);
     }
 
@@ -199,6 +202,13 @@ class _IllustPageState extends State<IllustPage> {
     if (user.isPremium) {
       ListIllustController.historyIds.add(widget.illust.id);
     }
+    _scrollController.addListener(() {
+      if (_scrollController.offset < context.height) {
+        relatedListController.showBackArea.value = false;
+      } else {
+        relatedListController.showBackArea.value = true;
+      }
+    });
     super.initState();
   }
 
@@ -228,6 +238,32 @@ class _IllustPageState extends State<IllustPage> {
                     top: 0,
                     child: buildBody(constrains.maxWidth, constrains.maxHeight),
                   ),
+                  Positioned(
+                    bottom: 0,
+                    left: 0,
+                    right: 0,
+                    child: Obx(() => AnimatedSwitcher(
+                          duration: const Duration(milliseconds: 300),
+                          child: (relatedListController.showBackArea.value)
+                              ? Button(
+                                  style: ButtonStyle.card(
+                                      size: ButtonSize.small,
+                                      density: ButtonDensity.dense),
+                                  onPressed: () {
+                                    _scrollController.animateTo(0,
+                                        duration:
+                                            const Duration(milliseconds: 300),
+                                        curve: Curves.easeInOut);
+                                  },
+                                  child: Icon(
+                                    Icons.arrow_upward,
+                                    size: 30,
+                                  ).paddingOnly(right: 6, top: 1, bottom: 1),
+                                ).withAlign(Alignment(1.05, 0.9)).paddingOnly(
+                                  bottom: Get.mediaQuery.size.height * 0.05)
+                              : Container(),
+                        )),
+                  ),
                   _buildAppbar(context),
                 ],
               );
@@ -247,14 +283,7 @@ class _IllustPageState extends State<IllustPage> {
               SizedBox(
                 height: MediaQuery.sizeOf(context).height / 2.3,
               ),
-              Text(
-                "This artwork is blocked".tr,
-                style: TextStyle(
-                    color: Theme.of(context).colorScheme.secondary,
-                    fontSize: 18,
-                    decoration: TextDecoration.none,
-                    fontWeight: FontWeight.w700),
-              ),
+              Text("This artwork is blocked".tr).h4(),
               const SizedBox(
                 height: 16,
               ),
@@ -307,9 +336,9 @@ class _IllustPageState extends State<IllustPage> {
                           ),
                         );
                       }, childCount: relatedListController.illusts.length),
-                      gridDelegate:
-                          const SliverGridDelegateWithFixedCrossAxisCount(
-                              crossAxisCount: 3))
+                      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount:
+                              max(3, (context.width / 150).floor())))
                   .sliverPadding(EdgeInsets.all(8)),
             ],
           ),
@@ -382,19 +411,6 @@ class _IllustPageState extends State<IllustPage> {
             Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                IconButton.ghost(
-                    icon: const DecoratedIcon(
-                      icon: Icon(Icons.expand_less),
-                      decoration:
-                          IconDecoration(border: IconBorder(width: 1.5)),
-                    ),
-                    onPressed: () {
-                      double p = _scrollController.position.maxScrollExtent -
-                          (relatedListController.illusts.length / 3.0) *
-                              (MediaQuery.of(context).size.width / 3.0);
-                      if (p < 0) p = 0;
-                      _scrollController.position.jumpTo(p);
-                    }),
                 IconButton.ghost(
                     icon: const DecoratedIcon(
                       icon: Icon(Icons.more_vert),

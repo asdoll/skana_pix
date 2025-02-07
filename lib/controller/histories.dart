@@ -4,6 +4,7 @@ import 'package:easy_refresh/easy_refresh.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:skana_pix/pixiv_dart_api.dart';
+import 'package:skana_pix/utils/leaders.dart';
 
 import '../utils/safplugin.dart';
 
@@ -31,7 +32,7 @@ class HistoryManager {
         title: novel.title,
         userName: novel.author.name,
         time: DateTime.now().millisecondsSinceEpoch,
-        pictureUrl: novel.coverImageUrl);
+        pictureUrl: novel.image.squareMedium);
     await novelHistoryProvider.insert(novelHis);
   }
 
@@ -172,6 +173,7 @@ class HistoryIllust extends GetxController {
     searchResult.clear();
     illusts.refresh();
     searchResult.refresh();
+    Leader.showToast("Cleared".tr);
   }
 
   void remove(int illustId) async {
@@ -225,6 +227,7 @@ class HistoryNovel extends GetxController {
     searchResult.clear();
     novels.refresh();
     searchResult.refresh();
+    Leader.showToast("Cleared".tr);
   }
 
   void remove(int novelId) async {

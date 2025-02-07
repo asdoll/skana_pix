@@ -226,7 +226,7 @@ class _SearchSuggestionPageState extends State<SearchSuggestionPage> {
         style: Theme.of(context)
             .typography
             .xSmall
-            .copyWith(color: Theme.of(context).colorScheme.input),
+            .copyWith(color: Theme.of(context).colorScheme.secondaryForeground),
         onTap: () {
           FocusScope.of(context).requestFocus(node);
         },
@@ -263,7 +263,7 @@ class _SearchSuggestionPageState extends State<SearchSuggestionPage> {
                 word: word,
               );
             }
-            if (type == ArtworkType.ALL) {
+            if (type == ArtworkType.USER) {
               return UserResultPage(
                 word: word,
               );
@@ -271,7 +271,7 @@ class _SearchSuggestionPageState extends State<SearchSuggestionPage> {
             return IllustResultPage(
               word: word,
             );
-          });
+          }, preventDuplicates: false);
         },
         placeholder: Text("Enter keywords or links".tr).xSmall());
   }

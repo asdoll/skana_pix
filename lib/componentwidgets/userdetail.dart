@@ -5,6 +5,7 @@ import 'package:share_plus/share_plus.dart';
 import 'package:skana_pix/componentwidgets/selecthtml.dart';
 import 'package:skana_pix/model/user.dart';
 import 'package:get/get.dart';
+import 'package:skana_pix/utils/widgetplugin.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 
 import '../view/userview/followlist.dart';
@@ -46,100 +47,83 @@ class _UserDetailPageState extends State<UserDetailPage> {
             ),
           ),
         ),
-        SliverToBoxAdapter(
-          child: Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Table(
-              rows: [
-                TableRow(cells: [
-                  TableCell(child: Text("Nickname".tr)),
-                  TableCell(child: Expanded(child: Text(detail.name))),
-                ]),
-                TableRow(cells: [
-                  TableCell(child: Text("Artist ID".tr)),
-                  TableCell(
-                      child: TextButton(
-                          child: Text(detail.id.toString()),
-                          onPressed: () {
-                            try {
-                              Clipboard.setData(
-                                  ClipboardData(text: detail.id.toString()));
-                            } catch (e) {}
-                          })),
-                ]),
-                TableRow(cells: [
-                  TableCell(child: Text("Follows".tr)),
-                  TableCell(
-                      child: TextButton(
-                          child: Text(detail.totalFollowUsers.toString()),
-                          onPressed: () {
-                            Get.to(() => FollowList(
-                                id: detail.id.toString(), setAppBar: true));
-                          }))
-                ]),
-                TableRow(cells: [
-                  TableCell(child: Text("Total My Pixiv users".tr)),
-                  TableCell(
-                      child: TextButton(
-                          child: Text(detail.myPixivUsers.toString()),
-                          onPressed: () {
-                            Get.to(() => FollowList(
-                                isMyPixiv: true,
-                                id: detail.id.toString(),
-                                setAppBar: true));
-                          })),
-                ]),
-                TableRow(cells: [
-                  TableCell(child: Text("Twitter")),
-                  TableCell(
-                      child: TextButton(
-                          child: Text(detail.twitterUrl ?? ""),
-                          onPressed: () async {
-                            final url = detail.twitterUrl;
-                            if (url != null) {
-                              try {
-                                await launchUrlString(url,
-                                    mode: LaunchMode.externalApplication);
-                              } catch (e) {
-                                Share.share(url);
-                              }
-                            }
-                          }))
-                ]),
-                TableRow(cells: [
-                  TableCell(child: Text("Gender".tr)),
-                  TableCell(child: Text(detail.gender)),
-                ]),
-                TableRow(cells: [
-                  TableCell(child: Text("Job".tr)),
-                  TableCell(child: Text(detail.job)),
-                ]),
-                TableRow(cells: [
-                  TableCell(child: Text('Pawoo')),
-                  TableCell(
-                      child: TextButton(
-                          child:
-                              Text(detail.pawooUrl != null ? 'Link' : 'none'),
-                          onPressed: () async {
-                            if (detail.pawooUrl == null) return;
-                            var url = detail.pawooUrl!;
-                            try {
-                              await launchUrlString(url,
-                                  mode: LaunchMode.externalApplication);
-                            } catch (e) {
-                              Share.share(url);
-                            }
-                          })),
-                ]),
-              ],
+        SliverList(
+          delegate: SliverChildListDelegate([
+            Button.card(
+              onPressed: () {},
+              trailing: Text(detail.name),
+              child: Text("Nickname".tr),
             ),
-          ),
-        ),
-        SliverToBoxAdapter(
-          child: Container(
-            height: 200,
-          ),
-        )
+            Button.card(
+              onPressed: () {
+                try {
+                  Clipboard.setData(ClipboardData(text: detail.id.toString()));
+                } catch (e) {}
+              },
+              trailing: Text(detail.id.toString()),
+              child: Text("Artist ID".tr),
+            ),
+            Button.card(
+              onPressed: () {
+                Get.to(() => FollowList(
+                    isMyPixiv: false,
+                    id: detail.id.toString(),
+                    setAppBar: true));
+              },
+              trailing: Text(detail.totalFollowUsers.toString()),
+              child: Text("Follows".tr),
+            ),
+            Button.card(
+              onPressed: () {
+                Get.to(() => FollowList(
+                    isMyPixiv: true,
+                    id: detail.id.toString(),
+                    setAppBar: true));
+              },
+              trailing: Text(detail.myPixivUsers.toString()),
+              child: Text("Total My Pixiv users".tr),
+            ),
+            Button.card(
+              onPressed: () async {
+                final url = detail.twitterUrl;
+                if (url != null && url.isNotEmpty) {
+                  try {
+                    await launchUrlString(url,
+                        mode: LaunchMode.externalApplication);
+                  } catch (e) {
+                    Share.share(url);
+                  }
+                }
+              },
+              trailing: Text(detail.twitterUrl ?? ""),
+              child: Text("Twitter".tr),
+            ),
+            Button.card(
+              onPressed: () {},
+              trailing: Text(detail.gender),
+              child: Text("Gender".tr),
+            ),
+            Button.card(
+              onPressed: () {},
+              trailing: Text(detail.job),
+              child: Text("Job".tr),
+            ),
+            Button.card(
+              onPressed: () async {
+                if (detail.pawooUrl == null) return;
+                var url = detail.pawooUrl!;
+                try {
+                  await launchUrlString(url,
+                      mode: LaunchMode.externalApplication);
+                } catch (e) {
+                  Share.share(url);
+                }
+              },
+              trailing: Text(detail.pawooUrl != null ? 'Link' : 'none'),
+              child: Text("Pawoo".tr),
+            )
+          ]),
+        ).sliverPaddingHorizontal(8),
       ],
     );
   }

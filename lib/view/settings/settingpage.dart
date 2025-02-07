@@ -7,6 +7,7 @@ import 'package:skana_pix/controller/account_controller.dart';
 import 'package:skana_pix/controller/update_controller.dart';
 import 'package:skana_pix/utils/widgetplugin.dart';
 import 'package:skana_pix/view/settings/blocklistpage.dart';
+import 'package:skana_pix/view/settings/netsettings.dart';
 import 'package:skana_pix/view/settings/newversion.dart';
 import 'package:skana_pix/view/settings/prefsettings.dart';
 import 'package:skana_pix/pixiv_dart_api.dart';
@@ -30,85 +31,91 @@ class _SettingPageState extends State<SettingPage> {
   @override
   Widget build(BuildContext context) {
     boardController.fetchBoard();
-    return CustomScrollView(
-      slivers: <Widget>[
-        Obx(() {
-          if (accountController.isLoggedIn.value) {
-            return SliverToBoxAdapter(
-                child: Card(
-                    child: Basic(
-              leading: PainterAvatar(
-                  url: ConnectManager().apiClient.account.user.profileImg,
-                  id: int.parse(
-                    ConnectManager().apiClient.userid,
-                  ),
-                  isMe: true,
-                  size: 48),
-              title: Text(
-                ConnectManager().apiClient.account.user.name,
-              ),
-              content: Text(
-                ConnectManager().apiClient.account.user.email,
-              ),
-            )));
-          }
-          return Container();
-        }),
-        SliverToBoxAdapter(
-            child: Button(
-                alignment: Alignment.centerLeft,
-                onPressed: () => Get.to(BlockListPage()),
-                style: ButtonStyle.card(),
-                child: Basic(
-                  leading: Icon(Icons.block),
-                  title: Text("Block List".tr),
-                ))),
-        if (accountController.isLoggedIn.value)
-          SliverToBoxAdapter(
-            child: Button(
-              alignment: Alignment.centerLeft,
-              onPressed: () =>
-                  launchUrlString("https://www.pixiv.net/setting_user.php"),
-              style: ButtonStyle.card(),
-              child: Basic(
-                leading: Icon(Icons.account_box),
-                title: Text("Account Settings".tr),
-              ),
-            ),
-          ),
-        SliverToBoxAdapter(
-          child: Button(
-              alignment: Alignment.centerLeft,
-              onPressed: () => Get.to(PreferenceSettings()),
-              style: ButtonStyle.card(),
-              child: Basic(
-                leading: Icon(Icons.settings),
-                title: Text("Preference Settings".tr),
-              )),
-        ),
-        SliverToBoxAdapter(
-          child: Button(
-              alignment: Alignment.centerLeft,
-              onPressed: () => Get.to(DataExport()),
-              style: ButtonStyle.card(),
-              child: Basic(
-                leading: Icon(Icons.folder_open_rounded),
-                title: Text("App Data".tr),
-              )),
-        ),
-        SliverToBoxAdapter(
-          child: Button(
-              alignment: Alignment.centerLeft,
-              onPressed: () => Get.to(AboutPage()),
-              style: ButtonStyle.card(),
-              child: Basic(
-                leading: Icon(Icons.message),
-                title: Text("About".tr),
-              )),
-        ),
-        Obx(() => boardController.needBoardSection.value
-            ? SliverToBoxAdapter(
+    return Obx(() => CustomScrollView(
+          slivers: <Widget>[
+            if (accountController.isLoggedIn.value)
+              SliverToBoxAdapter(
+                  child: Card(
+                      child: Basic(
+                leading: PainterAvatar(
+                    url: ConnectManager().apiClient.account.user.profileImg,
+                    id: int.parse(
+                      ConnectManager().apiClient.userid,
+                    ),
+                    isMe: true,
+                    size: 48),
+                title: Text(
+                  ConnectManager().apiClient.account.user.name,
+                ),
+                content: Text(
+                  ConnectManager().apiClient.account.user.email,
+                ),
+              ))),
+            SliverToBoxAdapter(
                 child: Button(
+                    alignment: Alignment.centerLeft,
+                    onPressed: () => Get.to(BlockListPage()),
+                    style: ButtonStyle.card(),
+                    child: Basic(
+                      leading: Icon(Icons.block),
+                      title: Text("Block List".tr),
+                    ))),
+            if (accountController.isLoggedIn.value)
+              SliverToBoxAdapter(
+                child: Button(
+                  alignment: Alignment.centerLeft,
+                  onPressed: () =>
+                      launchUrlString("https://www.pixiv.net/setting_user.php"),
+                  style: ButtonStyle.card(),
+                  child: Basic(
+                    leading: Icon(Icons.account_box),
+                    title: Text("Account Settings".tr),
+                  ),
+                ),
+              ),
+            SliverToBoxAdapter(
+              child: Button(
+                  alignment: Alignment.centerLeft,
+                  onPressed: () => Get.to(PreferenceSettings()),
+                  style: ButtonStyle.card(),
+                  child: Basic(
+                    leading: Icon(Icons.settings),
+                    title: Text("Preference Settings".tr),
+                  )),
+            ),
+            SliverToBoxAdapter(
+              child: Button(
+                  alignment: Alignment.centerLeft,
+                  onPressed: () => Get.to(NetworkSettings()),
+                  style: ButtonStyle.card(),
+                  child: Basic(
+                    leading: Icon(Icons.settings),
+                    title: Text("Network Settings".tr),
+                  )),
+            ),
+            SliverToBoxAdapter(
+              child: Button(
+                  alignment: Alignment.centerLeft,
+                  onPressed: () => Get.to(DataExport()),
+                  style: ButtonStyle.card(),
+                  child: Basic(
+                    leading: Icon(Icons.folder_open_rounded),
+                    title: Text("App Data".tr),
+                  )),
+            ),
+            SliverToBoxAdapter(
+              child: Button(
+                  alignment: Alignment.centerLeft,
+                  onPressed: () => Get.to(AboutPage()),
+                  style: ButtonStyle.card(),
+                  child: Basic(
+                    leading: Icon(Icons.message),
+                    title: Text("About".tr),
+                  )),
+            ),
+            if (boardController.needBoardSection.value)
+              SliverToBoxAdapter(
+                  child: Button(
                 alignment: Alignment.centerLeft,
                 onPressed: () => Get.to(BoardPage()),
                 style: ButtonStyle.card(),
@@ -116,26 +123,25 @@ class _SettingPageState extends State<SettingPage> {
                   leading: Icon(Icons.article),
                   title: Text("Bulletin Board".tr),
                 ),
-              ))
-            : SliverToBoxAdapter()),
-        SliverToBoxAdapter(
-          child: Button(
-            alignment: Alignment.centerLeft,
-            onPressed: () => Get.to(NewVersionPage()),
-            style: ButtonStyle.card(),
-            child: Basic(
-              leading: Icon(Icons.update),
-              title: Text("Check updates".tr),
-              trailing: Visibility(
-                visible: updateController.hasNewVersion.value,
-                child: NewVersionChip(),
+              )),
+            SliverToBoxAdapter(
+              child: Button(
+                alignment: Alignment.centerLeft,
+                onPressed: () => Get.to(NewVersionPage()),
+                style: ButtonStyle.card(),
+                child: Basic(
+                  leading: Icon(Icons.update),
+                  title: Text("Check updates".tr),
+                  trailing: Visibility(
+                    visible: updateController.hasNewVersion.value,
+                    child: NewVersionChip(),
+                  ),
+                ),
               ),
             ),
-          ),
-        ),
-        Obx(() => accountController.isLoggedIn.value
-            ? SliverToBoxAdapter(
-                child: Button(
+            if (accountController.isLoggedIn.value)
+              SliverToBoxAdapter(
+                  child: Button(
                 alignment: Alignment.centerLeft,
                 onPressed: () => _showLogoutDialog(context),
                 style: ButtonStyle.card(),
@@ -144,18 +150,8 @@ class _SettingPageState extends State<SettingPage> {
                   title: Text("Logout".tr),
                 ),
               ))
-            : SliverToBoxAdapter(
-                child: Button(
-                alignment: Alignment.centerLeft,
-                onPressed: () => Get.offAll(() => LoginPage()),
-                style: ButtonStyle.card(),
-                child: Basic(
-                  leading: Icon(Icons.login),
-                  title: Text("Login".tr),
-                ),
-              )))
-      ],
-    );
+          ],
+        ));
   }
 
   Future _showLogoutDialog(BuildContext context) async {

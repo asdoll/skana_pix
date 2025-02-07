@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:easy_refresh/easy_refresh.dart';
 import 'package:get/get.dart';
 import 'package:shadcn_flutter/shadcn_flutter.dart';
@@ -10,7 +12,8 @@ import 'package:waterfall_flow/waterfall_flow.dart';
 
 class NovelList extends StatefulWidget {
   final String controllerTag;
-  const NovelList({super.key, required this.controllerTag});
+  final bool noScroll;
+  const NovelList({super.key, required this.controllerTag, this.noScroll = false});
 
   @override
   State<NovelList> createState() => _NovelListState();
@@ -24,10 +27,11 @@ class _NovelListState extends State<NovelList> {
     ListNovelController controller =
         Get.find<ListNovelController>(tag: widget.controllerTag);
     controller.refreshController = refreshController;
+    ScrollController localScrollController = ScrollController();
     return EasyRefresh(
       controller: refreshController,
       refreshOnStart: true,
-      scrollController: globalScrollController,
+      scrollController: widget.noScroll ? localScrollController : globalScrollController,
       onRefresh: controller.reset,
       onLoad: controller.noNextPage ? null : controller.nextPage,
       header: DefaultHeaderFooter.header(context),
@@ -64,10 +68,10 @@ class _NovelListState extends State<NovelList> {
           }
           return WaterfallFlow.builder(
             padding: const EdgeInsets.only(top: 8),
-            controller: globalScrollController,
+            controller: widget.noScroll ? localScrollController : globalScrollController,
             gridDelegate: SliverWaterfallFlowDelegateWithFixedCrossAxisCount(
               crossAxisCount:
-                  context.orientation == Orientation.portrait ? 1 : 2,
+                  max(1, (context.width / 500).floor()),
               mainAxisSpacing: 8.0,
               crossAxisSpacing: 8.0,
             ),

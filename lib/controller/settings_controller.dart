@@ -87,3 +87,27 @@ class PrefsController extends GetxController {
     }
   }
 }
+
+class HostController extends GetxController {
+  RxInt hostIndex = settings.imageHost.obs;
+  RxString customProxyHost = settings.customProxyHost.obs;
+
+  String getPixreHost() {
+    return imageHost[1];
+  }
+
+  void setHostIndex(int index) {
+    hostIndex.value = index;
+    settings.imageHost = index;
+  }
+
+  void setCustomProxyHost(String host) {
+    customProxyHost.value = host;
+    settings.customProxyHost = host;
+  }
+
+  void reset() {
+    setHostIndex(0);
+    setCustomProxyHost(imageHost[0]);
+  }
+}

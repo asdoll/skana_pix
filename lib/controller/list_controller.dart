@@ -36,6 +36,7 @@ class ListIllustController extends GetxController {
   ListType controllerType;
   Rx<SearchOptions> searchOptions = SearchOptions().obs;
   DateTimeRange? dateTimeRange;
+  RxBool showBackArea = false.obs;
   static RxList<int> historyIds = RxList.empty();
 
   bool get showMangaBadage => type != ArtworkType.MANGA;
@@ -47,9 +48,9 @@ class ListIllustController extends GetxController {
   static void sendHistory() {
     if (historyIds.length > 5) {
       ConnectManager().apiClient.sendHistory(historyIds.reversed.toList());
-      historyIds.clear();
-      historyIds.refresh();
     }
+    historyIds.clear();
+    historyIds.refresh();
   }
 
   ListIllustController(

@@ -14,6 +14,7 @@ class DefaultHeaderFooter {
       readyText: 'Refreshing...'.tr,
       processingText: 'Refreshing...'.tr,
       processedText: 'Succeeded'.tr,
+      processedDuration: Duration(seconds: 1),
       noMoreText: 'No more'.tr,
       failedText: 'Failed'.tr,
       showText: true,
@@ -29,6 +30,7 @@ class DefaultHeaderFooter {
         failedText: "Failed".tr,
         showMessage: false,
         processedText: "Successed".tr,
+        processedDuration: Duration.zero,
         noMoreText: "No more".tr);
   }
 }

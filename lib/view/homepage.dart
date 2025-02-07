@@ -1,7 +1,10 @@
 import 'package:get/get.dart';
+import 'package:skana_pix/componentwidgets/gotop.dart';
 import 'package:skana_pix/componentwidgets/searchbar.dart';
 import 'package:skana_pix/controller/account_controller.dart';
+import 'package:skana_pix/controller/histories.dart';
 import 'package:skana_pix/controller/list_controller.dart';
+import 'package:skana_pix/controller/logging.dart';
 import 'package:skana_pix/controller/mini_controllers.dart';
 import 'package:skana_pix/controller/page_index_controller.dart';
 import 'package:skana_pix/controller/settings.dart';
@@ -114,6 +117,53 @@ class _HomePageState extends State<HomePage> {
               ),
             ],
             trailing: [
+              if (homeController.pageIndex.value == 11)
+                IconButton.ghost(
+                    density: ButtonDensity.compact,
+                    icon: Icon(Icons.delete),
+                    onPressed: () {
+                      showDialog(
+                          context: context,
+                          builder: (context) {
+                            return AlertDialog(
+                              title: Text("Clear History".tr).withAlign(
+                                Alignment.centerLeft,
+                              ),
+                              content:
+                                  Text("Are you sure to clear history?".tr),
+                              actions: [
+                                OutlineButton(
+                                  child: Text("Cancel".tr),
+                                  onPressed: () {
+                                    Get.back();
+                                  },
+                                ),
+                                PrimaryButton(
+                                  child: Text("Confirm".tr),
+                                  onPressed: () {
+                                    try {
+                                      if (Get.find<MTab>(tag: "history")
+                                              .index
+                                              .value ==
+                                          0) {
+                                        Get.find<HistoryIllust>(
+                                                tag: "history_illust")
+                                            .clear();
+                                      } else {
+                                        Get.find<HistoryNovel>(
+                                                tag: "history_novel")
+                                            .clear();
+                                      }
+                                    } catch (e) {
+                                      log.e(e);
+                                    }
+                                    Get.back();
+                                  },
+                                )
+                              ],
+                            );
+                          });
+                    }),
               if (homeController.pageIndex.value == 12)
                 IconButton.ghost(
                   icon: const Icon(
@@ -213,27 +263,7 @@ class _HomePageState extends State<HomePage> {
           const Divider(),
         ],
         footers: [
-          AnimatedSwitcher(
-            duration: const Duration(milliseconds: 300),
-            child: (homeController.pageIndex.value < 11 &&
-                    homeController.showBackArea.value)
-                ? Button(
-                    style: ButtonStyle.card(
-                        size: ButtonSize.small, density: ButtonDensity.dense),
-                    onPressed: () {
-                      globalScrollController.animateTo(0,
-                          duration: const Duration(milliseconds: 300),
-                          curve: Curves.easeInOut);
-                    },
-                    child: Icon(
-                      Icons.arrow_upward,
-                      size: 30,
-                    ).paddingOnly(right: 6, top: 1, bottom: 1),
-                  )
-                    .withAlign(Alignment(1.05, 0.9))
-                    .paddingOnly(bottom: Get.mediaQuery.size.height * 0.05)
-                : Container(),
-          )
+          const GoTop(),
         ],
         floatingFooter: true,
         child: switch (homeController.pageIndex.value) {

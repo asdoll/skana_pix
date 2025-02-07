@@ -1,9 +1,13 @@
 import 'package:shadcn_flutter/shadcn_flutter.dart';
 import 'package:get/get.dart';
+import 'package:skana_pix/componentwidgets/backarea.dart';
 import 'package:skana_pix/controller/account_controller.dart';
+import 'package:skana_pix/view/settings/netsettings.dart';
+import 'package:skana_pix/view/settings/settingpage.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 import '../componentwidgets/webview.dart';
 import '../utils/applinks.dart';
+
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
 
@@ -12,17 +16,47 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
+  int selected = 0;
   @override
   Widget build(BuildContext context) {
-    return Obx(() {
-      if (accountController.isLoading.value) {
-        return buildLoading(context);
-      } else if (!accountController.waitingForAuth.value) {
-        return buildLogin(context);
-      } else {
-        return buildWaiting(context);
-      }
-    });
+    return Scaffold(
+        footers: [
+          const Divider(),
+          NavigationBar(
+            alignment: NavigationBarAlignment.start,
+            onSelected: (index) {
+              setState(() {
+                selected = index;
+              });
+            },
+            index: selected,
+            children: [
+              NavigationWidget(
+                  child: IconButton.ghost(
+                icon: Icon(Icons.settings),
+                onPressed: () => Get.to(() => Scaffold(headers: [
+                  AppBar(
+                    title: Text("Settings".tr),
+                    padding: EdgeInsets.all(10),
+                    leading: [
+                      const NormalBackButton(),
+                    ],
+                  ),
+                  const Divider()
+                ],child:  SettingPage())),
+              ).withAlign(Alignment.centerRight)),
+            ],
+          ),
+        ],
+        child: Obx(() {
+          if (accountController.isLoading.value) {
+            return buildLoading(context);
+          } else if (!accountController.waitingForAuth.value) {
+            return buildLogin(context);
+          } else {
+            return buildWaiting(context);
+          }
+        }));
   }
 
   Widget buildLogin(BuildContext context) {

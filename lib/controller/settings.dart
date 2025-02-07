@@ -18,7 +18,7 @@ class UserSetting {
   List<String> settings = [
     '0', //0,darkMode 0:system 1:light 2:dark
     '0', //1,orientation 0:portrait 1:landscape 2:auto
-    '0', //2,not in use
+    '0', //2,imagehost 0:default, 1:cathost 2:custom
     'system', //3,language
     '4', //4,maxParallelDownload
     '', //5,downloadPath
@@ -49,7 +49,8 @@ class UserSetting {
     '', //30,historyUserTag
     'zinc', //31,themeColor
     '0', //32,novelDirectEntry 0:false 1:true
-    '1' //33,isHighRefreshRate 0:false 1:true
+    '1', //33,isHighRefreshRate 0:false 1:true
+    'i.pximg.net' //34,customProxy
   ];
 
   Future<void> updateSettings() async {
@@ -79,8 +80,8 @@ class UserSetting {
   void setDefaults() {
     settings = [
       '0', //0,darkMode 0:system 1:light 2:dark
-      '0', //1,isAMOLED 0:false 1:true
-      '0', //2,useDynamicColor 0:false 1:true
+      '0', //1,orientation 0:portrait 1:landscape 2:auto
+      '0', //2,imagehost 0:default, 1:cathost 2:custom
       'system', //3,language
       '4', //4,maxParallelDownload
       '', //5,downloadPath
@@ -109,9 +110,10 @@ class UserSetting {
       '', //28,historyIllustTag
       '', //29,historyNovelTag
       '', //30,historyUserTag
-      'zinc', //31,seedColor
+      'zinc', //31,themeColor
       '0', //32,novelDirectEntry 0:false 1:true
-      '1' //33,isHighRefreshRate 0:false 1:true
+      '1', //33,isHighRefreshRate 0:false 1:true
+      'i.pximg.net' //34,customProxy
     ];
     updateSettings();
   }
@@ -190,6 +192,18 @@ class UserSetting {
   String get saveChoice => settings[21];
   String get themeName => settings[31];
   String get darkMode => settings[0];
+  int get imageHost => int.parse(settings[2]);
+  String get customProxyHost => settings[34];
+
+  set imageHost(int value) {
+    settings[2] = value.toString();
+    updateSettings();
+  }
+
+  set customProxyHost(String value) {
+    settings[34] = value;
+    updateSettings();
+  }
 
   void addBlockedTags(List<String> tags) {
     for (var tag in tags) {

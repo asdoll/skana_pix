@@ -217,3 +217,25 @@ Future<void> resetSettings() async {
   settings.clearSettings();
   Leader.showToast("Reseted".tr);
 }
+
+Uri toTrueUri(Uri uri) {
+  if (settings.imageHost == 0) {
+    return uri;
+  } else {
+    if (settings.imageHost == 2 &&
+        !imageHost.contains(settings.customProxyHost)) {
+      try {
+        if (settings.customProxyHost.contains('/')) {
+          return Uri.parse(uri.toString().replaceAll(uri.host, settings.customProxyHost));
+        }
+        return uri.replace(host: settings.customProxyHost);
+      } catch (e) {}
+    }
+    if (settings.imageHost == 1) {
+      return uri.replace(host: imageHost[1]);
+    }
+  }
+  return uri;
+}
+
+const imageHost = ["i.pximg.net", "i.pixiv.re", "s.pximg.net"];

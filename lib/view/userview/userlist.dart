@@ -9,7 +9,8 @@ import 'package:waterfall_flow/waterfall_flow.dart';
 
 class UserList extends StatefulWidget {
   final String controllerTag;
-  const UserList({super.key, required this.controllerTag});
+  final bool noScroll;
+  const UserList({super.key, required this.controllerTag, this.noScroll = false});
 
   @override
   State<UserList> createState() => _UserListState();
@@ -31,6 +32,7 @@ class _UserListState extends State<UserList> {
         controlFinishLoad: true, controlFinishRefresh: true);
     controller.refreshController = easyRefreshController;
     MTab tab = Get.put(MTab(), tag: widget.controllerTag);
+    ScrollController localScrollController = ScrollController();
     return Obx(() => Column(
           children: [
             if (controller.userListType == UserListType.myfollowing)
@@ -67,12 +69,14 @@ class _UserListState extends State<UserList> {
             Expanded(
                 child: EasyRefresh(
               controller: easyRefreshController,
+              scrollController: widget.noScroll ? localScrollController : globalScrollController,
               header: DefaultHeaderFooter.header(context),
               footer: DefaultHeaderFooter.footer(context),
               onLoad: () => controller.nextPage(),
               onRefresh: () => controller.reset(),
               refreshOnStart: true,
               child: CustomScrollView(
+                controller: widget.noScroll ? localScrollController : globalScrollController,
                 slivers: [
                   SliverWaterfallFlow(
                     delegate: SliverChildBuilderDelegate((context, index) {

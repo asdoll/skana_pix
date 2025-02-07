@@ -1,5 +1,6 @@
 import 'package:shadcn_flutter/shadcn_flutter.dart';
 import 'package:get/get.dart';
+import 'package:skana_pix/componentwidgets/backarea.dart';
 import 'package:skana_pix/controller/list_controller.dart';
 import 'package:skana_pix/view/userview/userlist.dart';
 
@@ -26,7 +27,8 @@ class _FollowListState extends State<FollowList> {
   @override
   void dispose() {
     super.dispose();
-    Get.delete<ListNovelController>(tag: "${widget.isMe ? "myfollowing" : widget.id}userlist");
+    Get.delete<ListNovelController>(
+        tag: "${widget.isMe ? "myfollowing" : widget.id}userlist");
   }
 
   @override
@@ -55,12 +57,14 @@ class _FollowListState extends State<FollowList> {
         if (widget.setAppBar)
           AppBar(
             title: Text(widget.isMyPixiv ? "My Pixiv".tr : "Following".tr),
+            leading: [const NormalBackButton()],
+            padding: const EdgeInsets.all(10.0),
           ),
         if (widget.setAppBar) const Divider()
       ],
       child: UserList(
-          controllerTag:
-               "${widget.isMe ? "myfollowing" : widget.id}userlist"),
+          controllerTag: "${widget.isMe ? "myfollowing" : widget.id}userlist",
+          noScroll: !widget.isMe),
     );
   }
 }

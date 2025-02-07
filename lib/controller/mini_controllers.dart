@@ -16,7 +16,7 @@ class SearchPageController extends GetxController {
       case 1:
         return ArtworkType.NOVEL;
       default:
-        return ArtworkType.ALL;
+        return ArtworkType.USER;
     }
   }
 }

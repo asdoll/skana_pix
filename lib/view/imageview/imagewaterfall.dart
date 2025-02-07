@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:easy_refresh/easy_refresh.dart';
 import 'package:get/get.dart';
 import 'package:shadcn_flutter/shadcn_flutter.dart';
@@ -10,8 +12,10 @@ import 'package:waterfall_flow/waterfall_flow.dart';
 
 class ImageWaterfall extends StatefulWidget {
   final String controllerTag;
+  final bool noScroll;
 
-  const ImageWaterfall({super.key, required this.controllerTag});
+  const ImageWaterfall(
+      {super.key, required this.controllerTag, this.noScroll = false});
 
   @override
   State<ImageWaterfall> createState() => _ImageWaterfallState();
@@ -25,9 +29,11 @@ class _ImageWaterfallState extends State<ImageWaterfall> {
     EasyRefreshController refreshController = EasyRefreshController(
         controlFinishLoad: true, controlFinishRefresh: true);
     controller.refreshController = refreshController;
+    ScrollController localScrollController = ScrollController();
     return EasyRefresh(
       controller: refreshController,
-      scrollController: globalScrollController,
+      scrollController:
+          widget.noScroll ? localScrollController : globalScrollController,
       refreshOnStart: true,
       onRefresh: controller.reset,
       onLoad: controller.noNextPage ? null : controller.nextPage,
@@ -65,10 +71,11 @@ class _ImageWaterfallState extends State<ImageWaterfall> {
           }
           return WaterfallFlow.builder(
             padding: const EdgeInsets.only(top: 8),
-            controller: globalScrollController,
+            controller: widget.noScroll
+                ? localScrollController
+                : globalScrollController,
             gridDelegate: SliverWaterfallFlowDelegateWithFixedCrossAxisCount(
-              crossAxisCount:
-                  context.orientation == Orientation.portrait ? 2 : 4,
+              crossAxisCount: max(2, (context.width / 200).floor()),
               mainAxisSpacing: 8.0,
               crossAxisSpacing: 8.0,
             ),

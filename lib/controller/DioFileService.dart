@@ -14,11 +14,16 @@ class DioFileService extends FileService {
   DioFileService({PDio? pdio}) : dio = pdio ?? PDio();
 
   @override
-  Future<FileServiceResponse> get(String url, {Map<String, String>? headers}) async {
+  Future<FileServiceResponse> get(String url,
+      {Map<String, String>? headers}) async {
     final time =
         DateFormat("yyyy-MM-dd'T'HH:mm:ss'+00:00'").format(DateTime.now());
-    final hash = md5.convert(utf8.encode(time + BaseClient.hashSalt)).toString();
-    var res = await dio.get<ResponseBody>(url,
+    final hash =
+        md5.convert(utf8.encode(time + BaseClient.hashSalt)).toString();
+    Uri uri = Uri.parse(url);
+    uri = toTrueUri(uri);
+
+    var res = await dio.get<ResponseBody>(uri.toString(),
         options: Options(
             responseType: ResponseType.stream,
             validateStatus: (status) => status != null && status < 500,
@@ -32,18 +37,16 @@ class DioFileService extends FileService {
     if (res.statusCode != 200) {
       throw BadRequestException("Failed to load image: ${res.statusCode}");
     }
-    if(res.data == null){
+    if (res.data == null) {
       throw BadResponseException("Failed to load image: empty response");
     }
     return DioResponse(res);
   }
-  
 }
 
 class DioResponse implements FileServiceResponse {
   final Response<ResponseBody> _response;
   DioResponse(this._response);
-  
 
   @override
   Stream<List<int>> get content => _response.data!.stream;
@@ -58,11 +61,11 @@ class DioResponse implements FileServiceResponse {
   String? get eTag => _response.headers.value("etag");
 
   @override
-  int get statusCode => _response.statusCode ?? 404;//wont happen
+  int get statusCode => _response.statusCode ?? 404; //wont happen
 
   @override
   DateTime get validTill => DateTime.now().add(const Duration(days: 1));
-  
+
   @override
   String get fileExtension {
     final contentType = _response.headers.value("content-type");

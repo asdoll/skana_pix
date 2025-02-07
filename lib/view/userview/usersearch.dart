@@ -1,4 +1,6 @@
 import 'package:shadcn_flutter/shadcn_flutter.dart';
+import 'package:skana_pix/componentwidgets/backarea.dart';
+import 'package:skana_pix/componentwidgets/gotop.dart';
 import 'package:skana_pix/controller/list_controller.dart';
 import 'package:get/get.dart';
 import 'package:skana_pix/view/userview/userlist.dart';
@@ -15,7 +17,6 @@ class UserResultPage extends StatefulWidget {
 }
 
 class _UserResultPageState extends State<UserResultPage> {
-
   @override
   void dispose() {
     super.dispose();
@@ -35,9 +36,13 @@ class _UserResultPageState extends State<UserResultPage> {
             widget.translatedName.isEmpty ? widget.word : widget.translatedName,
             overflow: TextOverflow.ellipsis,
           ),
+          padding: EdgeInsets.all(10),
+          leading: [const NormalBackButton()],
         ),
         const Divider()
       ],
+      floatingFooter: true,
+      footers: [const GoTop()],
       child: UserList(controllerTag: "search_${widget.word}"),
     );
   }

@@ -10,7 +10,6 @@ import 'package:skana_pix/controller/mini_controllers.dart';
 import 'package:skana_pix/view/imageview/imagelistview.dart';
 import 'package:skana_pix/view/userview/usersearch.dart';
 import 'package:skana_pix/controller/like_controller.dart';
-import 'package:skana_pix/pixiv_dart_api.dart';
 import 'package:get/get.dart';
 
 import '../novelview/novelresult.dart';
@@ -119,17 +118,12 @@ class _SearchRecommmendUserPageState extends State<SearchRecommmendUserPage> {
               if (localManager.historyUserTag.isNotEmpty)
                 SliverToBoxAdapter(
                   child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                    padding: const EdgeInsets.only(left: 16.0,bottom: 16.0),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       crossAxisAlignment: CrossAxisAlignment.end,
                       children: [
-                        Text(
-                          "History".tr,
-                          style: TextStyle(
-                              fontSize: 16.0,
-                              color: Theme.of(context).typography.h4.color),
-                        ),
+                        Text("History".tr).h4(),
                       ],
                     ),
                   ),
@@ -143,7 +137,7 @@ class _SearchRecommmendUserPageState extends State<SearchRecommmendUserPage> {
                             padding:
                                 const EdgeInsets.symmetric(horizontal: 5.0),
                             child: Wrap(
-                              runSpacing: 0.0,
+                              runSpacing: 5.0,
                               spacing: 5.0,
                               children: [
                                 if (controller.tagExpand.value)
@@ -189,8 +183,8 @@ class _SearchRecommmendUserPageState extends State<SearchRecommmendUserPage> {
                             padding:
                                 const EdgeInsets.symmetric(horizontal: 5.0),
                             child: Wrap(
-                              runSpacing: 0.0,
-                              spacing: 3.0,
+                              runSpacing: 5.0,
+                              spacing: 5.0,
                               children: [
                                 for (var f in localManager.historyUserTag)
                                   PixChip(
@@ -208,59 +202,41 @@ class _SearchRecommmendUserPageState extends State<SearchRecommmendUserPage> {
                 ),
               if (localManager.historyUserTag.isNotEmpty)
                 SliverToBoxAdapter(
-                  child: m.InkWell(
-                    onTap: () {
-                      showDialog(
-                          context: context,
-                          builder: (context) {
-                            return AlertDialog(
-                              title: Text("Clean history?".tr)
-                                  .withAlign(Alignment.centerLeft),
-                              actions: [
-                                OutlineButton(
-                                    onPressed: () {
-                                      Get.back();
-                                    },
-                                    child: Text("Cancel".tr)),
-                                PrimaryButton(
-                                    onPressed: () {
-                                      settings
-                                          .clearHistoryTag(ArtworkType.USER);
-                                      localManager.clear("historyUserTag");
-                                      Get.back();
-                                    },
-                                    child: Text("Ok".tr)),
-                              ],
-                            );
-                          });
-                    },
-                    child: Center(
-                      child: Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          children: [
-                            Icon(
-                              Icons.delete_outline,
-                              size: 18.0,
-                              color: Theme.of(context).colorScheme.primary,
-                            ),
-                            Text(
-                              "Clear search history".tr,
-                              style: Theme.of(context)
-                                  .typography
-                                  .medium
-                                  .copyWith(
-                                      color: Theme.of(context)
-                                          .colorScheme
-                                          .primary),
-                            )
-                          ],
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Button(
+                        style: ButtonStyle.card(density: ButtonDensity.dense),
+                        onPressed: () {
+                          showDialog(
+                              context: context,
+                              builder: (context) {
+                                return AlertDialog(
+                                  title: Text("Clean history?".tr)
+                                      .withAlign(Alignment.centerLeft),
+                                  actions: [
+                                    OutlineButton(
+                                        onPressed: () {
+                                          Get.back();
+                                        },
+                                        child: Text("Cancel".tr)),
+                                    PrimaryButton(
+                                        onPressed: () {
+                                          localManager.clear("historyUserTag");
+                                          Get.back();
+                                        },
+                                        child: Text("Ok".tr)),
+                                  ],
+                                );
+                              });
+                        },
+                        child: Basic(
+                          leading: Icon(Icons.delete_outline),
+                          title: Text("Clear search history".tr).textSmall(),
                         ),
                       ),
-                    ),
-                  ),
+                    ],
+                  ).paddingAll(16.0),
                 ),
               SliverToBoxAdapter(
                 child: Padding(
@@ -305,8 +281,6 @@ class _SearchRecommendPageState extends State<SearchRecommendPage> {
         HotTagsController(widget.type),
         tag: "hotTags_${widget.type.name}");
     hotTagsController.refreshController = refreshController;
-
-    final rowCount = max(3, (context.width / 200).floor());
     return Obx(
       () => EasyRefresh(
         onRefresh: hotTagsController.reset,
@@ -483,7 +457,7 @@ class _SearchRecommendPageState extends State<SearchRecommendPage> {
               padding: EdgeInsets.all(8.0),
               sliver: SliverGrid(
                   delegate: SliverChildBuilderDelegate((context, index) {
-                    return GestureDetector(
+                    return m.InkWell(
                       onTap: () {
                         Get.to(() {
                           if (widget.type == ArtworkType.NOVEL) {
@@ -553,7 +527,7 @@ class _SearchRecommendPageState extends State<SearchRecommendPage> {
                     );
                   }, childCount: hotTagsController.tags.length),
                   gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: rowCount)),
+                      crossAxisCount: max(3, (context.width / 200).floor()))),
             ),
             if (GetPlatform.isAndroid)
               SliverToBoxAdapter(

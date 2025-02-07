@@ -6,16 +6,13 @@ import 'package:flutter/material.dart'
         InkWell,
         PopupMenuButton,
         PopupMenuItem,
-        SelectionArea,
-        Tab,
-        TabBar,
-        TabBarView,
-        TabController;
+        SelectionArea;
 import 'package:flutter/services.dart';
 import 'package:icon_decoration/icon_decoration.dart';
 import 'package:shadcn_flutter/shadcn_flutter.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:skana_pix/componentwidgets/userdetail.dart';
+import 'package:skana_pix/controller/mini_controllers.dart';
 import 'package:skana_pix/view/userview/userworks.dart';
 import 'package:skana_pix/controller/caches.dart';
 import 'package:skana_pix/controller/like_controller.dart';
@@ -49,8 +46,8 @@ class UserPage extends StatefulWidget {
 }
 
 class _UserPageState extends State<UserPage> with TickerProviderStateMixin {
-  late TabController _tabController;
   late ScrollController _scrollController;
+  late MTab mTab;
   bool backToTopVisible = false;
   UserDetails? userDetail;
   bool isMuted = false;
@@ -62,7 +59,7 @@ class _UserPageState extends State<UserPage> with TickerProviderStateMixin {
 
   @override
   void initState() {
-    _tabController = TabController(length: 3, vsync: this);
+    mTab = Get.put(MTab(), tag: "userpage_${widget.id}");
     _scrollController = ScrollController();
     _scrollController.addListener(() {
       if (_scrollController.hasClients) {
@@ -87,91 +84,90 @@ class _UserPageState extends State<UserPage> with TickerProviderStateMixin {
 
   @override
   void dispose() {
+    Get.delete<MTab>(tag: "userpage_${widget.id}");
     _scrollController.dispose();
-    _tabController.dispose();
     super.dispose();
   }
 
-  int _tabIndex = 0;
-
   @override
   Widget build(BuildContext context) {
-    return Obx(() {
-      if (isMuted) {
-        return Scaffold(
-          child: Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: <Widget>[
-                Text('X_X'),
-                Text('${widget.id}'),
-                PrimaryButton(
-                    onPressed: () {
-                      settings.removeBlockedUsers([widget.id.toString()]);
-                      setState(() {
-                        isMuted = false;
-                      });
-                    },
-                    child: Text("Unblock".tr)),
-              ],
-            ),
+    if (isMuted) {
+      return Scaffold(
+        child: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: <Widget>[
+              Text('X_X'),
+              Text('${widget.id}'),
+              PrimaryButton(
+                  onPressed: () {
+                    settings.removeBlockedUsers([widget.id.toString()]);
+                    setState(() {
+                      isMuted = false;
+                    });
+                  },
+                  child: Text("Unblock".tr)),
+            ],
           ),
-        );
-      }
+        ),
+      );
+    }
 
-      if (isError && userDetail == null) {
-        return Scaffold(
-          child: Container(
-              child: Center(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              mainAxisAlignment: MainAxisAlignment.center,
-              mainAxisSize: MainAxisSize.max,
-              children: <Widget>[
-                Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Text(
-                    "Network Error".tr,
-                  ),
+    if (isError && userDetail == null) {
+      return Scaffold(
+        child: Center(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            mainAxisAlignment: MainAxisAlignment.center,
+            mainAxisSize: MainAxisSize.max,
+            children: <Widget>[
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Text(
+                  "Network Error".tr,
                 ),
-                Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: PrimaryButton(
-                    onPressed: () {
-                      firstLoad();
-                    },
-                    child: Text("Retry".tr),
-                  ),
-                )
-              ],
-            ),
-          )),
-        );
-      }
-      if (userDetail == null) {
-        return Scaffold(
-          child: Center(child: CircularProgressIndicator()),
-        );
-      }
-      return _buildBody(context);
-    });
+              ),
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: PrimaryButton(
+                  onPressed: () {
+                    firstLoad();
+                  },
+                  child: Text("Retry".tr),
+                ),
+              )
+            ],
+          ),
+        ),
+      );
+    }
+    if (userDetail == null) {
+      return Scaffold(
+        child: Center(child: CircularProgressIndicator(size: 48)),
+      );
+    }
+    return _buildBody(context);
   }
 
   Widget _buildBody(BuildContext context) {
     return Scaffold(
       child: NestedScrollView(
         controller: _scrollController,
-        body: TabBarView(controller: _tabController, children: [
-          WorksPage(
-            id: userDetail!.id,
-            type: type,
-          ),
-          BookmarksPage(
-            id: userDetail!.id,
-            type: type,
-          ),
-          UserDetailPage(userDetail!),
-        ]).paddingTop(102 + MediaQuery.of(context).padding.top),
+        body: Obx(
+          () => (mTab.index.value == 0)
+              ? WorksPage(
+                  id: userDetail!.id,
+                  type: type,
+                  noScroll: true,
+                )
+              : (mTab.index.value == 1)
+                  ? BookmarksPage(
+                      id: userDetail!.id,
+                      type: type,
+                      noScroll: true,
+                    )
+                  : UserDetailPage(userDetail!),
+        ).paddingTop(102 + MediaQuery.of(context).padding.top),
         headerSliverBuilder: (BuildContext context, bool? innerBoxIsScrolled) {
           return _HeaderSlivers(innerBoxIsScrolled, context);
         },
@@ -184,99 +180,108 @@ class _UserPageState extends State<UserPage> with TickerProviderStateMixin {
       SliverOverlapAbsorber(
         handle: NestedScrollView.sliverOverlapAbsorberHandleFor(context),
         sliver: SliverAppBar(
-          pinned: true,
-          elevation: 0.0,
-          forceElevated: innerBoxIsScrolled ?? false,
-          expandedHeight: userDetail?.backgroundImage != null
-              ? MediaQuery.of(context).size.width / 2 +
-                  205 -
-                  MediaQuery.of(context).padding.top
-              : 300,
-          leading: CommonBackArea(),
-          actions: <Widget>[
-            Builder(builder: (context) {
-              return PrimaryButton(
-                  child: const DecoratedIcon(
-                    icon: Icon(Icons.share),
-                    decoration: IconDecoration(border: IconBorder(width: 1.5)),
-                  ),
-                  onPressed: () {
-                    final box = context.findRenderObject() as RenderBox?;
-                    final pos = box != null
-                        ? box.localToGlobal(Offset.zero) & box.size
-                        : null;
-                    Share.share('https://www.pixiv.net/users/${widget.id}',
-                        sharePositionOrigin: pos);
-                  });
-            }),
-            _buildPopMenu(context)
-          ],
-          flexibleSpace: FlexibleSpaceBar(
-            collapseMode: CollapseMode.pin,
-            background: Stack(
-              children: <Widget>[
-                _buildBackground(context),
-                _buildFakeBg(context),
-                Align(
-                  alignment: Alignment.bottomCenter,
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: <Widget>[
-                      _buildHeader(context),
-                      Column(
-                        children: <Widget>[
-                          _buildNameFollow(context),
-                          _buildComment(context),
-                          Tab(
-                            text: " ",
-                          )
-                        ],
-                      ),
-                    ],
-                  ),
-                )
-              ],
+            pinned: true,
+            elevation: 0.0,
+            forceElevated: innerBoxIsScrolled ?? false,
+            expandedHeight: userDetail?.backgroundImage != null
+                ? MediaQuery.of(context).size.width / 2 +
+                    205 -
+                    MediaQuery.of(context).padding.top
+                : 300,
+            leading: CommonBackArea(),
+            actions: <Widget>[
+              Builder(builder: (context) {
+                return GhostButton(
+                    child: const DecoratedIcon(
+                      icon: Icon(Icons.share),
+                      decoration:
+                          IconDecoration(border: IconBorder(width: 1.5)),
+                    ),
+                    onPressed: () {
+                      final box = context.findRenderObject() as RenderBox?;
+                      final pos = box != null
+                          ? box.localToGlobal(Offset.zero) & box.size
+                          : null;
+                      Share.share('https://www.pixiv.net/users/${widget.id}',
+                          sharePositionOrigin: pos);
+                    });
+              }),
+              _buildPopMenu(context)
+            ],
+            flexibleSpace: FlexibleSpaceBar(
+              collapseMode: CollapseMode.pin,
+              background: Stack(
+                children: <Widget>[
+                  _buildBackground(context),
+                  _buildFakeBg(context),
+                  Align(
+                    alignment: Alignment.bottomCenter,
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: <Widget>[
+                        _buildHeader(context),
+                        Column(
+                          children: <Widget>[
+                            _buildNameFollow(context),
+                            _buildComment(context),
+                            const Text(
+                              " ",
+                            ).h3(),
+                          ],
+                        ),
+                      ],
+                    ),
+                  )
+                ],
+              ),
             ),
-          ),
-          bottom: ColoredTabBar(
-            Theme.of(context).colorScheme.card,
-            TabBar(
-              controller: _tabController,
-              onTap: (index) {
-                setState(() {
-                  _tabIndex = index;
-                });
-              },
-              tabs: [
-                GestureDetector(
-                  onDoubleTap: () {
-                    if (_tabIndex == 0) _scrollController.position.jumpTo(0);
-                  },
-                  child: Tab(
-                    text: "Artworks".tr,
-                  ),
-                ),
-                GestureDetector(
-                  onDoubleTap: () {
-                    if (_tabIndex == 1) _scrollController.position.jumpTo(0);
-                  },
-                  child: Tab(
-                    text: "Bookmarks".tr,
-                  ),
-                ),
-                GestureDetector(
-                  onDoubleTap: () {
-                    if (_tabIndex == 2) _scrollController.position.jumpTo(0);
-                  },
-                  child: Tab(
-                    text: "Details".tr,
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
+            bottom: PreferredSize(
+                preferredSize: Size.fromHeight(48),
+                child: Obx(() => TabList(
+                      index: mTab.index.value,
+                      children: [
+                        TabButton(
+                          onPressed: () {
+                            if (mTab.index.value == 0) {
+                              _scrollController.position.animateTo(0,
+                                  duration: const Duration(milliseconds: 300),
+                                  curve: Curves.easeInOut);
+                            }
+                            mTab.index.value = 0;
+                          },
+                          child: Text(
+                            "Artworks".tr,
+                          ),
+                        ),
+                        TabButton(
+                          onPressed: () {
+                            if (mTab.index.value == 1) {
+                              _scrollController.position.animateTo(0,
+                                  duration: const Duration(milliseconds: 300),
+                                  curve: Curves.easeInOut);
+                            }
+                            mTab.index.value = 1;
+                          },
+                          child: Text(
+                            "Bookmarks".tr,
+                          ),
+                        ),
+                        TabButton(
+                          onPressed: () {
+                            if (mTab.index.value == 2) {
+                              _scrollController.position.animateTo(0,
+                                  duration: const Duration(milliseconds: 300),
+                                  curve: Curves.easeInOut);
+                            }
+                            mTab.index.value = 2;
+                          },
+                          child: Text(
+                            "Details".tr,
+                          ),
+                        ),
+                      ],
+                    )))),
       ),
     ];
   }
@@ -292,18 +297,16 @@ class _UserPageState extends State<UserPage> with TickerProviderStateMixin {
           Container(
             height: 55,
           ),
-          Container(
-            child: Column(
-              children: <Widget>[
-                _buildFakeNameFollow(context),
-                Container(
-                  height: 60,
-                ),
-                const Tab(
-                  text: " ",
-                )
-              ],
-            ),
+          Column(
+            children: <Widget>[
+              _buildFakeNameFollow(context),
+              Container(
+                height: 60,
+              ),
+              const Text(
+                " ",
+              ).h3()
+            ],
           ),
         ],
       ),
@@ -315,7 +318,7 @@ class _UserPageState extends State<UserPage> with TickerProviderStateMixin {
         width: MediaQuery.of(context).size.width,
         height: userDetail?.backgroundImage != null
             ? MediaQuery.of(context).size.width / 2
-            : MediaQuery.of(context).padding.top + 160,
+            : MediaQuery.of(context).padding.top + 90,
         child: userDetail != null
             ? userDetail!.backgroundImage != null
                 ? InkWell(
@@ -446,17 +449,17 @@ class _UserPageState extends State<UserPage> with TickerProviderStateMixin {
     return SizedBox(
       width: MediaQuery.of(context).size.width,
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16.0),
+        padding: const EdgeInsets.symmetric(horizontal: 24.0),
         child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
               Text(
                 userDetail?.name ?? "",
-              ),
+              ).h4(),
               Text(
                 userDetail == null
                     ? ""
-                    : '${userDetail!.totalFollowUsers} ${"Follow".tr}',
+                    : '${"Follows".tr}: ${userDetail!.totalFollowUsers}',
               )
             ]),
       ),
@@ -467,7 +470,7 @@ class _UserPageState extends State<UserPage> with TickerProviderStateMixin {
     return Container(
       width: MediaQuery.of(context).size.width,
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16.0),
+        padding: const EdgeInsets.symmetric(horizontal: 24.0),
         child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
@@ -475,7 +478,7 @@ class _UserPageState extends State<UserPage> with TickerProviderStateMixin {
                 tag: userDetail?.name ?? "${widget.heroTag}",
                 child: Text(
                   userDetail?.name ?? "",
-                ),
+                ).h4(),
               ),
               InkWell(
                 onTap: () {
@@ -485,7 +488,7 @@ class _UserPageState extends State<UserPage> with TickerProviderStateMixin {
                 child: Text(
                   userDetail == null
                       ? ""
-                      : '${userDetail!.totalFollowUsers} ${"Follow".tr}',
+                      : '${"Follows".tr}: ${userDetail!.totalFollowUsers}',
                 ),
               )
             ]),
@@ -650,20 +653,4 @@ class _UserPageState extends State<UserPage> with TickerProviderStateMixin {
   Future<Res<UserDetails>> loadData() async {
     return ConnectManager().apiClient.getUserDetails(widget.id);
   }
-}
-
-class ColoredTabBar extends Container implements PreferredSizeWidget {
-  ColoredTabBar(this.color, this.tabBar, {super.key});
-
-  final Color color;
-  final TabBar tabBar;
-
-  @override
-  Size get preferredSize => tabBar.preferredSize;
-
-  @override
-  Widget build(BuildContext context) => Container(
-        color: color,
-        child: tabBar,
-      );
 }

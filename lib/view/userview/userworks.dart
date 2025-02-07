@@ -9,8 +9,10 @@ import 'package:skana_pix/view/novelview/novellist.dart';
 class WorksPage extends StatefulWidget {
   final int id;
   final ArtworkType type;
+  final bool noScroll;
 
-  const WorksPage({super.key, required this.id, required this.type});
+  const WorksPage(
+      {super.key, required this.id, required this.type, this.noScroll = false});
 
   @override
   State<WorksPage> createState() => _WorksPageState();
@@ -53,23 +55,22 @@ class _WorksPageState extends State<WorksPage> {
             ],
           ),
           Expanded(
-            child: IndexedStack(
-              index: mtab.index.value,
-              children: [
-                WorkContent(
-                  id: widget.id,
-                  type: ArtworkType.ILLUST,
-                ),
-                WorkContent(
-                  id: widget.id,
-                  type: ArtworkType.MANGA,
-                ),
-                WorkContent(
-                  id: widget.id,
-                  type: ArtworkType.NOVEL,
-                ),
-              ],
-            ),
+            child: (mtab.index.value == 0)
+                ? WorkContent(
+                    id: widget.id,
+                    type: ArtworkType.ILLUST,
+                    noScroll: widget.noScroll,
+                  )
+                : (mtab.index.value == 1)
+                    ? WorkContentManga(
+                        id: widget.id,
+                        noScroll: widget.noScroll,
+                      )
+                    : WorkContent(
+                        id: widget.id,
+                        type: ArtworkType.NOVEL,
+                        noScroll: widget.noScroll,
+                      ),
           ),
         ],
       );
@@ -77,11 +78,28 @@ class _WorksPageState extends State<WorksPage> {
   }
 }
 
+class WorkContentManga extends StatelessWidget {
+  final int id;
+  final bool noScroll;
+  const WorkContentManga({super.key, required this.id, this.noScroll = false});
+
+  @override
+  Widget build(BuildContext context) {
+    return WorkContent(
+      id: id,
+      type: ArtworkType.MANGA,
+      noScroll: noScroll,
+    );
+  }
+}
+
 class WorkContent extends StatefulWidget {
   final int id;
   final ArtworkType type;
+  final bool noScroll;
 
-  const WorkContent({super.key, required this.id, required this.type});
+  const WorkContent(
+      {super.key, required this.id, required this.type, this.noScroll = false});
 
   @override
   State<WorkContent> createState() => _WorkContentState();
@@ -106,14 +124,22 @@ class _WorkContentState extends State<WorkContent> {
       // ignore: unused_local_variable
       ListIllustController controller = Get.put(
           ListIllustController(
-              controllerType: ListType.works, type: widget.type),
+              id: widget.id.toString(),
+              controllerType: ListType.works,
+              type: widget.type),
           tag: "works_${widget.type.name}_${widget.id}");
       return ImageWaterfall(
-          controllerTag: "works_${widget.type.name}_${widget.id}");
+          controllerTag: "works_${widget.type.name}_${widget.id}",
+          noScroll: widget.noScroll);
     } else {
-      Get.put(ListNovelController(controllerType: ListType.works),
+      // ignore: unused_local_variable
+      ListNovelController controller = Get.put(
+          ListNovelController(
+              id: widget.id.toString(), controllerType: ListType.works),
           tag: "works_${widget.type.name}_${widget.id}");
-      return NovelList(controllerTag: "works_${widget.type.name}_${widget.id}");
+      return NovelList(
+          controllerTag: "works_${widget.type.name}_${widget.id}",
+          noScroll: widget.noScroll);
     }
   }
 }

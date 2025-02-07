@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:shadcn_flutter/shadcn_flutter.dart';
 import 'package:get/get.dart';
 import 'package:skana_pix/componentwidgets/backarea.dart';
+import 'package:skana_pix/componentwidgets/gotop.dart';
 import 'package:skana_pix/controller/account_controller.dart';
 import 'package:skana_pix/controller/list_controller.dart';
 import 'package:skana_pix/model/worktypes.dart';
@@ -41,7 +42,10 @@ class _IllustResultPageState extends State<IllustResultPage> {
         tag: "search_${widget.word}");
     controller.restrict.value = "all";
     return Obx(() {
-      return Scaffold(headers: [
+      return Scaffold(
+        floatingFooter: true,
+        footers: [const GoTop()],
+        headers: [
         AppBar(
           title: Text(
             widget.translatedName.isEmpty ? widget.word : widget.translatedName,

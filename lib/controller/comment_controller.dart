@@ -9,7 +9,7 @@ class CommentController extends GetxController {
   String? nextUrl;
   String id;
   ArtworkType type;
-  EasyRefreshController easyRefreshController;
+  EasyRefreshController? easyRefreshController;
   RxBool isLoading = false.obs;
   RxList<Comment> comments = RxList.empty();
   RxString error = "".obs;
@@ -17,16 +17,15 @@ class CommentController extends GetxController {
   RxString parentCommentName = "".obs;
   bool isReply;
 
-  CommentController(
-      this.id, this.type, this.easyRefreshController, this.isReply);
+  CommentController(this.id, this.type, this.isReply);
 
   Future<Res<List<Comment>>> loadData() async {
     if (isLoading.value) return Res.error("Loading");
     if (nextUrl == "end") {
-      easyRefreshController.finishLoad(IndicatorResult.noMore);
+      easyRefreshController?.finishLoad(IndicatorResult.noMore);
       return Res.error("No more data");
     }
-
+    isLoading.value = true;
     Res<List<Comment>> res = type == ArtworkType.NOVEL
         ? (isReply
             ? await ConnectManager()
@@ -43,27 +42,25 @@ class CommentController extends GetxController {
       nextUrl ??= "end";
     }
     if (nextUrl == "end") {
-      easyRefreshController.finishLoad(IndicatorResult.noMore);
+      easyRefreshController?.finishLoad(IndicatorResult.noMore);
     } else {
-      easyRefreshController.finishLoad();
+      easyRefreshController?.finishLoad();
     }
     return res;
   }
 
   void nextPage() {
-    if (isLoading.value) return;
-    isLoading.value = true;
     loadData().then((value) {
       isLoading.value = false;
       if (value.success) {
         comments.addAll(filterComments(value.data));
         comments.refresh();
-        easyRefreshController.finishLoad();
+        easyRefreshController?.finishLoad();
       } else {
         var message = value.errorMessage ??
             "Network Error. Please refresh to try again.".tr;
         if (message == "No more data") {
-          easyRefreshController.finishLoad(IndicatorResult.noMore);
+          easyRefreshController?.finishLoad(IndicatorResult.noMore);
           return;
         }
         if (message.length > 45) {
@@ -71,7 +68,7 @@ class CommentController extends GetxController {
         }
         error.value = message;
         Leader.showToast(message);
-        easyRefreshController.finishLoad(IndicatorResult.fail);
+        easyRefreshController?.finishLoad(IndicatorResult.fail);
       }
     });
   }
@@ -87,15 +84,16 @@ class CommentController extends GetxController {
 
   void firstLoad() {
     loadData().then((value) {
+      isLoading.value = false;
       if (value.success) {
         comments.addAll(filterComments(value.data));
         comments.refresh();
-        easyRefreshController.finishRefresh();
+        easyRefreshController?.finishRefresh();
       } else {
         var message = value.errorMessage ??
             "Network Error. Please refresh to try again.".tr;
         if (message == "No more data") {
-          easyRefreshController.finishRefresh(IndicatorResult.noMore);
+          easyRefreshController?.finishRefresh(IndicatorResult.noMore);
           return;
         }
         if (message.length > 45) {
@@ -103,7 +101,7 @@ class CommentController extends GetxController {
         }
         error = message.obs;
         Leader.showToast(message);
-        easyRefreshController.finishRefresh(IndicatorResult.fail);
+        easyRefreshController?.finishRefresh(IndicatorResult.fail);
       }
     });
   }
@@ -131,7 +129,7 @@ class CommentController extends GetxController {
         Leader.showToast(res.errorMessage ?? "Network Error".tr);
       } else {
         Leader.showToast("Commented".tr);
-        easyRefreshController.callRefresh();
+        easyRefreshController?.callRefresh();
       }
     } else if (type == ArtworkType.NOVEL) {
       res =
@@ -140,7 +138,7 @@ class CommentController extends GetxController {
         Leader.showToast(res.errorMessage ?? "Network Error".tr);
       } else {
         Leader.showToast("Commented".tr);
-        easyRefreshController.callRefresh();
+        easyRefreshController?.callRefresh();
       }
     }
   }

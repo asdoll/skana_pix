@@ -13,8 +13,10 @@ import 'package:skana_pix/view/novelview/novellist.dart';
 class BookmarksPage extends StatefulWidget {
   final int id;
   final ArtworkType type;
+  final bool noScroll;
 
-  const BookmarksPage({super.key, required this.id, required this.type});
+  const BookmarksPage(
+      {super.key, required this.id, required this.type, this.noScroll = false});
 
   @override
   State<BookmarksPage> createState() => _BookmarksPageState();
@@ -31,48 +33,48 @@ class _BookmarksPageState extends State<BookmarksPage> {
   Widget build(BuildContext context) {
     MTab mtab = Get.put(MTab(), tag: "bookmarks_${widget.id}");
     mtab.index.value = widget.type == ArtworkType.ILLUST ? 0 : 1;
-    return Obx(() {
-      return Column(
-        children: [
-          TabList(
-            index: mtab.index.value,
-            children: [
-              TabButton(
-                child: Text("Illust".tr),
-                onPressed: () {
-                  mtab.index.value = 0;
-                },
-              ),
-              TabButton(
-                child: Text("Novel".tr),
-                onPressed: () {
-                  mtab.index.value = 1;
-                },
-              ),
-            ],
-          ),
-          Expanded(
-            child: (mtab.index.value == 0)
-                ? BookmarkContent(
-                    id: widget.id,
-                    type: ArtworkType.ILLUST,
-                  )
-                : BookmarkContent(
-                    id: widget.id,
-                    type: ArtworkType.NOVEL,
-                  ),
-          ),
-        ],
-      );
-    });
+    return Obx(() => Column(
+          children: [
+            TabList(
+              index: mtab.index.value,
+              children: [
+                TabButton(
+                  child: Text("Illust".tr),
+                  onPressed: () {
+                    mtab.index.value = 0;
+                  },
+                ),
+                TabButton(
+                  child: Text("Novel".tr),
+                  onPressed: () {
+                    mtab.index.value = 1;
+                  },
+                ),
+              ],
+            ),
+            Expanded(
+              child: (mtab.index.value == 0)
+                  ? BookmarkContent(
+                      id: widget.id,
+                      type: ArtworkType.ILLUST,
+                    )
+                  : BookmarkContent(
+                      id: widget.id,
+                      type: ArtworkType.NOVEL,
+                    ),
+            ),
+          ],
+        ));
   }
 }
 
 class BookmarkContent extends StatefulWidget {
   final int id;
   final ArtworkType type;
+  final bool noScroll;
 
-  const BookmarkContent({super.key, required this.id, required this.type});
+  const BookmarkContent(
+      {super.key, required this.id, required this.type, this.noScroll = false});
 
   @override
   State<BookmarkContent> createState() => _BookmarkContentState();
@@ -102,14 +104,17 @@ class _BookmarkContentState extends State<BookmarkContent> {
               type: widget.type,
               id: widget.id.toString()),
           tag: "userbookmarks_${widget.id}");
-      return Obx(
-          () => ImageWaterfall(controllerTag: "userbookmarks_${widget.id}"));
+      return ImageWaterfall(
+          controllerTag: "userbookmarks_${widget.id}",
+          noScroll: widget.noScroll);
     } else {
       ListNovelController controller = Get.put(
           ListNovelController(
               controllerType: ListType.userbookmarks, id: widget.id.toString()),
           tag: "userbookmarks_${widget.id}");
-      return Obx(() => NovelList(controllerTag: "userbookmarks_${widget.id}"));
+      return NovelList(
+          controllerTag: "userbookmarks_${widget.id}",
+          noScroll: widget.noScroll);
     }
   }
 }

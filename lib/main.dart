@@ -47,7 +47,6 @@ Future<void> main() async {
     updateController.check();
     mtc = Get.put(MiniThemeController(), permanent: true);
     searchPageController = Get.put(SearchPageController(), permanent: true);
-    
     homeController.init();
     if (Platform.isWindows || Platform.isLinux) {
       sqfliteFfiInit();
