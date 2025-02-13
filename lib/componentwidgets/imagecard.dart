@@ -1,10 +1,12 @@
-import 'package:flutter/material.dart' show InkWell;
+import 'package:flutter/material.dart';
+import 'package:moon_design/moon_design.dart';
 import 'package:skana_pix/controller/list_controller.dart';
+import 'package:skana_pix/controller/settings.dart';
+import 'package:skana_pix/model/illust.dart';
 import 'package:skana_pix/model/worktypes.dart';
-import 'package:skana_pix/pixiv_dart_api.dart';
 import 'package:get/get.dart';
 import 'package:blur/blur.dart';
-import 'package:shadcn_flutter/shadcn_flutter.dart';
+import 'package:skana_pix/utils/io_extension.dart';
 import 'package:skana_pix/utils/widgetplugin.dart';
 import '../view/imageview/imagelistview.dart';
 import 'nullhero.dart';
@@ -40,42 +42,36 @@ class _IllustCardState extends State<IllustCard> {
   @override
   Widget build(BuildContext context) {
     listController = Get.find<ListIllustController>(tag: widget.controllerTag);
-    return Obx(() {
-      if ((listController.illusts[widget.index].isR18 ||
-              listController.illusts[widget.index].isR18G) &&
-          settings.hideR18) {
-        return buildR18InkWell(context, listController.illusts[widget.index]);
-      }
-
-      return buildInkWell(context, listController.illusts[widget.index]);
-    });
+    return Obx(() => buildInkWell(
+        context,
+        listController.illusts[widget.index],
+        ((listController.illusts[widget.index].isR18 ||
+                listController.illusts[widget.index].isR18G) &&
+            settings.hideR18)));
   }
 
   _onLongPressSave(Illust illust) async {
     if (settings.longPressSaveConfirm) {
-      final result = await showDialog(
-          context: context,
-          builder: (context) {
-            return AlertDialog(
-              title: Text("Save".tr).withAlign(Alignment.centerLeft),
-              content: Text(illust.title),
-              actions: <Widget>[
-                TextButton(
-                  child: Text("Cancel".tr),
-                  onPressed: () {
-                    Get.back(result: false);
-                  },
-                ),
-                TextButton(
-                  child: Text("Ok".tr),
-                  onPressed: () {
-                    Get.back(result: true);
-                  },
-                ),
-              ],
-            );
-          });
-      if (!result) {
+      final result = await alertDialog<bool>(
+        context,
+        "Save".tr,
+        illust.title,
+        [
+          outlinedButton(
+            label: "Cancel".tr,
+            onPressed: () {
+              Get.back(result: false);
+            },
+          ),
+          filledButton(
+            label: "Ok".tr,
+            onPressed: () {
+              Get.back(result: true);
+            },
+          ),
+        ],
+      );
+      if (result != true) {
         return;
       }
     }
@@ -103,62 +99,28 @@ class _IllustCardState extends State<IllustCard> {
         ? NullHero(
             tag: tag,
             child: PixivImage(illust.images.first.squareMedium,
-                fit: BoxFit.fitWidth).rounded(8),
-          )
+                fit: BoxFit.fitWidth),
+          ).rounded(6)
         : NullHero(
             tag: tag,
-            child: PixivImage(illust.images.first.medium, fit: BoxFit.fitWidth).rounded(8),
-          );
+            child: PixivImage(illust.images.first.medium, fit: BoxFit.fitWidth),
+          ).rounded(6);
   }
 
-  Widget buildInkWell(BuildContext context, Illust illust) {
+  Widget buildInkWell(BuildContext context, Illust illust, bool isR18) {
     var tooLong = (illust.height.toDouble() / illust.width.toDouble() > 3) ||
         widget.useSquare;
     var radio =
         (tooLong) ? 1.0 : illust.width.toDouble() / illust.height.toDouble();
-    return Card(
-        padding: const EdgeInsets.all(8.0),
-        clipBehavior: Clip.antiAlias,
-        child: _buildAnimationWraper(
-            context,
-            Column(
-              children: <Widget>[
-                AspectRatio(
-                    aspectRatio: radio,
-                    child: Stack(
-                      children: [
-                        Positioned.fill(
-                            child: _buildPic(
-                                "${widget.controllerTag}_${illust.id}",
-                                tooLong,
-                                illust)),
-                        Positioned(
-                            top: 5.0,
-                            right: 5.0,
-                            child: Row(
-                              children: [
-                                if (settings.feedAIBadge && illust.isAi)
-                                  _buildAIBadge(),
-                                _buildVisibility(illust),
-                                if (illust.isUgoira) _buildUgoiraBadge(),
-                              ],
-                            )),
-                      ],
-                    )),
-                _buildBottom(context, illust),
-              ],
-            ),
-            illust));
-  }
 
-  Widget buildR18InkWell(BuildContext context, Illust illust) {
-    var tooLong = illust.height.toDouble() / illust.width.toDouble() > 3;
-    var radio =
-        (tooLong) ? 1.0 : illust.width.toDouble() / illust.height.toDouble();
-    return Card(
-        padding: const EdgeInsets.all(8.0),
-        clipBehavior: Clip.antiAlias,
-        child: _buildAnimationWraper(
+    return moonListTileWidgets(
+      noPadding: true,
+        onTap: () => Get.to(
+            () => ImageListViewPage(
+                controllerTag: widget.controllerTag, index: widget.index),
+            preventDuplicates: false),
+        menuItemPadding: EdgeInsets.all(6),
+        label: _buildAnimationWraper(
             context,
             Column(
               children: <Widget>[
@@ -167,19 +129,27 @@ class _IllustCardState extends State<IllustCard> {
                     child: Stack(
                       children: [
                         Positioned.fill(
-                            child: blurWidget(_buildPic(
-                                "${widget.controllerTag}_${illust.id}",
-                                tooLong,
-                                illust))),
+                            child: isR18
+                                ? blurWidget(_buildPic(
+                                    "${widget.controllerTag}_${illust.id}",
+                                    tooLong,
+                                    illust))
+                                : _buildPic(
+                                    "${widget.controllerTag}_${illust.id}",
+                                    tooLong,
+                                    illust)),
                         Positioned(
                             top: 5.0,
                             right: 5.0,
                             child: Row(
                               children: [
                                 if (settings.feedAIBadge && illust.isAi)
-                                  _buildAIBadge(),
-                                _buildR18Badge(),
-                                if (illust.isUgoira) _buildUgoiraBadge(),
+                                  _buildAIBadge().paddingOnly(right: 2),
+                                _buildVisibility(illust).paddingOnly(right: 2),
+                                if (isR18)
+                                  _buildR18Badge().paddingOnly(right: 2),
+                                if (illust.isUgoira)
+                                  _buildUgoiraBadge().paddingOnly(right: 2),
                               ],
                             )),
                       ],
@@ -193,7 +163,7 @@ class _IllustCardState extends State<IllustCard> {
   Widget blurWidget(Widget w) {
     return Blur(
       blur: 5,
-      blurColor: Colors.gray,
+      blurColor: Colors.grey,
       child: w,
     );
   }
@@ -203,7 +173,7 @@ class _IllustCardState extends State<IllustCard> {
       padding: EdgeInsets.all(1.0),
       child: Container(
         decoration: const BoxDecoration(
-          color: Color.fromRGBO(255, 255, 255, 0.4),
+          color: Color.fromRGBO(0, 0, 0, 0.4),
           borderRadius: BorderRadius.all(Radius.circular(4.0)),
         ),
         child: const Padding(
@@ -222,7 +192,7 @@ class _IllustCardState extends State<IllustCard> {
       padding: EdgeInsets.all(1.0),
       child: Container(
         decoration: const BoxDecoration(
-          color: Color.fromRGBO(255, 255, 255, 0.4),
+          color: Color.fromRGBO(0, 0, 0, 0.4),
           borderRadius: BorderRadius.all(Radius.circular(4.0)),
         ),
         child: const Padding(
@@ -241,7 +211,7 @@ class _IllustCardState extends State<IllustCard> {
       padding: EdgeInsets.all(1.0),
       child: Container(
         decoration: const BoxDecoration(
-          color: Color.fromRGBO(255, 255, 255, 0.4),
+          color: Color.fromRGBO(0, 0, 0, 0.4),
           borderRadius: BorderRadius.all(Radius.circular(4.0)),
         ),
         child: const Padding(
@@ -259,7 +229,7 @@ class _IllustCardState extends State<IllustCard> {
       BuildContext context, Widget child, Illust illust) {
     return InkWell(
       onLongPress: () {
-        _buildLongPressToSaveHint(illust);
+        _buildLongPressToSaveHint(context, illust);
       },
       onTap: () {
         Get.to(
@@ -271,25 +241,18 @@ class _IllustCardState extends State<IllustCard> {
     );
   }
 
-  _buildLongPressToSaveHint(Illust illust) async {
+  _buildLongPressToSaveHint(BuildContext context, Illust illust) async {
     if (GetPlatform.isIOS) {
       if (settings.firstLongPressSave) {
         settings.set("firstLongPressSave", false);
-        await showDialog(
-            context: context,
-            builder: (context) {
-              return AlertDialog(
-                title: Text('长按保存').withAlign(Alignment.centerLeft),
-                content: Text('长按卡片将会保存插画到相册'),
-                actions: <Widget>[
-                  TextButton(
-                      onPressed: () {
-                        Get.back();
-                      },
-                      child: Text('Ok'.tr))
-                ],
-              );
-            });
+        await alertDialog<void>(context, "长按保存".tr, '长按卡片将会保存插画到相册'.tr, [
+          filledButton(
+            label: "Ok".tr,
+            onPressed: () {
+              Get.back();
+            },
+          )
+        ]);
       }
     }
     _onLongPressSave(illust);
@@ -306,22 +269,24 @@ class _IllustCardState extends State<IllustCard> {
             Text(
               illust.title,
               maxLines: 1,
-              overflow: TextOverflow.clip,
-              style: Theme.of(context).typography.xSmall.copyWith(fontWeight: FontWeight.w500),
+              overflow: TextOverflow.ellipsis,
               strutStyle: const StrutStyle(forceStrutHeight: true, leading: 0),
-            ).paddingOnly(bottom: 4),
+            ).subHeader().paddingOnly(bottom: 4),
             Text(
               illust.author.name,
               maxLines: 1,
-              overflow: TextOverflow.clip,
-              style: Theme.of(context).typography.xSmall.copyWith(color: Theme.of(context).colorScheme.mutedForeground, fontWeight: FontWeight.w500),
+              overflow: TextOverflow.ellipsis,
+              style: TextStyle(
+                  color:
+                      context.moonTheme?.menuItemTheme.colors.contentTextColor),
               strutStyle: const StrutStyle(forceStrutHeight: true, leading: 0),
-            )
+            ).small()
           ]),
         ),
         Align(
           alignment: Alignment.centerRight,
-          child: StarIcon(id: illust.id.toString(), type: widget.type).paddingOnly(right: 8,top: 8),
+          child: StarIcon(id: illust.id.toString(), type: widget.type)
+              .paddingOnly(right: 2, top: 8),
         )
       ],
     );
@@ -337,7 +302,7 @@ class _IllustCardState extends State<IllustCard> {
           padding: EdgeInsets.all(1.0),
           child: Container(
             decoration: const BoxDecoration(
-              color: Color.fromRGBO(255, 255, 255, 0.4),
+              color: Color.fromRGBO(0, 0, 0, 0.4),
               borderRadius: BorderRadius.all(Radius.circular(4.0)),
             ),
             child: Padding(

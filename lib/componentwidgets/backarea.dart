@@ -1,4 +1,4 @@
-import 'package:shadcn_flutter/shadcn_flutter.dart';
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:icon_decoration/icon_decoration.dart';
 import 'package:skana_pix/view/homepage.dart';
@@ -15,9 +15,9 @@ class _CommonBackAreaState extends State<CommonBackArea> {
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      child: IconButton.ghost(
+      child: IconButton(
         icon: DecoratedIcon(
-          icon: Icon(_isLongPress ? Icons.home : Icons.arrow_back),
+          icon: Icon(_isLongPress ? Icons.home : Icons.arrow_back,color: Colors.white,),
           decoration: const IconDecoration(border: IconBorder(width: 1.5)),
         ),
         onPressed: () {
@@ -39,12 +39,11 @@ class NormalBackButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return OutlineButton(
-      density: ButtonDensity.icon,
+    return IconButton(
       onPressed: () {
         Get.back();
       },
-      child: const Icon(Icons.arrow_back),
+      icon: const Icon(Icons.arrow_back),
     );
   }
 }

@@ -2,7 +2,7 @@ import 'package:get/get.dart';
 import 'package:skana_pix/controller/list_controller.dart';
 import 'package:skana_pix/model/worktypes.dart';
 import 'package:skana_pix/view/imageview/imagewaterfall.dart';
-import 'package:shadcn_flutter/shadcn_flutter.dart';
+import 'package:flutter/material.dart';
 import 'package:skana_pix/view/novelview/novellist.dart';
 
 class RecomIllustsPage extends StatefulWidget {

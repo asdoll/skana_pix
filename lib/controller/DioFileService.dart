@@ -6,7 +6,10 @@ import 'package:dio/dio.dart';
 import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import 'package:flutter_cache_manager/src/web/mime_converter.dart';
 import 'package:intl/intl.dart';
-import 'package:skana_pix/pixiv_dart_api.dart';
+import 'package:skana_pix/controller/PDio.dart';
+import 'package:skana_pix/controller/bases.dart';
+import 'package:skana_pix/controller/exceptions.dart';
+import 'package:skana_pix/utils/io_extension.dart';
 
 class DioFileService extends FileService {
   final PDio dio;

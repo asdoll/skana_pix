@@ -1,12 +1,12 @@
 // ignore_for_file: unused_local_variable
 
-import 'package:shadcn_flutter/shadcn_flutter.dart';
+import 'package:flutter/material.dart';
+import 'package:moon_design/moon_design.dart';
 import 'package:skana_pix/controller/list_controller.dart';
 import 'package:skana_pix/controller/logging.dart';
 import 'package:skana_pix/controller/mini_controllers.dart';
 import 'package:skana_pix/model/worktypes.dart';
 import 'package:get/get.dart';
-import 'package:skana_pix/utils/widgetplugin.dart';
 import 'package:skana_pix/view/imageview/imagewaterfall.dart';
 import 'package:skana_pix/view/novelview/novellist.dart';
 
@@ -22,47 +22,47 @@ class BookmarksPage extends StatefulWidget {
   State<BookmarksPage> createState() => _BookmarksPageState();
 }
 
-class _BookmarksPageState extends State<BookmarksPage> {
+class _BookmarksPageState extends State<BookmarksPage>
+    with SingleTickerProviderStateMixin {
+  late TabController controller;
+  @override
+  void initState() {
+    super.initState();
+    controller = TabController(length: 2, vsync: this);
+  }
+
   @override
   void dispose() {
     super.dispose();
-    Get.delete<MTab>(tag: "bookmarks_${widget.id}");
+    controller.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    MTab mtab = Get.put(MTab(), tag: "bookmarks_${widget.id}");
-    mtab.index.value = widget.type == ArtworkType.ILLUST ? 0 : 1;
     return Obx(() => Column(
           children: [
-            TabList(
-              index: mtab.index.value,
-              children: [
-                TabButton(
-                  child: Text("Illust".tr),
-                  onPressed: () {
-                    mtab.index.value = 0;
-                  },
+            MoonTabBar(
+              tabController: controller,
+              tabs: [
+                MoonTab(
+                  label: Text("Illust".tr),
                 ),
-                TabButton(
-                  child: Text("Novel".tr),
-                  onPressed: () {
-                    mtab.index.value = 1;
-                  },
+                MoonTab(
+                  label: Text("Novel".tr),
                 ),
               ],
             ),
             Expanded(
-              child: (mtab.index.value == 0)
-                  ? BookmarkContent(
-                      id: widget.id,
-                      type: ArtworkType.ILLUST,
-                    )
-                  : BookmarkContent(
-                      id: widget.id,
-                      type: ArtworkType.NOVEL,
-                    ),
-            ),
+                child: TabBarView(children: [
+              BookmarkContent(
+                id: widget.id,
+                type: ArtworkType.ILLUST,
+              ),
+              BookmarkContent(
+                id: widget.id,
+                type: ArtworkType.NOVEL,
+              )
+            ])),
           ],
         ));
   }
@@ -127,44 +127,46 @@ class MyBookmarksPage extends StatefulWidget {
   State<MyBookmarksPage> createState() => _MyBookmarksPageState();
 }
 
-class _MyBookmarksPageState extends State<MyBookmarksPage> {
+class _MyBookmarksPageState extends State<MyBookmarksPage>
+    with TickerProviderStateMixin {
+  late TabController controller;
+  @override
+  void initState() {
+    super.initState();
+    controller = TabController(length: 2, vsync: this);
+  }
+
   @override
   void dispose() {
     super.dispose();
-    Get.delete<MTab>(tag: "mybookmarks");
+    controller.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    MTab mtab = Get.put(MTab(), tag: "mybookmarks");
-    return Obx(() {
+    return Builder(builder: (_) {
       return Column(
         children: [
-          TabList(
-            index: mtab.index.value,
-            children: [
-              TabButton(
-                child: Text("Illust".tr),
-                onPressed: () {
-                  mtab.index.value = 0;
-                },
+          MoonTabBar(
+            tabController: controller,
+            tabs: [
+              MoonTab(
+                label: Text("Illust".tr),
               ),
-              TabButton(
-                child: Text("Novel".tr),
-                onPressed: () {
-                  mtab.index.value = 1;
-                },
+              MoonTab(
+                label: Text("Novel".tr),
               ),
             ],
           ),
           Expanded(
-            child: (mtab.index.value == 0)
-                ? MyBookmarkContent(
-                    type: ArtworkType.ILLUST,
-                  )
-                : MyBookmarkContent(
-                    type: ArtworkType.NOVEL,
-                  ),
+            child: TabBarView(children: [
+              MyBookmarkContent(
+                type: ArtworkType.ILLUST,
+              ),
+              MyBookmarkContent(
+                type: ArtworkType.NOVEL,
+              ),
+            ]),
           ),
         ],
       );
@@ -204,46 +206,48 @@ class _MyBookmarkContentState extends State<MyBookmarkContent> {
               controllerType: ListType.mybookmarks, type: widget.type),
           tag: "mybookmarks_illust");
       MTab mtab = Get.put(MTab(), tag: "mybookmarks_illust");
-      return Obx(() => Column(
-            children: [
-              Tabs(
-                index: mtab.index.value,
-                tabs: [
-                  Text("Public".tr),
-                  Text("Private".tr),
+      return Builder(
+          builder: (_) => Column(
+                children: [
+                  // Tabs(
+                  //   index: mtab.index.value,
+                  //   tabs: [
+                  //     Text("Public".tr),
+                  //     Text("Private".tr),
+                  //   ],
+                  //   onChanged: (index) {
+                  //     mtab.index.value = index;
+                  //     controller.restrict.value = index == 0 ? 'public' : 'private';
+                  //     controller.refreshController?.callRefresh();
+                  //   },
+                  // ).paddingTop(10),
+                  Expanded(
+                    child: ImageWaterfall(controllerTag: "mybookmarks_illust"),
+                  ),
                 ],
-                onChanged: (index) {
-                  mtab.index.value = index;
-                  controller.restrict.value = index == 0 ? 'public' : 'private';
-                  controller.refreshController?.callRefresh();
-                },
-              ).paddingTop(10),
-              Expanded(
-                child: ImageWaterfall(controllerTag: "mybookmarks_illust"),
-              ),
-            ],
-          ));
+              ));
     } else {
       ListNovelController controller = Get.put(
           ListNovelController(controllerType: ListType.mybookmarks),
           tag: "mybookmarks_novel");
       MTab mtab = Get.put(MTab(), tag: "mybookmarks_novel");
-      return Obx(() => Column(
-            children: [
-              Tabs(
-                index: mtab.index.value,
-                tabs: [Text("Public".tr), Text("Private".tr)],
-                onChanged: (index) {
-                  mtab.index.value = index;
-                  controller.restrict.value = index == 0 ? 'public' : 'private';
-                  controller.refreshController?.callRefresh();
-                },
-              ).paddingTop(10),
-              Expanded(
-                child: NovelList(controllerTag: "mybookmarks_novel"),
-              ),
-            ],
-          ));
+      return Builder(
+          builder: (_) => Column(
+                children: [
+                  // Tabs(
+                  //   index: mtab.index.value,
+                  //   tabs: [Text("Public".tr), Text("Private".tr)],
+                  //   onChanged: (index) {
+                  //     mtab.index.value = index;
+                  //     controller.restrict.value = index == 0 ? 'public' : 'private';
+                  //     controller.refreshController?.callRefresh();
+                  //   },
+                  // ).paddingTop(10),
+                  Expanded(
+                    child: NovelList(controllerTag: "mybookmarks_novel"),
+                  ),
+                ],
+              ));
     }
   }
 }

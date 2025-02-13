@@ -3,7 +3,8 @@ import 'dart:convert';
 import 'package:easy_refresh/easy_refresh.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
-import 'package:skana_pix/pixiv_dart_api.dart';
+import 'package:skana_pix/model/illust.dart';
+import 'package:skana_pix/model/novel.dart';
 import 'package:skana_pix/utils/leaders.dart';
 
 import '../utils/safplugin.dart';

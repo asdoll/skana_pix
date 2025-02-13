@@ -1,5 +1,5 @@
-import 'package:shadcn_flutter/shadcn_flutter.dart';
-import 'package:flutter/material.dart' show SelectionArea;
+import 'package:moon_design/moon_design.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:skana_pix/componentwidgets/selecthtml.dart';
@@ -47,83 +47,87 @@ class _UserDetailPageState extends State<UserDetailPage> {
             ),
           ),
         ),
-        SliverList(
-          delegate: SliverChildListDelegate([
-            Button.card(
-              onPressed: () {},
-              trailing: Text(detail.name),
-              child: Text("Nickname".tr),
-            ),
-            Button.card(
-              onPressed: () {
-                try {
-                  Clipboard.setData(ClipboardData(text: detail.id.toString()));
-                } catch (e) {}
-              },
-              trailing: Text(detail.id.toString()),
-              child: Text("Artist ID".tr),
-            ),
-            Button.card(
-              onPressed: () {
-                Get.to(() => FollowList(
-                    isMyPixiv: false,
-                    id: detail.id.toString(),
-                    setAppBar: true));
-              },
-              trailing: Text(detail.totalFollowUsers.toString()),
-              child: Text("Follows".tr),
-            ),
-            Button.card(
-              onPressed: () {
-                Get.to(() => FollowList(
-                    isMyPixiv: true,
-                    id: detail.id.toString(),
-                    setAppBar: true));
-              },
-              trailing: Text(detail.myPixivUsers.toString()),
-              child: Text("Total My Pixiv users".tr),
-            ),
-            Button.card(
-              onPressed: () async {
-                final url = detail.twitterUrl;
-                if (url != null && url.isNotEmpty) {
+        SliverToBoxAdapter(
+            child: OverflowBox(
+          child: MoonTable(
+            columnsCount: 5,
+            rowSize: MoonTableRowSize.sm,
+            tablePadding: const EdgeInsets.symmetric(horizontal: 16),
+            rows: [
+              MoonTableRow(
+                  onTap: () {},
+                  cells: [Text("Nickname".tr), Text(detail.name)]),
+              MoonTableRow(
+                  onTap: () {
+                    try {
+                      Clipboard.setData(
+                          ClipboardData(text: detail.id.toString()));
+                    } catch (e) {}
+                  },
+                  cells: [Text("Artist ID".tr), Text(detail.id.toString())]),
+              MoonTableRow(
+                onTap: () {
+                  Get.to(() => FollowList(
+                      isMyPixiv: false,
+                      id: detail.id.toString(),
+                      setAppBar: true));
+                },
+                cells: [
+                  Text("Follows".tr),
+                  Text(detail.totalFollowUsers.toString())
+                ],
+              ),
+              MoonTableRow(
+                  onTap: () {
+                    Get.to(() => FollowList(
+                        isMyPixiv: true,
+                        id: detail.id.toString(),
+                        setAppBar: true));
+                  },
+                  cells: [
+                    Text("Total My Pixiv users".tr),
+                    Text(detail.myPixivUsers.toString())
+                  ]),
+              MoonTableRow(
+                  onTap: () async {
+                    final url = detail.twitterUrl;
+                    if (url != null && url.isNotEmpty) {
+                      try {
+                        await launchUrlString(url,
+                            mode: LaunchMode.externalApplication);
+                      } catch (e) {
+                        Share.share(url);
+                      }
+                    }
+                  },
+                  cells: [Text("Twitter".tr), Text(detail.twitterUrl ?? "")]),
+              MoonTableRow(
+                onTap: () {},
+                cells: [Text("Gender".tr), Text(detail.gender)],
+              ),
+              MoonTableRow(
+                onTap: () {},
+                cells: [Text("Job".tr), Text(detail.job)],
+              ),
+              MoonTableRow(
+                onTap: () async {
+                  if (detail.pawooUrl == null) return;
+                  var url = detail.pawooUrl!;
                   try {
                     await launchUrlString(url,
                         mode: LaunchMode.externalApplication);
                   } catch (e) {
                     Share.share(url);
                   }
-                }
-              },
-              trailing: Text(detail.twitterUrl ?? ""),
-              child: Text("Twitter".tr),
-            ),
-            Button.card(
-              onPressed: () {},
-              trailing: Text(detail.gender),
-              child: Text("Gender".tr),
-            ),
-            Button.card(
-              onPressed: () {},
-              trailing: Text(detail.job),
-              child: Text("Job".tr),
-            ),
-            Button.card(
-              onPressed: () async {
-                if (detail.pawooUrl == null) return;
-                var url = detail.pawooUrl!;
-                try {
-                  await launchUrlString(url,
-                      mode: LaunchMode.externalApplication);
-                } catch (e) {
-                  Share.share(url);
-                }
-              },
-              trailing: Text(detail.pawooUrl != null ? 'Link' : 'none'),
-              child: Text("Pawoo".tr),
-            )
-          ]),
-        ).sliverPaddingHorizontal(8),
+                },
+                cells: [
+                  Text("Pawoo".tr),
+                  Text(detail.pawooUrl != null ? 'Link'.tr : "")
+                ],
+              )
+            ],
+          ),
+        )).sliverPaddingHorizontal(8),
       ],
     );
   }

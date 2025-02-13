@@ -6,10 +6,12 @@ import 'package:file_selector/file_selector.dart';
 import 'package:flutter_file_dialog/flutter_file_dialog.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
+import 'package:skana_pix/controller/bases.dart';
 import 'package:skana_pix/controller/caches.dart';
 import 'package:permission_handler/permission_handler.dart';
-import 'package:skana_pix/pixiv_dart_api.dart';
 import 'package:image_gallery_saver_plus/image_gallery_saver_plus.dart';
+import 'package:skana_pix/controller/settings.dart';
+import 'package:skana_pix/model/illust.dart';
 import 'package:skana_pix/utils/leaders.dart';
 import 'safplugin.dart';
 

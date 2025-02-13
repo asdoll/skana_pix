@@ -1,7 +1,7 @@
 import 'dart:math';
 
 import 'package:easy_refresh/easy_refresh.dart';
-import 'package:shadcn_flutter/shadcn_flutter.dart';
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:skana_pix/controller/mini_controllers.dart';
 import 'package:skana_pix/controller/soup_controller.dart';

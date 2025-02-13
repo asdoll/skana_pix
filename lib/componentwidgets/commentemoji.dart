@@ -1,5 +1,5 @@
-import 'package:shadcn_flutter/shadcn_flutter.dart';
-
+import 'package:flutter/material.dart';
+import 'package:moon_design/moon_design.dart';
 import '../view/commentpage.dart';
 
 class CommentEmojiText extends StatefulWidget {
@@ -77,7 +77,7 @@ class _CommentEmojiTextState extends State<CommentEmojiText> {
   Widget build(BuildContext context) {
     return Text.rich(
       TextSpan(
-        style: Theme.of(context).typography.textSmall,
+        style: context.moonTheme?.textAreaTheme.properties.textStyle,
         children: [for (var i in _spans) i],
       ),
     );

@@ -1,10 +1,11 @@
 import 'package:easy_refresh/easy_refresh.dart';
-import 'package:shadcn_flutter/shadcn_flutter.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
 import 'package:get/get.dart';
-import 'package:skana_pix/componentwidgets/backarea.dart';
+import 'package:moon_design/moon_design.dart';
 import 'package:skana_pix/componentwidgets/headerfooter.dart';
 import 'package:skana_pix/controller/update_controller.dart';
+import 'package:skana_pix/utils/widgetplugin.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class BoardPage extends StatefulWidget {
@@ -21,17 +22,8 @@ class _BoardPageState extends State<BoardPage> {
         EasyRefreshController(controlFinishRefresh: true);
 
     return Scaffold(
-      headers: [
-        AppBar(
-          title: Text("Bulletin Board".tr),
-          padding: EdgeInsets.all(10),
-          leading: [
-            const NormalBackButton(),
-          ],
-        ),
-        const Divider()
-      ],
-      child: Obx(() {
+      appBar: appBar(title: "Bulletin Board".tr),
+      body: Obx(() {
         return EasyRefresh(
           controller: controller,
           onRefresh: () async {
@@ -43,18 +35,22 @@ class _BoardPageState extends State<BoardPage> {
             padding: EdgeInsets.zero,
             children: [
               for (final board in boardController.boardList)
-                Card(
-                    child: Basic(
-                  title: Text(
+                moonListTileWidgets(
+                  label: Text(
                     board.title,
-                  ),
+                  ).header(),
                   content: HtmlWidget(
                     board.content,
                     onTapUrl: (url) {
                       return launchUrl(Uri.parse(url));
                     },
+                    textStyle: context
+                        .moonTheme?.tokens.typography.heading.text14
+                        .apply(
+                      color: context.moonTheme?.tokens.colors.bulma,
+                    ),
                   ),
-                )),
+                ),
             ],
           ),
         );

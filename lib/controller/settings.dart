@@ -3,14 +3,11 @@ import 'dart:ui';
 
 import 'package:flutter_displaymode/flutter_displaymode.dart';
 import 'package:get/get.dart';
-import 'package:hive_flutter/hive_flutter.dart';
-import 'package:shadcn_flutter/shadcn_flutter.dart';
+import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:skana_pix/controller/like_controller.dart';
+import 'package:skana_pix/controller/logging.dart';
 import 'package:skana_pix/model/worktypes.dart';
-import 'package:skana_pix/pixiv_dart_api.dart';
-
-import '../utils/text_composition/text_composition.dart';
 
 class UserSetting {
   late SharedPreferences prefs;
@@ -179,10 +176,9 @@ class UserSetting {
       settings[0] == '0' &&
           WidgetsBinding.instance.platformDispatcher.platformBrightness ==
               Brightness.dark;
-  bool get isAMOLED => settings[1] == '1';
   bool get useDynamicColor => settings[2] == '1';
   bool get longPressSaveConfirm => settings[18] == '1';
-  bool get firstLongPressSave => settings[19] == '1';
+  bool get firstLongPressSave => prefs.getBool('firstLongPressSave') ?? true;
   bool get hideR18 => settings[15] == '1';
   bool get hideAI => settings[16] == '1';
   bool get feedAIBadge => settings[17] == '1';
@@ -633,21 +629,10 @@ class UserSetting {
   }
 
   void set(String key, dynamic value) {
-    // settings[int.parse(key)] = value;
-    // updateSettings();
+    prefs.setString(key, value);
   }
 }
 
 var settings = UserSetting();
 
-class TextConfigManager {
-  static final _box = Hive.box("textConfigData");
-  static TextCompositionConfig get config =>
-      TextCompositionConfig.fromJSON(_box.toMap().cast<String, dynamic>());
-  static set config(TextCompositionConfig config) =>
-      _box.putAll(config.toJSON());
-  static Future<void> init() async {
-    await Hive.initFlutter("textConfigData");
-    await Hive.openBox("textConfigData");
-  }
-}
+

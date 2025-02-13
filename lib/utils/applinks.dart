@@ -1,5 +1,5 @@
 import 'package:app_links/app_links.dart';
-import 'package:skana_pix/pixiv_dart_api.dart';
+import 'package:skana_pix/controller/logging.dart';
 
 /*
 Future<void> _register(String scheme) async {

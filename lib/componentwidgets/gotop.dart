@@ -1,5 +1,6 @@
 import 'package:get/get.dart';
-import 'package:shadcn_flutter/shadcn_flutter.dart';
+import 'package:moon_design/moon_design.dart';
+import 'package:flutter/material.dart';
 import 'package:skana_pix/controller/mini_controllers.dart';
 import 'package:skana_pix/controller/page_index_controller.dart';
 
@@ -11,21 +12,23 @@ class GoTop extends StatelessWidget {
     return Obx(() => AnimatedSwitcher(
           duration: const Duration(milliseconds: 300),
           child: (homeController.showBackArea.value)
-              ? Button(
-                  style: ButtonStyle.card(
-                      size: ButtonSize.small, density: ButtonDensity.dense),
-                  onPressed: () {
+              ? MoonButton.icon(
+                  buttonSize: MoonButtonSize.lg,
+                  showBorder: true,
+                  borderColor: Get
+                      .context?.moonTheme?.buttonTheme.colors.borderColor
+                      .withValues(alpha: 0.5),
+                  backgroundColor: Get.context?.moonTheme?.tokens.colors.zeno,
+                  onTap: () {
                     globalScrollController.animateTo(0,
                         duration: const Duration(milliseconds: 300),
                         curve: Curves.easeInOut);
                   },
-                  child: Icon(
+                  icon: Icon(
                     Icons.arrow_upward,
-                    size: 30,
-                  ).paddingOnly(right: 6, top: 1, bottom: 1),
+                    color: Colors.white,
+                  ),
                 )
-                  .withAlign(Alignment(1.05, 0.9))
-                  .paddingOnly(bottom: Get.mediaQuery.size.height * 0.05)
               : Container(),
         ));
   }

@@ -1,6 +1,8 @@
-import 'package:shadcn_flutter/shadcn_flutter.dart';
+import 'package:moon_design/moon_design.dart';
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:skana_pix/controller/like_controller.dart';
+import 'package:skana_pix/utils/widgetplugin.dart';
 
 class UserFollowButton extends StatefulWidget {
   final bool liked;
@@ -22,48 +24,33 @@ class _UserFollowButtonState extends State<UserFollowButton> {
       child: Obx(() {
         switch (likeController.users[widget.id] ?? liked) {
           case 0:
-            return IconButton.primary(
+            return filledButton(
                 onPressed: () {
                   likeController.toggleUser(widget.id, liked);
                 },
-                icon: Center(
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 14),
-                    child: Text(
-                      "Follow".tr,
-                      style: const TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                  ),
-                ));
+                label: "Follow".tr);
           case 1:
-            return IconButton.secondary(
-                icon: const Center(
-              child: Padding(
+            return MoonButton.icon(
+              showBorder: true,
+              icon: Center(
+                  child: Padding(
                 padding: EdgeInsets.symmetric(horizontal: 20),
                 child: SizedBox(
-                    width: 12, height: 12, child: CircularProgressIndicator()),
-              ),
-            ));
+                    width: 12,
+                    height: 12,
+                    child: MoonCircularLoader(
+                      color: context.moonTheme?.tokens.colors.bulma,
+                      circularLoaderSize: MoonCircularLoaderSize.sm,
+                    )),
+              )),
+            );
           default:
-            return IconButton.primary(
-                onPressed: () {
-                  likeController.toggleUser(widget.id, liked);
-                },
-                icon: Center(
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 14),
-                    child: Text(
-                      "Following".tr,
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                  ),
-                ));
+            return filledButton(
+              onPressed: () {
+                likeController.toggleUser(widget.id, liked);
+              },
+              label: "Following".tr,
+            );
         }
       }),
     );

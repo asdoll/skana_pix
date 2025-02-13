@@ -1,8 +1,8 @@
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:shadcn_flutter/shadcn_flutter.dart';
-import 'package:skana_pix/componentwidgets/backarea.dart';
+import 'package:moon_design/moon_design.dart';
 import 'package:skana_pix/controller/settings_controller.dart';
-import 'package:flutter/material.dart' as m;
+import 'package:skana_pix/utils/widgetplugin.dart';
 
 class NetworkSettings extends StatefulWidget {
   const NetworkSettings({super.key});
@@ -24,91 +24,96 @@ class _NetworkSettingsState extends State<NetworkSettings> {
     TextEditingController input = TextEditingController();
 
     return Scaffold(
-        headers: [
-          AppBar(
-            title: Text('Network Settings'.tr),
-            padding: EdgeInsets.all(10),
-            leading: [
-              const NormalBackButton(),
-            ],
-          ),
-          const Divider()
-        ],
-        child: Obx(
+        appBar: appBar(title: 'Network Settings'.tr),
+        body: Obx(
           () => CustomScrollView(
             slivers: [
               SliverPadding(padding: EdgeInsets.all(20)),
               SliverToBoxAdapter(
-                child: Card(
-                  child: Basic(
-                    title: Text('Reverse Proxy'.tr),
-                    subtitle: Text(
-                        "Used to retrieve images from pixiv when using the app through the reverse proxy"
-                            .tr),
-                    trailing: Select<int>(
-                      value: controller.hostIndex.value,
-                      onChanged: (value) {
-                        if (value == null) return;
-                        controller.setHostIndex(value);
-                      },
-                      itemBuilder: (context, index) {
-                        switch (index) {
-                          case 0:
-                            return Text("Default".tr);
-                          case 1:
-                            return Text(controller.getPixreHost());
-                          case _:
-                            return Text("Custom".tr);
-                        }
-                      },
-                      children: [
-                        SelectGroup(
-                          children: [
-                            SelectItemButton(
-                                value: 0, child: Text("Default".tr)),
-                            SelectItemButton(
-                                value: 1,
-                                child: Text(controller.getPixreHost())),
-                            SelectItemButton(
-                                value: 2, child: Text("Custom".tr)),
-                          ],
-                        )
-                      ],
-                    ),
+                  child: moonListTile(
+                title: 'Reverse Proxy'.tr,
+                subtitle:
+                    "Used to retrieve images from pixiv when using the app through the reverse proxy"
+                        .tr,
+                trailing: MoonDropdown(
+                  show: controller.showMenu.value,
+                  constrainWidthToChild: true,
+                  onTapOutside: () => controller.showMenu.value = false,
+                  content: Column(
+                    children: [
+                      MoonMenuItem(
+                        onTap: () {
+                          controller.showMenu.value = false;
+                          controller.hostIndex.value = 0;
+                        },
+                        label: Text("Default".tr),
+                      ),
+                      MoonMenuItem(
+                        onTap: () {
+                          controller.showMenu.value = false;
+                          controller.hostIndex.value = 1;
+                        },
+                        label: Text(controller.getPixreHost()),
+                      ),
+                      MoonMenuItem(
+                        onTap: () {
+                          controller.showMenu.value = false;
+                          controller.hostIndex.value = 2;
+                        },
+                        label: Text("Custom".tr),
+                      ),
+                    ],
+                  ),
+                  child: MoonFilledButton(
+                    width: 120,
+                    onTap: () =>
+                        controller.showMenu.value = !controller.showMenu.value,
+                    label: controller.hostIndex.value == 0
+                        ? Text("Default".tr)
+                        : controller.hostIndex.value == 1
+                            ? Text(controller.getPixreHost())
+                            : Text("Custom".tr),
                   ),
                 ),
-              ),
+              )),
               if (controller.hostIndex.value == 2)
                 SliverToBoxAdapter(
-                  child: m.InkWell(
+                  child: moonListTileWidgets(
                     onTap: () {
-                      showDialog(
+                      input.text = controller.customProxyHost.value;
+                      showMoonModal<void>(
                           context: context,
                           builder: (context) {
-                            input.text = controller.customProxyHost.value;
-                            return AlertDialog(
-                              title: Text('Custom Proxy'.tr),
-                              content: TextField(
+                            return Dialog(
+                                child: Column(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                     MoonAlert(
+                              borderColor: Get.context?.moonTheme?.buttonTheme
+                                  .colors.borderColor
+                                  .withValues(alpha: 0.5),
+                              showBorder: true,
+                              label: Text('Custom Proxy'.tr).header(),
+                              verticalGap: 16,
+                              content: MoonFormTextInput(
                                 controller: input,
-                                trailing: IconButton.ghost(
+                                trailing: MoonButton.icon(
                                   icon: Icon(Icons.done),
-                                  onPressed: () {
+                                  onTap: () {
                                     controller.setCustomProxyHost(input.text);
                                     Get.back();
                                   },
                                 ),
-                              ),
-                            );
+                              ).paddingBottom(16),
+                            )
+                                  ],
+                                ));
                           });
                     },
-                    child: Card(
-                      child: Basic(
-                        title: Text('Custom Proxy'.tr),
-                        subtitle: Text(controller.customProxyHost.value),
-                        trailing: IconButton.ghost(
-                          icon: Icon(Icons.edit),
-                        ),
-                      ),
+                    label: Text('Custom Proxy'.tr),
+                    content: Text(controller.customProxyHost.value),
+                    trailing: MoonButton.icon(
+                      icon: Icon(Icons.edit),
                     ),
                   ),
                 ),
@@ -116,7 +121,16 @@ class _NetworkSettingsState extends State<NetworkSettings> {
                 padding: EdgeInsets.all(16),
               ),
               SliverToBoxAdapter(
-                child: Row(mainAxisAlignment: MainAxisAlignment.center,children: [DestructiveButton(child: Text('Reset'.tr),onPressed: () => controller.reset(),)],),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    filledButton(
+                      label: 'Reset'.tr,
+                      onPressed: () => controller.reset(),
+                      color: context.moonTheme?.tokens.colors.dodoria,
+                    )
+                  ],
+                ),
               )
             ],
           ),

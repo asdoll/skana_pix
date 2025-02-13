@@ -1,7 +1,7 @@
 import 'dart:io';
-import 'package:flutter/material.dart'
-    show AdaptiveTextSelectionToolbar, InkWell, SelectionArea;
-import 'package:shadcn_flutter/shadcn_flutter.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_colorpicker/flutter_colorpicker.dart';
+import 'package:moon_design/moon_design.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_xlider/flutter_xlider.dart';
 import 'package:get/get.dart';
@@ -10,15 +10,18 @@ import 'package:share_plus/share_plus.dart';
 import 'package:skana_pix/componentwidgets/backarea.dart';
 import 'package:skana_pix/componentwidgets/staricon.dart';
 import 'package:skana_pix/componentwidgets/userpage.dart';
+import 'package:skana_pix/controller/bases.dart';
 import 'package:skana_pix/controller/histories.dart';
 import 'package:skana_pix/controller/like_controller.dart';
 import 'package:skana_pix/controller/list_controller.dart';
+import 'package:skana_pix/controller/logging.dart';
 import 'package:skana_pix/controller/novel_controller.dart';
-import 'package:skana_pix/controller/theme_controller.dart';
-import 'package:skana_pix/pixiv_dart_api.dart';
+import 'package:skana_pix/controller/text_controller.dart';
+import 'package:skana_pix/model/novel.dart';
+import 'package:skana_pix/model/tag.dart';
+import 'package:skana_pix/utils/io_extension.dart';
 import 'package:skana_pix/utils/leaders.dart';
 import 'package:skana_pix/utils/text_composition/text_composition.dart';
-import 'package:skana_pix/utils/translate.dart';
 import 'package:skana_pix/utils/widgetplugin.dart';
 import '../../model/worktypes.dart';
 import '../../componentwidgets/avatar.dart';
@@ -67,7 +70,7 @@ class _NovelViewerPageState extends State<NovelViewerPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      child: TextCompositionPage(
+      body: TextCompositionPage(
         controller: TextComposition(
             config: config,
             loadChapter: (e) => _novelStore.fetch(),
@@ -88,8 +91,8 @@ class _NovelViewerPageState extends State<NovelViewerPage> {
                   Spacer(),
                   _buildBottomRow(
                       context,
-                      Theme.of(context).colorScheme.background,
-                      Theme.of(context).colorScheme.foreground,
+                      Theme.of(context).colorScheme.surface,
+                      Theme.of(context).colorScheme.onSurface,
                       textComposition),
                 ],
               );
@@ -100,8 +103,8 @@ class _NovelViewerPageState extends State<NovelViewerPage> {
 
   _buildAppBar(BuildContext context) {
     return AppBar(
-      backgroundColor: Theme.of(context).colorScheme.background,
-      leading: [CommonBackArea()],
+      backgroundColor: Theme.of(context).colorScheme.surface,
+      leading: CommonBackArea(),
       title: Text(
         widget.novel.title.atMost8,
         style: const TextStyle(
@@ -109,37 +112,48 @@ class _NovelViewerPageState extends State<NovelViewerPage> {
           overflow: TextOverflow.ellipsis,
         ),
       ),
-      trailing: [
+      actions: [
         StarIcon(
           id: widget.novel.id.toString(),
           type: ArtworkType.NOVEL,
           liked: widget.novel.isBookmarked,
         ),
-        IconButton.ghost(
-            onPressed: () => buildShowModalBottomSheet(context),
+        IconButton(
+            onPressed: () => buildShowModalBottomSheet(context, widget.novel),
             icon: Icon(Icons.info_outline_rounded)),
-        IconButton.ghost(
+        IconButton(
           icon: Icon(Icons.settings),
-          onPressed: () => openSheet(
+          onPressed: () => showModalBottomSheet(
             context: context,
-            position: OverlayPosition.bottom,
             builder: (context) => SizedBox(
               height: context.height > 700 ? 700 : context.height,
               child: configSettingBuilder(context, config,
                   (Color color, void Function(Color color) onChange) {
-                showColorPickerDialog(
-                  title: Text("Pick A Color".tr),
-                  context: context,
-                  color: ColorDerivative.fromColor(color),
-                  onColorChanged: (value) {
-                    onChange(value.toColor());
-                  },
-                );
+                showMoonModal(
+                    context: context,
+                    builder: (context) => Dialog(
+                            child: Column(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                              MoonAlert(
+                                label: Text("Pick A Color".tr),
+                                content: SingleChildScrollView(
+                                  child: ColorPicker(
+                                    pickerColor: color,
+                                    onColorChanged: onChange,
+                                    labelTypes: [],
+                                    pickerAreaHeightPercent: 0.8,
+                                    portraitOnly: true,
+                                    hexInputBar: true,
+                                  ),
+                                ),
+                              ),
+                            ])));
               }, (e, ee) {}, (e, ee) {}),
             ),
           ),
         ),
-        IconButton.ghost(
+        IconButton(
           icon: Icon(Icons.more_vert),
           onPressed: () {
             _showMessage(context);
@@ -363,316 +377,22 @@ class _NovelViewerPageState extends State<NovelViewerPage> {
     );
   }
 
-  Future buildShowModalBottomSheet(BuildContext context) {
-    return openSheet(
-      context: context,
-      position: OverlayPosition.bottom,
-      builder: (_) {
-        return SizedBox(
-          height: Get.mediaQuery.size.height * 0.6,
-          child: Scaffold(
-            child: SingleChildScrollView(child: _buildFirstView(context)),
-          ),
-        );
-      },
-    );
-  }
-
-  Widget _buildFirstView(BuildContext context) {
-    return Padding(
-      padding: EdgeInsets.only(top: Get.mediaQuery.padding.top),
-      child: Column(
-        children: [
-          Container(
-            height: 20,
-          ),
-          Center(
-            child: PixivImage(
-              widget.novel.coverImageUrl,
-              width: 80,
-              height: 120,
-              fit: BoxFit.cover,
-            ).rounded(8.0),
-          ),
-          Padding(
-            padding: const EdgeInsets.only(
-                left: 16.0, right: 16.0, top: 12.0, bottom: 8.0),
-            child: Text(
-              widget.novel.title,
-            ).h4(),
-          ),
-          Padding(
-            padding: const EdgeInsets.only(
-                left: 8.0, right: 8.0, top: 8.0, bottom: 8),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Wrap(crossAxisAlignment: WrapCrossAlignment.center, children: [
-                  PainterAvatar(
-                    url: widget.novel.author.avatar,
-                    id: widget.novel.author.id,
-                    size: 16,
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.only(left: 6.0),
-                    child: Text(
-                      widget.novel.author.name.atMost8,
-                    ).xSmall(),
-                  ),
-                ]),
-                const SizedBox(width: 16),
-                UserFollowButton(
-                  id: widget.novel.author.id.toString(),
-                  liked: widget.novel.author.isFollowed,
-                ),
-              ],
-            ),
-          ),
-          if (widget.novel.seriesId != null)
-            Padding(
-              padding: const EdgeInsets.only(
-                  left: 16.0, right: 16.0, top: 0.0, bottom: 0.0),
-              child: InkWell(
-                onTap: () {
-                  Get.to(() => NovelSeriesPage(widget.novel.seriesId!));
-                },
-                child: Container(
-                  height: 26,
-                  padding: const EdgeInsets.symmetric(horizontal: 14),
-                  decoration: BoxDecoration(
-                    color: mtc.theme.value.colorScheme.secondary,
-                    borderRadius: const BorderRadius.all(Radius.circular(12)),
-                  ),
-                  child: Text(
-                    "Series:${widget.novel.seriesTitle}",
-                  ).textSmall().semiBold(),
-                ),
-              ),
-            ),
-          //MARK DETAIL NUM,
-          _buildNumItem(widget.novel, context),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16.0),
-            child: Text(
-              widget.novel.createDate.toShortTime(),
-              style: mtc.theme.value.typography.textSmall,
-            ),
-          ),
-          Padding(
-              padding:
-                  const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
-              child: Wrap(
-                crossAxisAlignment: WrapCrossAlignment.center,
-                spacing: 2,
-                runSpacing: 1,
-                children: [
-                  if (widget.novel.isAi)
-                    Text("AI-generated".tr,
-                        style: mtc.theme.value.typography.textSmall.copyWith(
-                            color: mtc.theme.value.colorScheme.secondary)),
-                  for (var f in widget.novel.tags) buildRow(context, f)
-                ],
-              )),
-          if (widget.novel.caption.trim().isNotEmpty)
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Card(
-                child: Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: SelectionArea(
-                    contextMenuBuilder: (context, editableTextState) {
-                      return _buildSelectionMenu(editableTextState, context);
-                    },
-                    child: SelectableHtml(data: widget.novel.caption),
-                  ),
-                ),
-              ),
-            ),
-          Button(
-            onPressed: () {
-              Get.to(
-                  () =>
-                      CommentPage(id: widget.novel.id, type: ArtworkType.NOVEL),
-                  preventDuplicates: false);
-            },
-            style: ButtonStyle.card(density: ButtonDensity.dense),
-            child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Icon(
-                    Icons.comment,
-                    size: 16,
-                    color: mtc.theme.value.colorScheme.primary,
-                  ),
-                  SizedBox(
-                    width: 4,
-                  ),
-                  Text(
-                    "Show comments".tr,
-                  ).xSmall(),
-                ]),
-          ).paddingSymmetric(vertical: 16),
-        ],
-      ),
-    );
-  }
-
-  Widget buildRow(BuildContext context, Tag f) {
-    return GestureDetector(
-      onLongPress: () async {
-        _longPressTag(context, f);
-      },
-      onTap: () {
-        Get.to(
-            () => NovelResultPage(
-                  word: f.name,
-                  translatedName: f.translatedName ?? "",
-                ),
-            preventDuplicates: false);
-      },
-      child: Container(
-        height: 22,
-        padding: const EdgeInsets.symmetric(horizontal: 14),
-        decoration: BoxDecoration(
-          color: mtc.theme.value.colorScheme.secondary,
-          borderRadius: const BorderRadius.all(Radius.circular(12.5)),
-        ),
-        child: RichText(
-            textAlign: TextAlign.center,
-            text: TextSpan(
-                text: "#${f.name}",
-                children: [
-                  TextSpan(
-                    text: " ",
-                    style: mtc.theme.value.typography.textSmall,
-                  ),
-                  TextSpan(
-                      text: f.translatedName ?? "~",
-                      style: mtc.theme.value.typography.textSmall)
-                ],
-                style: mtc.theme.value.typography.textSmall.copyWith(
-                    color: mtc.theme.value.colorScheme.secondaryForeground))),
-      ),
-    );
-  }
-
-  Future _longPressTag(BuildContext context, Tag f) async {
-    switch (await showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return AlertDialog(
-            title: RichText(
-              text: TextSpan(children: [
-                TextSpan(
-                    text: f.name,
-                    style: mtc.theme.value.typography.textLarge
-                        .copyWith(color: mtc.theme.value.colorScheme.primary)),
-                if (f.translatedName != null)
-                  TextSpan(
-                      text: "\n${"${f.translatedName}"}",
-                      style: mtc.theme.value.typography.textLarge)
-              ]),
-            ).withAlign(Alignment.centerLeft),
-            actions: <Widget>[
-              OutlineButton(
-                onPressed: () {
-                  Get.back(result: 0);
-                },
-                child: Text("Block".tr),
-              ),
-              PrimaryButton(
-                onPressed: () {
-                  Get.back(result: 1);
-                },
-                child: Text("Bookmark".tr),
-              ),
-              PrimaryButton(
-                onPressed: () {
-                  Get.back(result: 2);
-                },
-                child: Text("Copy".tr),
-              ),
-            ],
-          );
-        })) {
-      case 0:
-        {
-          localManager.add("blockedNovelTags", [f.name]);
-        }
-        break;
-      case 1:
-        {
-          localManager.add("bookmarkedNovelTags", [f.name]);
-        }
-        break;
-      case 2:
-        {
-          await Clipboard.setData(ClipboardData(text: f.name));
-          Leader.showToast("Copied to clipboard".tr);
-        }
-    }
-  }
-
-  AdaptiveTextSelectionToolbar _buildSelectionMenu(
-      SelectableRegionState editableTextState, BuildContext context) {
-    final List<ContextMenuButtonItem> buttonItems =
-        editableTextState.contextMenuButtonItems;
-    return AdaptiveTextSelectionToolbar.buttonItems(
-      anchors: editableTextState.contextMenuAnchors,
-      buttonItems: buttonItems,
-    );
-  }
-
-  Widget _buildNumItem(Novel novel, BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 4),
-      child: Wrap(
-        crossAxisAlignment: WrapCrossAlignment.center,
-        spacing: 2,
-        runSpacing: 0,
-        children: [
-          Icon(
-            Icons.bookmark,
-            size: 14,
-            color: mtc.theme.value.colorScheme.primary,
-          ),
-          Text("${novel.totalBookmarks}",
-              style: mtc.theme.value.typography.textSmall.copyWith(
-                  color: mtc.theme.value.colorScheme.mutedForeground)),
-          Padding(
-            padding: const EdgeInsets.only(left: 8.0),
-            child: Icon(
-              Icons.remove_red_eye_rounded,
-              size: 14,
-              color: mtc.theme.value.colorScheme.primary,
-            ),
-          ),
-          Text("${novel.totalViews}",
-              style: mtc.theme.value.typography.textSmall.copyWith(
-                  color: mtc.theme.value.colorScheme.mutedForeground)),
-        ],
-      ),
-    );
-  }
-
   Future _showMessage(BuildContext context) {
-    return openSheet(
+    return showMoonModalBottomSheet(
         context: context,
-        position: OverlayPosition.bottom,
         builder: (context) {
           return SafeArea(
             child: Column(
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
-              children: <Widget>[
-                Basic(
-                  subtitle: Text(
+              children: [
+                MoonMenuItem(
+                  content: Text(
                     widget.novel.author.name,
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
                   ),
-                  title: Text(
+                  label: Text(
                     widget.novel.title,
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
@@ -690,61 +410,71 @@ class _NovelViewerPageState extends State<NovelViewerPage> {
                     },
                   ),
                 ).paddingVertical(16),
-                Button(
-                    style: ButtonStyle.card(density: ButtonDensity.dense),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: [
-                        Text('Previous'.tr).textSmall(),
-                        buildListTile(
-                            _novelStore
-                                .novelWebResponse!.seriesNavigation?.prevNovel,
-                            context),
-                      ],
-                    )),
+                MoonMenuItem(
+                    label: Text('Previous'.tr).xSmall(),
+                    content: _novelStore.novelWebResponse?.seriesNavigation
+                                ?.prevNovel ==
+                            null
+                        ? null
+                        : Text(
+                                _novelStore.novelWebResponse?.seriesNavigation
+                                        ?.prevNovel?.title ??
+                                    "",
+                                maxLines: 2,
+                                overflow: TextOverflow.ellipsis)
+                            .xSmall(),
+                    onTap: _novelStore.novelWebResponse?.seriesNavigation
+                                ?.prevNovel ==
+                            null
+                        ? null
+                        : () => Get.to(NovelPageLite(_novelStore
+                                .novelWebResponse
+                                ?.seriesNavigation
+                                ?.prevNovel
+                                ?.id
+                                .toString() ??
+                            ""))),
                 Container(height: 8),
-                Button(
-                    style: ButtonStyle.card(density: ButtonDensity.dense),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: [
-                        Text('Next'.tr).textSmall(),
-                        buildListTile(
-                            _novelStore
-                                .novelWebResponse!.seriesNavigation?.nextNovel,
-                            context),
-                      ],
-                    )),
+                MoonMenuItem(
+                    label: Text('Next'.tr).xSmall(),
+                    content: _novelStore.novelWebResponse?.seriesNavigation
+                                ?.nextNovel ==
+                            null
+                        ? null
+                        : Text(
+                                _novelStore.novelWebResponse?.seriesNavigation
+                                        ?.nextNovel?.title ??
+                                    "",
+                                maxLines: 2,
+                                overflow: TextOverflow.ellipsis)
+                            .xSmall(),
+                    onTap: _novelStore.novelWebResponse?.seriesNavigation
+                                ?.nextNovel ==
+                            null
+                        ? null
+                        : () => Get.to(NovelPageLite(_novelStore
+                                .novelWebResponse
+                                ?.seriesNavigation
+                                ?.nextNovel
+                                ?.id
+                                .toString() ??
+                            ""))),
                 if (GetPlatform.isAndroid) Container(height: 8),
                 if (GetPlatform.isAndroid)
-                  Button(
-                    style: ButtonStyle.card(density: ButtonDensity.dense),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: [
-                        Basic(
-                          title: Text("Export".tr),
-                          leading: Icon(Icons.folder_zip).textSmall(),
-                        ).textSmall(),
-                      ],
-                    ),
-                    onPressed: () {
+                  MoonMenuItem(
+                    label: Text("Export".tr),
+                    leading: Icon(Icons.folder_zip),
+                    onTap: () {
                       _export(context);
                     },
                   ),
                 Container(height: 8),
-                Button(
-                  style: ButtonStyle.card(density: ButtonDensity.dense),
-                  child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: [
-                        Basic(
-                            title: Text("Share".tr).textSmall(),
-                            leading: Icon(
-                              Icons.share,
-                            )).textSmall(),
-                      ]),
-                  onPressed: () {
+                MoonMenuItem(
+                  label: Text("Share".tr).xSmall(),
+                  leading: Icon(
+                    Icons.share,
+                  ),
+                  onTap: () {
                     Get.back();
                     Share.share(
                         "https://www.pixiv.net/novel/show.php?id=${widget.novel.id}");
@@ -754,25 +484,6 @@ class _NovelViewerPageState extends State<NovelViewerPage> {
             ).paddingHorizontal(16),
           );
         });
-  }
-
-  Widget buildListTile(SimpleNovel? relNovel, BuildContext context) {
-    if (relNovel == null) {
-      return Basic(
-        title: Text("No more".tr).xSmall(),
-      );
-    }
-    return InkWell(
-        onTap: () {
-          Navigator.of(context).push(MaterialPageRoute(
-              builder: (BuildContext context) =>
-                  NovelPageLite(relNovel.id.toString())));
-        },
-        child: Basic(
-          title:
-              Text(relNovel.title, maxLines: 2, overflow: TextOverflow.ellipsis)
-                  .xSmall(),
-        ));
   }
 
   void _export(BuildContext context) async {
@@ -814,19 +525,18 @@ class _NovelPageLiteState extends State<NovelPageLite> {
     return Obx(
       () => localManager.blockedNovels.contains(widget.id)
           ? Scaffold(
-              child: Center(
+              body: Center(
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Text(
                       "Blocked".tr,
-                      style: Theme.of(context).typography.h2,
-                    ).paddingBottom(16),
-                    PrimaryButton(
+                    ).h2().paddingBottom(16),
+                    filledButton(
+                        label: "Unblock".tr,
                         onPressed: () {
                           localManager.delete("blockedNovels", [widget.id]);
-                        },
-                        child: Text("Unblock".tr)),
+                        }),
                   ],
                 ),
               ),
@@ -834,42 +544,322 @@ class _NovelPageLiteState extends State<NovelPageLite> {
           : controller.error == null
               ? controller.isLoading.value
                   ? Scaffold(
-                      headers: [
-                        AppBar(
-                          title: Text("Loading".tr),
-                        ),
-                        const Divider()
-                      ],
-                      child: Center(
+                      appBar: AppBar(
+                        title: Text("Loading".tr),
+                      ),
+                      body: Center(
                         child: CircularProgressIndicator(),
                       ),
                     )
                   : Scaffold(
-                      headers: [
-                        AppBar(
-                          title: Text(controller.novels.first.title),
-                        ),
-                        const Divider()
-                      ],
-                      child: NovelViewerPage(controller.novels.first),
+                      appBar: AppBar(
+                        title: Text(controller.novels.first.title),
+                      ),
+                      body: NovelViewerPage(controller.novels.first),
                     )
               : Scaffold(
-                  child: Center(
+                  body: Center(
                     child: Column(
                       children: [
-                        Text(
-                          "Error".tr,
-                          style: Theme.of(context).typography.h3,
-                        ).paddingBottom(16).paddingTop(context.height / 4),
-                        PrimaryButton(
+                        Text("Error".tr)
+                            .h2()
+                            .paddingBottom(16)
+                            .paddingTop(context.height / 4),
+                        filledButton(
                             onPressed: () {
                               controller.reset();
                             },
-                            child: Text("Retry".tr)),
+                            label: "Retry".tr),
                       ],
                     ),
                   ),
                 ),
     );
   }
+}
+
+Future buildShowModalBottomSheet(BuildContext context, Novel novel,
+    [bool showFloating = false]) {
+  return showMoonModalBottomSheet(
+    context: context,
+    builder: (_) {
+      return SizedBox(
+        height: Get.mediaQuery.size.height * 0.6,
+        child: Scaffold(
+          floatingActionButton: showFloating
+              ? MoonButton.icon(
+                  backgroundColor:
+                      Get.context?.moonTheme?.tokens.colors.piccolo,
+                  icon: Icon(Icons.menu_book_rounded),
+                  onTap: () =>
+                      Get.to(NovelViewerPage(novel), preventDuplicates: false),
+                )
+              : null,
+          body: SingleChildScrollView(
+              child: Padding(
+            padding: EdgeInsets.only(top: Get.mediaQuery.padding.top),
+            child: Column(
+              children: [
+                Container(
+                  height: 20,
+                ),
+                Center(
+                  child: PixivImage(
+                    novel.coverImageUrl,
+                    width: 80,
+                    height: 120,
+                    fit: BoxFit.cover,
+                  ).rounded(8.0),
+                ),
+                Padding(
+                  padding: const EdgeInsets.only(
+                      left: 16.0, right: 16.0, top: 12.0, bottom: 8.0),
+                  child: Text(
+                    novel.title,
+                  ).header(),
+                ),
+                Padding(
+                  padding: const EdgeInsets.only(
+                      left: 8.0, right: 8.0, top: 8.0, bottom: 8),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Wrap(
+                          crossAxisAlignment: WrapCrossAlignment.center,
+                          children: [
+                            PainterAvatar(
+                              url: novel.author.avatar,
+                              id: novel.author.id,
+                              size: 16,
+                            ),
+                            Padding(
+                              padding: const EdgeInsets.only(left: 6.0),
+                              child: Text(
+                                novel.author.name.atMost8,
+                              ).xSmall(),
+                            ),
+                          ]),
+                      const SizedBox(width: 16),
+                      UserFollowButton(
+                        id: novel.author.id.toString(),
+                        liked: novel.author.isFollowed,
+                      ),
+                    ],
+                  ),
+                ),
+                if (novel.seriesId != null)
+                  Padding(
+                    padding: const EdgeInsets.only(
+                        left: 16.0, right: 16.0, top: 0.0, bottom: 0.0),
+                    child: InkWell(
+                      onTap: () {
+                        Get.to(() => NovelSeriesPage(novel.seriesId!));
+                      },
+                      child: Container(
+                        height: 26,
+                        padding: const EdgeInsets.symmetric(horizontal: 14),
+                        decoration: BoxDecoration(
+                          color: context.moonTheme?.tokens.colors.hit,
+                          borderRadius:
+                              const BorderRadius.all(Radius.circular(12)),
+                        ),
+                        child: Text(
+                          "Series:${novel.seriesTitle}",
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ).small(),
+                      ),
+                    ),
+                  ),
+                //MARK DETAIL NUM,
+                _buildNumItem(novel, context),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                  child: Text(
+                    novel.createDate.toShortTime(),
+                    // style: mtc.theme.value.typography.textSmall,
+                  ),
+                ),
+                Padding(
+                    padding: const EdgeInsets.symmetric(
+                        vertical: 8.0, horizontal: 16.0),
+                    child: Wrap(
+                      crossAxisAlignment: WrapCrossAlignment.center,
+                      spacing: 2,
+                      runSpacing: 1,
+                      children: [
+                        if (novel.isAi)
+                          Text(
+                            "AI-generated".tr,
+                            // style: mtc.theme.value.typography.textSmall.copyWith(
+                            //      color: mtc.theme.value.colorScheme.secondary)
+                          ),
+                        for (var f in novel.tags) buildRow(context, f)
+                      ],
+                    )),
+                if (novel.caption.trim().isNotEmpty)
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Card(
+                      child: Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: SelectionArea(
+                          contextMenuBuilder: (context, editableTextState) {
+                            return _buildSelectionMenu(
+                                editableTextState, context);
+                          },
+                          child: SelectableHtml(data: novel.caption),
+                        ),
+                      ),
+                    ),
+                  ),
+                MoonButton(
+                  onTap: () {
+                    Get.to(
+                        () =>
+                            CommentPage(id: novel.id, type: ArtworkType.NOVEL),
+                        preventDuplicates: false);
+                  },
+                  trailing: Icon(
+                    Icons.comment,
+                    size: 16,
+                    color: context.moonTheme?.tokens.colors.piccolo,
+                  ),
+                  label: Text(
+                    "Show comments".tr,
+                  ).xSmall(),
+                ).paddingSymmetric(vertical: 16),
+              ],
+            ),
+          )),
+        ),
+      );
+    },
+  );
+}
+
+Widget buildRow(BuildContext context, Tag f) {
+  return GestureDetector(
+    onLongPress: () async {
+      _longPressTag(context, f);
+    },
+    onTap: () {
+      Get.to(
+          () => NovelResultPage(
+                word: f.name,
+                translatedName: f.translatedName ?? "",
+              ),
+          preventDuplicates: false);
+    },
+    child: Container(
+      height: 22,
+      padding: const EdgeInsets.symmetric(horizontal: 14),
+      decoration: BoxDecoration(
+        color: context.moonTheme?.tokens.colors.hit,
+        borderRadius: const BorderRadius.all(Radius.circular(12.5)),
+      ),
+      child: RichText(
+          textAlign: TextAlign.center,
+          text: TextSpan(
+            text: "#${f.name}",
+            children: [
+              TextSpan(
+                text: " ",
+                //style: mtc.theme.value.typography.textSmall,
+              ),
+              TextSpan(
+                text: f.translatedName ?? "~",
+                //style: mtc.theme.value.typography.textSmall
+              )
+            ],
+            // style: mtc.theme.value.typography.textSmall.copyWith(
+            //     color: mtc.theme.value.colorScheme.secondaryForeground)
+          )),
+    ),
+  );
+}
+
+Future _longPressTag(BuildContext context, Tag f) async {
+  switch (await alertDialog(context, f.name, f.translatedName ?? "", [
+    outlinedButton(
+      onPressed: () {
+        Get.back(result: 0);
+      },
+      label: "Block".tr,
+    ),
+    filledButton(
+      onPressed: () {
+        Get.back(result: 1);
+      },
+      label: "Bookmark".tr,
+    ),
+    filledButton(
+      onPressed: () {
+        Get.back(result: 2);
+      },
+      label: "Copy".tr,
+    ),
+  ])) {
+    case 0:
+      {
+        localManager.add("blockedNovelTags", [f.name]);
+      }
+      break;
+    case 1:
+      {
+        localManager.add("bookmarkedNovelTags", [f.name]);
+      }
+      break;
+    case 2:
+      {
+        await Clipboard.setData(ClipboardData(text: f.name));
+        Leader.showToast("Copied to clipboard".tr);
+      }
+  }
+}
+
+AdaptiveTextSelectionToolbar _buildSelectionMenu(
+    SelectableRegionState editableTextState, BuildContext context) {
+  final List<ContextMenuButtonItem> buttonItems =
+      editableTextState.contextMenuButtonItems;
+  return AdaptiveTextSelectionToolbar.buttonItems(
+    anchors: editableTextState.contextMenuAnchors,
+    buttonItems: buttonItems,
+  );
+}
+
+Widget _buildNumItem(Novel novel, BuildContext context) {
+  return Padding(
+    padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 4),
+    child: Wrap(
+      crossAxisAlignment: WrapCrossAlignment.center,
+      spacing: 2,
+      runSpacing: 0,
+      children: [
+        Icon(
+          Icons.bookmark,
+          size: 14,
+          color: context.moonTheme?.tokens.colors.piccolo,
+        ),
+        Text(
+          "${novel.totalBookmarks}",
+          //     style: mtc.theme.value.typography.textSmall.copyWith(
+          //         color: mtc.theme.value.colorScheme.mutedForeground)
+        ),
+        Padding(
+          padding: const EdgeInsets.only(left: 8.0),
+          child: Icon(
+            Icons.remove_red_eye_rounded,
+            size: 14,
+            color: context.moonTheme?.tokens.colors.piccolo,
+          ),
+        ),
+        Text(
+          "${novel.totalViews}",
+          // style: mtc.theme.value.typography.textSmall.copyWith(
+          //     color: mtc.theme.value.colorScheme.mutedForeground)
+        ),
+      ],
+    ),
+  );
 }

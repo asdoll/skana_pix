@@ -1,9 +1,10 @@
-import 'package:flutter/material.dart' show InkWell;
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:shadcn_flutter/shadcn_flutter.dart';
-import 'package:skana_pix/pixiv_dart_api.dart';
+import 'package:skana_pix/model/author.dart';
+import 'package:skana_pix/model/illust.dart';
+import 'package:skana_pix/model/novel.dart';
 import 'package:skana_pix/utils/widgetplugin.dart';
-import '../model/worktypes.dart';
+import 'package:skana_pix/model/worktypes.dart';
 import 'avatar.dart';
 import 'followbutton.dart';
 import 'pixivimage.dart';
@@ -47,18 +48,15 @@ class _PainterCardState extends State<PainterCard> {
 
   @override
   Widget build(BuildContext context) {
-    return InkWell(
+    return moonListTileWidgets(
       onTap: () async {
         Get.to(() => UserPage(
               id: user.id,
               type: type,
             ));
       },
-      child: Card(
-        clipBehavior: Clip.antiAlias,
-        child: Column(
-          children: [_buildPreviewSlivers(context), buildPadding(context)],
-        ),
+      label: Column(
+        children: [_buildPreviewSlivers(context), buildPadding(context)],
       ),
     );
   }
@@ -106,7 +104,7 @@ class _PainterCardState extends State<PainterCard> {
                   novel.title,
                   maxLines: 3,
                   overflow: TextOverflow.ellipsis,
-                ).textSmall(),
+                ).small(),
               ),
             )
           ],
@@ -148,7 +146,8 @@ class _PainterCardState extends State<PainterCard> {
           Expanded(
             child: Padding(
               padding: const EdgeInsets.all(16.0),
-              child: Text(user.name, maxLines: 1, overflow: TextOverflow.ellipsis).semiBold(),
+              child:
+                  Text(user.name, maxLines: 1, overflow: TextOverflow.ellipsis),
             ),
           ),
           UserFollowButton(

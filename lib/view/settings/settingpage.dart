@@ -1,8 +1,5 @@
-import 'dart:io';
-
 import 'package:get/get.dart';
-import 'package:path_provider/path_provider.dart';
-import 'package:shadcn_flutter/shadcn_flutter.dart';
+import 'package:flutter/material.dart';
 import 'package:skana_pix/controller/account_controller.dart';
 import 'package:skana_pix/controller/update_controller.dart';
 import 'package:skana_pix/utils/widgetplugin.dart';
@@ -10,7 +7,6 @@ import 'package:skana_pix/view/settings/blocklistpage.dart';
 import 'package:skana_pix/view/settings/netsettings.dart';
 import 'package:skana_pix/view/settings/newversion.dart';
 import 'package:skana_pix/view/settings/prefsettings.dart';
-import 'package:skana_pix/pixiv_dart_api.dart';
 import 'package:skana_pix/view/homepage.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 
@@ -29,153 +25,103 @@ class SettingPage extends StatefulWidget {
 class _SettingPageState extends State<SettingPage> {
   @override
   Widget build(BuildContext context) {
-    boardController.fetchBoard();
     return Obx(() => CustomScrollView(
           slivers: <Widget>[
             if (accountController.isLoggedIn.value)
               SliverToBoxAdapter(
-                  child: Card(
-                      child: Basic(
+                  child: moonListTile(
                 leading: PainterAvatar(
-                    url: ConnectManager().apiClient.account.user.profileImg,
+                    url: accountController.user.profileImg,
                     id: int.parse(
-                      ConnectManager().apiClient.userid,
+                      accountController.userid.value,
                     ),
                     isMe: true,
                     size: 48),
-                title: Text(
-                  ConnectManager().apiClient.account.user.name,
-                ),
-                content: Text(
-                  ConnectManager().apiClient.account.user.email,
-                ),
-              ))),
+                title: accountController.user.name,
+                subtitle: accountController.user.email,
+              )),
             SliverToBoxAdapter(
-                child: Button(
-                    alignment: Alignment.centerLeft,
-                    onPressed: () => Get.to(BlockListPage()),
-                    style: ButtonStyle.card(),
-                    child: Basic(
-                      leading: Icon(Icons.block),
-                      title: Text("Block List".tr),
-                    ))),
+                child: moonListTile(
+                    onTap: () => Get.to(BlockListPage()),
+                    leading: Icon(Icons.block),
+                    title: "Block List".tr)),
             if (accountController.isLoggedIn.value)
               SliverToBoxAdapter(
-                child: Button(
-                  alignment: Alignment.centerLeft,
-                  onPressed: () =>
-                      launchUrlString("https://www.pixiv.net/setting_user.php"),
-                  style: ButtonStyle.card(),
-                  child: Basic(
+                child: moonListTile(
+                    onTap: () => launchUrlString(
+                        "https://www.pixiv.net/setting_user.php"),
                     leading: Icon(Icons.account_box),
-                    title: Text("Account Settings".tr),
-                  ),
-                ),
+                    title: "Account Settings".tr),
               ),
             SliverToBoxAdapter(
-              child: Button(
-                  alignment: Alignment.centerLeft,
-                  onPressed: () => Get.to(PreferenceSettings()),
-                  style: ButtonStyle.card(),
-                  child: Basic(
-                    leading: Icon(Icons.settings),
-                    title: Text("Preference Settings".tr),
-                  )),
+              child: moonListTile(
+                  onTap: () => Get.to(PreferenceSettings()),
+                  leading: Icon(Icons.settings),
+                  title: "Preference Settings".tr),
             ),
             SliverToBoxAdapter(
-              child: Button(
-                  alignment: Alignment.centerLeft,
-                  onPressed: () => Get.to(NetworkSettings()),
-                  style: ButtonStyle.card(),
-                  child: Basic(
-                    leading: Icon(Icons.settings),
-                    title: Text("Network Settings".tr),
-                  )),
+              child: moonListTile(
+                  onTap: () => Get.to(NetworkSettings()),
+                  leading: Icon(Icons.settings),
+                  title: "Network Settings".tr),
             ),
             SliverToBoxAdapter(
-              child: Button(
-                  alignment: Alignment.centerLeft,
-                  onPressed: () => Get.to(DataExport()),
-                  style: ButtonStyle.card(),
-                  child: Basic(
-                    leading: Icon(Icons.folder_open_rounded),
-                    title: Text("App Data".tr),
-                  )),
+              child: moonListTile(
+                  onTap: () => Get.to(DataExport()),
+                  leading: Icon(Icons.folder_open_rounded),
+                  title: "App Data".tr),
             ),
             SliverToBoxAdapter(
-              child: Button(
-                  alignment: Alignment.centerLeft,
-                  onPressed: () => Get.to(AboutPage()),
-                  style: ButtonStyle.card(),
-                  child: Basic(
-                    leading: Icon(Icons.message),
-                    title: Text("About".tr),
-                  )),
+              child: moonListTile(
+                  onTap: () => Get.to(AboutPage()),
+                  leading: Icon(Icons.message),
+                  title: "About".tr),
             ),
             if (boardController.needBoardSection.value)
               SliverToBoxAdapter(
-                  child: Button(
-                alignment: Alignment.centerLeft,
-                onPressed: () => Get.to(BoardPage()),
-                style: ButtonStyle.card(),
-                child: Basic(
-                  leading: Icon(Icons.article),
-                  title: Text("Bulletin Board".tr),
-                ),
+                  child: moonListTile(
+                onTap: () => Get.to(BoardPage()),
+                leading: Icon(Icons.article),
+                title: "Bulletin Board".tr,
               )),
             SliverToBoxAdapter(
-              child: Button(
-                alignment: Alignment.centerLeft,
-                onPressed: () => Get.to(NewVersionPage()),
-                style: ButtonStyle.card(),
-                child: Basic(
-                  leading: Icon(Icons.update),
-                  title: Text("Check updates".tr),
-                  trailing: Visibility(
-                    visible: updateController.hasNewVersion.value,
-                    child: NewVersionChip(),
-                  ),
+              child: moonListTile(
+                onTap: () => Get.to(NewVersionPage()),
+                leading: Icon(Icons.update),
+                title: "Check updates".tr,
+                trailing: Visibility(
+                  visible: updateController.hasNewVersion.value,
+                  child: NewVersionChip(),
                 ),
               ),
             ),
             if (accountController.isLoggedIn.value)
               SliverToBoxAdapter(
-                  child: Button(
-                alignment: Alignment.centerLeft,
-                onPressed: () => _showLogoutDialog(context),
-                style: ButtonStyle.card(),
-                child: Basic(
-                  leading: Icon(Icons.logout),
-                  title: Text("Logout".tr),
-                ),
+                  child: moonListTile(
+                onTap: () => _showLogoutDialog(context),
+                leading: Icon(Icons.logout),
+                title: "Logout".tr,
               ))
           ],
         ));
   }
 
   Future _showLogoutDialog(BuildContext context) async {
-    final result = await showDialog(
-        context: context,
-        builder: (context) {
-          return AlertDialog(
-            title: Text("Logout".tr).toAlign(Alignment.centerLeft),
-            content: Text("Are you sure you want to logout?".tr),
-            actions: <Widget>[
-              OutlineButton(
-                child: Text("Cancel".tr),
-                onPressed: () {
-                  Get.back(result: "CANCEL");
-                },
-              ),
-              PrimaryButton(
-                child: Text("Ok".tr),
-                onPressed: () {
-                  Get.back(result: "OK");
-                },
-              ),
-            ],
-          );
-        });
+    final result = await alertDialog<String>(
+        context, "Logout".tr, "Are you sure you want to logout?".tr, [
+      outlinedButton(
+        label: "Cancel".tr,
+        onPressed: () {
+          Get.back(result: "CANCEL");
+        },
+      ),
+      filledButton(
+        label: "Ok".tr,
+        onPressed: () {
+          Get.back(result: "OK");
+        },
+      ),
+    ]);
     switch (result) {
       case "OK":
         {
@@ -190,36 +136,36 @@ class _SettingPageState extends State<SettingPage> {
   }
 
   // ignore: unused_element
-  Future _showClearCacheDialog(BuildContext context) async {
-    final result = await showDialog(
-        builder: (BuildContext context) {
-          return AlertDialog(
-            title: Text("Clear All Cache".tr),
-            actions: <Widget>[
-              TextButton(
-                child: Text("Cancel".tr),
-                onPressed: () {
-                  Get.back(result: "CANCEL");
-                },
-              ),
-              TextButton(
-                child: Text("Ok".tr),
-                onPressed: () {
-                  Get.back(result: "OK");
-                },
-              ),
-            ],
-          );
-        },
-        context: context);
-    if (result == "OK") {
-      try {
-        Directory tempDir = await getTemporaryDirectory();
-        tempDir.deleteSync(recursive: true);
-        //cleanGlanceData();
-      } catch (e) {}
-    }
-  }
+//   Future _showClearCacheDialog(BuildContext context) async {
+//     final result = await showDialog(
+//         builder: (BuildContext context) {
+//           return AlertDialog(
+//             title: Text("Clear All Cache".tr),
+//             actions: <Widget>[
+//               TextButton(
+//                 child: Text("Cancel".tr),
+//                 onPressed: () {
+//                   Get.back(result: "CANCEL");
+//                 },
+//               ),
+//               TextButton(
+//                 child: Text("Ok".tr),
+//                 onPressed: () {
+//                   Get.back(result: "OK");
+//                 },
+//               ),
+//             ],
+//           );
+//         },
+//         context: context);
+//     if (result == "OK") {
+//       try {
+//         Directory tempDir = await getTemporaryDirectory();
+//         tempDir.deleteSync(recursive: true);
+//         //cleanGlanceData();
+//       } catch (e) {}
+//     }
+//   }
 }
 
 class NewVersionChip extends StatelessWidget {

@@ -1,8 +1,8 @@
 import 'dart:math';
 
 import 'package:easy_refresh/easy_refresh.dart';
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:shadcn_flutter/shadcn_flutter.dart';
 import 'package:skana_pix/componentwidgets/headerfooter.dart';
 import 'package:skana_pix/componentwidgets/imagecard.dart';
 import 'package:skana_pix/controller/list_controller.dart';
@@ -47,12 +47,12 @@ class _ImageWaterfallState extends State<ImageWaterfall> {
             return Center(
               child: Column(
                 children: [
-                  Text("Error".tr).h3().paddingTop(context.height / 4),
-                  Button.primary(
+                  Text("Error".tr).h2().paddingTop(context.height / 4),
+                  filledButton(
                     onPressed: () {
                       refreshController.callRefresh();
                     },
-                    child: Text("Retry".tr),
+                    label:"Retry".tr
                   )
                 ],
               ),
@@ -64,13 +64,13 @@ class _ImageWaterfallState extends State<ImageWaterfall> {
               return Center(
                 child: Padding(
                   padding: const EdgeInsets.all(8.0),
-                  child: Text('[ ]', style: Theme.of(context).typography.h1),
+                  child: Text('[ ]').h1(),
                 ),
               );
             }
           }
           return WaterfallFlow.builder(
-            padding: const EdgeInsets.only(top: 8),
+            padding: const EdgeInsets.only(top: 8, left: 8, right: 8),
             controller: widget.noScroll
                 ? localScrollController
                 : globalScrollController,

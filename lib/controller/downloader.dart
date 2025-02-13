@@ -2,8 +2,7 @@
 // import 'dart:io';
 
 // import 'package:dio/dio.dart';
-// import 'package:skana_pix/pixiv_dart_api.dart';
-
+// 
 // import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 
 // import 'download_task.dart';

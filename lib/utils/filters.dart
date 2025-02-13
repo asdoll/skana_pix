@@ -1,5 +1,7 @@
 import 'package:skana_pix/controller/like_controller.dart';
-import 'package:skana_pix/pixiv_dart_api.dart';
+import 'package:skana_pix/controller/settings.dart';
+import 'package:skana_pix/model/illust.dart';
+import 'package:skana_pix/model/novel.dart';
 
 List<Illust> checkIllusts(List<Illust> illusts) {
   illusts.removeWhere((illust) {

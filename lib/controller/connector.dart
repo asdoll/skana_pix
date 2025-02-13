@@ -1,9 +1,14 @@
 import 'dart:io';
 
+import 'package:skana_pix/controller/PDio.dart';
 import 'package:skana_pix/controller/account_controller.dart';
-import 'package:skana_pix/pixiv_dart_api.dart';
 
 import 'package:path_provider/path_provider.dart';
+import 'package:skana_pix/controller/api_client.dart';
+import 'package:skana_pix/controller/bases.dart';
+import 'package:skana_pix/controller/logging.dart';
+import 'package:skana_pix/model/user.dart';
+import 'package:skana_pix/utils/io_extension.dart';
 
 typedef UpdateFollowCallback = void Function(bool isFollowed);
 
@@ -64,69 +69,3 @@ class ConnectManager {
     });
   }
 }
-
-User get user => ConnectManager().apiClient.account.user;
-
-Function get sendHistory => ConnectManager().apiClient.sendHistory;
-Function get getIllustsWithNextUrl =>
-    ConnectManager().apiClient.getIllustsWithNextUrl;
-Function get getIllustByID => ConnectManager().apiClient.getIllustByID;
-Function get getRecommendedIllusts =>
-    ConnectManager().apiClient.getRecommendedIllusts;
-Function get getBookmarkedIllusts =>
-    ConnectManager().apiClient.getBookmarkedIllusts;
-Function get getRecommendedMangas =>
-    ConnectManager().apiClient.getRecommendedMangas;
-Function get getBookmarkedNovels =>
-    ConnectManager().apiClient.getBookmarkedNovels;
-Function get getRecommendedNovels =>
-    ConnectManager().apiClient.getRecommendNovels;
-Function get generateWebviewUrl =>
-    ConnectManager().apiClient.generateWebviewUrl;
-Function get loginWithCode => ConnectManager().apiClient.loginWithCode;
-Function get refreshToken => ConnectManager().apiClient.refreshToken;
-Function get getUserDetails => ConnectManager().apiClient.getUserDetails;
-Function get followUser => ConnectManager().apiClient.follow;
-Function get searchUsers => ConnectManager().apiClient.searchUsers;
-Function get getFollowing => ConnectManager().apiClient.getFollowing;
-Function get getMypixiv => ConnectManager().apiClient.getMypixiv;
-Function get getRecommendationUsers =>
-    ConnectManager().apiClient.getRecommendationUsers;
-Function get getHistory => ConnectManager().apiClient.getHistory;
-Function get getMuteList => ConnectManager().apiClient.getMuteList;
-Function get editMute => ConnectManager().apiClient.editMute;
-Function get relatedUsers => ConnectManager().apiClient.relatedUsers;
-Function get batchIllustRequest =>
-    ConnectManager().apiClient.batchIllustRequest;
-Function get getUserBookmarks => ConnectManager().apiClient.getUserBookmarks;
-Function get addBookmark => ConnectManager().apiClient.addBookmark;
-Function get getHotTags => ConnectManager().apiClient.getHotTags;
-Function get getHotNovelTags => ConnectManager().apiClient.getHotNovelTags;
-Function get searchIt => ConnectManager().apiClient.search;
-Function get getUserIllusts => ConnectManager().apiClient.getUserIllusts;
-Function get getFollowingArtworks =>
-    ConnectManager().apiClient.getFollowingArtworks;
-Function get getRanking => ConnectManager().apiClient.getRanking;
-Function get getComments => ConnectManager().apiClient.getComments;
-Function get commentIt => ConnectManager().apiClient.comment;
-Function get relatedIllusts => ConnectManager().apiClient.relatedIllusts;
-Function get getNovelImage => ConnectManager().apiClient.getNovelImage;
-Function get getNovelsWithNextUrl =>
-    ConnectManager().apiClient.getNovelsWithNextUrl;
-Function get searchNovels => ConnectManager().apiClient.searchNovels;
-Function get getNovelRanking => ConnectManager().apiClient.getNovelRanking;
-Function get favoriteNovel => ConnectManager().apiClient.favoriteNovel;
-Function get deleteFavoriteNovel =>
-    ConnectManager().apiClient.deleteFavoriteNovel;
-Function get getNovelComments => ConnectManager().apiClient.getNovelComments;
-Function get getNovelContent => ConnectManager().apiClient.getNovelContent;
-Function get relatedNovels => ConnectManager().apiClient.relatedNovels;
-Function get getNovelSeries => ConnectManager().apiClient.getNovelSeries;
-Function get getNovelFollowing => ConnectManager().apiClient.getNovelFollowing;
-Function get getUserNovels => ConnectManager().apiClient.getUserNovels;
-Function get commentNovel => ConnectManager().apiClient.commentNovel;
-Function get getNovelById => ConnectManager().apiClient.getNovelById;
-Function get getSpotlightArticles =>
-    ConnectManager().apiClient.getSpotlightArticles;
-Function get getNextSpotlightArticles =>
-    ConnectManager().apiClient.getNextSpotlightArticles;

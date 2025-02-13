@@ -1,5 +1,4 @@
-import 'package:flutter/material.dart' show InkWell;
-import 'package:shadcn_flutter/shadcn_flutter.dart';
+import 'package:flutter/material.dart';
 import 'package:skana_pix/model/worktypes.dart';
 import 'package:get/get.dart';
 
@@ -32,12 +31,10 @@ class _SearchBar1State extends State<SearchBar1> {
     return SizedBox(
       height: 48,
       child: Card(
-        padding: EdgeInsets.symmetric(horizontal: 16),
-        fillColor: Colors.gray.shade400,
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            IconButton.ghost(
+            IconButton(
               icon: Icon(Icons.search),
               onPressed: () {},
             ),
@@ -53,9 +50,7 @@ class _SearchBar1State extends State<SearchBar1> {
                       : widget.type == ArtworkType.NOVEL
                           ? 'Search Novel'.tr
                           : 'Search User'.tr,
-                  style: TextStyle(
-                      fontSize: 16,
-                      color: Theme.of(context).typography.xSmall.color),
+                  style: TextStyle(fontSize: 16),
                 ),
               ),
             ),

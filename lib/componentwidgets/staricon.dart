@@ -1,7 +1,8 @@
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:shadcn_flutter/shadcn_flutter.dart';
 import 'package:skana_pix/controller/like_controller.dart';
 import 'package:skana_pix/model/worktypes.dart';
+import 'package:like_button/like_button.dart';
 
 class StarIcon extends StatefulWidget {
   final String id;
@@ -22,41 +23,28 @@ class StarIcon extends StatefulWidget {
 }
 
 class _StarIconState extends State<StarIcon> {
-
   int get liked => widget.liked ? 2 : 0;
 
   @override
   Widget build(BuildContext context) {
     return Container(
-        width: widget.size,
+        width: widget.size + 4,
         height: widget.size,
         color: Colors.transparent,
-        child: IconButton.ghost(
-          density: ButtonDensity.compact,
-          size: ButtonSize(widget.size / 36),
-          onPressed: () {
-            likeController.toggle(widget.id, widget.type, liked);
-          },
-          icon: Obx(() {
-            switch (widget.type == ArtworkType.ILLUST ||
-                    widget.type == ArtworkType.MANGA
-                ? likeController.illusts[widget.id] ?? liked
-                : likeController.novels[widget.id] ?? liked) {
-              case 0:
-                return Icon(
-                  Icons.favorite_border,
-                  color: Theme.of(context).colorScheme.secondaryForeground,
-                );
-              case 1:
-                return Icon(Icons.favorite,
-                    color: Theme.of(context).colorScheme.secondaryForeground);
-              default:
-                return Icon(
-                  Icons.favorite,
-                  color: Colors.red,
-                );
-            }
-          }),
-        ));
+        child: Obx(() => LikeButton(
+              size: widget.size,
+              onTap: (bool v) async {
+                await likeController.toggle(widget.id, widget.type, v ? 2 : 0);
+                return (widget.type == ArtworkType.ILLUST ||
+                            widget.type == ArtworkType.MANGA
+                        ? likeController.illusts[widget.id] ?? liked
+                        : likeController.novels[widget.id] ?? liked) ==
+                    2;
+              },
+              isLiked: (widget.type == ArtworkType.ILLUST ||
+                          widget.type == ArtworkType.MANGA
+                      ? likeController.illusts[widget.id] ?? liked
+                      : likeController.novels[widget.id] ?? liked) == 2,
+            )));
   }
 }

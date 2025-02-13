@@ -1,8 +1,10 @@
 import 'package:easy_refresh/easy_refresh.dart';
 import 'package:get/get.dart';
+import 'package:skana_pix/controller/connector.dart';
 import 'package:skana_pix/controller/like_controller.dart';
+import 'package:skana_pix/controller/res.dart';
+import 'package:skana_pix/model/comment.dart';
 import 'package:skana_pix/model/worktypes.dart';
-import 'package:skana_pix/pixiv_dart_api.dart';
 import 'package:skana_pix/utils/leaders.dart';
 
 class CommentController extends GetxController {

@@ -1,6 +1,8 @@
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
-import 'package:shadcn_flutter/shadcn_flutter.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:moon_design/moon_design.dart';
+import 'package:flutter/material.dart';
 import 'package:skana_pix/controller/logging.dart';
 import 'package:skana_pix/controller/settings.dart';
 
@@ -14,7 +16,7 @@ class ThemeManager {
   }
 
   ThemeData getUpdatedTheme() {
-    return getTheme(settings.themeName, settings.isDarkMode);
+    return getTheme(settings.isDarkMode);
   }
 
   ThemeManager._init() {
@@ -29,12 +31,10 @@ class ThemeManager {
 
   bool get isDarkMode => settings.isDarkMode;
 
-  ValueNotifier<ThemeData> theme =
-      ValueNotifier<ThemeData>(getTheme('zinc', false));
+  ValueNotifier<ThemeData> theme = ValueNotifier<ThemeData>(getTheme(false));
 
   void updateValue(ThemeData themes) {
     theme.value = themes;
-    mtc.callback(themes);
     SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
       systemNavigationBarColor: Colors.transparent,
       statusBarBrightness:
@@ -46,127 +46,54 @@ class ThemeManager {
   }
 }
 
-ThemeData getTheme(String themeName, bool isDark) {
-  switch (themeName) {
-    case 'blue':
-      return ThemeData(
-          colorScheme:
-              ColorSchemes.blue(isDark ? ThemeMode.dark : ThemeMode.light),
-          radius: 0.5);
-    case 'green':
-      return ThemeData(
-          colorScheme:
-              ColorSchemes.green(isDark ? ThemeMode.dark : ThemeMode.light),
-          radius: 0.5);
-    case 'red':
-      return ThemeData(
-          colorScheme:
-              ColorSchemes.red(isDark ? ThemeMode.dark : ThemeMode.light),
-          radius: 0.5);
-    case 'yellow':
-      return ThemeData(
-          colorScheme:
-              ColorSchemes.yellow(isDark ? ThemeMode.dark : ThemeMode.light),
-          radius: 0.5);
-    case 'zinc':
-      return ThemeData(
-          colorScheme:
-              ColorSchemes.zinc(isDark ? ThemeMode.dark : ThemeMode.light),
-          radius: 0.5);
-    case 'neutral':
-      return ThemeData(
-          colorScheme:
-              ColorSchemes.neutral(isDark ? ThemeMode.dark : ThemeMode.light),
-          radius: 0.5);
-    case 'stone':
-      return ThemeData(
-          colorScheme:
-              ColorSchemes.stone(isDark ? ThemeMode.dark : ThemeMode.light),
-          radius: 0.5);
-    case 'rose':
-      return ThemeData(
-          colorScheme:
-              ColorSchemes.rose(isDark ? ThemeMode.dark : ThemeMode.light),
-          radius: 0.5);
-    case 'violet':
-      return ThemeData(
-          colorScheme:
-              ColorSchemes.violet(isDark ? ThemeMode.dark : ThemeMode.light),
-          radius: 0.5);
-    case 'slate':
-      return ThemeData(
-          colorScheme:
-              ColorSchemes.slate(isDark ? ThemeMode.dark : ThemeMode.light),
-          radius: 0.5);
-    case 'orange':
-      return ThemeData(
-          colorScheme:
-              ColorSchemes.orange(isDark ? ThemeMode.dark : ThemeMode.light),
-          radius: 0.5);
-    case 'gray':
-      return ThemeData(
-          colorScheme:
-              ColorSchemes.gray(isDark ? ThemeMode.dark : ThemeMode.light),
-          radius: 0.5);
-    default:
-      return ThemeData(
-          colorScheme:
-              ColorSchemes.zinc(isDark ? ThemeMode.dark : ThemeMode.light),
-          radius: 0.5);
-  }
+ThemeData getTheme(bool isDark) {
+  return (isDark
+          ? ThemeData.dark().copyWith(
+              textTheme: GoogleFonts.notoSansTextTheme(
+                Get.theme.textTheme,
+              ),
+              appBarTheme: AppBarTheme(
+                titleSpacing: 0,
+                backgroundColor:
+                    MoonTheme(tokens: MoonTokens.dark).tokens.colors.popo,
+              ),
+              scaffoldBackgroundColor:
+                  MoonTheme(tokens: MoonTokens.light).tokens.colors.bulma)
+          : ThemeData.light().copyWith(
+              textTheme: GoogleFonts.notoSansTextTheme(
+                Get.theme.textTheme,
+              ),
+              appBarTheme: AppBarTheme(
+                titleSpacing: 0,
+                backgroundColor:
+                    MoonTheme(tokens: MoonTokens.dark).tokens.colors.goten,
+              ),
+              scaffoldBackgroundColor:
+                  MoonTheme(tokens: MoonTokens.light).tokens.colors.goten))
+      .copyWith(extensions: <ThemeExtension<dynamic>>[
+    MoonTheme(tokens: isDark ? MoonTokens.dark.copyWith(
+      typography: MoonTypography.typography.copyWith(
+        heading: MoonTypography.typography.heading.apply(
+          fontFamily: GoogleFonts.notoSans().fontFamily,
+        ),
+        body: MoonTypography.typography.body.apply(
+          fontFamily: GoogleFonts.notoSans().fontFamily,
+        )
+      )
+    ) : MoonTokens.light)
+  ]);
 }
 
-List<String> getThemeNames() {
-  return [
-    'blue',
-    'green',
-    'red',
-    'yellow',
-    'zinc',
-    'neutral',
-    'stone',
-    'rose',
-    'violet',
-    'slate',
-    'orange',
-    'gray'
-  ];
-}
-
-class MiniThemeController extends GetxController {
-  Rx<ThemeData> theme = getTheme('zinc', false).obs;
-
-  MiniThemeController();
-
-  void callback(ThemeData theme) {
-    this.theme.value = theme;
-    this.theme.refresh();
-  }
-}
-
-late MiniThemeController mtc;
+late ThemeController tc;
 
 class ThemeController extends GetxController {
-  RxString themeName = settings.themeName.obs;
   RxString darkMode = settings.darkMode.obs;
-  RxBool isAMOLED = settings.isAMOLED.obs;
-  List<String> themeNames = getThemeNames();
-  List<ColorScheme> themeColors = getThemeNames()
-      .map((e) => getTheme(e, settings.isDarkMode).colorScheme)
-      .toList();
-
-  void changeTheme(String theme) {
-    settings.settings[31] = theme;
-    settings.updateSettings();
-    themeName.value = theme;
-    ThemeManager.instance.updateValue(getTheme(theme, settings.isDarkMode));
-  }
+  RxBool dmMenu = false.obs;
 
   void changeDarkMode(String darkMode) {
     settings.settings[0] = darkMode;
     settings.updateSettings();
     this.darkMode.value = settings.darkMode;
-    ThemeManager.instance
-        .updateValue(getTheme(settings.themeName, settings.isDarkMode));
+    ThemeManager.instance.updateValue(getTheme(settings.isDarkMode));
   }
 }

@@ -1,10 +1,13 @@
 import 'package:get/get.dart';
-import 'package:skana_pix/pixiv_dart_api.dart';
+import 'package:skana_pix/controller/settings.dart';
+import 'package:skana_pix/utils/io_extension.dart';
 import 'package:skana_pix/utils/widgetplugin.dart';
 
 class PrefsController extends GetxController {
   RxString language = settings.locale.obs;
+  RxBool langMenu = false.obs;
   RxString awPrefer = settings.awPrefer.obs;
+  RxBool awMenu = false.obs;
   RxBool showOriginal = (settings.settings[7] == "1").obs;
   RxBool hideR18 = (settings.settings[15] == "1").obs;
   RxBool hideAI = (settings.settings[16] == "1").obs;
@@ -14,6 +17,7 @@ class PrefsController extends GetxController {
   RxBool checkUpdate = (settings.settings[9] == "1").obs;
   RxBool isHighRefreshRate = (settings.settings[33] == "1").obs;
   RxString orientation = settings.settings[1].obs;
+  RxBool orientationMenu = false.obs;
 
   void changeLanguage(String? value) {
     if (value != null) {
@@ -91,6 +95,7 @@ class PrefsController extends GetxController {
 class HostController extends GetxController {
   RxInt hostIndex = settings.imageHost.obs;
   RxString customProxyHost = settings.customProxyHost.obs;
+  RxBool showMenu = false.obs;
 
   String getPixreHost() {
     return imageHost[1];

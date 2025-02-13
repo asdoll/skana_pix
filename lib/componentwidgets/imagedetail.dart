@@ -1,13 +1,14 @@
-import 'package:shadcn_flutter/shadcn_flutter.dart';
 import 'package:flutter/services.dart';
 import 'package:skana_pix/controller/like_controller.dart';
+import 'package:skana_pix/model/illust.dart';
+import 'package:skana_pix/model/tag.dart';
 import 'package:skana_pix/model/worktypes.dart';
-import 'package:skana_pix/pixiv_dart_api.dart';
 import 'package:get/get.dart';
-import 'package:flutter/material.dart'
-    show SelectionArea, AdaptiveTextSelectionToolbar, InkWell;
+import 'package:flutter/material.dart';
+import 'package:moon_design/moon_design.dart';
+import 'package:skana_pix/utils/io_extension.dart';
 import 'package:skana_pix/utils/leaders.dart';
-
+import 'package:skana_pix/utils/widgetplugin.dart';
 import 'avatar.dart';
 import '../view/commentpage.dart';
 import 'followbutton.dart';
@@ -70,7 +71,7 @@ class _IllustDetailContentState extends State<IllustDetailContent> {
         _buildCommentTextArea(context, _illust),
         Padding(
           padding: const EdgeInsets.only(left: 8.0),
-          child: Text("Related artworks".tr).small(),
+          child: Text("Related artworks".tr).subHeader(),
         ),
       ],
     );
@@ -90,11 +91,7 @@ class _IllustDetailContentState extends State<IllustDetailContent> {
             child: SelectionArea(
               child: Text(
                 data.title,
-                style: Theme.of(context)
-                    .typography
-                    .textSmall
-                    .copyWith(fontSize: 18),
-              ),
+              ).header(),
             ),
           ),
           SizedBox(
@@ -105,47 +102,33 @@ class _IllustDetailContentState extends State<IllustDetailContent> {
             children: <Widget>[
               Icon(
                 Icons.remove_red_eye,
-                color: Theme.of(context).colorScheme.foreground,
                 size: 12,
               ),
               Padding(
                 padding: const EdgeInsets.only(left: 2.0),
-                child: Text(
-                  data.totalView.toString(),
-                  style: TextStyle(
-                      fontSize: 12,
-                      color: Theme.of(context).colorScheme.foreground),
-                ),
+                child: Text(data.totalView.toString()).small(),
               ),
               Container(
                 width: 4.0,
               ),
               Icon(
                 Icons.favorite,
-                color: Theme.of(context).colorScheme.foreground,
                 size: 12.0,
               ),
               Padding(
                 padding: const EdgeInsets.only(left: 2.0),
-                child: Text("${data.totalBookmarks}",
-                    style: TextStyle(
-                        fontSize: 12,
-                        color: Theme.of(context).colorScheme.foreground)),
+                child: Text("${data.totalBookmarks}").small(),
               ),
               Container(
                 width: 4.0,
               ),
               Icon(
                 Icons.timelapse_rounded,
-                color: Theme.of(context).colorScheme.foreground,
                 size: 12.0,
               ),
               Padding(
                 padding: const EdgeInsets.only(left: 2.0),
-                child: Text(data.createDate.toShortTime(),
-                    style: TextStyle(
-                        fontSize: 12,
-                        color: Theme.of(context).colorScheme.foreground)),
+                child: Text(data.createDate.toShortTime()).small(),
               )
             ],
           ),
@@ -155,12 +138,7 @@ class _IllustDetailContentState extends State<IllustDetailContent> {
           Row(
             mainAxisAlignment: MainAxisAlignment.start,
             children: <Widget>[
-              Text(
-                "Artwork ID".tr,
-                style: TextStyle(
-                    fontSize: 12,
-                    color: Theme.of(context).colorScheme.foreground),
-              ),
+              Text("Artwork ID".tr).small(),
               Container(
                 width: 4.0,
               ),
@@ -168,12 +146,7 @@ class _IllustDetailContentState extends State<IllustDetailContent> {
               Container(
                 width: 10.0,
               ),
-              Text(
-                "Pixel".tr,
-                style: TextStyle(
-                    fontSize: 12,
-                    color: Theme.of(context).colorScheme.foreground),
-              ),
+              Text("Pixel".tr).small(),
               Container(
                 width: 4.0,
               ),
@@ -193,8 +166,9 @@ class _IllustDetailContentState extends State<IllustDetailContent> {
       child: Text(
         text,
         style: TextStyle(
-            color: Theme.of(context).colorScheme.mutedForeground, fontSize: 12),
-      ),
+            color: context.moonTheme?.textAreaTheme.colors.helperTextColor,
+            fontSize: 12),
+      ).small(),
     );
   }
 
@@ -209,27 +183,15 @@ class _IllustDetailContentState extends State<IllustDetailContent> {
           if (data.isAi)
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 4),
-              decoration: const BoxDecoration(
-                color: Colors.black,
+              decoration: BoxDecoration(
+                color: context.moonTheme?.tokens.colors.piccolo,
                 borderRadius: BorderRadius.all(Radius.circular(8)),
               ),
               child: RichText(
                   textAlign: TextAlign.start,
-                  text: TextSpan(
-                      text: "AI-generated".tr,
-                      children: [
-                        TextSpan(
-                          text: " ",
-                          style: Theme.of(context)
-                              .typography
-                              .textSmall
-                              .copyWith(fontSize: 12),
-                        ),
-                      ],
-                      style: Theme.of(context)
-                          .typography
-                          .textSmall
-                          .copyWith(color: Colors.white, fontSize: 12))),
+                  text: TextSpan(text: "AI-generated".tr, children: [
+                    TextSpan(text: " ").small(),
+                  ]).small()),
             ),
           for (var f in data.tags) buildRow(context, f)
         ],
@@ -288,80 +250,43 @@ class _IllustDetailContentState extends State<IllustDetailContent> {
 
   Widget _buildCommentTextArea(BuildContext context, Illust data) {
     return Center(
-      child: Padding(
-        padding: EdgeInsets.only(left: 16.0, right: 16.0),
-        child: InkWell(
-          onTap: () {
-            Get.to(() => CommentPage(id: data.id), preventDuplicates: false);
-          },
-          child: Center(
-            child: Card(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-              child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Icon(
-                      Icons.comment,
-                      size: 16,
-                      color: Theme.of(context).colorScheme.primary,
-                    ),
-                    SizedBox(
-                      width: 4,
-                    ),
-                    Text(
-                      "Show comments".tr,
-                    ).xSmall(),
-                  ]),
-            ).paddingSymmetric(vertical: 16),
-          ),
-        ),
+        child: MoonButton(
+      backgroundColor: context.moonTheme?.tokens.colors.gohan,
+      onTap: () {
+        Get.to(() => CommentPage(id: data.id), preventDuplicates: false);
+      },
+      leading: Icon(
+        Icons.comment,
+        size: 16,
+        color: Theme.of(context).colorScheme.primary,
       ),
-    );
+      label: Text(
+        "Show comments".tr,
+      ).small(),
+    )).paddingSymmetric(vertical: 16);
   }
 
   Future _longPressTag(BuildContext context, Tag f) async {
-    switch (await showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return AlertDialog(
-            title: RichText(
-              text: TextSpan(children: [
-                TextSpan(
-                    text: f.name,
-                    style: Theme.of(context).typography.textSmall.copyWith(
-                        color: Theme.of(context).colorScheme.primary)),
-                if (f.translatedName != null)
-                  TextSpan(
-                      text: "\n${"${f.translatedName}"}",
-                      style: Theme.of(context).typography.textSmall)
-              ]),
-            ).withAlign(Alignment.centerLeft),
-            actions: <Widget>[
-              OutlineButton(
-                density: ButtonDensity.dense,
-                onPressed: () {
-                  Get.back(result: 0);
-                },
-                child: Text("Block".tr),
-              ),
-              PrimaryButton(
-                density: ButtonDensity.dense,
-                onPressed: () {
-                  Get.back(result: 1);
-                },
-                child: Text("Bookmark".tr),
-              ),
-              PrimaryButton(
-                density: ButtonDensity.dense,
-                onPressed: () {
-                  Get.back(result: 2);
-                },
-                child: Text("Copy".tr),
-              ),
-            ],
-          );
-        })) {
+    switch (await alertDialog<int>(context, f.name, f.translatedName ?? "", [
+      outlinedButton(
+        label: "Block".tr,
+        onPressed: () {
+          Get.back(result: 0);
+        },
+      ),
+      outlinedButton(
+        label: "Bookmark".tr,
+        onPressed: () {
+          Get.back(result: 1);
+        },
+      ),
+      filledButton(
+        label: "Copy".tr,
+        onPressed: () {
+          Get.back(result: 2);
+        },
+      )
+    ])) {
       case 0:
         {
           localManager.add("blockedTags", [f.name]);
@@ -397,7 +322,7 @@ class _IllustDetailContentState extends State<IllustDetailContent> {
         height: 25,
         padding: const EdgeInsets.symmetric(horizontal: 14),
         decoration: BoxDecoration(
-          color: Get.theme.colorScheme.primary,
+          color: context.moonTheme?.tokens.colors.piccolo,
           borderRadius: const BorderRadius.all(Radius.circular(12.5)),
         ),
         child: Column(
@@ -407,27 +332,16 @@ class _IllustDetailContentState extends State<IllustDetailContent> {
                 textAlign: TextAlign.start,
                 overflow: TextOverflow.ellipsis,
                 maxLines: 1,
-                text: TextSpan(
-                    text: "#${f.name}",
-                    children: [
-                      TextSpan(
-                        text: " ",
-                        style: Theme.of(context)
-                            .typography
-                            .textSmall
-                            .copyWith(fontSize: 12),
-                      ),
-                      if (f.translatedName != null)
-                        TextSpan(
+                text: TextSpan(text: "#${f.name}", children: [
+                  TextSpan(
+                    text: " ",
+                  ).small(),
+                  if (f.translatedName != null)
+                    TextSpan(
                             text: "${f.translatedName}",
-                            style: Theme.of(context)
-                                .typography
-                                .textSmall
-                                .copyWith(fontSize: 12))
-                    ],
-                    style: Theme.of(context).typography.textSmall.copyWith(
-                        color: Theme.of(context).colorScheme.primaryForeground,
-                        fontSize: 12))),
+                            style: TextStyle(fontStyle: FontStyle.italic))
+                        .small()
+                ]).small()),
           ],
         ),
       ),
@@ -484,13 +398,7 @@ class _IllustDetailContentState extends State<IllustDetailContent> {
                                   ),
                               preventDuplicates: false);
                         },
-                        child: Text(
-                          illust.author.name,
-                          style: TextStyle(
-                              fontSize: 14,
-                              color:
-                                  Theme.of(context).typography.textSmall.color),
-                        ),
+                        child: Text(illust.author.name).subHeader(),
                       ),
                     ),
                   ),

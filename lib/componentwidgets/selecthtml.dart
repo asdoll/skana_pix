@@ -1,7 +1,8 @@
-import 'package:shadcn_flutter/shadcn_flutter.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
 import 'package:share_plus/share_plus.dart';
-import 'package:skana_pix/pixiv_dart_api.dart';
+import 'package:skana_pix/controller/logging.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class SelectableHtml extends StatefulWidget {
@@ -20,8 +21,7 @@ class _SelectableHtmlState extends State<SelectableHtml> {
       widget.data,
       customStylesBuilder: (e) {
         if (e.attributes.containsKey('href')) {
-          final color = Theme.of(context).colorScheme.primary;
-          return {'color': '#${color.value.toRadixString(16).substring(2, 8)}'};
+          return {'color': '#${Colors.blue.toHexString()}'};
         }
         return null;
       },

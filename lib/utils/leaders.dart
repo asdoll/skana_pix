@@ -1,28 +1,28 @@
 import 'package:dio/dio.dart' as d;
 import 'package:get/get.dart';
-import 'package:shadcn_flutter/shadcn_flutter.dart';
-import 'package:bot_toast/bot_toast.dart';
+import 'package:flutter/material.dart';
+import 'package:moon_design/moon_design.dart';
+import 'package:skana_pix/controller/logging.dart';
 import 'package:skana_pix/view/imageview/imagelistview.dart';
 import 'package:skana_pix/model/worktypes.dart';
-import 'package:skana_pix/pixiv_dart_api.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 
-import '../view/novelview/novelpage.dart';
-import '../view/novelview/novelseries.dart';
-import '../view/imageview/imagesearchresult.dart';
-import '../view/souppage.dart';
-import '../componentwidgets/userpage.dart';
+import 'package:skana_pix/view/novelview/novelpage.dart';
+import 'package:skana_pix/view/novelview/novelseries.dart';
+import 'package:skana_pix/view/imageview/imagesearchresult.dart';
+import 'package:skana_pix/view/souppage.dart';
+import 'package:skana_pix/componentwidgets/userpage.dart';
 
 class Leader {
   static showToast(String text) {
-    BotToast.cleanAll();
-    BotToast.defaultOption.customText.align = const Alignment(0,0.9);
-    BotToast.showCustomText(
-      toastBuilder: (cancelFunc) => SurfaceCard(
-        padding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-        child: Text(text).small(),
-      ),
-    );
+    try {
+      MoonToast.show(
+        Get.context!,
+        label: Text(text),
+      );
+    } catch (e) {
+      log.e(e);
+    }
   }
 
   static Future<bool> pushWithUri(BuildContext context, Uri link) async {

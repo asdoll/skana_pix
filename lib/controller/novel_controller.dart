@@ -1,6 +1,6 @@
 import 'package:easy_refresh/easy_refresh.dart';
+import 'package:flutter/rendering.dart';
 import 'package:get/get.dart';
-import 'package:shadcn_flutter/shadcn_flutter.dart';
 import 'package:skana_pix/controller/connector.dart';
 import 'package:skana_pix/controller/exceptions.dart';
 import 'package:skana_pix/controller/logging.dart';
@@ -77,7 +77,7 @@ class NovelSeriesDetailController extends GetxController {
     }
     Res<NovelSeriesResponse> res = await ConnectManager()
         .apiClient
-        .getNovelSeries(seriesId, nextUrl.value);
+        .getNovelSeries(seriesId, nextUrl.value.isEmpty ? null : nextUrl.value);
     if (!res.error) {
       nextUrl.value = res.subData ?? "end";
     }

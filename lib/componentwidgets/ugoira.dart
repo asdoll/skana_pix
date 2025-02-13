@@ -1,13 +1,14 @@
 import 'dart:io';
 import 'package:archive/archive_io.dart';
 
-import 'package:shadcn_flutter/shadcn_flutter.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import 'package:skana_pix/controller/caches.dart';
 
 import 'dart:ui' as ui;
 
-import 'package:skana_pix/pixiv_dart_api.dart';
+import 'package:skana_pix/controller/connector.dart';
+
 
 class UgoiraWidget extends StatefulWidget {
   const UgoiraWidget(

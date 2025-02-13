@@ -209,7 +209,7 @@ class SpotlightStoreBase extends GetxController {
     try {
       if (nextUrl != null && nextUrl!.isNotEmpty) {
         try {
-          SpotlightResponse response = await getNextSpotlightArticles(nextUrl!);
+          SpotlightResponse response = await ConnectManager().apiClient.getNextSpotlightArticles(nextUrl!);
           if (response.nextUrl != null && response.nextUrl == "error") {
             controller?.finishRefresh(IndicatorResult.fail);
             return false;

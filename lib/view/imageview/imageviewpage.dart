@@ -1,12 +1,15 @@
 import 'dart:io';
 
+import 'package:flutter/material.dart';
+import 'package:moon_design/moon_design.dart';
 import 'package:path/path.dart' as path;
-import 'package:shadcn_flutter/shadcn_flutter.dart';
 import 'package:flutter/services.dart';
 import 'package:photo_view/photo_view.dart';
 import 'package:photo_view/photo_view_gallery.dart';
-import 'package:skana_pix/pixiv_dart_api.dart';
+import 'package:skana_pix/controller/bases.dart';
+import 'package:skana_pix/utils/io_extension.dart';
 import 'package:skana_pix/utils/leaders.dart';
+import 'package:skana_pix/utils/widgetplugin.dart';
 import '../../controller/caches.dart';
 import '../../componentwidgets/pixivimage.dart';
 
@@ -53,9 +56,11 @@ class _ImageViewPageState extends State<ImageViewPage> {
       if (widget.urls.length == 1) {
         final url = widget.urls.first;
         return Scaffold(
+                    extendBody: true,
+          extendBodyBehindAppBar: true,
           backgroundColor: Colors.black,
-          footers: [_buildBottom(context)],
-          child: PhotoView(
+          bottomNavigationBar: _buildBottom(context),
+          body: PhotoView(
             filterQuality: FilterQuality.high,
             initialScale: PhotoViewComputedScale.contained,
             heroAttributes: PhotoViewHeroAttributes(tag: url),
@@ -65,9 +70,11 @@ class _ImageViewPageState extends State<ImageViewPage> {
         );
       } else {
         return Scaffold(
-          footers: [_buildBottom(context)],
+                    extendBody: true,
+          extendBodyBehindAppBar: true,
+          bottomNavigationBar: _buildBottom(context),
           backgroundColor: Colors.black,
-          child: PhotoViewGallery.builder(
+          body: PhotoViewGallery.builder(
             scrollPhysics: const BouncingScrollPhysics(),
             pageController: controller,
             builder: (BuildContext context, int index) {
@@ -104,12 +111,12 @@ class _ImageViewPageState extends State<ImageViewPage> {
 
   Widget _buildBottom(BuildContext context) {
     if (_fullScreen) {
-      return AppBar(
-        backgroundColor: Colors.transparent,
+      return BottomAppBar(
+        color: Colors.transparent,
         child: Row(
           children: [
-            IconButton.ghost(
-                onPressed: () {
+            MoonButton.icon(
+                onTap: () {
                   setState(() {
                     _fullScreen = false;
                   });
@@ -118,14 +125,14 @@ class _ImageViewPageState extends State<ImageViewPage> {
                 },
                 icon: Icon(
                   Icons.fullscreen_exit,
-                  color: Colors.white.withAlpha(50),
+                  color: Colors.white.withValues(alpha: 0.5),
                 ))
           ],
         ),
       );
     }
-    return AppBar(
-      backgroundColor: Colors.transparent,
+    return BottomAppBar(
+      color: Colors.transparent,
       child: Visibility(
         visible: true,
         child: Row(
@@ -134,36 +141,33 @@ class _ImageViewPageState extends State<ImageViewPage> {
           children: [
             Row(
               children: [
-                IconButton.ghost(
+                MoonButton.icon(
                   icon: Icon(
                     Icons.photo_library_outlined,
                     color: Colors.white,
                   ),
-                  onPressed: () {},
+                  onTap: () {},
                 ),
                 Text(
                   "${currentPage + 1}/${widget.urls.length}",
-                  style: Theme.of(context)
-                      .typography
-                      .large
-                      .copyWith(color: Colors.white),
-                ),
+                  style: TextStyle(color: Colors.white),
+                ).header(),
               ],
             ),
             Row(
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
-                IconButton.ghost(
+                MoonButton.icon(
                     icon: Icon(
                       Icons.arrow_back,
                       color: Colors.white,
                     ),
-                    onPressed: () async {
+                    onTap: () async {
                       Navigator.of(context).pop();
                     }),
-                IconButton.ghost(
+                MoonButton.icon(
                   icon: Icon(Icons.fullscreen, color: Colors.white),
-                  onPressed: () {
+                  onTap: () {
                     setState(() {
                       _fullScreen = true;
                     });
@@ -172,12 +176,12 @@ class _ImageViewPageState extends State<ImageViewPage> {
                   },
                 ),
                 GestureDetector(
-                    child: IconButton.ghost(
+                    child: MoonButton.icon(
                         icon: Icon(
                           Icons.save_alt,
                           color: Colors.white,
                         ),
-                        onPressed: () {
+                        onTap: () {
                           File file = File(path.join(
                               BasePath.cachePath,
                               "share_cache",
@@ -196,12 +200,12 @@ class _ImageViewPageState extends State<ImageViewPage> {
                   opacity: shareShow ? 1 : 0.5,
                   duration: Duration(milliseconds: 500),
                   child: Builder(builder: (context) {
-                    return IconButton.ghost(
+                    return MoonButton.icon(
                         icon: Icon(
                           Icons.share,
                           color: Colors.white,
                         ),
-                        onPressed: () async {
+                        onTap: () async {
                           var file =
                               await imagesCacheManager.getFileFromCache(nowUrl);
                           if (file != null) {

@@ -1,23 +1,20 @@
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:flutter/material.dart'
-    show
-        CollapseMode,
-        FlexibleSpaceBar,
-        InkWell,
-        PopupMenuButton,
-        PopupMenuItem,
-        SelectionArea;
+import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:icon_decoration/icon_decoration.dart';
-import 'package:shadcn_flutter/shadcn_flutter.dart';
+import 'package:moon_design/moon_design.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:skana_pix/componentwidgets/userdetail.dart';
-import 'package:skana_pix/controller/mini_controllers.dart';
+import 'package:skana_pix/controller/connector.dart';
+import 'package:skana_pix/controller/logging.dart';
+import 'package:skana_pix/controller/res.dart';
+import 'package:skana_pix/controller/settings.dart';
+import 'package:skana_pix/model/user.dart';
+import 'package:skana_pix/utils/io_extension.dart';
 import 'package:skana_pix/view/userview/userworks.dart';
 import 'package:skana_pix/controller/caches.dart';
 import 'package:skana_pix/controller/like_controller.dart';
 import 'package:skana_pix/model/worktypes.dart';
-import 'package:skana_pix/pixiv_dart_api.dart';
 import 'package:get/get.dart';
 import 'package:skana_pix/utils/leaders.dart';
 import 'package:skana_pix/utils/widgetplugin.dart';
@@ -47,19 +44,19 @@ class UserPage extends StatefulWidget {
 
 class _UserPageState extends State<UserPage> with TickerProviderStateMixin {
   late ScrollController _scrollController;
-  late MTab mTab;
   bool backToTopVisible = false;
   UserDetails? userDetail;
   bool isMuted = false;
   bool isError = false;
   ArtworkType get type =>
       widget.type == ArtworkType.ALL ? ArtworkType.ILLUST : widget.type;
+  late TabController tabController;
 
   String restrict = 'public';
 
   @override
   void initState() {
-    mTab = Get.put(MTab(), tag: "userpage_${widget.id}");
+    tabController = TabController(length: 3, vsync: this);
     _scrollController = ScrollController();
     _scrollController.addListener(() {
       if (_scrollController.hasClients) {
@@ -84,8 +81,8 @@ class _UserPageState extends State<UserPage> with TickerProviderStateMixin {
 
   @override
   void dispose() {
-    Get.delete<MTab>(tag: "userpage_${widget.id}");
     _scrollController.dispose();
+    tabController.dispose();
     super.dispose();
   }
 
@@ -93,20 +90,20 @@ class _UserPageState extends State<UserPage> with TickerProviderStateMixin {
   Widget build(BuildContext context) {
     if (isMuted) {
       return Scaffold(
-        child: Center(
+        body: Center(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
               Text('X_X'),
               Text('${widget.id}'),
-              PrimaryButton(
+              filledButton(
                   onPressed: () {
                     settings.removeBlockedUsers([widget.id.toString()]);
                     setState(() {
                       isMuted = false;
                     });
                   },
-                  child: Text("Unblock".tr)),
+                  label: "Unblock".tr),
             ],
           ),
         ),
@@ -115,7 +112,7 @@ class _UserPageState extends State<UserPage> with TickerProviderStateMixin {
 
     if (isError && userDetail == null) {
       return Scaffold(
-        child: Center(
+        body: Center(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.center,
             mainAxisAlignment: MainAxisAlignment.center,
@@ -129,11 +126,11 @@ class _UserPageState extends State<UserPage> with TickerProviderStateMixin {
               ),
               Padding(
                 padding: const EdgeInsets.all(8.0),
-                child: PrimaryButton(
+                child: filledButton(
                   onPressed: () {
                     firstLoad();
                   },
-                  child: Text("Retry".tr),
+                  label: "Retry".tr,
                 ),
               )
             ],
@@ -143,7 +140,10 @@ class _UserPageState extends State<UserPage> with TickerProviderStateMixin {
     }
     if (userDetail == null) {
       return Scaffold(
-        child: Center(child: CircularProgressIndicator(size: 48)),
+        body: Center(
+            child: MoonCircularLoader(
+          circularLoaderSize: MoonCircularLoaderSize.lg,
+        )),
       );
     }
     return _buildBody(context);
@@ -151,22 +151,23 @@ class _UserPageState extends State<UserPage> with TickerProviderStateMixin {
 
   Widget _buildBody(BuildContext context) {
     return Scaffold(
-      child: NestedScrollView(
+      body: NestedScrollView(
         controller: _scrollController,
-        body: Obx(
-          () => (mTab.index.value == 0)
-              ? WorksPage(
-                  id: userDetail!.id,
-                  type: type,
-                  noScroll: true,
-                )
-              : (mTab.index.value == 1)
-                  ? BookmarksPage(
-                      id: userDetail!.id,
-                      type: type,
-                      noScroll: true,
-                    )
-                  : UserDetailPage(userDetail!),
+        body: TabBarView(
+          controller: tabController,
+          children: [
+            WorksPage(
+              id: userDetail!.id,
+              type: type,
+              noScroll: true,
+            ),
+            BookmarksPage(
+              id: userDetail!.id,
+              type: type,
+              noScroll: true,
+            ),
+            UserDetailPage(userDetail!)
+          ],
         ).paddingTop(102 + MediaQuery.of(context).padding.top),
         headerSliverBuilder: (BuildContext context, bool? innerBoxIsScrolled) {
           return _HeaderSlivers(innerBoxIsScrolled, context);
@@ -191,13 +192,13 @@ class _UserPageState extends State<UserPage> with TickerProviderStateMixin {
             leading: CommonBackArea(),
             actions: <Widget>[
               Builder(builder: (context) {
-                return GhostButton(
-                    child: const DecoratedIcon(
+                return MoonButton.icon(
+                    icon: const DecoratedIcon(
                       icon: Icon(Icons.share),
                       decoration:
                           IconDecoration(border: IconBorder(width: 1.5)),
                     ),
-                    onPressed: () {
+                    onTap: () {
                       final box = context.findRenderObject() as RenderBox?;
                       final pos = box != null
                           ? box.localToGlobal(Offset.zero) & box.size
@@ -227,7 +228,7 @@ class _UserPageState extends State<UserPage> with TickerProviderStateMixin {
                             _buildComment(context),
                             const Text(
                               " ",
-                            ).h3(),
+                            ).header(),
                           ],
                         ),
                       ],
@@ -238,48 +239,24 @@ class _UserPageState extends State<UserPage> with TickerProviderStateMixin {
             ),
             bottom: PreferredSize(
                 preferredSize: Size.fromHeight(48),
-                child: Obx(() => TabList(
-                      index: mTab.index.value,
-                      children: [
-                        TabButton(
-                          onPressed: () {
-                            if (mTab.index.value == 0) {
-                              _scrollController.position.animateTo(0,
-                                  duration: const Duration(milliseconds: 300),
-                                  curve: Curves.easeInOut);
-                            }
-                            mTab.index.value = 0;
-                          },
-                          child: Text(
+                child: Obx(() => MoonTabBar(
+                      tabController: tabController,
+                      tabs: [
+                        MoonTab(
+                          label: Text(
                             "Artworks".tr,
                           ),
                         ),
-                        TabButton(
-                          onPressed: () {
-                            if (mTab.index.value == 1) {
-                              _scrollController.position.animateTo(0,
-                                  duration: const Duration(milliseconds: 300),
-                                  curve: Curves.easeInOut);
-                            }
-                            mTab.index.value = 1;
-                          },
-                          child: Text(
+                        MoonTab(
+                          label: Text(
                             "Bookmarks".tr,
                           ),
                         ),
-                        TabButton(
-                          onPressed: () {
-                            if (mTab.index.value == 2) {
-                              _scrollController.position.animateTo(0,
-                                  duration: const Duration(milliseconds: 300),
-                                  curve: Curves.easeInOut);
-                            }
-                            mTab.index.value = 2;
-                          },
-                          child: Text(
+                        MoonTab(
+                          label: Text(
                             "Details".tr,
                           ),
-                        ),
+                        )
                       ],
                     )))),
       ),
@@ -305,7 +282,7 @@ class _UserPageState extends State<UserPage> with TickerProviderStateMixin {
               ),
               const Text(
                 " ",
-              ).h3()
+              ).header()
             ],
           ),
         ],
@@ -323,35 +300,60 @@ class _UserPageState extends State<UserPage> with TickerProviderStateMixin {
             ? userDetail!.backgroundImage != null
                 ? InkWell(
                     onLongPress: () {
-                      showDialog(
+                      showMoonModal<void>(
                           context: context,
                           builder: (context) {
-                            return AlertDialog(
-                              title: Text("Save".tr)
-                                  .withAlign(Alignment.centerLeft),
-                              content: ClipRRect(
-                                borderRadius: BorderRadius.circular(12),
-                                child: CachedNetworkImage(
-                                  imageUrl: userDetail!.backgroundImage!,
-                                  fit: BoxFit.cover,
-                                  cacheManager: imagesCacheManager,
-                                ),
-                              ),
-                              actions: [
-                                OutlineButton(
-                                    onPressed: () async {
-                                      Navigator.of(context).pop();
-                                    },
-                                    child: Text("Cancel".tr)),
-                                PrimaryButton(
-                                    onPressed: () async {
-                                      Navigator.of(context).pop();
-                                      await _saveUserBg(context,
-                                          userDetail!.backgroundImage!);
-                                    },
-                                    child: Text("Ok".tr)),
-                              ],
-                            );
+                            return Dialog(
+                                child: Column(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                  MoonAlert(
+                                      borderColor: Get.context?.moonTheme
+                                          ?.buttonTheme.colors.borderColor
+                                          .withValues(alpha: 0.5),
+                                      showBorder: true,
+                                      label: Text("Save".tr).header(),
+                                      verticalGap: 16,
+                                      content: Column(
+                                        mainAxisSize: MainAxisSize.min,
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          ClipRRect(
+                                            borderRadius:
+                                                BorderRadius.circular(12),
+                                            child: CachedNetworkImage(
+                                              imageUrl:
+                                                  userDetail!.backgroundImage!,
+                                              fit: BoxFit.cover,
+                                              cacheManager: imagesCacheManager,
+                                            ),
+                                          ).paddingBottom(16),
+                                          Row(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.end,
+                                            children: [
+                                              outlinedButton(
+                                                label: "Cancel".tr,
+                                                onPressed: () {
+                                                  Get.back();
+                                                },
+                                              ).paddingRight(8),
+                                              filledButton(
+                                                label: "Ok".tr,
+                                                onPressed: () async {
+                                                  Get.back();
+                                                  await _saveUserBg(
+                                                      context,
+                                                      userDetail!
+                                                          .backgroundImage!);
+                                                },
+                                              ).paddingRight(8),
+                                            ],
+                                          )
+                                        ],
+                                      )),
+                                ]));
                           });
                     },
                     child: CachedNetworkImage(
@@ -379,33 +381,27 @@ class _UserPageState extends State<UserPage> with TickerProviderStateMixin {
               Leader.showToast("You can't follow yourself".tr);
               return;
             }
-            followUser(userDetail!.id.toString(), "add", "private");
-
+            ConnectManager()
+                .apiClient
+                .follow(userDetail!.id.toString(), "add", "private");
             break;
           case 1:
             {
-              final result = await showDialog(
-                  context: context,
-                  builder: (context) {
-                    return AlertDialog(
-                      title: Text('${"Block User".tr}?')
-                          .withAlign(Alignment.centerLeft),
-                      actions: <Widget>[
-                        OutlineButton(
-                          child: Text("Cancel".tr),
-                          onPressed: () {
-                            Get.back();
-                          },
-                        ),
-                        PrimaryButton(
-                          child: Text("Ok".tr),
-                          onPressed: () {
-                            Get.back(result: "OK");
-                          },
-                        ),
-                      ],
-                    );
-                  });
+              final result = await alertDialog(
+                  context, "Block User".tr, "${"Block User".tr}?", [
+                outlinedButton(
+                  label: "Cancel".tr,
+                  onPressed: () {
+                    Get.back();
+                  },
+                ),
+                filledButton(
+                  label: "Ok".tr,
+                  onPressed: () {
+                    Get.back(result: "OK");
+                  },
+                ),
+              ]);
               if (result == "OK") {
                 settings.addBlockedUsers([userDetail!.name]);
                 setState(() {
@@ -455,7 +451,7 @@ class _UserPageState extends State<UserPage> with TickerProviderStateMixin {
             children: <Widget>[
               Text(
                 userDetail?.name ?? "",
-              ).h4(),
+              ).header(),
               Text(
                 userDetail == null
                     ? ""
@@ -478,7 +474,7 @@ class _UserPageState extends State<UserPage> with TickerProviderStateMixin {
                 tag: userDetail?.name ?? "${widget.heroTag}",
                 child: Text(
                   userDetail?.name ?? "",
-                ).h4(),
+                ).header(),
               ),
               InkWell(
                 onTap: () {
@@ -550,35 +546,55 @@ class _UserPageState extends State<UserPage> with TickerProviderStateMixin {
                 url: userDetail!.avatar,
                 size: 80,
                 onTap: () {
-                  showDialog(
+                  showMoonModal(
                       context: context,
-                      builder: (context) {
-                        return AlertDialog(
-                          title:
-                              Text("Save".tr).withAlign(Alignment.centerLeft),
-                          content: ClipRRect(
-                            borderRadius: BorderRadius.circular(12),
-                            child: CachedNetworkImage(
-                              imageUrl: userDetail!.avatar,
-                              fit: BoxFit.cover,
-                              cacheManager: imagesCacheManager,
-                            ),
-                          ),
-                          actions: [
-                            OutlineButton(
-                                onPressed: () async {
-                                  Navigator.of(context).pop();
-                                },
-                                child: Text("Cancel".tr)),
-                            PrimaryButton(
-                                onPressed: () async {
-                                  Navigator.of(context).pop();
-                                  await _saveUserC(context);
-                                },
-                                child: Text("Ok".tr)),
-                          ],
-                        );
-                      });
+                      builder: (context) => Dialog(
+                              child: Column(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                MoonAlert(
+                                    borderColor: Get.context?.moonTheme
+                                        ?.buttonTheme.colors.borderColor
+                                        .withValues(alpha: 0.5),
+                                    showBorder: true,
+                                    label: Text("Save".tr).header(),
+                                    verticalGap: 16,
+                                    content: Column(
+                                      mainAxisSize: MainAxisSize.min,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        ClipRRect(
+                                          borderRadius:
+                                              BorderRadius.circular(12),
+                                          child: CachedNetworkImage(
+                                            imageUrl: userDetail!.avatar,
+                                            fit: BoxFit.cover,
+                                            cacheManager: imagesCacheManager,
+                                          ),
+                                        ).paddingBottom(16),
+                                        Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.end,
+                                          children: [
+                                            outlinedButton(
+                                              label: "Cancel".tr,
+                                              onPressed: () {
+                                                Get.back();
+                                              },
+                                            ).paddingRight(8),
+                                            filledButton(
+                                              label: "Ok".tr,
+                                              onPressed: () async {
+                                                Get.back();
+                                                await _saveUserC(context);
+                                              },
+                                            ).paddingRight(8),
+                                          ],
+                                        )
+                                      ],
+                                    )),
+                              ])));
                 },
                 id: userDetail!.id,
               ),

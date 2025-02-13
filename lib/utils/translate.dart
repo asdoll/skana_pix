@@ -1,8 +1,8 @@
 import 'package:get/get.dart';
-import 'package:skana_pix/pixiv_dart_api.dart';
 
-class TranslateMap {
-  static Map<String, Map<String, String>> get translation => {
+class TranslateMap extends Translations {
+  @override
+  Map<String, Map<String, String>> get keys => {
         "en": {
           'blue': 'Blue',
           'green': 'Green',
@@ -434,7 +434,8 @@ class TranslateMap {
           "Default": "默认",
           "Custom": "自定义",
           'Reverse Proxy': '反向代理',
-          "Used to retrieve images from pixiv when using the app through the reverse proxy": "用于通过反向代理使用APP时从pixiv获取图片",
+          "Used to retrieve images from pixiv when using the app through the reverse proxy":
+              "用于通过反向代理使用APP时从pixiv获取图片",
           'Custom Proxy': '自定义代理',
         },
         "zh_TW": {
@@ -854,37 +855,9 @@ class TranslateMap {
           "Default": "默認",
           "Custom": "自定義",
           'Reverse Proxy': '反向代理',
-          "Used to retrieve images from pixiv when using the app through the reverse proxy": "用於透過反向代理使用APP時從pixiv取得圖片",
+          "Used to retrieve images from pixiv when using the app through the reverse proxy":
+              "用於透過反向代理使用APP時從pixiv取得圖片",
           'Custom Proxy': '自定義代理',
         },
       };
-}
-
-extension Translation on String {
-  String get atMost8 {
-    if (length > 8) {
-      return "${substring(0, 8)}...";
-    }
-    return this;
-  }
-
-  String get atMost13 {
-    if (length > 13) {
-      return "${substring(0, 8)}...";
-    }
-    return this;
-  }
-}
-
-String get copyInfoText =>
-    "${"Illust ID:".tr} {illust_id}\n${"Title:".tr} {title}\n${"User ID:".tr} {user_id}\n${"User Name:".tr} {user_name}\n${"Tags:".tr} {tags}";
-
-String illustToShareInfoText(Illust illust) {
-  final str = copyInfoText
-      .replaceAll('{illust_id}', illust.id.toString())
-      .replaceAll("{user_name}", illust.author.name)
-      .replaceAll("{tags}", illust.tags.map((e) => e.toString()).join(', '))
-      .replaceAll("{user_id}", illust.author.id.toString())
-      .replaceAll("{title}", illust.title);
-  return str;
 }

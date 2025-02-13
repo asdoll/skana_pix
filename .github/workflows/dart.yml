@@ -7,7 +7,7 @@ name: Dart
 
 on:
   push:
-    branches: [ "main", "rev_theme" ]
+    branches: [ "main" ]
   pull_request:
     branches: [ "main" ]
 

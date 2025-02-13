@@ -1,7 +1,7 @@
-import 'package:shadcn_flutter/shadcn_flutter.dart';
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:skana_pix/componentwidgets/backarea.dart';
 import 'package:skana_pix/controller/account_controller.dart';
+import 'package:skana_pix/utils/widgetplugin.dart';
 import 'package:skana_pix/view/settings/settingpage.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 import '../componentwidgets/webview.dart';
@@ -19,35 +19,19 @@ class _LoginPageState extends State<LoginPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        footers: [
-          const Divider(),
-          NavigationBar(
-            alignment: NavigationBarAlignment.start,
-            onSelected: (index) {
-              setState(() {
-                selected = index;
-              });
-            },
-            index: selected,
+        bottomNavigationBar: BottomAppBar(
+          child: Row(
             children: [
-              NavigationWidget(
-                  child: IconButton.ghost(
+              IconButton(
                 icon: Icon(Icons.settings),
-                onPressed: () => Get.to(() => Scaffold(headers: [
-                  AppBar(
-                    title: Text("Settings".tr),
-                    padding: EdgeInsets.all(10),
-                    leading: [
-                      const NormalBackButton(),
-                    ],
-                  ),
-                  const Divider()
-                ],child:  SettingPage())),
-              ).withAlign(Alignment.centerRight)),
+                onPressed: () => Get.to(() => Scaffold(
+                    appBar: appBar(title: "Settings".tr),
+                    body: SettingPage())),
+              )
             ],
           ),
-        ],
-        child: Obx(() {
+        ),
+        body: Obx(() {
           if (accountController.isLoading.value) {
             return buildLoading(context);
           } else if (!accountController.waitingForAuth.value) {
@@ -62,51 +46,50 @@ class _LoginPageState extends State<LoginPage> {
     return SizedBox(
       child: Center(
         child: Card(
-            padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 24),
             child: SizedBox(
-              width: 300,
-              height: 300,
-              child: Column(
-                children: [
-                  const SizedBox(
-                    height: 16,
-                  ),
-                  Align(
-                    alignment: Alignment.centerLeft,
-                    child: Text(
-                      ("     ${"SkanaPix".tr}"),
-                      style: const TextStyle(fontSize: 20),
-                    ),
-                  ),
-                  Expanded(
-                    child: Center(
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          SizedBox(
-                            width: 110,
-                            child: PrimaryButton(
-                              onPressed: onContinue,
-                              child: Text("Login".tr),
-                            ),
-                          ),
-                          const SizedBox(
-                            height: 16,
-                          ),
-                          Container(
-                            padding: const EdgeInsets.symmetric(
-                                horizontal: 8, vertical: 4),
-                            child: Text(
-                                "You need to complete the login operation in the browser window that will open."
-                                    .tr),
-                          )
-                        ],
-                      ),
-                    ),
-                  ),
-                ],
+          width: 300,
+          height: 300,
+          child: Column(
+            children: [
+              const SizedBox(
+                height: 16,
               ),
-            )),
+              Align(
+                alignment: Alignment.centerLeft,
+                child: Text(
+                  ("     ${"SkanaPix".tr}"),
+                  style: const TextStyle(fontSize: 20),
+                ),
+              ),
+              Expanded(
+                child: Center(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      SizedBox(
+                        width: 110,
+                        child: TextButton(
+                          onPressed: onContinue,
+                          child: Text("Login".tr),
+                        ),
+                      ),
+                      const SizedBox(
+                        height: 16,
+                      ),
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 8, vertical: 4),
+                        child: Text(
+                            "You need to complete the login operation in the browser window that will open."
+                                .tr),
+                      )
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ),
+        )),
       ),
     );
   }
@@ -115,44 +98,43 @@ class _LoginPageState extends State<LoginPage> {
     return SizedBox(
       child: Center(
         child: Card(
-            padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 24),
             child: SizedBox(
-              width: 300,
-              height: 300,
-              child: Column(
-                children: [
-                  Align(
-                    alignment: Alignment.centerLeft,
-                    child: Text(
-                      "Waiting...".tr,
-                      style: const TextStyle(
-                          fontSize: 24, fontWeight: FontWeight.bold),
-                    ),
-                  ),
-                  Expanded(
-                    child: Center(
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 8, vertical: 4),
-                        child: Text(
-                            "Waiting for authentication. Please finished in the browser."
-                                .tr),
-                      ),
-                    ),
-                  ),
-                  Row(
-                    children: [
-                      OutlineButton(
-                          child: Text("Back".tr),
-                          onPressed: () {
-                            accountController.waitingForAuth.value = false;
-                          }),
-                      const Spacer(),
-                    ],
-                  )
-                ],
+          width: 300,
+          height: 300,
+          child: Column(
+            children: [
+              Align(
+                alignment: Alignment.centerLeft,
+                child: Text(
+                  "Waiting...".tr,
+                  style: const TextStyle(
+                      fontSize: 24, fontWeight: FontWeight.bold),
+                ),
               ),
-            )),
+              Expanded(
+                child: Center(
+                  child: Container(
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                    child: Text(
+                        "Waiting for authentication. Please finished in the browser."
+                            .tr),
+                  ),
+                ),
+              ),
+              Row(
+                children: [
+                  TextButton(
+                      child: Text("Back".tr),
+                      onPressed: () {
+                        accountController.waitingForAuth.value = false;
+                      }),
+                  const Spacer(),
+                ],
+              )
+            ],
+          ),
+        )),
       ),
     );
   }
@@ -161,28 +143,27 @@ class _LoginPageState extends State<LoginPage> {
     return SizedBox(
       child: Center(
         child: Card(
-            padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 24),
             child: SizedBox(
-              width: 300,
-              height: 300,
-              child: Column(
-                children: [
-                  Align(
-                    alignment: Alignment.centerLeft,
-                    child: Text(
-                      "Logging in".tr,
-                      style: const TextStyle(
-                          fontSize: 24, fontWeight: FontWeight.bold),
-                    ),
-                  ),
-                  const Expanded(
-                    child: Center(
-                      child: CircularProgressIndicator(),
-                    ),
-                  ),
-                ],
+          width: 300,
+          height: 300,
+          child: Column(
+            children: [
+              Align(
+                alignment: Alignment.centerLeft,
+                child: Text(
+                  "Logging in".tr,
+                  style: const TextStyle(
+                      fontSize: 24, fontWeight: FontWeight.bold),
+                ),
               ),
-            )),
+              const Expanded(
+                child: Center(
+                  child: CircularProgressIndicator(),
+                ),
+              ),
+            ],
+          ),
+        )),
       ),
     );
   }
@@ -202,7 +183,7 @@ class _LoginPageState extends State<LoginPage> {
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.end,
                   children: [
-                    OutlineButton(
+                    TextButton(
                       child: Text("Cancel".tr),
                       onPressed: () {
                         exitLogin = true;
@@ -210,7 +191,7 @@ class _LoginPageState extends State<LoginPage> {
                       },
                     ),
                     const SizedBox(height: 16),
-                    PrimaryButton(
+                    TextButton(
                       child: Text("Continue with Webview".tr),
                       onPressed: () {
                         exitLogin = false;
@@ -219,7 +200,7 @@ class _LoginPageState extends State<LoginPage> {
                       },
                     ),
                     const SizedBox(height: 16),
-                    PrimaryButton(
+                    TextButton(
                       child: Text("Continue with External Browser".tr),
                       onPressed: () {
                         exitLogin = false;

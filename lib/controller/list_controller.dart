@@ -1,10 +1,17 @@
 import 'package:easy_refresh/easy_refresh.dart';
 import 'package:get/get.dart';
-import 'package:shadcn_flutter/shadcn_flutter.dart';
+import 'package:flutter/material.dart';
+import 'package:skana_pix/controller/connector.dart';
 import 'package:skana_pix/controller/like_controller.dart';
 import 'package:skana_pix/controller/page_index_controller.dart';
+import 'package:skana_pix/controller/res.dart';
+import 'package:skana_pix/controller/settings.dart';
+import 'package:skana_pix/model/author.dart';
+import 'package:skana_pix/model/illust.dart';
+import 'package:skana_pix/model/novel.dart';
+import 'package:skana_pix/model/searches.dart';
+import 'package:skana_pix/model/tag.dart';
 import 'package:skana_pix/model/worktypes.dart';
-import 'package:skana_pix/pixiv_dart_api.dart';
 import 'package:skana_pix/utils/filters.dart';
 import 'package:skana_pix/utils/leaders.dart';
 
@@ -32,11 +39,12 @@ class ListIllustController extends GetxController {
   EasyRefreshController? refreshController;
   String id;
   String tag;
-  RxString restrict = "public".obs;
+  String restrict;
   ListType controllerType;
   Rx<SearchOptions> searchOptions = SearchOptions().obs;
   DateTimeRange? dateTimeRange;
   RxBool showBackArea = false.obs;
+  RxBool showDropdown = false.obs;
   static RxList<int> historyIds = RxList.empty();
 
   bool get showMangaBadage => type != ArtworkType.MANGA;
@@ -44,6 +52,8 @@ class ListIllustController extends GetxController {
   double get callLoadOverOffset => GetPlatform.isIOS ? 2 : 5;
 
   bool get noNextPage => controllerType == ListType.single;
+
+  bool get showOriginal => settings.showOriginal;
 
   static void sendHistory() {
     if (historyIds.length > 5) {
@@ -57,7 +67,9 @@ class ListIllustController extends GetxController {
       {required this.controllerType,
       required this.type,
       this.id = "",
-      this.tag = ""});
+      this.tag = "",
+      this.restrict = "public",
+      });
 
   Future<Res<List<Illust>>> loadData() async {
     if (isLoading.value) {
@@ -78,7 +90,7 @@ class ListIllustController extends GetxController {
             .relatedIllusts(id, nexturl.isEmpty ? null : nexturl.value);
       case ListType.feed:
         return ConnectManager().apiClient.getFollowingArtworks(
-            restrict.value, nexturl.isEmpty ? null : nexturl.value);
+            restrict, nexturl.isEmpty ? null : nexturl.value);
       case ListType.ranking:
         return ConnectManager().apiClient.getRanking(
             type == ArtworkType.ILLUST
@@ -112,7 +124,7 @@ class ListIllustController extends GetxController {
             .getUserBookmarks(id, nexturl.isEmpty ? null : nexturl.value);
       case ListType.mybookmarks:
         return ConnectManager().apiClient.getBookmarkedIllusts(
-            restrict.value, nexturl.isEmpty ? null : nexturl.value);
+            restrict, nexturl.isEmpty ? null : nexturl.value);
       case ListType.works:
         return ConnectManager().apiClient.getUserIllusts(
             id,
@@ -137,18 +149,20 @@ class ListIllustController extends GetxController {
   List<Illust> filterIllusts(List<Illust> datas) {
     if (controllerType == ListType.userbookmarks ||
         controllerType == ListType.mybookmarks ||
-        controllerType == ListType.works) return checkIllusts(datas);
-
-    if (!["all", "illust", "manga"].contains(restrict.value)) {
-      restrict.value = "all";
+        controllerType == ListType.works) {
+      return checkIllusts(datas);
     }
-    if (restrict.value == "all") {
+
+    if (!["all", "illust", "manga"].contains(restrict)) {
+      restrict = "all";
+    }
+    if (restrict == "all") {
       return checkIllusts(datas);
     }
     if (illusts.length < 10 && nexturl.value != "end") {
       nextPage();
     }
-    datas.retainWhere((element) => element.type == restrict.value);
+    datas.retainWhere((element) => element.type == restrict);
     return checkIllusts(datas);
   }
 
@@ -208,6 +222,7 @@ class ListIllustController extends GetxController {
       }
     });
   }
+
 }
 
 class ListNovelController extends GetxController {
@@ -215,7 +230,7 @@ class ListNovelController extends GetxController {
   RxString nexturl = "".obs;
   RxBool isLoading = false.obs;
   RxBool isFirstLoading = true.obs;
-  RxString restrict = "public".obs;
+  String restrict;
   RxString? error;
   RxInt index = 0.obs;
   RxInt page = 1.obs;
@@ -228,8 +243,13 @@ class ListNovelController extends GetxController {
   bool get noNextPage => controllerType == ListType.single;
   RxInt tagIndex = 0.obs;
 
+  bool get novelDirectEntry => settings.novelDirectEntry;
+
   ListNovelController(
-      {required this.controllerType, this.tag = "", this.id = ""});
+      {required this.controllerType,
+      this.tag = "",
+      this.id = "",
+      this.restrict = "public"});
 
   Future<Res<List<Novel>>> loadData() async {
     if (isLoading.value) {
@@ -260,7 +280,7 @@ class ListNovelController extends GetxController {
             id.toString(), nexturl.isEmpty ? null : nexturl.value);
       case ListType.mybookmarks:
         return ConnectManager().apiClient.getBookmarkedNovels(
-            restrict.value, nexturl.isEmpty ? null : nexturl.value);
+            restrict, nexturl.isEmpty ? null : nexturl.value);
 
       case ListType.related:
         return ConnectManager()
@@ -268,7 +288,7 @@ class ListNovelController extends GetxController {
             .relatedNovels(id, nexturl.isEmpty ? null : nexturl.value);
       case ListType.feed:
         return ConnectManager().apiClient.getNovelFollowing(
-            restrict.value, nexturl.isEmpty ? null : nexturl.value);
+            restrict, nexturl.isEmpty ? null : nexturl.value);
       case ListType.search:
         if (nexturl.isNotEmpty) {
           return ConnectManager().apiClient.getNovelsWithNextUrl(nexturl.value);

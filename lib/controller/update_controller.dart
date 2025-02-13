@@ -21,10 +21,6 @@ class BoardController extends GetxController {
 
   void fetchBoard({EasyRefreshController? controller}) async {
     try {
-      if (!needBoardSection.value) {
-        needBoardSection.refresh();
-        return;
-      }
       final list = await load();
       boardDataLoaded.value = true;
       boardList.value = list;

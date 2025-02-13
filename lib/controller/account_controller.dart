@@ -1,5 +1,6 @@
 import 'package:get/get.dart';
 import 'package:skana_pix/controller/connector.dart';
+import 'package:skana_pix/model/user.dart';
 import 'package:skana_pix/utils/leaders.dart';
 
 class AccountController extends GetxController {
@@ -13,6 +14,8 @@ class AccountController extends GetxController {
     userid.value = ConnectManager().apiClient.userid;
     isPremium.value = ConnectManager().apiClient.isPremium;
   }
+
+  User get user => ConnectManager().apiClient.account.user;
 
   Future<String> generateWebviewUrl() {
     return ConnectManager().apiClient.generateWebviewUrl();

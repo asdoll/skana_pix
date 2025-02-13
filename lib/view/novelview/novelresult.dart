@@ -4,8 +4,8 @@ import 'package:skana_pix/componentwidgets/backarea.dart';
 import 'package:skana_pix/componentwidgets/gotop.dart';
 import 'package:skana_pix/controller/account_controller.dart';
 import 'package:skana_pix/controller/list_controller.dart';
-import 'package:skana_pix/pixiv_dart_api.dart';
 import 'package:get/get.dart';
+import 'package:skana_pix/model/searches.dart';
 import 'package:skana_pix/view/novelview/novellist.dart';
 
 class NovelResultPage extends StatefulWidget {
@@ -97,7 +97,7 @@ class _NovelResultPageState extends State<NovelResultPage> {
                           );
                         });
                     if (dateTimeRange != null) {
-                      controller.dateTimeRange = dateTimeRange;
+                      //controller.dateTimeRange = dateTimeRange;
                       controller.searchOptions.value.startTime =
                           dateTimeRange!.start;
                       controller.searchOptions.value.endTime =
@@ -106,7 +106,7 @@ class _NovelResultPageState extends State<NovelResultPage> {
                       controller.refreshController?.callRefresh();
                     }
                   }),
-              if (ConnectManager().apiClient.isPremium)
+              if (accountController.isPremium.value)
                 IconButton.ghost(
                     icon: Icon(Icons.format_list_numbered),
                     onPressed: () {
@@ -270,11 +270,8 @@ class _NovelResultPageState extends State<NovelResultPage> {
                                               0: Text(search_sort_name[0].tr),
                                               1: Text(search_sort_name[1].tr),
                                               2: Text(search_sort_name[2].tr),
-                                              if (!ConnectManager()
-                                                      .notLoggedIn &&
-                                                  ConnectManager()
-                                                      .apiClient
-                                                      .isPremium) ...{
+                                              if (accountController
+                                                  .isPremium.value) ...{
                                                 3: Text(search_sort_name[3].tr),
                                                 4: Text(search_sort_name[4].tr),
                                               }

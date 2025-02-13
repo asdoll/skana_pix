@@ -1,16 +1,19 @@
 import 'dart:math';
 
 import 'package:easy_refresh/easy_refresh.dart';
-import 'package:flutter/material.dart' show InkWell, SelectionArea;
-import 'package:shadcn_flutter/shadcn_flutter.dart';
+import 'package:flutter/material.dart';
+import 'package:moon_design/moon_design.dart';
 import 'package:flutter/services.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:skana_pix/componentwidgets/headerfooter.dart';
 import 'package:skana_pix/componentwidgets/imagedetail.dart';
+import 'package:skana_pix/componentwidgets/userpage.dart';
+import 'package:skana_pix/controller/account_controller.dart';
 import 'package:skana_pix/controller/histories.dart';
 import 'package:skana_pix/controller/like_controller.dart';
 import 'package:skana_pix/controller/list_controller.dart';
-import 'package:skana_pix/pixiv_dart_api.dart';
+import 'package:skana_pix/model/illust.dart';
+import 'package:skana_pix/utils/io_extension.dart';
 import 'package:skana_pix/utils/leaders.dart';
 import 'package:skana_pix/utils/widgetplugin.dart';
 
@@ -119,7 +122,7 @@ class _ImageListViewPageState extends State<ImageListViewPage> {
                 top: 0,
                 bottom: 32,
                 child: Center(
-                    child: IconButton.ghost(
+                    child: IconButton(
                   icon: const Icon(Icons.chevron_right),
                   onPressed: () {
                     nextPage();
@@ -134,7 +137,7 @@ class _ImageListViewPageState extends State<ImageListViewPage> {
                 top: 0,
                 bottom: 32,
                 child: Center(
-                    child: IconButton.ghost(
+                    child: IconButton(
                   icon: const Icon(Icons.chevron_left),
                   onPressed: () {
                     previousPage();
@@ -199,7 +202,7 @@ class _IllustPageState extends State<IllustPage> {
         tag: "related_${widget.illust.id}");
     relatedListController.refreshController = _refreshController;
     relatedListController.firstLoad();
-    if (user.isPremium) {
+    if (accountController.isPremium.value) {
       ListIllustController.historyIds.add(widget.illust.id);
     }
     _scrollController.addListener(() {
@@ -223,11 +226,36 @@ class _IllustPageState extends State<IllustPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      child: ColoredBox(
-        color: Theme.of(context).colorScheme.background,
+      floatingActionButton: Obx(() => AnimatedSwitcher(
+                        duration: const Duration(milliseconds: 300),
+                        child: (relatedListController.showBackArea.value)
+                            ? MoonButton.icon(
+                                buttonSize: MoonButtonSize.lg,
+                                showBorder: true,
+                                borderColor: Get.context?.moonTheme?.buttonTheme
+                                    .colors.borderColor
+                                    .withValues(alpha: 0.5),
+                                backgroundColor:
+                                    Get.context?.moonTheme?.tokens.colors.zeno,
+                                onTap: () {
+                                  _scrollController.animateTo(0,
+                                      duration:
+                                          const Duration(milliseconds: 300),
+                                      curve: Curves.easeInOut);
+                                },
+                                icon: Icon(
+                                  Icons.arrow_upward,
+                                  color: Colors.white,
+                                ),
+                              )
+                            : Container())),
+      body: ColoredBox(
+        color: context.moonTheme?.tokens.colors.goku ??
+            Theme.of(context).colorScheme.surface,
         child: SizedBox.expand(
           child: ColoredBox(
-            color: Theme.of(context).colorScheme.background,
+            color: context.moonTheme?.tokens.colors.goku ??
+                Theme.of(context).colorScheme.surface,
             child: LayoutBuilder(builder: (context, constrains) {
               return Stack(
                 children: [
@@ -237,32 +265,6 @@ class _IllustPageState extends State<IllustPage> {
                     right: 0,
                     top: 0,
                     child: buildBody(constrains.maxWidth, constrains.maxHeight),
-                  ),
-                  Positioned(
-                    bottom: 0,
-                    left: 0,
-                    right: 0,
-                    child: Obx(() => AnimatedSwitcher(
-                          duration: const Duration(milliseconds: 300),
-                          child: (relatedListController.showBackArea.value)
-                              ? Button(
-                                  style: ButtonStyle.card(
-                                      size: ButtonSize.small,
-                                      density: ButtonDensity.dense),
-                                  onPressed: () {
-                                    _scrollController.animateTo(0,
-                                        duration:
-                                            const Duration(milliseconds: 300),
-                                        curve: Curves.easeInOut);
-                                  },
-                                  child: Icon(
-                                    Icons.arrow_upward,
-                                    size: 30,
-                                  ).paddingOnly(right: 6, top: 1, bottom: 1),
-                                ).withAlign(Alignment(1.05, 0.9)).paddingOnly(
-                                  bottom: Get.mediaQuery.size.height * 0.05)
-                              : Container(),
-                        )),
                   ),
                   _buildAppbar(context),
                 ],
@@ -283,16 +285,16 @@ class _IllustPageState extends State<IllustPage> {
               SizedBox(
                 height: MediaQuery.sizeOf(context).height / 2.3,
               ),
-              Text("This artwork is blocked".tr).h4(),
+              Text("This artwork is blocked".tr).header(),
               const SizedBox(
                 height: 16,
               ),
-              Button.secondary(
+              filledButton(
                   onPressed: () {
                     localManager.delete(
                         "blockedIllusts", [widget.illust.id.toString()]);
                   },
-                  child: Text("Unblock".tr)),
+                  label: "Unblock".tr),
             ]),
           ),
         );
@@ -363,22 +365,20 @@ class _IllustPageState extends State<IllustPage> {
     }
     Widget image;
 
-    var imageUrl = settings.showOriginal
+    var imageUrl = relatedListController.showOriginal
         ? widget.illust.images[index].original
         : widget.illust.images[index].medium;
 
     if (!widget.illust.isUgoira) {
       image = SizedBox(
-          width: imageWidth,
-          height: imageHeight,
+          width: MediaQuery.of(context).size.width,
           child: GestureDetector(
               onTap: () => Get.to(() => ImageViewPage(
                   widget.illust.images.map((e) => e.large).toList(),
                   initialPage: index)),
               child: PixivImage(
                 imageUrl,
-                width: width,
-                height: height,
+                width: MediaQuery.of(context).size.width,
               )));
     } else {
       image = UgoiraWidget(
@@ -408,105 +408,114 @@ class _IllustPageState extends State<IllustPage> {
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             CommonBackArea(),
-            Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                IconButton.ghost(
-                    icon: const DecoratedIcon(
-                      icon: Icon(Icons.more_vert),
-                      decoration:
-                          IconDecoration(border: IconBorder(width: 1.5)),
+            Obx(() => MoonDropdown(
+                constrainWidthToChild: true,
+                show: relatedListController.showDropdown.value,
+                onTapOutside: () =>
+                    relatedListController.showDropdown.value = false,
+                content: SizedBox(
+                  child: Column(children: [
+                    MoonMenuItem(
+                      onTap: () => Get.to(UserPage(
+                        id: widget.illust.author.id,
+                        heroTag: hashCode.toString(),
+                        type: widget.illust.type == "illust"
+                            ? ArtworkType.ILLUST
+                            : ArtworkType.MANGA,
+                      )),
+                      leading: Hero(
+                        tag: widget.illust.author.avatar + hashCode.toString(),
+                        child: PainterAvatar(
+                          url: widget.illust.author.avatar,
+                          id: widget.illust.author.id,
+                          size: 32,
+                        ),
+                      ),
+                      trailing: UserFollowButton(
+                          liked: widget.illust.author.isFollowed,
+                          id: widget.illust.author.id.toString()),
+                      label: SelectionArea(
+                        child: Text(widget.illust.author.name,
+                                maxLines: 1, overflow: TextOverflow.ellipsis)
+                            .subHeader(),
+                      ),
                     ),
-                    onPressed: () {
-                      showDropdown(
-                          context: context,
-                          builder: (_) => DropdownMenu(children: [
-                                MenuLabel(
-                                  leading: Hero(
-                                    tag: widget.illust.author.avatar +
-                                        hashCode.toString(),
-                                    child: PainterAvatar(
-                                      url: widget.illust.author.avatar,
-                                      id: widget.illust.author.id,
-                                      size: 32,
-                                    ),
-                                  ),
-                                  trailing: UserFollowButton(
-                                      liked: widget.illust.author.isFollowed,
-                                      id: widget.illust.author.id.toString()),
-                                  child: SelectionArea(
-                                    child: Text(
-                                      widget.illust.author.name,
-                                      style: TextStyle(
-                                          fontSize: 14,
-                                          color: Theme.of(context)
-                                              .typography
-                                              .textSmall
-                                              .color),
-                                    ),
-                                  ),
-                                ),
-                                if (widget.illust.images.length > 1)
-                                  MenuButton(
-                                    onPressed: (context) {
-                                      _showMutiChoiceDialog(
-                                          widget.illust, context);
-                                    },
-                                    leading: const Icon(
-                                      Icons.save,
-                                    ),
-                                    child: Text("Multi-choice Save".tr),
-                                  ),
-                                MenuButton(
-                                  leading: Icon(
-                                    Icons.share,
-                                  ),
-                                  onPressed: (context) {
-                                    final box = context.findRenderObject()
-                                        as RenderBox?;
-                                    final pos = box != null
-                                        ? box.localToGlobal(Offset.zero) &
-                                            box.size
-                                        : null;
-                                    Share.share(
-                                        "https://www.pixiv.net/artworks/${widget.illust.id}",
-                                        sharePositionOrigin: pos);
-                                  },
-                                  child: Text("Share".tr),
-                                ),
-                                MenuButton(
-                                  leading: Icon(
-                                    Icons.link,
-                                  ),
-                                  child: Text("Link".tr),
-                                  onPressed: (context) async {
-                                    await Clipboard.setData(ClipboardData(
-                                        text:
-                                            "https://www.pixiv.net/artworks/${widget.illust.id}"));
-                                    Leader.showToast("Copied to clipboard".tr);
-                                  },
-                                ),
-                                MenuButton(
-                                    leading: Icon(Icons.block),
-                                    onPressed: (context) {
-                                      if (localManager.blockedIllusts.contains(
-                                          widget.illust.id.toString())) {
-                                        settings.removeBlockedIllusts(
-                                            [widget.illust.id.toString()]);
-                                      } else {
-                                        settings.addBlockedIllusts(
-                                            [widget.illust.id.toString()]);
-                                      }
-                                    },
-                                    child: Obx(() => localManager.blockedIllusts
-                                            .contains(
-                                                widget.illust.id.toString())
-                                        ? Text("Unblock".tr)
-                                        : Text("Block".tr))),
-                              ]));
-                    })
-              ],
-            )
+                    if (widget.illust.images.length > 1)
+                      MoonMenuItem(
+                        onTap: () {
+                          relatedListController.showDropdown.value = false;
+                          _showMutiChoiceDialog(widget.illust, context);
+                        },
+                        leading: const Icon(
+                          Icons.save,
+                        ),
+                        label: Text("Multi-choice Save".tr),
+                      ),
+                    MoonMenuItem(
+                      leading: const Icon(
+                        Icons.share,
+                      ),
+                      onTap: () {
+                        relatedListController.showDropdown.value = false;
+                        final box = context.findRenderObject() as RenderBox?;
+                        final pos = box != null
+                            ? box.localToGlobal(Offset.zero) & box.size
+                            : null;
+                        Share.share(
+                            "https://www.pixiv.net/artworks/${widget.illust.id}",
+                            sharePositionOrigin: pos);
+                      },
+                      label: Text("Share".tr),
+                    ),
+                    MoonMenuItem(
+                      leading: Icon(
+                        Icons.link,
+                      ),
+                      label: Text("Link".tr),
+                      onTap: () async {
+                        relatedListController.showDropdown.value = false;
+                        await Clipboard.setData(ClipboardData(
+                            text:
+                                "https://www.pixiv.net/artworks/${widget.illust.id}"));
+                        Leader.showToast("Copied to clipboard".tr);
+                      },
+                    ),
+                    MoonMenuItem(
+                        leading: Icon(Icons.block),
+                        onTap: () {
+                          relatedListController.showDropdown.value = false;
+                          if (localManager.blockedIllusts
+                              .contains(widget.illust.id.toString())) {
+                            localManager.delete("blockedIllusts",
+                                [widget.illust.id.toString()]);
+                          } else {
+                            localManager.add("blockedIllusts",
+                                [widget.illust.id.toString()]);
+                          }
+                        },
+                        label: Obx(() => localManager.blockedIllusts
+                                .contains(widget.illust.id.toString())
+                            ? Text("Unblock".tr)
+                            : Text("Block".tr))),
+                  ]),
+                ),
+                child: SizedBox(
+                  width: max(200, min(300, context.width / 1.5)),
+                  child: Row(
+                    children: [
+                      Expanded(child: Spacer()),
+                      MoonButton.icon(
+                        icon: const DecoratedIcon(
+                          icon: Icon(Icons.more_vert),
+                          decoration:
+                              IconDecoration(border: IconBorder(width: 1.5)),
+                        ),
+                        onTap: () => relatedListController.showDropdown.value =
+                            !relatedListController.showDropdown.value,
+                      )
+                    ],
+                  ),
+                )))
           ],
         ),
       ],
@@ -514,95 +523,110 @@ class _IllustPageState extends State<IllustPage> {
   }
 
   Future _showMutiChoiceDialog(Illust illust, BuildContext context) async {
-    List<bool> indexs = [];
-    bool allOn = false;
-    for (int i = 0; i < illust.images.length; i++) {
-      indexs.add(false);
-    }
-    final result = await showDialog(
+    MutiChoiceDialogController controller =
+        MutiChoiceDialogController(illust.images.length);
+    final result = await showMoonModal(
         context: context,
         builder: (context) {
-          return StatefulBuilder(builder: (context, setDialogState) {
-            return SafeArea(
-              child: AlertDialog(
-                title: Text(illust.title).withAlign(Alignment.centerLeft),
-                content: SizedBox(
-                  height: context.height / 1.5,
-                  child: GridView.builder(
-                    itemBuilder: (context, index) {
-                      final data = illust.images[index];
-                      return Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: InkWell(
-                          onTap: () {
-                            setDialogState(() {
-                              indexs[index] = !indexs[index];
-                            });
-                          },
-                          onLongPress: () {
-                            Get.to(() => ImageViewPage(
-                                illust.images.map((e) => e.large).toList(),
-                                initialPage: index));
-                          },
-                          child: Stack(
-                            children: [
-                              PixivImage(
-                                data.squareMedium,
-                                placeWidget: Center(
-                                  child: Text(index.toString()),
+          return Dialog(
+              child: Column(mainAxisSize: MainAxisSize.min, children: [
+            MoonAlert(
+              borderColor: Get
+                  .context?.moonTheme?.buttonTheme.colors.borderColor
+                  .withValues(alpha: 0.5),
+              showBorder: true,
+              label: Text(illust.title).header(),
+              verticalGap: 16,
+              content: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      SizedBox(
+                        height: context.height / 2,
+                        child: GridView.builder(
+                          itemBuilder: (context, index) {
+                            final data = illust.images[index];
+                            return Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: InkWell(
+                                onTap: () {
+                                    controller.indexs[index] = !controller.indexs[index];
+                                    controller.indexs.refresh();
+                                },
+                                onLongPress: () {
+                                  Get.to(() => ImageViewPage(
+                                      illust.images
+                                          .map((e) => e.large)
+                                          .toList(),
+                                      initialPage: index));
+                                },
+                                child: Stack(
+                                  children: [
+                                    PixivImage(
+                                      data.squareMedium,
+                                      placeWidget: Center(
+                                        child: Text(index.toString()),
+                                      ),
+                                    ),
+                                    Obx(() => Align(
+                                        alignment: Alignment.bottomRight,
+                                        child: Visibility(
+                                            visible: controller.indexs[index],
+                                            child: Padding(
+                                              padding:
+                                                  const EdgeInsets.all(4.0),
+                                              child: Icon(
+                                                Icons.check_circle,
+                                                color: Colors.green,
+                                              ),
+                                            )))),
+                                  ],
                                 ),
                               ),
-                              Align(
-                                  alignment: Alignment.bottomRight,
-                                  child: Visibility(
-                                      visible: indexs[index],
-                                      child: Padding(
-                                        padding: const EdgeInsets.all(4.0),
-                                        child: Icon(
-                                          Icons.check_circle,
-                                          color: Colors.green,
-                                        ),
-                                      ))),
-                            ],
-                          ),
+                            );
+                          },
+                          itemCount: illust.images.length,
+                          gridDelegate:
+                              SliverGridDelegateWithFixedCrossAxisCount(
+                                  crossAxisCount: 3),
                         ),
-                      );
-                    },
-                    itemCount: illust.images.length,
-                    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                        crossAxisCount: 3),
-                  ),
-                ),
-                actions: [
-                  PrimaryButton(
-                    leading: Icon(!allOn
-                        ? Icons.check_circle_outline
-                        : Icons.check_circle),
-                    child: Text("All".tr),
-                    onPressed: () {
-                      allOn = !allOn;
-                      for (var i = 0; i < indexs.length; i++) {
-                        indexs[i] = allOn;
-                      }
-                      setDialogState(() {});
-                    },
-                  ),
-                  PrimaryButton(
-                    leading: Icon(Icons.save),
-                    child: Text("Save".tr),
-                    onPressed: () {
-                      Get.back(result: "OK");
-                    },
-                  ),
-                ],
-              ),
-            );
-          });
+                      ).paddingBottom(16),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        children: [
+                          MoonFilledButton(
+                            buttonSize: MoonButtonSize.sm,
+                            leading: Icon(!controller.allOn.value
+                                ? Icons.check_circle_outline
+                                : Icons.check_circle),
+                            label: Text("All".tr),
+                            onTap: () {
+                              controller.allOn.value = !controller.allOn.value;
+                              for (var i = 0; i < controller.indexs.length; i++) {
+                                controller.indexs[i] = controller.allOn.value;
+                              }
+                              controller.indexs.refresh();
+                            },
+                          ).paddingRight(8),
+                          MoonFilledButton(
+                            buttonSize: MoonButtonSize.sm,
+                            leading: Icon(Icons.save),
+                            label: Text("Save".tr),
+                            onTap: () {
+                              Get.back(result: "OK");
+                            },
+                          ),
+                        ],
+                      )
+                    ],
+                  )),
+            
+          ]));
         });
     switch (result) {
       case "OK":
         {
-          saveImage(illust, indexes: indexs);
+          saveImage(illust, indexes: controller.indexs);
         }
     }
   }
@@ -635,5 +659,14 @@ class _IllustPageLiteState extends State<IllustPageLite> {
     return Obx(() => controller.isLoading.value
         ? Container()
         : ImageListViewPage(controllerTag: "illust_${widget.id}", index: 0));
+  }
+}
+
+class MutiChoiceDialogController extends GetxController {
+  RxList<bool> indexs = RxList.empty();
+  RxBool allOn = false.obs;
+  MutiChoiceDialogController(int length) {
+    indexs = RxList.filled(length, false);
+    indexs.refresh();
   }
 }
