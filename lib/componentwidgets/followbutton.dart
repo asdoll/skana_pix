@@ -7,6 +7,7 @@ import 'package:skana_pix/utils/widgetplugin.dart';
 class UserFollowButton extends StatefulWidget {
   final bool liked;
   final String id;
+  
   const UserFollowButton({super.key, required this.liked, required this.id});
 
   @override
@@ -31,6 +32,7 @@ class _UserFollowButtonState extends State<UserFollowButton> {
                 label: "Follow".tr);
           case 1:
             return MoonButton.icon(
+              buttonSize: MoonButtonSize.sm,
               showBorder: true,
               icon: Center(
                   child: Padding(

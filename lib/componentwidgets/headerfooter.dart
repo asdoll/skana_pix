@@ -15,7 +15,7 @@ class DefaultHeaderFooter {
         readyText: 'Refreshing...'.tr,
         processingText: 'Refreshing...'.tr,
         processedText: 'Succeeded'.tr,
-        processedDuration: Duration(seconds: 1),
+        processedDuration: Duration(milliseconds: 50),
         noMoreText: 'No more'.tr,
         failedText: 'Failed'.tr,
         showText: true,

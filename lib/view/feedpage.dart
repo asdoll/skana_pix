@@ -2,6 +2,7 @@ import 'package:get/get.dart';
 import 'package:moon_design/moon_design.dart';
 import 'package:skana_pix/controller/list_controller.dart';
 import 'package:skana_pix/model/worktypes.dart';
+import 'package:skana_pix/utils/widgetplugin.dart';
 import 'package:skana_pix/view/imageview/imagewaterfall.dart';
 import 'package:skana_pix/view/novelview/novellist.dart';
 import 'package:flutter/material.dart';
@@ -46,7 +47,7 @@ class _FeedIllustState extends State<FeedIllust>
               label: Text("Private".tr),
             )
           ],
-        ),
+        ).paddingLeft(16).toAlign(Alignment.topLeft),
         Expanded(
           child: TabBarView(
             controller: tabController,
@@ -128,7 +129,7 @@ class _FeedNovelState extends State<FeedNovel> with SingleTickerProviderStateMix
               label: Text("Private".tr),
             )
           ],
-        ),
+        ).paddingLeft(16).toAlign(Alignment.topLeft),
         Expanded(
           child: TabBarView(
             controller: tabController,

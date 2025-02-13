@@ -1,5 +1,4 @@
-import 'package:shadcn_flutter/shadcn_flutter.dart';
-import 'package:flutter/material.dart' show FlexibleSpaceBar, InkWell;
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:icon_decoration/icon_decoration.dart';
 import 'package:skana_pix/model/spotlight.dart';
@@ -38,7 +37,8 @@ class _SoupPageState extends State<SoupPage> {
         Get.put(SoupFetcher(), tag: "soupFetcher_${widget.heroTag}");
     soupFetcher.fetch(widget.url);
     return Obx(() {
-      return NestedScrollView(
+      return Scaffold(
+        body: NestedScrollView(
           body: soupFetcher.amWorks.isEmpty
               ? Center(
                   child: CircularProgressIndicator(),
@@ -47,12 +47,13 @@ class _SoupPageState extends State<SoupPage> {
                   itemBuilder: (BuildContext context, int index) {
                     return Builder(builder: (context) {
                       if (index == 0) {
-                        if (soupFetcher.description.isEmpty)
+                        if (soupFetcher.description.isEmpty) {
                           return Container(height: 1);
+                        }
                         return Card(
                           child: Padding(
                             padding: const EdgeInsets.all(8.0),
-                            child: Text(soupFetcher.description).h3(),
+                            child: Text(soupFetcher.description).appHeader(),
                           ),
                         );
                       }
@@ -82,16 +83,17 @@ class _SoupPageState extends State<SoupPage> {
                                                 .pathSegments
                                                 .length -
                                             1]),
-                                    size: 60,
+                                    size: 50,
                                   ),
                                   SizedBox(width: 15),
                                   Column(
                                     crossAxisAlignment:
                                         CrossAxisAlignment.start,
                                     children: [
-                                      Text(trimSize(amWork.title!)).h4(),
+                                      Text(trimSize(amWork.title!))
+                                          .appSubHeader(),
                                       SizedBox(height: 4),
-                                      Text(amWork.user!,style: Theme.of(context).typography.textSmall.copyWith(color: Theme.of(context).colorScheme.mutedForeground)),
+                                      Text(amWork.user!).subHeader(),
                                     ],
                                   ),
                                 ],
@@ -109,7 +111,7 @@ class _SoupPageState extends State<SoupPage> {
             return [
               if (widget.spotlight != null)
                 SliverAppBar(
-                  leading: IconButton.ghost(
+                  leading: IconButton(
                     icon: DecoratedIcon(
                       icon: Icon(Icons.arrow_back),
                       decoration:
@@ -133,17 +135,16 @@ class _SoupPageState extends State<SoupPage> {
                             foreground: Paint()
                               ..style = PaintingStyle.stroke
                               ..strokeWidth = 0.5
-                              ..color =
-                                  Theme.of(context).colorScheme.background,
+                              ..color = Colors.black,
                           ),
-                        ).medium(),
+                        ).subHeaderForgound(),
                         // Solid text as fill.
                         Text(
                           widget.spotlight!.pureTitle,
                           style: TextStyle(
-                            color: Theme.of(context).colorScheme.foreground,
+                            color: Colors.white,
                           ),
-                        ).medium(),
+                        ).subHeader(),
                       ],
                     ),
                     background: NullHero(
@@ -156,9 +157,9 @@ class _SoupPageState extends State<SoupPage> {
                     ),
                   ),
                   actions: <Widget>[
-                    IconButton.ghost(
+                    IconButton(
                       icon: const DecoratedIcon(
-                        icon: Icon(Icons.share),
+                        icon: Icon(Icons.share, color: Colors.white),
                         decoration:
                             IconDecoration(border: IconBorder(width: 1.5)),
                       ),
@@ -172,7 +173,8 @@ class _SoupPageState extends State<SoupPage> {
               else
                 SliverAppBar()
             ];
-          });
+          }),
+      );
     });
   }
 }

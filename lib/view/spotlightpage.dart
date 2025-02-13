@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:skana_pix/controller/mini_controllers.dart';
 import 'package:skana_pix/controller/soup_controller.dart';
+import 'package:skana_pix/utils/widgetplugin.dart';
 import 'package:waterfall_flow/waterfall_flow.dart';
 
 import '../componentwidgets/headerfooter.dart';
@@ -40,13 +41,15 @@ class _SpotlightPageState extends State<SpotlightPage> {
         controller: refreshController,
         child: WaterfallFlow.builder(
           gridDelegate: SliverWaterfallFlowDelegateWithFixedCrossAxisCount(
+              mainAxisSpacing: 4,
+              crossAxisSpacing: 4,
               crossAxisCount: max(2, (context.width / 250).floor())),
           controller: globalScrollController,
           itemBuilder: (BuildContext context, int index) {
             return SpotlightCard(spotlight: spotlightStore.articles[index]);
           },
           itemCount: spotlightStore.articles.length,
-        ),
+        ).paddingTop(4),
       );
     });
   }

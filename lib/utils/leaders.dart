@@ -17,8 +17,9 @@ class Leader {
   static showToast(String text) {
     try {
       MoonToast.show(
+        backgroundColor: MoonColors.dark.gohan,
         Get.context!,
-        label: Text(text),
+        label: Text(text, style: TextStyle(color: MoonColors.light.goku)),
       );
     } catch (e) {
       log.e(e);

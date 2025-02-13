@@ -49,6 +49,7 @@ class _PainterCardState extends State<PainterCard> {
   @override
   Widget build(BuildContext context) {
     return moonListTileWidgets(
+      menuItemPadding: EdgeInsets.all(6),
       onTap: () async {
         Get.to(() => UserPage(
               id: user.id,
@@ -70,7 +71,7 @@ class _PainterCardState extends State<PainterCard> {
             child: i < works.length
                 ? (works[i] is Novel
                     ? buildCardNovel(context, works[i] as Novel)
-                    : buildCardIllust(context, works[i] as Illust))
+                    : buildCardIllust(context, works[i] as Illust)).paddingOnly(bottom: 8, left: 2, right: 2)
                 : Container(),
           )
       ],
@@ -104,7 +105,7 @@ class _PainterCardState extends State<PainterCard> {
                   novel.title,
                   maxLines: 3,
                   overflow: TextOverflow.ellipsis,
-                ).small(),
+                ).subHeader(),
               ),
             )
           ],
@@ -124,9 +125,7 @@ class _PainterCardState extends State<PainterCard> {
   }
 
   Widget buildPadding(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.all(8.0),
-      child: Row(
+    return Row(
         crossAxisAlignment: CrossAxisAlignment.center,
         mainAxisAlignment: MainAxisAlignment.start,
         children: <Widget>[
@@ -147,7 +146,7 @@ class _PainterCardState extends State<PainterCard> {
             child: Padding(
               padding: const EdgeInsets.all(16.0),
               child:
-                  Text(user.name, maxLines: 1, overflow: TextOverflow.ellipsis),
+                  Text(user.name, maxLines: 1, overflow: TextOverflow.ellipsis).subHeader(),
             ),
           ),
           UserFollowButton(
@@ -155,7 +154,7 @@ class _PainterCardState extends State<PainterCard> {
             id: user.id.toString(),
           )
         ],
-      ),
+      
     );
   }
 }

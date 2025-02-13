@@ -1,8 +1,10 @@
-import 'package:shadcn_flutter/shadcn_flutter.dart';
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:moon_design/moon_design.dart';
 import 'package:skana_pix/componentwidgets/chip.dart';
 import 'package:skana_pix/controller/like_controller.dart';
 import 'package:skana_pix/controller/mini_controllers.dart';
+import 'package:skana_pix/utils/widgetplugin.dart';
 
 import 'novelview/novelresult.dart';
 import 'imageview/imagesearchresult.dart';
@@ -32,7 +34,7 @@ class _MyTagsPageState extends State<MyTagsPage> {
               children: [
                 Text(
                   "Illust•Manga".tr,
-                ).h4(),
+                ).header(),
               ],
             ),
           ),
@@ -53,9 +55,8 @@ class _MyTagsPageState extends State<MyTagsPage> {
                                 onTap: () => Get.to(
                                     () => IllustResultPage(word: f),
                                     preventDuplicates: false)),
-                          Chip(
-                              style: ButtonStyle.primary(),
-                              child: AnimatedSwitcher(
+                          MoonChip(
+                              label: AnimatedSwitcher(
                                 duration: Duration(milliseconds: 300),
                                 transitionBuilder: (child, anim) {
                                   return ScaleTransition(
@@ -65,7 +66,7 @@ class _MyTagsPageState extends State<MyTagsPage> {
                                     ? Icons.expand_more
                                     : Icons.expand_less),
                               ),
-                              onPressed: () {
+                              onTap: () {
                                 setState(() {
                                   _tagExpand = !_tagExpand;
                                 });
@@ -94,7 +95,7 @@ class _MyTagsPageState extends State<MyTagsPage> {
                   child: Column(children: [
                     SizedBox(height: 20),
                     Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-                      Text("No bookmarked tags".tr).textSmall(),
+                      Text("No bookmarked tags".tr).small(),
                     ]),
                   ]),
                 ),
@@ -102,48 +103,41 @@ class _MyTagsPageState extends State<MyTagsPage> {
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Button(
-                  style: ButtonStyle.card(density: ButtonDensity.dense),
-                  onPressed: () {
-                    showDialog(
-                        context: context,
-                        builder: (context) {
-                          return AlertDialog(
-                            title: Text("Clean history?".tr)
-                                .withAlign(Alignment.centerLeft),
-                            actions: [
-                              OutlineButton(
+                MoonFilledButton(
+                  onTap: () {
+                    alertDialog(context,
+                            "Clean history?".tr,
+                            "",
+                            [
+                              outlinedButton(
                                   onPressed: () {
                                     Get.back();
                                   },
-                                  child: Text("Cancel".tr)),
-                              PrimaryButton(
+                                  label: "Cancel".tr),
+                              filledButton(
                                   onPressed: () {
                                     localManager.clear("bookmarkedTags");
                                     Get.back();
                                   },
-                                  child: Text("Ok".tr)),
+                                  label: "Ok".tr),
                             ],
                           );
-                        });
-                  },
-                  child: Basic(
+                        },
                     leading: Icon(Icons.delete_outline),
-                    title: Text("Delete all".tr).textSmall(),
-                  ),
+                    label: Text("Delete all".tr).small(),
                 ),
               ],
             ).paddingAll(16.0),
           Padding(padding: EdgeInsets.only(top: 16.0)),
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16.0),
+            padding: const EdgeInsets.all(16.0),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               crossAxisAlignment: CrossAxisAlignment.end,
               children: [
                 Text(
                   "Novel".tr,
-                ).h4(),
+                ).header(),
               ],
             ),
           ),
@@ -165,9 +159,8 @@ class _MyTagsPageState extends State<MyTagsPage> {
                                   () => NovelResultPage(word: f),
                                   preventDuplicates: false),
                             ),
-                          Chip(
-                              style: ButtonStyle.primary(),
-                              child: AnimatedSwitcher(
+                          MoonChip(
+                              label: AnimatedSwitcher(
                                 duration: Duration(milliseconds: 300),
                                 transitionBuilder: (child, anim) {
                                   return ScaleTransition(
@@ -177,7 +170,7 @@ class _MyTagsPageState extends State<MyTagsPage> {
                                     ? Icons.expand_more
                                     : Icons.expand_less),
                               ),
-                              onPressed: () {
+                              onTap: () {
                                 setState(() {
                                   _tagExpandNovel = !_tagExpandNovel;
                                 });
@@ -208,42 +201,35 @@ class _MyTagsPageState extends State<MyTagsPage> {
                     SizedBox(height: 20),
                     Row(
                         mainAxisAlignment: MainAxisAlignment.center,
-                        children: [Text("No bookmarked tags".tr).textSmall()]),
+                        children: [Text("No bookmarked tags".tr).small()]),
                   ]),
                 ),
           if (localManager.bookmarkedNovelTags.isNotEmpty)
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Button(
-                  style: ButtonStyle.card(density: ButtonDensity.dense),
-                  onPressed: () {
-                    showDialog(
-                        context: context,
-                        builder: (context) {
-                          return AlertDialog(
-                            title: Text("Clean history?".tr)
-                                .withAlign(Alignment.centerLeft),
-                            actions: [
-                              OutlineButton(
+                MoonFilledButton(
+                  onTap: () {
+                    alertDialog(context,
+                            "Clean history?".tr,
+                            "",
+                            [
+                              outlinedButton(
                                   onPressed: () {
                                     Get.back();
                                   },
-                                  child: Text("Cancel".tr)),
-                              PrimaryButton(
+                                  label: "Cancel".tr),
+                              filledButton(
                                   onPressed: () {
                                     localManager.clear("bookmarkedNovelTags");
                                     Get.back();
                                   },
-                                  child: Text("Ok".tr)),
+                                  label: "Ok".tr),
                             ],
                           );
-                        });
-                  },
-                  child: Basic(
+                        },
                     leading: Icon(Icons.delete_outline),
-                    title: Text("Delete all".tr).textSmall(),
-                  ),
+                    label: Text("Delete all".tr).small(),
                 ),
               ],
             ).paddingAll(16.0),

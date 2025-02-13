@@ -59,28 +59,31 @@ class _HomePageState extends State<HomePage> {
           title: (homeController.pageIndex.value == 7)
               ? SearchBar1(searchPageController
                   .getAwType(searchPageController.selectedIndex.value))
-              : MoonMenuItem(
-                  onTap: () {},
-                  label:
-                      Text(getTitle(pages[homeController.pageIndex.value]).tr)
-                          .appHeader(),
-                  verticalGap: 0,
-                  content: getSubtitle(pages[homeController.pageIndex.value]).isNotEmpty
+              : Row(children: [
+                  Text(getTitle(pages[homeController.pageIndex.value]).tr)
+                      .appHeader().paddingRight(8),
+                  getSubtitle(pages[homeController.pageIndex.value]).isNotEmpty
                       ? Text(getSubtitle(pages[homeController.pageIndex.value]).tr,
                               style: TextStyle(
                                   color: Get.context?.moonTheme?.textAreaTheme
                                       .colors.helperTextColor))
                           .appSubHeader()
-                      : ((homeController.pageIndex.value == 5)
+                      : (homeController.pageIndex.value == 5)
                           ? Text(
                                   rankTagsMap[homeController.tagList(homeController.workIndex.value)[homeController.tagIndex.value]] ??
-                                      homeController.tagList(homeController
-                                          .workIndex
-                                          .value)[homeController.tagIndex.value],
-                                  style: TextStyle(color: Get.context?.moonTheme?.textAreaTheme.colors.helperTextColor))
+                                      homeController.tagList(
+                                              homeController.workIndex.value)[
+                                          homeController.tagIndex.value],
+                                  style: TextStyle(
+                                      color: Get
+                                          .context
+                                          ?.moonTheme
+                                          ?.textAreaTheme
+                                          .colors
+                                          .helperTextColor))
                               .subHeader()
-                          : null),
-                ),
+                          : Container()
+                ]),
           shape: Border(
               bottom: BorderSide(
             color: Get.theme.colorScheme.onSurface.withValues(alpha: 0.5),
@@ -243,7 +246,7 @@ class _HomePageState extends State<HomePage> {
               buildButton('Following'.tr, BootstrapIcons.person, 10),
               buildButton('History'.tr, BootstrapIcons.clock, 11),
               buildButton('Settings'.tr, BootstrapIcons.gear, 12),
-            ])),
+            ]).paddingSymmetric(horizontal: 8)),
         floatingActionButton: GoTop(),
         body: switch (homeController.pageIndex.value) {
           0 => RecomIllustsPage(),
@@ -278,9 +281,10 @@ class _HomePageState extends State<HomePage> {
             ? Get.context?.moonTheme?.tokens.colors.piccolo
             : Colors.transparent,
         label: Text(label,
-            style: homeController.pageIndex.value == index
-                ? TextStyle(color: MoonColors.light.goku)
-                : null),
+                style: homeController.pageIndex.value == index
+                    ? TextStyle(color: MoonColors.light.goku)
+                    : null)
+            .subHeader(),
         leading: icon == null
             ? null
             : Icon(
@@ -296,7 +300,7 @@ class _HomePageState extends State<HomePage> {
       );
     }
     return MoonMenuItem(
-      label: Text(label),
+      label: Text(label).subHeader(),
       leading: icon == null ? null : Icon(icon),
     );
   }

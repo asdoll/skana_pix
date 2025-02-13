@@ -1,14 +1,12 @@
 import 'package:easy_refresh/easy_refresh.dart';
-import 'package:shadcn_flutter/shadcn_flutter.dart';
-import 'package:flutter/material.dart'
-    show InkWell, AdaptiveTextSelectionToolbar, SelectionArea;
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:skana_pix/componentwidgets/backarea.dart';
+import 'package:moon_design/moon_design.dart';
 import 'package:skana_pix/componentwidgets/headerfooter.dart';
 import 'package:skana_pix/componentwidgets/pixivimage.dart';
 import 'package:skana_pix/controller/comment_controller.dart';
-import 'package:skana_pix/controller/like_controller.dart';
 import 'package:skana_pix/utils/io_extension.dart';
+import 'package:skana_pix/utils/widgetplugin.dart';
 
 import '../model/worktypes.dart';
 import '../componentwidgets/avatar.dart';
@@ -135,8 +133,7 @@ class _CommentPageState extends State<CommentPage> {
     EasyRefreshController easyRefreshController = EasyRefreshController(
         controlFinishLoad: true, controlFinishRefresh: true);
     CommentController controller = Get.put(
-        CommentController(widget.id.toString(), widget.type,
-            widget.isReply),
+        CommentController(widget.id.toString(), widget.type, widget.isReply),
         tag: "comment_${widget.id}_${widget.type}");
     controller.easyRefreshController = easyRefreshController;
     return Listener(
@@ -148,17 +145,8 @@ class _CommentPageState extends State<CommentPage> {
         if (_focusNode.hasFocus) _focusNode.unfocus();
       },
       child: Scaffold(
-        headers: [
-          AppBar(
-            title: Text("Comments".tr),
-            padding: EdgeInsets.all(10),
-            leading: [
-              const NormalBackButton(),
-            ],
-          ),
-          const Divider()
-        ],
-        child: SafeArea(
+        appBar: appBar(title: "Comments".tr),
+        body: SafeArea(
           child: Obx(
             () => Column(
               children: <Widget>[
@@ -166,6 +154,7 @@ class _CommentPageState extends State<CommentPage> {
                   child: EasyRefresh(
                     controller: easyRefreshController,
                     header: DefaultHeaderFooter.header(context),
+                    footer: DefaultHeaderFooter.footer(context),
                     onRefresh: controller.reset,
                     refreshOnStart: true,
                     onLoad: controller.nextPage,
@@ -195,20 +184,18 @@ class _CommentPageState extends State<CommentPage> {
                                     mainAxisAlignment:
                                         MainAxisAlignment.spaceBetween,
                                     children: <Widget>[
-                                      Expanded(child: Text(
-                                        controller.comments[index].name,
-                                        maxLines: 1,
-                                        style: TextStyle(
-                                            color: Theme.of(context)
-                                                .colorScheme
-                                                .secondaryForeground,
-                                            overflow: TextOverflow.ellipsis),
-                                      ).semiBold(),),
+                                      Expanded(
+                                          child: Text(
+                                                  controller
+                                                      .comments[index].name,
+                                                  maxLines: 1,
+                                                  overflow:
+                                                      TextOverflow.ellipsis)
+                                              .header()),
                                       Row(
                                         children: [
                                           if (!widget.isReply)
-                                            PrimaryButton(
-                                                density: ButtonDensity.dense,
+                                            filledButton(
                                                 onPressed: () {
                                                   controller.parentCommentId
                                                           .value =
@@ -219,62 +206,61 @@ class _CommentPageState extends State<CommentPage> {
                                                       controller
                                                           .comments[index].name;
                                                 },
-                                                child: Text("Reply".tr)),
+                                                label: "Reply".tr),
                                           Padding(
                                             padding: const EdgeInsets.symmetric(
                                                 horizontal: 12.0),
-                                            child: GhostButton(
-                                                density: ButtonDensity.dense,
+                                            child: IconButton(
                                                 onPressed: () {
-                                                  showDropdown(
-                                                      context: context,
-                                                      builder: (context) {
-                                                        return DropdownMenu(
-                                                          children: [
-                                                            MenuButton(
-                                                              leading: const Icon(
-                                                                Icons.person_off,
-                                                              ),
-                                                              child: Text(
-                                                                  "Block User"
-                                                                      .tr),
-                                                              onPressed:
-                                                                  (_) async {
-                                                                localManager.add(
-                                                                    "blockedCommentUsers",
-                                                                    [
-                                                                      controller
-                                                                          .comments[
-                                                                              index]
-                                                                          .name
-                                                                    ]);
-                                                              },
-                                                            ),
-                                                            MenuButton(
-                                                              leading: const Icon(
-                                                                Icons.block,
-                                                              ),
-                                                              child: Text(
-                                                                  "Block Comment"
-                                                                      .tr),
-                                                              onPressed:
-                                                                  (_) async {
-                                                                Get.back();
-                                                                localManager.add(
-                                                                    "blockedComments",
-                                                                    [
-                                                                      controller
-                                                                          .comments[
-                                                                              index]
-                                                                          .comment
-                                                                    ]);
-                                                              },
-                                                            ),
-                                                          ],
-                                                        );
-                                                      });
+                                                  // showDropdown(
+                                                  //     context: context,
+                                                  //     builder: (context) {
+                                                  //       return DropdownMenu(
+                                                  //         children: [
+                                                  //           MenuButton(
+                                                  //             leading: const Icon(
+                                                  //               Icons.person_off,
+                                                  //             ),
+                                                  //             child: Text(
+                                                  //                 "Block User"
+                                                  //                     .tr),
+                                                  //             onPressed:
+                                                  //                 (_) async {
+                                                  //               localManager.add(
+                                                  //                   "blockedCommentUsers",
+                                                  //                   [
+                                                  //                     controller
+                                                  //                         .comments[
+                                                  //                             index]
+                                                  //                         .name
+                                                  //                   ]);
+                                                  //             },
+                                                  //           ),
+                                                  //           MenuButton(
+                                                  //             leading: const Icon(
+                                                  //               Icons.block,
+                                                  //             ),
+                                                  //             child: Text(
+                                                  //                 "Block Comment"
+                                                  //                     .tr),
+                                                  //             onPressed:
+                                                  //                 (_) async {
+                                                  //               Get.back();
+                                                  //               localManager.add(
+                                                  //                   "blockedComments",
+                                                  //                   [
+                                                  //                     controller
+                                                  //                         .comments[
+                                                  //                             index]
+                                                  //                         .comment
+                                                  //                   ]);
+                                                  //             },
+                                                  //           ),
+                                                  //         ],
+                                                  //       );
+                                                  //     });
                                                 },
-                                                child: const Icon(
+                                                icon: const Icon(
                                                     Icons.more_horiz)),
                                           )
                                         ],
@@ -323,14 +309,20 @@ class _CommentPageState extends State<CommentPage> {
                                       true)
                                     Padding(
                                       padding: const EdgeInsets.only(top: 8.0),
-                                      child: Chip(
-                                        child: Text("View Replies".tr),
-                                        onPressed: () async {
+                                      child: MoonFilledButton(
+                                        buttonSize: MoonButtonSize.sm,
+                                        backgroundColor: Get.context?.moonTheme
+                                            ?.tokens.colors.hit,
+                                        label: Text("View Replies".tr,
+                                            style:
+                                                TextStyle(color: Colors.black)),
+                                        onTap: () async {
                                           Get.to(
                                               CommentPage(
                                                 id: controller
                                                     .comments[index].id,
                                                 isReply: true,
+                                                type: controller.type,
                                               ),
                                               preventDuplicates: false);
                                         },
@@ -338,13 +330,9 @@ class _CommentPageState extends State<CommentPage> {
                                     ),
                                   Padding(
                                     padding: const EdgeInsets.only(top: 8.0),
-                                    child: Text(
-                                      controller.comments[index].date
-                                          .toShortTime(),
-                                      style: Theme.of(context)
-                                          .typography
-                                          .textSmall,
-                                    ),
+                                    child: Text(controller.comments[index].date
+                                            .toShortTime())
+                                        .small(),
                                   )
                                 ],
                               ),
@@ -367,15 +355,15 @@ class _CommentPageState extends State<CommentPage> {
                     children: [
                       Row(
                         children: <Widget>[
-                          IconButton.ghost(
-                            icon: Icon(Icons.book),
+                          IconButton(
+                            icon: Icon(Icons.book_outlined),
                             onPressed: () {
                               if (widget.isReply) return;
                               controller.parentCommentId.value = 0;
                               controller.parentCommentName.value = "";
                             },
                           ),
-                          IconButton.ghost(
+                          IconButton(
                             icon: Icon(Icons.emoji_emotions_outlined),
                             onPressed: () {
                               setState(() {
@@ -399,11 +387,11 @@ class _CommentPageState extends State<CommentPage> {
                                               .colorScheme
                                               .secondary),
                                 ),
-                                child: TextField(
-                                  placeholder: Text(
-                                      "${"Reply to".tr} ${controller.parentCommentName.value == "" ? "" : controller.parentCommentName.value}"),
+                                child: MoonFormTextInput(
+                                  hintText:
+                                      "${"Reply to".tr} ${controller.parentCommentName.value == "" ? "" : controller.parentCommentName.value}",
                                   controller: _editController,
-                                  trailing: IconButton.ghost(
+                                  trailing: IconButton(
                                       icon: const Icon(
                                         Icons.reply,
                                       ),

@@ -1,0 +1,2 @@
+C:/Users/ludeq/skana_pix/android/app/.cxx/Debug/x5bb255u/armeabi-v7a/CMakeFiles/edit_cache.dir
+C:/Users/ludeq/skana_pix/android/app/.cxx/Debug/x5bb255u/armeabi-v7a/CMakeFiles/rebuild_cache.dir

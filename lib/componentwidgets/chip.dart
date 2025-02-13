@@ -20,13 +20,19 @@ class PixChip extends StatelessWidget {
   Widget build(BuildContext context) {
     if (isSetting) {
       return MoonChip(
+          backgroundColor: context.moonTheme?.tokens.colors.cell60,
           onTap: () => delete(context, f, type),
           trailing: const Icon(Icons.close),
-          label: Text(f));
+          label: Text(f,
+              strutStyle: const StrutStyle(forceStrutHeight: true, leading: 0)));
     }
     return InkWell(
         onLongPress: () => delete(context, f, type),
-        child: MoonChip(label: Text(f), onTap: onTap));
+        child: MoonChip(
+            backgroundColor: context.moonTheme?.tokens.colors.cell60,
+            label: Text(f,
+                strutStyle: const StrutStyle(forceStrutHeight: true, leading: 0)),
+            onTap: onTap));
   }
 
   Future delete(BuildContext context, String f, String type) async {

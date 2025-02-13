@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:moon_design/moon_design.dart';
+import 'package:skana_pix/utils/widgetplugin.dart';
 import '../view/commentpage.dart';
 
 class CommentEmojiText extends StatefulWidget {
@@ -36,7 +37,7 @@ class _CommentEmojiTextState extends State<CommentEmojiText> {
     for (var element in text.characters) {
       if (element == '(') {
         if (template.isNotEmpty) {
-          spans.add(TextSpan(text: template));
+          spans.add(TextSpan(text: template).small());
           template = "";
         }
         emojiCollecting = true;
@@ -51,7 +52,7 @@ class _CommentEmojiTextState extends State<CommentEmojiText> {
               height: 20,
             )));
           } else {
-            spans.add(TextSpan(text: "($emojiText)"));
+            spans.add(TextSpan(text: "($emojiText)").small());
             template = "";
           }
         }
@@ -66,7 +67,7 @@ class _CommentEmojiTextState extends State<CommentEmojiText> {
       }
     }
     if (template.isNotEmpty) {
-      spans.add(TextSpan(text: template));
+      spans.add(TextSpan(text: template).small());
     }
     setState(() {
       _spans = spans;
@@ -76,10 +77,11 @@ class _CommentEmojiTextState extends State<CommentEmojiText> {
   @override
   Widget build(BuildContext context) {
     return Text.rich(
+      strutStyle: const StrutStyle(forceStrutHeight: true, leading: 0),
       TextSpan(
         style: context.moonTheme?.textAreaTheme.properties.textStyle,
         children: [for (var i in _spans) i],
-      ),
+      ).small(),
     );
   }
 }

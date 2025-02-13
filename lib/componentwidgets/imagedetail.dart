@@ -188,6 +188,8 @@ class _IllustDetailContentState extends State<IllustDetailContent> {
                 borderRadius: BorderRadius.all(Radius.circular(8)),
               ),
               child: RichText(
+                  strutStyle:
+                      const StrutStyle(forceStrutHeight: true, leading: 0),
                   textAlign: TextAlign.start,
                   text: TextSpan(text: "AI-generated".tr, children: [
                     TextSpan(text: " ").small(),
@@ -210,7 +212,7 @@ class _IllustDetailContentState extends State<IllustDetailContent> {
         padding: const EdgeInsets.symmetric(vertical: 6.0, horizontal: 14),
         child: Container(
           decoration: BoxDecoration(
-            color: Theme.of(context).colorScheme.secondary,
+            color: context.moonTheme?.tokens.colors.frieza60,
             borderRadius: BorderRadius.all(Radius.circular(16)),
           ),
           child: Padding(
@@ -259,10 +261,10 @@ class _IllustDetailContentState extends State<IllustDetailContent> {
         Icons.comment,
         size: 16,
         color: Theme.of(context).colorScheme.primary,
-      ),
-      label: Text(
-        "Show comments".tr,
-      ).small(),
+      ).paddingTop(2),
+      label: Text("Show comments".tr,
+              strutStyle: const StrutStyle(forceStrutHeight: true, leading: 0))
+          .small(),
     )).paddingSymmetric(vertical: 16);
   }
 
@@ -274,7 +276,7 @@ class _IllustDetailContentState extends State<IllustDetailContent> {
           Get.back(result: 0);
         },
       ),
-      outlinedButton(
+      filledButton(
         label: "Bookmark".tr,
         onPressed: () {
           Get.back(result: 1);
@@ -294,6 +296,7 @@ class _IllustDetailContentState extends State<IllustDetailContent> {
         break;
       case 1:
         {
+          Leader.showToast("Bookmarked".tr);
           localManager.add("bookmarkedTags", [f.name]);
         }
         break;
@@ -329,6 +332,8 @@ class _IllustDetailContentState extends State<IllustDetailContent> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             RichText(
+                strutStyle:
+                    const StrutStyle(forceStrutHeight: true, leading: 0),
                 textAlign: TextAlign.start,
                 overflow: TextOverflow.ellipsis,
                 maxLines: 1,

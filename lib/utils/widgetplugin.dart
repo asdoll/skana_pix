@@ -269,6 +269,17 @@ extension TextExtension on Text {
                 color: style?.color ??
                     Get.context?.moonTheme?.textAreaTheme.colors.textColor),
       );
+  
+  Text subHeaderForgound() => Text(
+        data ?? '',
+        maxLines: maxLines,
+        overflow: overflow,
+        strutStyle: strutStyle,
+        style: Get.context?.moonTheme?.tokens.typography.heading.text14
+            .copyWith(
+              foreground: style?.foreground ?? Get.context?.moonTheme?.tokens.typography.heading.text14.foreground,
+            ),
+      );
 
   Text xSmall() => Text(
         data ?? '',
@@ -307,7 +318,10 @@ extension TextExtension on Text {
 extension TextSpanExtension on TextSpan {
   TextSpan small() => TextSpan(
         style: Get.context?.moonTheme?.tokens.typography.heading.text12
-            .copyWith(color: style?.color, fontStyle: style?.fontStyle),
+            .copyWith(
+                color: style?.color ??
+                    Get.context?.moonTheme?.textAreaTheme.colors.textColor,
+                fontStyle: style?.fontStyle),
         text: text,
         children: children,
         recognizer: recognizer,

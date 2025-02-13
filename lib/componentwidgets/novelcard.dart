@@ -116,7 +116,7 @@ class _NovelCardState extends State<NovelCard> {
                       Container(),
                     for (var f
                         in recomNovelsController.novels[widget.index].tags)
-                      Text("${f.name} ").xSmall()
+                      Text("${f.name} ",strutStyle: const StrutStyle(forceStrutHeight: true, leading: 0)).xSmall()
                   ],
                 ).paddingBottom(8),
               ],

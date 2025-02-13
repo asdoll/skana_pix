@@ -393,8 +393,9 @@ class ListUserController extends GetxController {
   RxBool tagExpand = false.obs;
   UserListType userListType;
   String id;
-  RxString restrict = "public".obs;
-  ListUserController({required this.userListType, this.id = ""});
+  String restrict;
+  ListUserController(
+      {required this.userListType, this.id = "", this.restrict = "public"});
 
   Future<Res<List<UserPreview>>> loadData() async {
     if (isLoading.value) {
@@ -413,7 +414,7 @@ class ListUserController extends GetxController {
       case UserListType.myfollowing:
       case UserListType.following:
         res = await ConnectManager().apiClient.getFollowing(id.toString(),
-            restrict.value, nexturl.value.isEmpty ? null : nexturl.value);
+            restrict, nexturl.value.isEmpty ? null : nexturl.value);
         break;
       case UserListType.mymypixiv:
       case UserListType.usermypixiv:

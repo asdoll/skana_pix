@@ -19,6 +19,7 @@ class SpotlightCard extends StatelessWidget {
       child: SizedBox(
           height: 250,
           child: moonListTileWidgets(
+            noPadding: true,
             onTap: () async {
               Get.to(
                   () => SoupPage(
@@ -35,12 +36,12 @@ class SpotlightCard extends StatelessWidget {
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
               style: TextStyle(color: context.moonTheme?.menuItemTheme.colors.labelTextColor),
-            ).header(),
+            ).subHeader(),
                 Text(
               spotlight.pureTitle,
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
-            ).subHeader()
+            ).small()
               ],
             ),
             label: SizedBox(

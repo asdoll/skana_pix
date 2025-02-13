@@ -55,7 +55,7 @@ dependencies:
   shared_preferences: ^2.3.2
   share_plus: ^10.1.0
   permission_handler: ^11.3.1
-  image_gallery_saver_plus: ^3.0.5
+  image_gallery_saver_plus: ^4.0.0-0.alpha
   flutter_widget_from_html: ^0.15.2
   icon_decoration: ^2.0.2
   html: ^0.15.4

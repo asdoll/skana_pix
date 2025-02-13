@@ -50,7 +50,7 @@ ThemeData getTheme(bool isDark) {
   return (isDark
           ? ThemeData.dark().copyWith(
               textTheme: GoogleFonts.notoSansTextTheme(
-                Get.theme.textTheme,
+                Get.theme.textTheme
               ),
               appBarTheme: AppBarTheme(
                 titleSpacing: 0,
@@ -80,7 +80,16 @@ ThemeData getTheme(bool isDark) {
           fontFamily: GoogleFonts.notoSans().fontFamily,
         )
       )
-    ) : MoonTokens.light)
+    ) : MoonTokens.light.copyWith(
+      typography: MoonTypography.typography.copyWith(
+        heading: MoonTypography.typography.heading.apply(
+          fontFamily: GoogleFonts.notoSans().fontFamily,
+        ),
+        body: MoonTypography.typography.body.apply(
+          fontFamily: GoogleFonts.notoSans().fontFamily,
+        )
+      )
+    ))
   ]);
 }
 

@@ -588,8 +588,7 @@ Future buildShowModalBottomSheet(BuildContext context, Novel novel,
         child: Scaffold(
           floatingActionButton: showFloating
               ? MoonButton.icon(
-                  backgroundColor:
-                      Get.context?.moonTheme?.tokens.colors.piccolo,
+                  backgroundColor: Get.context?.moonTheme?.tokens.colors.hit,
                   icon: Icon(Icons.menu_book_rounded),
                   onTap: () =>
                       Get.to(NovelViewerPage(novel), preventDuplicates: false),
@@ -636,7 +635,7 @@ Future buildShowModalBottomSheet(BuildContext context, Novel novel,
                               padding: const EdgeInsets.only(left: 6.0),
                               child: Text(
                                 novel.author.name.atMost8,
-                              ).xSmall(),
+                              ).subHeader(),
                             ),
                           ]),
                       const SizedBox(width: 16),
@@ -656,10 +655,10 @@ Future buildShowModalBottomSheet(BuildContext context, Novel novel,
                         Get.to(() => NovelSeriesPage(novel.seriesId!));
                       },
                       child: Container(
-                        height: 26,
+                        height: 20,
                         padding: const EdgeInsets.symmetric(horizontal: 14),
                         decoration: BoxDecoration(
-                          color: context.moonTheme?.tokens.colors.hit,
+                          color: context.moonTheme?.tokens.colors.piccolo,
                           borderRadius:
                               const BorderRadius.all(Radius.circular(12)),
                         ),
@@ -667,6 +666,7 @@ Future buildShowModalBottomSheet(BuildContext context, Novel novel,
                           "Series:${novel.seriesTitle}",
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
+                          style: TextStyle(color: Colors.white),
                         ).small(),
                       ),
                     ),
@@ -677,8 +677,7 @@ Future buildShowModalBottomSheet(BuildContext context, Novel novel,
                   padding: const EdgeInsets.symmetric(horizontal: 16.0),
                   child: Text(
                     novel.createDate.toShortTime(),
-                    // style: mtc.theme.value.typography.textSmall,
-                  ),
+                  ).small(),
                 ),
                 Padding(
                     padding: const EdgeInsets.symmetric(
@@ -689,11 +688,21 @@ Future buildShowModalBottomSheet(BuildContext context, Novel novel,
                       runSpacing: 1,
                       children: [
                         if (novel.isAi)
-                          Text(
-                            "AI-generated".tr,
-                            // style: mtc.theme.value.typography.textSmall.copyWith(
-                            //      color: mtc.theme.value.colorScheme.secondary)
-                          ),
+                          Container(
+                              height: 20,
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 14),
+                              decoration: BoxDecoration(
+                                color: context.moonTheme?.tokens.colors.piccolo,
+                                borderRadius: const BorderRadius.all(
+                                    Radius.circular(12.5)),
+                              ),
+                              child: Text(
+                                "AI-generated".tr,
+                                strutStyle: const StrutStyle(
+                                    forceStrutHeight: true, leading: 0),
+                                textAlign: TextAlign.center,
+                              ).small()),
                         for (var f in novel.tags) buildRow(context, f)
                       ],
                     )),
@@ -701,6 +710,7 @@ Future buildShowModalBottomSheet(BuildContext context, Novel novel,
                   Padding(
                     padding: const EdgeInsets.all(8.0),
                     child: Card(
+                      color: context.moonTheme?.tokens.colors.frieza60,
                       child: Padding(
                         padding: const EdgeInsets.all(8.0),
                         child: SelectionArea(
@@ -714,21 +724,23 @@ Future buildShowModalBottomSheet(BuildContext context, Novel novel,
                     ),
                   ),
                 MoonButton(
+                  backgroundColor: context.moonTheme?.tokens.colors.gohan,
                   onTap: () {
                     Get.to(
                         () =>
                             CommentPage(id: novel.id, type: ArtworkType.NOVEL),
                         preventDuplicates: false);
                   },
-                  trailing: Icon(
+                  leading: Icon(
                     Icons.comment,
                     size: 16,
-                    color: context.moonTheme?.tokens.colors.piccolo,
-                  ),
-                  label: Text(
-                    "Show comments".tr,
-                  ).xSmall(),
-                ).paddingSymmetric(vertical: 16),
+                    color: Theme.of(context).colorScheme.primary,
+                  ).paddingTop(2),
+                  label: Text("Show comments".tr,
+                          strutStyle: const StrutStyle(
+                              forceStrutHeight: true, leading: 0))
+                      .small(),
+                ).paddingSymmetric(vertical: 16).paddingBottom(100),
               ],
             ),
           )),
@@ -752,29 +764,26 @@ Widget buildRow(BuildContext context, Tag f) {
           preventDuplicates: false);
     },
     child: Container(
-      height: 22,
+      height: 20,
       padding: const EdgeInsets.symmetric(horizontal: 14),
       decoration: BoxDecoration(
-        color: context.moonTheme?.tokens.colors.hit,
+        color: context.moonTheme?.tokens.colors.piccolo,
         borderRadius: const BorderRadius.all(Radius.circular(12.5)),
       ),
       child: RichText(
+          strutStyle: const StrutStyle(forceStrutHeight: true, leading: 0),
           textAlign: TextAlign.center,
           text: TextSpan(
             text: "#${f.name}",
             children: [
               TextSpan(
                 text: " ",
-                //style: mtc.theme.value.typography.textSmall,
               ),
               TextSpan(
                 text: f.translatedName ?? "~",
-                //style: mtc.theme.value.typography.textSmall
               )
             ],
-            // style: mtc.theme.value.typography.textSmall.copyWith(
-            //     color: mtc.theme.value.colorScheme.secondaryForeground)
-          )),
+          ).small()),
     ),
   );
 }
@@ -807,6 +816,7 @@ Future _longPressTag(BuildContext context, Tag f) async {
       break;
     case 1:
       {
+        Leader.showToast("Bookmarked".tr);
         localManager.add("bookmarkedNovelTags", [f.name]);
       }
       break;
@@ -843,9 +853,7 @@ Widget _buildNumItem(Novel novel, BuildContext context) {
         ),
         Text(
           "${novel.totalBookmarks}",
-          //     style: mtc.theme.value.typography.textSmall.copyWith(
-          //         color: mtc.theme.value.colorScheme.mutedForeground)
-        ),
+        ).small(),
         Padding(
           padding: const EdgeInsets.only(left: 8.0),
           child: Icon(
@@ -856,9 +864,7 @@ Widget _buildNumItem(Novel novel, BuildContext context) {
         ),
         Text(
           "${novel.totalViews}",
-          // style: mtc.theme.value.typography.textSmall.copyWith(
-          //     color: mtc.theme.value.colorScheme.mutedForeground)
-        ),
+        ).small(),
       ],
     ),
   );
