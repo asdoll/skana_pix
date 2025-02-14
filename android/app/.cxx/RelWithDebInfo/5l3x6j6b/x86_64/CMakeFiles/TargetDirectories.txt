@@ -1,0 +1,2 @@
+/home/yhlu/Documents/skana_pix/android/app/.cxx/RelWithDebInfo/5l3x6j6b/x86_64/CMakeFiles/edit_cache.dir
+/home/yhlu/Documents/skana_pix/android/app/.cxx/RelWithDebInfo/5l3x6j6b/x86_64/CMakeFiles/rebuild_cache.dir
