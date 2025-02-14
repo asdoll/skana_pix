@@ -1,4 +1,5 @@
-import 'package:shadcn_flutter/shadcn_flutter.dart';
+import 'package:flutter/material.dart';
+import 'package:moon_design/moon_design.dart';
 import 'package:skana_pix/controller/list_controller.dart';
 import 'package:get/get.dart';
 import 'package:skana_pix/controller/page_index_controller.dart';
@@ -14,53 +15,59 @@ class RankingPage extends StatefulWidget {
   State<RankingPage> createState() => _RankingPageState();
 }
 
-class _RankingPageState extends State<RankingPage> {
+class _RankingPageState extends State<RankingPage>
+    with SingleTickerProviderStateMixin {
+  late TabController tabController;
+
+  @override
+  void initState() {
+    super.initState();
+    tabController = TabController(length: 3, vsync: this);
+  }
+
+  @override
+  void dispose() {
+    tabController.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Obx(() {
-      return Column(
-        children: <Widget>[
-          AnimatedContainer(
-            duration: Duration(milliseconds: 400),
-            child: TabList(index: homeController.workIndex.value, children: [
-              TabButton(
-                child: Text("Illust".tr),
-                onPressed: () {
-                  homeController.workIndex.value = 0;
-                  homeController.tagIndex.value = 0;
-                  homeController.dateTime.value = null;
-                },
-              ),
-              TabButton(
-                child: Text("Manga".tr),
-                onPressed: () {
-                  homeController.workIndex.value = 1;
-                  homeController.tagIndex.value = 0;
-                  homeController.dateTime.value = null;
-                },
-              ),
-              TabButton(
-                child: Text("Novel".tr),
-                onPressed: () {
-                  homeController.workIndex.value = 2;
-                  homeController.tagIndex.value = 0;
-                  homeController.dateTime.value = null;
-                },
-              ),
-            ]),
+    return Column(
+      children: [
+        AnimatedContainer(
+          duration: Duration(milliseconds: 400),
+          child: MoonTabBar(
+              tabController: tabController,
+              onTabChanged: (value) {
+                homeController.workIndex.value = value;
+                homeController.tagIndex.value = 0;
+                homeController.dateTime.value = null;
+              },
+              tabs: [
+                MoonTab(
+                  label: Text("Illust".tr),
+                ),
+                MoonTab(
+                  label: Text("Manga".tr),
+                ),
+                MoonTab(
+                  label: Text("Novel".tr),
+                ),
+              ]),
+        ),
+        Expanded(
+          child: TabBarView(
+            controller: tabController,
+            children: [
+              _OneRankingIllustPage(),
+              _OneRankingMangaPage(),
+              _OneRankingNovelPage(),
+            ],
           ),
-          (homeController.workIndex.value == 0)
-              ? Expanded(child: _OneRankingIllustPage())
-              : Container(),
-          (homeController.workIndex.value == 1)
-              ? Expanded(child: _OneRankingMangaPage())
-              : Container(),
-          (homeController.workIndex.value == 2)
-              ? Expanded(child: _OneRankingNovelPage())
-              : Container(),
-        ],
-      );
-    });
+        )
+      ],
+    );
   }
 }
 
@@ -75,8 +82,7 @@ class _OneRankingIllustPageState extends State<_OneRankingIllustPage> {
   @override
   void dispose() {
     super.dispose();
-    Get.delete<ListIllustController>(
-        tag: "rankingIllust");
+    Get.delete<ListIllustController>(tag: "rankingIllust");
   }
 
   @override
@@ -101,8 +107,7 @@ class _OneRankingMangaPageState extends State<_OneRankingMangaPage> {
   @override
   void dispose() {
     super.dispose();
-    Get.delete<ListIllustController>(
-        tag: "rankingManga");
+    Get.delete<ListIllustController>(tag: "rankingManga");
   }
 
   @override
@@ -127,8 +132,7 @@ class _OneRankingNovelPageState extends State<_OneRankingNovelPage> {
   @override
   void dispose() {
     super.dispose();
-    Get.delete<ListNovelController>(
-        tag: "rankingNovel");
+    Get.delete<ListNovelController>(tag: "rankingNovel");
   }
 
   @override

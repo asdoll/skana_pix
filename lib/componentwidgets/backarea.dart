@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:icon_decoration/icon_decoration.dart';
+import 'package:moon_design/moon_design.dart';
 import 'package:skana_pix/view/homepage.dart';
 
 class CommonBackArea extends StatefulWidget {
@@ -43,7 +44,7 @@ class NormalBackButton extends StatelessWidget {
       onPressed: () {
         Get.back();
       },
-      icon: const Icon(Icons.arrow_back),
+      icon: Icon(Icons.arrow_back,color: context.moonTheme?.tokens.colors.bulma,),
     );
   }
 }

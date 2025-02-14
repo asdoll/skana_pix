@@ -38,6 +38,7 @@ class _UserListState extends State<UserList> {
               scrollController: widget.noScroll ? localScrollController : globalScrollController,
               header: DefaultHeaderFooter.header(context),
               footer: DefaultHeaderFooter.footer(context),
+              refreshOnStartHeader: DefaultHeaderFooter.refreshHeader(context),
               onLoad: () => controller.nextPage(),
               onRefresh: () => controller.reset(),
               refreshOnStart: true,

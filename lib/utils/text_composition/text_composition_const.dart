@@ -14,7 +14,8 @@ void paintText(
     ui.Canvas canvas, ui.Size size, TextPage page, TextCompositionConfig config) {
   print("paintText ${page.chIndex} ${page.number} / ${page.total}");
   final lineCount = page.lines.length;
-  final tp = TextPainter(textDirection: TextDirection.ltr, maxLines: 1);
+  final tp = TextPainter(textDirection: TextDirection.ltr, maxLines: 1,
+      strutStyle: const StrutStyle(forceStrutHeight: true, leading: 0),);
   final titleStyle = TextStyle(
     fontWeight: FontWeight.bold,
     fontSize: config.fontSize + 2,
@@ -70,6 +71,7 @@ void paintText(
       fontSize: 12,
       fontFamily: config.fontFamily,
       color: config.fontColor,
+      overflow: TextOverflow.ellipsis,
     );
     tp.text = TextSpan(text: page.info, style: styleInfo);
     tp.layout(maxWidth: size.width - config.leftPadding - config.rightPadding - 60);

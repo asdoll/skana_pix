@@ -58,7 +58,6 @@ class _WebviewPageState extends State<WebviewPage> {
                 top: MediaQuery.of(context).padding.top, left: 16, right: 16),
             child: Row(
               children: [
-                //const Text("Webview"),
                 const Spacer(),
                 IconButton(
                   icon: const Icon(

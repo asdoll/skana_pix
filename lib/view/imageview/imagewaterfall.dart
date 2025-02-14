@@ -38,6 +38,7 @@ class _ImageWaterfallState extends State<ImageWaterfall> {
       onRefresh: controller.reset,
       onLoad: controller.noNextPage ? null : controller.nextPage,
       header: DefaultHeaderFooter.header(context),
+      refreshOnStartHeader: DefaultHeaderFooter.refreshHeader(context),
       callLoadOverOffset: controller.callLoadOverOffset,
       footer:
           controller.noNextPage ? null : DefaultHeaderFooter.footer(context),

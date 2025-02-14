@@ -35,6 +35,7 @@ class _NovelListState extends State<NovelList> {
       onRefresh: controller.reset,
       onLoad: controller.noNextPage ? null : controller.nextPage,
       header: DefaultHeaderFooter.header(context),
+      refreshOnStartHeader: DefaultHeaderFooter.refreshHeader(context),
       footer:
           controller.noNextPage ? null : DefaultHeaderFooter.footer(context),
       child: Obx(

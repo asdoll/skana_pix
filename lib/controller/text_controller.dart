@@ -11,4 +11,7 @@ class TextConfigManager {
     await Hive.initFlutter("textConfigData");
     await Hive.openBox("textConfigData");
   }
+  static void reset() {
+    _box.clear();
+  }
 }

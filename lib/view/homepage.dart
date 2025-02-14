@@ -1,4 +1,5 @@
 import 'package:bootstrap_icons/bootstrap_icons.dart';
+import 'package:calendar_date_picker2/calendar_date_picker2.dart';
 import 'package:get/get.dart';
 import 'package:skana_pix/componentwidgets/gotop.dart';
 import 'package:skana_pix/componentwidgets/searchbar.dart';
@@ -61,7 +62,8 @@ class _HomePageState extends State<HomePage> {
                   .getAwType(searchPageController.selectedIndex.value))
               : Row(children: [
                   Text(getTitle(pages[homeController.pageIndex.value]).tr)
-                      .appHeader().paddingRight(8),
+                      .appHeader()
+                      .paddingRight(8),
                   getSubtitle(pages[homeController.pageIndex.value]).isNotEmpty
                       ? Text(getSubtitle(pages[homeController.pageIndex.value]).tr,
                               style: TextStyle(
@@ -129,99 +131,108 @@ class _HomePageState extends State<HomePage> {
               ),
             if (homeController.pageIndex.value == 12)
               MoonSwitch(
-                value: tc.darkMode.value == "system"
+                value: tc.darkMode.value == "0"
                     ? Get.isPlatformDarkMode
                     : tc.darkMode.value == "2",
                 switchSize: MoonSwitchSize.xs,
                 activeTrackWidget: Icon(Icons.dark_mode_outlined),
                 inactiveTrackWidget: Icon(Icons.light_mode_outlined),
                 inactiveTrackColor: context.moonTheme?.tokens.colors.krillin,
+                activeTrackColor: context.moonTheme?.tokens.colors.trunks,
                 onChanged: (bool newValue) =>
                     tc.changeDarkMode(newValue ? "2" : "1"),
               ).paddingRight(8),
             if (homeController.pageIndex.value == 5)
-              MoonButton.icon(
-                icon: const Icon(
-                  Icons.filter_alt_outlined,
-                ),
-                onTap: () {
-                  // showDropdown(
-                  //   context: context,
-                  //   builder: (context) {
-                  //     return DropdownMenu(
-                  //       children: [
-                  //         for (int i = 0;
-                  //             i <
-                  //                 homeController
-                  //                     .tagList(homeController.workIndex.value)
-                  //                     .length;
-                  //             i++)
-                  //           MenuButton(
-                  //             child: Text(rankTagsMap[homeController.tagList(
-                  //                     homeController.workIndex.value)[i]] ??
-                  //                 homeController.tagList(
-                  //                     homeController.workIndex.value)[i]),
-                  //             onPressed: (context) {
-                  //               homeController.tagIndex.value = i;
-                  //               homeController.refreshRanking();
-                  //             },
-                  //           ),
-                  //       ],
-                  //     );
-                  //   },
-                  // );
-                },
-              ),
+              MoonDropdown(
+                  show: homeController.filterMenu.value,
+                  onTapOutside: () => homeController.filterMenu.value = false,
+                  content: Column(
+                    children: [
+                      for (int i = 0;
+                          i <
+                              homeController
+                                  .tagList(homeController.workIndex.value)
+                                  .length;
+                          i++)
+                        MoonMenuItem(
+                          label: Text(rankTagsMap[homeController.tagList(
+                                      homeController.workIndex.value)[i]] ??
+                                  homeController.tagList(
+                                      homeController.workIndex.value)[i])
+                              .small(),
+                          onTap: () {
+                            homeController.filterMenu.value = false;
+                            homeController.tagIndex.value = i;
+                            homeController.refreshRanking();
+                          },
+                        ),
+                    ],
+                  ),
+                  child: MoonButton.icon(
+                      icon: const Icon(
+                        Icons.filter_alt_outlined,
+                      ),
+                      onTap: () => homeController.filterMenu.value =
+                          !homeController.filterMenu.value)),
             if (homeController.pageIndex.value == 5)
               MoonButton.icon(
                 icon: const Icon(
                   Icons.calendar_month,
                 ),
                 onTap: () {
-                  // showMoonModal<void>(
-                  //     context: context,
-                  //     builder: (context) {
-                  //       DateTime? date = homeController.dateTime.value;
-                  //       return AlertDialog(
-                  //         content: DatePickerDialog(
-                  //             initialViewType: CalendarViewType.date,
-                  //             selectionMode: CalendarSelectionMode.single,
-                  //             initialValue: date == null
-                  //                 ? null
-                  //                 : CalendarValue.single(date),
-                  //             stateBuilder: (date) {
-                  //               if (date.isBefore(DateTime(2007, 9))) {
-                  //                 return DateState.disabled;
-                  //               } //pixiv于2007年9月10日由上谷隆宏等人首次推出第一个测试版...
-                  //               if (date.isAfter(DateTime.now())) {
-                  //                 return DateState.disabled;
-                  //               }
-                  //               return DateState.enabled;
-                  //             },
-                  //             onChanged: (value) {
-                  //               if (value == null) return;
-                  //               final range = value.toSingle();
-                  //               date = range.date;
-                  //             }),
-                  //         actions: [
-                  //           OutlineButton(
-                  //             child: Text("Cancel".tr),
-                  //             onPressed: () {
-                  //               date = null;
-                  //               Get.back();
-                  //             },
-                  //           ),
-                  //           PrimaryButton(
-                  //             child: Text("Confirm".tr),
-                  //             onPressed: () {
-                  //               homeController.dateTime.value = date;
-                  //               homeController.refreshRanking();
-                  //               Get.back();
-                  //             },
-                  //           )
-                  //         ],
-                  //       );
-                  //     });
+                  showMoonModal<void>(
+                      context: context,
+                      builder: (context) {
+                        DateTime? date = homeController.dateTime.value;
+                        return Dialog(
+                            child: Column(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                              MoonAlert(
+                                  borderColor: Get.context?.moonTheme
+                                      ?.buttonTheme.colors.borderColor
+                                      .withValues(alpha: 0.5),
+                                  showBorder: true,
+                                  label: Text("Date".tr),
+                                  content: Column(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      CalendarDatePicker2(
+                                          config: CalendarDatePicker2Config(
+                                            disableMonthPicker: true,
+                                            selectedDayHighlightColor: context.moonTheme?.tokens.colors.frieza,
+                                            selectedDayTextStyle: TextStyle(color: context.moonTheme?.tokens.colors.bulma),
+                                              firstDate: DateTime(2007, 9, 10),
+                                              lastDate: DateTime.now()),
+                                          value: [date],
+                                          onValueChanged: (value) =>
+                                              date = value.first),
+                                      Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.end,
+                                          children: [
+                                            outlinedButton(
+                                              label: "Cancel".tr,
+                                              onPressed: () {
+                                                date = null;
+                                                Get.back();
+                                              },
+                                            ).paddingRight(8),
+                                            filledButton(
+                                              color: context.moonTheme?.tokens.colors.frieza,
+                                              label: "Confirm".tr,
+                                              onPressed: () {
+                                                homeController.dateTime.value =
+                                                    date;
+                                                homeController.refreshRanking();
+                                                Get.back();
+                                              },
+                                            ).paddingRight(8)
+                                          ])
+                                    ],
+                                  ))
+                            ]));
+                      });
                 },
               ),
           ],

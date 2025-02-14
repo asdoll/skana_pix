@@ -82,6 +82,7 @@ class _NovelSeriesPageState extends State<NovelSeriesPage> {
             onRefresh: () => controller.firstLoad(),
             header: DefaultHeaderFooter.header(context),
             footer: DefaultHeaderFooter.footer(context),
+            refreshOnStartHeader: DefaultHeaderFooter.refreshHeader(context),
             refreshOnStart: true,
             child: Builder(builder: (context) {
               if (controller.novelSeriesDetail.value != null) {

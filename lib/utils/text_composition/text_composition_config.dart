@@ -64,8 +64,8 @@ class TextCompositionConfig {
     this.animationStatus = true,
     this.animationHighImage = false,
     this.animationWithImage = true,
-    this.animation = AnimationType.cover,
-    this.animationDuration = 450,
+    this.animation = AnimationType.curl,
+    this.animationDuration = 200,
     this.topPadding = 16,
     this.leftPadding = 16,
     this.bottomPadding = 16,
@@ -78,10 +78,38 @@ class TextCompositionConfig {
     this.fontColor = const Color(0xFF353535),
     this.fontSize = 20,
     this.fontHeight = 1.6,
-    this.fontFamily = '',
+    this.fontFamily = 'NotoSans',
     this.background = '#FF999C99',
     this.backgroundColor = const Color(0xFF999C99),
   });
+
+  void reset() {
+    showStatus = true;
+    showInfo = true;
+    justifyHeight = true;
+    oneHand = false;
+    underLine = false;
+    animationStatus = true;
+    animationHighImage = false;
+    animationWithImage = true;
+    animation = AnimationType.curl;
+    animationDuration = 200;
+    topPadding = 16;
+    leftPadding = 16;
+    bottomPadding = 16;
+    rightPadding = 16;
+    titlePadding = 30;
+    paragraphPadding = 18;
+    columnPadding = 30;
+    columns = 0;
+    indentation = 2;
+    fontColor = const Color(0xFF353535);
+    fontSize = 20;
+    fontHeight = 1.6;
+    fontFamily = 'NotoSans';
+    background = '#FF999C99';
+    backgroundColor = const Color(0xFF999C99);
+  }
 
   bool updateConfig({
     bool? showStatus,
@@ -223,14 +251,14 @@ class TextCompositionConfig {
       showInfo: cast(encoded['showInfo'], true),
       justifyHeight: cast(encoded['justifyHeight'], true),
       oneHand: cast(encoded['oneHand'], false),
-      underLine: cast(encoded['underLine'], true),
+      underLine: cast(encoded['underLine'], false),
       animationStatus: cast(encoded['animationStatus'], true),
       animationHighImage: cast(encoded['animationHighImage'], false),
       animationWithImage: cast(encoded['animationWithImage'], true),
       animation: AnimationType.values.firstWhere(
           (a) => a.name == cast(encoded['animation'], ''),
-          orElse: () => AnimationType.cover),
-      animationDuration: cast(encoded['animationDuration'], 400),
+          orElse: () => AnimationType.curl),
+      animationDuration: cast(encoded['animationDuration'], 200),
       topPadding: cast(encoded['topPadding'], 16),
       leftPadding: cast(encoded['leftPadding'], 16),
       bottomPadding: cast(encoded['bottomPadding'], 16),
@@ -240,12 +268,12 @@ class TextCompositionConfig {
       columnPadding: cast(encoded['columnPadding'], 30),
       columns: cast(encoded['columns'], 0),
       indentation: cast(encoded['indentation'], 2),
-      fontColor: Color(cast(encoded['fontColor'], 0xFF303133)),
+      fontColor: Color(cast(encoded['fontColor'], 0xFF353535)),
       fontSize: cast(encoded['fontSize'], 20),
       fontHeight: cast(encoded['fontHeight'], 1.6),
-      fontFamily: cast(encoded['fontFamily'], ''),
+      fontFamily: cast(encoded['fontFamily'], 'NotoSans'),
       background: cast(encoded['background'], '#FFFFFFCC'),
-      backgroundColor: Color(cast(encoded['backgroundColor'], 0xFFFFFFCC)),
+      backgroundColor: Color(cast(encoded['backgroundColor'], 0xFF999C99)),
     );
   }
 

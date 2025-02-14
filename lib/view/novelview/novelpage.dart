@@ -9,6 +9,7 @@ import 'package:path/path.dart' as path;
 import 'package:share_plus/share_plus.dart';
 import 'package:skana_pix/componentwidgets/backarea.dart';
 import 'package:skana_pix/componentwidgets/staricon.dart';
+import 'package:skana_pix/componentwidgets/tag.dart';
 import 'package:skana_pix/componentwidgets/userpage.dart';
 import 'package:skana_pix/controller/bases.dart';
 import 'package:skana_pix/controller/histories.dart';
@@ -20,14 +21,13 @@ import 'package:skana_pix/controller/text_controller.dart';
 import 'package:skana_pix/model/novel.dart';
 import 'package:skana_pix/model/tag.dart';
 import 'package:skana_pix/utils/io_extension.dart';
-import 'package:skana_pix/utils/leaders.dart';
+import 'package:skana_pix/utils/readersetting.dart';
 import 'package:skana_pix/utils/text_composition/text_composition.dart';
 import 'package:skana_pix/utils/widgetplugin.dart';
 import '../../model/worktypes.dart';
 import '../../componentwidgets/avatar.dart';
 import '../commentpage.dart';
 import '../../componentwidgets/followbutton.dart';
-import 'novelresult.dart';
 import 'novelseries.dart';
 import '../../componentwidgets/pixivimage.dart';
 import '../../componentwidgets/selecthtml.dart';
@@ -55,15 +55,12 @@ class _NovelViewerPageState extends State<NovelViewerPage> {
     _novelStore =
         Get.put(NovelStore(widget.novel), tag: widget.novel.id.toString());
     _novelStore.fetch();
-    SystemChrome.setEnabledSystemUIMode(SystemUiMode.leanBack);
   }
 
   @override
   void dispose() {
     TextConfigManager.config = config;
     Get.delete<NovelStore>(tag: widget.novel.id.toString());
-    SystemChrome.setEnabledSystemUIMode(SystemUiMode.manual,
-        overlays: SystemUiOverlay.values);
     super.dispose();
   }
 
@@ -87,7 +84,6 @@ class _NovelViewerPageState extends State<NovelViewerPage> {
               return Column(
                 children: [
                   _buildAppBar(context),
-                  Divider(),
                   Spacer(),
                   _buildBottomRow(
                       context,
@@ -127,7 +123,7 @@ class _NovelViewerPageState extends State<NovelViewerPage> {
             context: context,
             builder: (context) => SizedBox(
               height: context.height > 700 ? 700 : context.height,
-              child: configSettingBuilder(context, config,
+              child: configSettingBuilderMoon(context, config,
                   (Color color, void Function(Color color) onChange) {
                 showMoonModal(
                     context: context,
@@ -136,8 +132,14 @@ class _NovelViewerPageState extends State<NovelViewerPage> {
                                 mainAxisSize: MainAxisSize.min,
                                 children: [
                               MoonAlert(
+                                borderColor: Get.context?.moonTheme
+                                          ?.buttonTheme.colors.borderColor
+                                          .withValues(alpha: 0.5),
+                                      showBorder: true,
                                 label: Text("Pick A Color".tr),
                                 content: SingleChildScrollView(
+                                    child: Theme(
+                                  data: ThemeData.dark(),
                                   child: ColorPicker(
                                     pickerColor: color,
                                     onColorChanged: onChange,
@@ -146,7 +148,7 @@ class _NovelViewerPageState extends State<NovelViewerPage> {
                                     portraitOnly: true,
                                     hexInputBar: true,
                                   ),
-                                ),
+                                )),
                               ),
                             ])));
               }, (e, ee) {}, (e, ee) {}),
@@ -387,6 +389,7 @@ class _NovelViewerPageState extends State<NovelViewerPage> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 MoonMenuItem(
+                  onTap: () {},
                   content: Text(
                     widget.novel.author.name,
                     maxLines: 2,
@@ -411,7 +414,7 @@ class _NovelViewerPageState extends State<NovelViewerPage> {
                   ),
                 ).paddingVertical(16),
                 MoonMenuItem(
-                    label: Text('Previous'.tr).xSmall(),
+                    label: Text('Previous'.tr).subHeader(),
                     content: _novelStore.novelWebResponse?.seriesNavigation
                                 ?.prevNovel ==
                             null
@@ -422,7 +425,7 @@ class _NovelViewerPageState extends State<NovelViewerPage> {
                                     "",
                                 maxLines: 2,
                                 overflow: TextOverflow.ellipsis)
-                            .xSmall(),
+                            .subHeader(),
                     onTap: _novelStore.novelWebResponse?.seriesNavigation
                                 ?.prevNovel ==
                             null
@@ -436,7 +439,7 @@ class _NovelViewerPageState extends State<NovelViewerPage> {
                             ""))),
                 Container(height: 8),
                 MoonMenuItem(
-                    label: Text('Next'.tr).xSmall(),
+                    label: Text('Next'.tr).subHeader(),
                     content: _novelStore.novelWebResponse?.seriesNavigation
                                 ?.nextNovel ==
                             null
@@ -447,7 +450,7 @@ class _NovelViewerPageState extends State<NovelViewerPage> {
                                     "",
                                 maxLines: 2,
                                 overflow: TextOverflow.ellipsis)
-                            .xSmall(),
+                            .subHeader(),
                     onTap: _novelStore.novelWebResponse?.seriesNavigation
                                 ?.nextNovel ==
                             null
@@ -462,7 +465,7 @@ class _NovelViewerPageState extends State<NovelViewerPage> {
                 if (GetPlatform.isAndroid) Container(height: 8),
                 if (GetPlatform.isAndroid)
                   MoonMenuItem(
-                    label: Text("Export".tr),
+                    label: Text("Export".tr).subHeader(),
                     leading: Icon(Icons.folder_zip),
                     onTap: () {
                       _export(context);
@@ -470,7 +473,7 @@ class _NovelViewerPageState extends State<NovelViewerPage> {
                   ),
                 Container(height: 8),
                 MoonMenuItem(
-                  label: Text("Share".tr).xSmall(),
+                  label: Text("Share".tr).subHeader(),
                   leading: Icon(
                     Icons.share,
                   ),
@@ -544,17 +547,11 @@ class _NovelPageLiteState extends State<NovelPageLite> {
           : controller.error == null
               ? controller.isLoading.value
                   ? Scaffold(
-                      appBar: AppBar(
-                        title: Text("Loading".tr),
-                      ),
                       body: Center(
                         child: CircularProgressIndicator(),
                       ),
                     )
                   : Scaffold(
-                      appBar: AppBar(
-                        title: Text(controller.novels.first.title),
-                      ),
                       body: NovelViewerPage(controller.novels.first),
                     )
               : Scaffold(
@@ -581,15 +578,20 @@ class _NovelPageLiteState extends State<NovelPageLite> {
 Future buildShowModalBottomSheet(BuildContext context, Novel novel,
     [bool showFloating = false]) {
   return showMoonModalBottomSheet(
+    borderRadius: BorderRadius.all(Radius.circular(8)),
     context: context,
     builder: (_) {
-      return SizedBox(
+      return SafeArea(
+          child: SizedBox(
         height: Get.mediaQuery.size.height * 0.6,
         child: Scaffold(
           floatingActionButton: showFloating
               ? MoonButton.icon(
-                  backgroundColor: Get.context?.moonTheme?.tokens.colors.hit,
-                  icon: Icon(Icons.menu_book_rounded),
+                  backgroundColor: Get.context?.moonTheme?.tokens.colors.cell,
+                  icon: Icon(
+                    Icons.menu_book_rounded,
+                    color: Colors.black,
+                  ),
                   onTap: () =>
                       Get.to(NovelViewerPage(novel), preventDuplicates: false),
                 )
@@ -650,25 +652,12 @@ Future buildShowModalBottomSheet(BuildContext context, Novel novel,
                   Padding(
                     padding: const EdgeInsets.only(
                         left: 16.0, right: 16.0, top: 0.0, bottom: 0.0),
-                    child: InkWell(
+                    child: PixTag(
                       onTap: () {
                         Get.to(() => NovelSeriesPage(novel.seriesId!));
                       },
-                      child: Container(
-                        height: 20,
-                        padding: const EdgeInsets.symmetric(horizontal: 14),
-                        decoration: BoxDecoration(
-                          color: context.moonTheme?.tokens.colors.piccolo,
-                          borderRadius:
-                              const BorderRadius.all(Radius.circular(12)),
-                        ),
-                        child: Text(
-                          "Series:${novel.seriesTitle}",
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                          style: TextStyle(color: Colors.white),
-                        ).small(),
-                      ),
+                      f: Tag("Series:${novel.seriesTitle}", null),
+                      isNovel: true,
                     ),
                   ),
                 //MARK DETAIL NUM,
@@ -688,22 +677,9 @@ Future buildShowModalBottomSheet(BuildContext context, Novel novel,
                       runSpacing: 1,
                       children: [
                         if (novel.isAi)
-                          Container(
-                              height: 20,
-                              padding:
-                                  const EdgeInsets.symmetric(horizontal: 14),
-                              decoration: BoxDecoration(
-                                color: context.moonTheme?.tokens.colors.piccolo,
-                                borderRadius: const BorderRadius.all(
-                                    Radius.circular(12.5)),
-                              ),
-                              child: Text(
-                                "AI-generated".tr,
-                                strutStyle: const StrutStyle(
-                                    forceStrutHeight: true, leading: 0),
-                                textAlign: TextAlign.center,
-                              ).small()),
-                        for (var f in novel.tags) buildRow(context, f)
+                          PixTag(
+                              f: Tag("AI-generated".tr, null), isNovel: true),
+                        for (var f in novel.tags) PixTag(f: f, isNovel: true),
                       ],
                     )),
                 if (novel.caption.trim().isNotEmpty)
@@ -745,87 +721,9 @@ Future buildShowModalBottomSheet(BuildContext context, Novel novel,
             ),
           )),
         ),
-      );
+      ));
     },
   );
-}
-
-Widget buildRow(BuildContext context, Tag f) {
-  return GestureDetector(
-    onLongPress: () async {
-      _longPressTag(context, f);
-    },
-    onTap: () {
-      Get.to(
-          () => NovelResultPage(
-                word: f.name,
-                translatedName: f.translatedName ?? "",
-              ),
-          preventDuplicates: false);
-    },
-    child: Container(
-      height: 20,
-      padding: const EdgeInsets.symmetric(horizontal: 14),
-      decoration: BoxDecoration(
-        color: context.moonTheme?.tokens.colors.piccolo,
-        borderRadius: const BorderRadius.all(Radius.circular(12.5)),
-      ),
-      child: RichText(
-          strutStyle: const StrutStyle(forceStrutHeight: true, leading: 0),
-          textAlign: TextAlign.center,
-          text: TextSpan(
-            text: "#${f.name}",
-            children: [
-              TextSpan(
-                text: " ",
-              ),
-              TextSpan(
-                text: f.translatedName ?? "~",
-              )
-            ],
-          ).small()),
-    ),
-  );
-}
-
-Future _longPressTag(BuildContext context, Tag f) async {
-  switch (await alertDialog(context, f.name, f.translatedName ?? "", [
-    outlinedButton(
-      onPressed: () {
-        Get.back(result: 0);
-      },
-      label: "Block".tr,
-    ),
-    filledButton(
-      onPressed: () {
-        Get.back(result: 1);
-      },
-      label: "Bookmark".tr,
-    ),
-    filledButton(
-      onPressed: () {
-        Get.back(result: 2);
-      },
-      label: "Copy".tr,
-    ),
-  ])) {
-    case 0:
-      {
-        localManager.add("blockedNovelTags", [f.name]);
-      }
-      break;
-    case 1:
-      {
-        Leader.showToast("Bookmarked".tr);
-        localManager.add("bookmarkedNovelTags", [f.name]);
-      }
-      break;
-    case 2:
-      {
-        await Clipboard.setData(ClipboardData(text: f.name));
-        Leader.showToast("Copied to clipboard".tr);
-      }
-  }
 }
 
 AdaptiveTextSelectionToolbar _buildSelectionMenu(

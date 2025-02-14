@@ -49,7 +49,6 @@ class SpotlightCard extends StatelessWidget {
               width: 190.0,
               child: CachedNetworkImage(
                 imageUrl: spotlight.thumbnail,
-                //httpHeaders: Hoster.header(url: spotlight.thumbnail),
                 fit: BoxFit.cover,
                 cacheManager: imagesCacheManager,
                 height: 190.0,

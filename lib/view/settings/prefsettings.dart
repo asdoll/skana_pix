@@ -23,10 +23,10 @@ class _PreferenceSettingsState extends State<PreferenceSettings> {
   Widget build(BuildContext context) {
     PrefsController controller = Get.put(PrefsController());
 
-    return Scaffold(
-      appBar: appBar(title: 'Preference Settings'.tr),
-      body: Obx(
-        () => CustomScrollView(
+    return Obx(
+      () => Scaffold(
+        appBar: appBar(title: 'Preference Settings'.tr),
+        body: CustomScrollView(
           slivers: [
             SliverToBoxAdapter(
                 child: moonListTile(
@@ -94,6 +94,7 @@ class _PreferenceSettingsState extends State<PreferenceSettings> {
                         onTap: () {
                           tc.dmMenu.value = false;
                           tc.changeDarkMode('0');
+                          setState(() {});
                         },
                         label: Text("System".tr),
                       ),
@@ -101,6 +102,7 @@ class _PreferenceSettingsState extends State<PreferenceSettings> {
                         onTap: () {
                           tc.dmMenu.value = false;
                           tc.changeDarkMode('1');
+                          setState(() {});
                         },
                         label: Text("Light".tr),
                       ),
@@ -108,6 +110,7 @@ class _PreferenceSettingsState extends State<PreferenceSettings> {
                         onTap: () {
                           tc.dmMenu.value = false;
                           tc.changeDarkMode('2');
+                          setState(() {});
                         },
                         label: Text("Dark".tr),
                       ),

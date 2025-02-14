@@ -1,7 +1,7 @@
 import 'dart:math';
-import 'package:flutter/material.dart' as m;
+import 'package:flutter/material.dart';
 import 'package:easy_refresh/easy_refresh.dart';
-import 'package:shadcn_flutter/shadcn_flutter.dart';
+import 'package:moon_design/moon_design.dart';
 import 'package:skana_pix/componentwidgets/headerfooter.dart';
 import 'package:skana_pix/controller/mini_controllers.dart';
 import 'package:skana_pix/view/imageview/imagelistview.dart';
@@ -19,37 +19,38 @@ class HistoryPage extends StatefulWidget {
   State<HistoryPage> createState() => _HistoryPageState();
 }
 
-class _HistoryPageState extends State<HistoryPage> {
+class _HistoryPageState extends State<HistoryPage>
+    with SingleTickerProviderStateMixin {
+  late TabController tabController;
+
+  @override
+  void initState() {
+    super.initState();
+    tabController = TabController(length: 2, vsync: this);
+  }
+
   @override
   void dispose() {
+    tabController.dispose();
     super.dispose();
-    Get.delete<MTab>(tag: "history");
   }
 
   @override
   Widget build(BuildContext context) {
-    MTab mTab = Get.put(MTab(), tag: "history");
-    return Obx(() => Scaffold(
-          headers: [
-            TabList(
-              index: mTab.index.value,
-              children: [
-                TabButton(
-                    child: Text("Illust•Manga".tr),
-                    onPressed: () {
-                      mTab.index.value = 0;
-                    }),
-                TabButton(
-                    child: Text("Novel".tr),
-                    onPressed: () {
-                      mTab.index.value = 1;
-                    }),
-              ],
-            ),
-            const Divider(),
-          ],
-          child: (mTab.index.value == 0) ? IllustsHistory() : NovelsHistory(),
-        ));
+    return Column(children: [
+      MoonTabBar(
+        tabController: tabController,
+        tabs: [
+          MoonTab(label: Text("Illust•Manga".tr)),
+          MoonTab(label: Text("Novel".tr)),
+        ],
+      ).paddingLeft(16).toAlign(Alignment.topLeft),
+      Expanded(
+          child: TabBarView(controller: tabController, children: [
+        IllustsHistory(),
+        NovelsHistory(),
+      ])),
+    ]);
   }
 }
 
@@ -75,23 +76,15 @@ class _IllustsHistoryState extends State<IllustsHistory> {
     controller.refreshController = refreshController;
     TextEditingController searchController = TextEditingController();
     return Scaffold(
-      child: Column(
+      body: Column(
         children: [
-          TextField(
-            placeholder: Text("Search Illusts or Pianters".tr),
+          MoonTextInput(
+            padding: EdgeInsets.only(left: 8),
+            hintText: "Search Illusts or Pianters".tr,
             controller: searchController,
-            leading: StatedWidget.builder(
-              builder: (context, states) {
-                if (states.focused) {
-                  return Icon(Icons.search);
-                } else {
-                  return Icon(Icons.search).iconMutedForeground();
-                }
-              },
-            ),
-            trailing: IconButton.text(
-              icon: Icon(Icons.close),
-              density: ButtonDensity.compact,
+            leading: Icon(MoonIcons.generic_search_24_light),
+            trailing: IconButton(
+              icon: Icon(MoonIcons.controls_close_24_light),
               onPressed: () {
                 setState(() {
                   searchController.clear();
@@ -111,6 +104,8 @@ class _IllustsHistoryState extends State<IllustsHistory> {
                   onRefresh: controller.load,
                   refreshOnStart: true,
                   header: DefaultHeaderFooter.header(context),
+                  refreshOnStartHeader:
+                      DefaultHeaderFooter.refreshHeader(context),
                   child: WaterfallFlow.builder(
                     padding: const EdgeInsets.only(top: 8),
                     controller: globalScrollController,
@@ -130,34 +125,27 @@ class _IllustsHistoryState extends State<IllustsHistory> {
                                 preventDuplicates: false);
                           },
                           onLongPress: () async {
-                            final result = await showDialog(
-                                context: context,
-                                builder: (context) {
-                                  return AlertDialog(
-                                    title: Text("${"Delete".tr}?")
-                                        .withAlign(Alignment.centerLeft),
-                                    actions: <Widget>[
-                                      OutlineButton(
-                                        child: Text("Cancel".tr),
-                                        onPressed: () {
-                                          Get.back();
-                                        },
-                                      ),
-                                      PrimaryButton(
-                                        child: Text("Ok".tr),
-                                        onPressed: () {
-                                          Get.back(result: "OK");
-                                        },
-                                      ),
-                                    ],
-                                  );
-                                });
+                            final result = await alertDialog(
+                                context, "${"Delete".tr}?", "", [
+                              outlinedButton(
+                                label: "Cancel".tr,
+                                onPressed: () {
+                                  Get.back();
+                                },
+                              ),
+                              filledButton(
+                                label: "Ok".tr,
+                                onPressed: () {
+                                  Get.back(result: "OK");
+                                },
+                              )
+                            ]);
                             if (result == "OK") {
                               controller.remove(
                                   controller.searchResult[index].illustId);
                             }
                           },
-                          child: m.Card(
+                          child: Card(
                               child: PixivImage(
                                       controller.searchResult[index].pictureUrl)
                                   .rounded(16.0)));
@@ -193,30 +181,21 @@ class _NovelsHistoryState extends State<NovelsHistory> {
         controlFinishLoad: true, controlFinishRefresh: true);
     controller.refreshController = refreshController;
     TextEditingController searchController = TextEditingController();
-
     return Scaffold(
-      child: Column(
+      body: Column(
         children: [
-          TextField(
-            placeholder: Text("Search Novels or Authors".tr),
+          MoonTextInput(
+            padding: EdgeInsets.only(left: 8),
+            hintText: "Search Novels or Authors".tr,
             controller: searchController,
-            leading: StatedWidget.builder(
-              builder: (context, states) {
-                if (states.focused) {
-                  return Icon(Icons.search);
-                } else {
-                  return Icon(Icons.search).iconMutedForeground();
-                }
-              },
-            ),
-            trailing: IconButton.text(
-              icon: Icon(Icons.close),
-              density: ButtonDensity.compact,
+            leading: Icon(MoonIcons.generic_search_24_light),
+            trailing: IconButton(
+              icon: Icon(MoonIcons.controls_close_24_light),
               onPressed: () {
                 setState(() {
                   searchController.clear();
+                  controller.search("");
                 });
-                controller.search("");
               },
             ),
             onChanged: (value) {
@@ -224,12 +203,15 @@ class _NovelsHistoryState extends State<NovelsHistory> {
             },
           ).paddingAll(8),
           Expanded(
-            child: Obx(() => EasyRefresh(
+            child: Obx(
+              () => EasyRefresh(
                   controller: refreshController,
                   scrollController: globalScrollController,
                   onRefresh: controller.load,
                   refreshOnStart: true,
                   header: DefaultHeaderFooter.header(context),
+                  refreshOnStartHeader:
+                      DefaultHeaderFooter.refreshHeader(context),
                   child: WaterfallFlow.builder(
                     padding: const EdgeInsets.only(top: 8),
                     controller: globalScrollController,
@@ -249,34 +231,27 @@ class _NovelsHistoryState extends State<NovelsHistory> {
                                 preventDuplicates: false);
                           },
                           onLongPress: () async {
-                            final result = await showDialog(
-                                context: context,
-                                builder: (context) {
-                                  return AlertDialog(
-                                    title: Text("${"Delete".tr}?")
-                                        .withAlign(Alignment.centerLeft),
-                                    actions: <Widget>[
-                                      OutlineButton(
-                                        child: Text("Cancel".tr),
-                                        onPressed: () {
-                                          Get.back();
-                                        },
-                                      ),
-                                      PrimaryButton(
-                                        child: Text("Ok".tr),
-                                        onPressed: () {
-                                          Get.back(result: "OK");
-                                        },
-                                      ),
-                                    ],
-                                  );
-                                });
+                            final result = await alertDialog(
+                                context, "${"Delete".tr}?", "", [
+                              outlinedButton(
+                                label: "Cancel".tr,
+                                onPressed: () {
+                                  Get.back();
+                                },
+                              ),
+                              filledButton(
+                                label: "Ok".tr,
+                                onPressed: () {
+                                  Get.back(result: "OK");
+                                },
+                              )
+                            ]);
                             if (result == "OK") {
                               controller.remove(
                                   controller.searchResult[index].novelId);
                             }
                           },
-                          child: m.Card(
+                          child: Card(
                               child: AspectRatio(
                             aspectRatio: 1.0,
                             child: Stack(
@@ -303,7 +278,8 @@ class _NovelsHistoryState extends State<NovelsHistory> {
                                       controller.searchResult[index].title,
                                       maxLines: 3,
                                       overflow: TextOverflow.ellipsis,
-                                    ).textSmall(),
+                                      style: TextStyle(color: Colors.white),
+                                    ).small(),
                                   ),
                                 )
                               ],
@@ -311,8 +287,8 @@ class _NovelsHistoryState extends State<NovelsHistory> {
                           ).rounded(16.0)));
                     },
                     itemCount: controller.searchResult.length,
-                  ),
-                )),
+                  )),
+            ),
           )
         ],
       ),

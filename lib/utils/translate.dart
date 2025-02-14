@@ -179,6 +179,7 @@ class TranslateMap extends Translations {
           "Submit": "提交",
           "Local": "本地",
           "Both": "同时",
+          "Blocked": "已屏蔽",
           "This artwork is blocked": "此作品已被屏蔽",
           "Delete Invalid Items": "删除无效项目",
           "Private Favorite": "私人收藏",
@@ -438,6 +439,9 @@ class TranslateMap extends Translations {
           "Used to retrieve images from pixiv when using the app through the reverse proxy":
               "用于通过反向代理使用APP时从pixiv获取图片",
           'Custom Proxy': '自定义代理',
+          "No comments": "没有评论",
+          "Resetted": "已重置",
+          "Confirm Reset": "确认重置",
         },
         "zh_TW": {
           "Search": "搜索",
@@ -600,6 +604,7 @@ class TranslateMap extends Translations {
           "Submit": "提交",
           "Local": "本地",
           "Both": "同時",
+          "Blocked": "已屏蔽",
           "This artwork is blocked": "此作品已被屏蔽",
           "Delete Invalid Items": "刪除無效項目",
           "Private Favorite": "私人收藏",
@@ -860,6 +865,9 @@ class TranslateMap extends Translations {
           "Used to retrieve images from pixiv when using the app through the reverse proxy":
               "用於透過反向代理使用APP時從pixiv取得圖片",
           'Custom Proxy': '自定義代理',
+          "No comments": "沒有評論",
+          "Resetted": "已重置",
+          "Confirm Reset": "確認重置",
         },
       };
 }

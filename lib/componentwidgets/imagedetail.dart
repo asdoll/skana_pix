@@ -1,5 +1,4 @@
-import 'package:flutter/services.dart';
-import 'package:skana_pix/controller/like_controller.dart';
+import 'package:skana_pix/componentwidgets/tag.dart';
 import 'package:skana_pix/model/illust.dart';
 import 'package:skana_pix/model/tag.dart';
 import 'package:skana_pix/model/worktypes.dart';
@@ -7,12 +6,10 @@ import 'package:get/get.dart';
 import 'package:flutter/material.dart';
 import 'package:moon_design/moon_design.dart';
 import 'package:skana_pix/utils/io_extension.dart';
-import 'package:skana_pix/utils/leaders.dart';
 import 'package:skana_pix/utils/widgetplugin.dart';
 import 'avatar.dart';
 import '../view/commentpage.dart';
 import 'followbutton.dart';
-import '../view/imageview/imagesearchresult.dart';
 import 'selecthtml.dart';
 import 'userpage.dart';
 
@@ -177,25 +174,12 @@ class _IllustDetailContentState extends State<IllustDetailContent> {
       padding: const EdgeInsets.only(left: 16.0, right: 16.0, top: 8.0),
       child: Wrap(
         crossAxisAlignment: WrapCrossAlignment.center,
-        spacing: 6,
-        runSpacing: 6,
+        spacing: 2,
+        runSpacing: 2,
         children: [
           if (data.isAi)
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 4),
-              decoration: BoxDecoration(
-                color: context.moonTheme?.tokens.colors.piccolo,
-                borderRadius: BorderRadius.all(Radius.circular(8)),
-              ),
-              child: RichText(
-                  strutStyle:
-                      const StrutStyle(forceStrutHeight: true, leading: 0),
-                  textAlign: TextAlign.start,
-                  text: TextSpan(text: "AI-generated".tr, children: [
-                    TextSpan(text: " ").small(),
-                  ]).small()),
-            ),
-          for (var f in data.tags) buildRow(context, f)
+            PixTag(f: Tag("AI-generated".tr, null)),
+          for (var f in data.tags) PixTag(f:f)
         ],
       ),
     );
@@ -261,96 +245,11 @@ class _IllustDetailContentState extends State<IllustDetailContent> {
         Icons.comment,
         size: 16,
         color: Theme.of(context).colorScheme.primary,
-      ).paddingTop(2),
-      label: Text("Show comments".tr,
-              strutStyle: const StrutStyle(forceStrutHeight: true, leading: 0))
-          .small(),
+      ),
+      label: Text(
+        "Show comments".tr,
+      ).small(),
     )).paddingSymmetric(vertical: 16);
-  }
-
-  Future _longPressTag(BuildContext context, Tag f) async {
-    switch (await alertDialog<int>(context, f.name, f.translatedName ?? "", [
-      outlinedButton(
-        label: "Block".tr,
-        onPressed: () {
-          Get.back(result: 0);
-        },
-      ),
-      filledButton(
-        label: "Bookmark".tr,
-        onPressed: () {
-          Get.back(result: 1);
-        },
-      ),
-      filledButton(
-        label: "Copy".tr,
-        onPressed: () {
-          Get.back(result: 2);
-        },
-      )
-    ])) {
-      case 0:
-        {
-          localManager.add("blockedTags", [f.name]);
-        }
-        break;
-      case 1:
-        {
-          Leader.showToast("Bookmarked".tr);
-          localManager.add("bookmarkedTags", [f.name]);
-        }
-        break;
-      case 2:
-        {
-          await Clipboard.setData(ClipboardData(text: f.name));
-          Leader.showToast("Copied to clipboard".tr);
-        }
-    }
-  }
-
-  Widget buildRow(BuildContext context, Tag f) {
-    return GestureDetector(
-      onLongPress: () async {
-        await _longPressTag(context, f);
-      },
-      onTap: () {
-        Get.to(
-            () => IllustResultPage(
-                  word: f.name,
-                  translatedName: f.translatedName ?? "",
-                ),
-            preventDuplicates: false);
-      },
-      child: Container(
-        height: 25,
-        padding: const EdgeInsets.symmetric(horizontal: 14),
-        decoration: BoxDecoration(
-          color: context.moonTheme?.tokens.colors.piccolo,
-          borderRadius: const BorderRadius.all(Radius.circular(12.5)),
-        ),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            RichText(
-                strutStyle:
-                    const StrutStyle(forceStrutHeight: true, leading: 0),
-                textAlign: TextAlign.start,
-                overflow: TextOverflow.ellipsis,
-                maxLines: 1,
-                text: TextSpan(text: "#${f.name}", children: [
-                  TextSpan(
-                    text: " ",
-                  ).small(),
-                  if (f.translatedName != null)
-                    TextSpan(
-                            text: "${f.translatedName}",
-                            style: TextStyle(fontStyle: FontStyle.italic))
-                        .small()
-                ]).small()),
-          ],
-        ),
-      ),
-    );
   }
 
   Widget _buildNameAvatar(BuildContext context, Illust illust) {

@@ -1,12 +1,12 @@
 import 'dart:math';
 
 import 'package:easy_refresh/easy_refresh.dart';
-import 'package:shadcn_flutter/shadcn_flutter.dart';
-import 'package:flutter/material.dart' as m;
+import 'package:flutter/material.dart';
+import 'package:moon_design/moon_design.dart';
 import 'package:skana_pix/componentwidgets/chip.dart';
 import 'package:skana_pix/componentwidgets/headerfooter.dart';
 import 'package:skana_pix/controller/list_controller.dart';
-import 'package:skana_pix/controller/mini_controllers.dart';
+import 'package:skana_pix/utils/widgetplugin.dart';
 import 'package:skana_pix/view/imageview/imagelistview.dart';
 import 'package:skana_pix/view/userview/usersearch.dart';
 import 'package:skana_pix/controller/like_controller.dart';
@@ -25,59 +25,47 @@ class SearchPage extends StatefulWidget {
   State<SearchPage> createState() => _SearchPageState();
 }
 
-class _SearchPageState extends State<SearchPage> {
+class _SearchPageState extends State<SearchPage>
+    with SingleTickerProviderStateMixin {
+  late TabController tabController;
   @override
-  Widget build(BuildContext context) {
-    return Obx(() {
-      return Scaffold(
-        headers: [
-          TabList(
-            index: searchPageController.selectedIndex.value,
-            children: [
-              TabButton(
-                child: Text('Illust•Manga'.tr),
-                onPressed: () {
-                  searchPageController.selectedIndex.value = 0;
-                },
-              ),
-              TabButton(
-                child: Text('Novel'.tr),
-                onPressed: () {
-                  searchPageController.selectedIndex.value = 1;
-                },
-              ),
-              TabButton(
-                child: Text('User'.tr),
-                onPressed: () {
-                  searchPageController.selectedIndex.value = 2;
-                },
-              ),
-            ],
-          ),
-        ],
-        child: (searchPageController.selectedIndex.value == 2)
-            ? SearchRecommmendUserPage()
-            : (searchPageController.selectedIndex.value == 0)
-                ? _RecommendIllust()
-                : (searchPageController.selectedIndex.value == 1)
-                    ? _RecommendNovel()
-                    : Container(),
-      );
-    });
+  void initState() {
+    super.initState();
+    tabController = TabController(length: 3, vsync: this);
   }
-}
 
-class _RecommendIllust extends StatelessWidget {
   @override
-  Widget build(BuildContext context) {
-    return SearchRecommendPage(ArtworkType.ILLUST);
+  void dispose() {
+    super.dispose();
+    tabController.dispose();
   }
-}
 
-class _RecommendNovel extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return SearchRecommendPage(ArtworkType.NOVEL);
+    return Column(
+      children: [
+        MoonTabBar(
+          tabController: tabController,
+          tabs: [
+            MoonTab(
+              label: Text('Illust•Manga'.tr),
+            ),
+            MoonTab(
+              label: Text('Novel'.tr),
+            ),
+            MoonTab(
+              label: Text('User'.tr),
+            ),
+          ],
+        ),
+        Expanded(
+            child: TabBarView(controller: tabController, children: [
+          SearchRecommendPage(ArtworkType.ILLUST),
+          SearchRecommendPage(ArtworkType.NOVEL),
+          SearchRecommmendUserPage(),
+        ]))
+      ],
+    );
   }
 }
 
@@ -104,88 +92,42 @@ class _SearchRecommmendUserPageState extends State<SearchRecommmendUserPage> {
         ListUserController(userListType: UserListType.recom),
         tag: "search_user");
     controller.refreshController = refreshController;
-    return Scaffold(
-      child: EasyRefresh(
-        header: DefaultHeaderFooter.header(context),
-        controller: refreshController,
-        onRefresh: () => controller.reset(),
-        onLoad: () => controller.nextPage(),
-        refreshOnStart: true,
-        child: Obx(() {
-          return CustomScrollView(
-            slivers: [
-              SliverPadding(padding: EdgeInsets.only(top: 16.0)),
-              if (localManager.historyUserTag.isNotEmpty)
-                SliverToBoxAdapter(
-                  child: Padding(
-                    padding: const EdgeInsets.only(left: 16.0,bottom: 16.0),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      crossAxisAlignment: CrossAxisAlignment.end,
-                      children: [
-                        Text("History".tr).h4(),
-                      ],
-                    ),
+    return EasyRefresh(
+      header: DefaultHeaderFooter.header(context),
+      refreshOnStartHeader: DefaultHeaderFooter.refreshHeader(context),
+      controller: refreshController,
+      onRefresh: () => controller.reset(),
+      onLoad: () => controller.nextPage(),
+      refreshOnStart: true,
+      child: Obx(() {
+        return CustomScrollView(
+          slivers: [
+            SliverPadding(padding: EdgeInsets.only(top: 16.0)),
+            if (localManager.historyUserTag.isNotEmpty)
+              SliverToBoxAdapter(
+                child: Padding(
+                  padding: const EdgeInsets.only(left: 16.0, bottom: 16.0),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    crossAxisAlignment: CrossAxisAlignment.end,
+                    children: [
+                      Text("History".tr).header(),
+                    ],
                   ),
                 ),
-              if (localManager.historyUserTag.isNotEmpty)
-                SliverPadding(
-                  padding: EdgeInsets.symmetric(horizontal: 8),
-                  sliver: SliverToBoxAdapter(
-                    child: (localManager.historyUserTag.length > 20)
-                        ? Padding(
-                            padding:
-                                const EdgeInsets.symmetric(horizontal: 5.0),
-                            child: Wrap(
-                              runSpacing: 5.0,
-                              spacing: 5.0,
-                              children: [
-                                if (controller.tagExpand.value)
-                                  for (var f in localManager.historyUserTag)
-                                    PixChip(
-                                        f: f,
-                                        type: "historyUserTag",
-                                        onTap: () => Get.to(
-                                            () => UserResultPage(
-                                                  word: f,
-                                                ),
-                                            preventDuplicates: false)),
-                                if (!controller.tagExpand.value)
-                                  for (var f in localManager.historyUserTag
-                                      .sublist(0, 12))
-                                    PixChip(
-                                        f: f,
-                                        type: "historyUserTag",
-                                        onTap: () => Get.to(
-                                            () => UserResultPage(
-                                                  word: f,
-                                                ),
-                                            preventDuplicates: false)),
-                                Chip(
-                                    child: AnimatedSwitcher(
-                                      duration: Duration(milliseconds: 300),
-                                      transitionBuilder: (child, anim) {
-                                        return ScaleTransition(
-                                            scale: anim, child: child);
-                                      },
-                                      child: Icon(!controller.tagExpand.value
-                                          ? Icons.expand_more
-                                          : Icons.expand_less),
-                                    ),
-                                    onPressed: () {
-                                      controller.tagExpand.value =
-                                          !controller.tagExpand.value;
-                                    })
-                              ],
-                            ),
-                          )
-                        : Padding(
-                            padding:
-                                const EdgeInsets.symmetric(horizontal: 5.0),
-                            child: Wrap(
-                              runSpacing: 5.0,
-                              spacing: 5.0,
-                              children: [
+              ),
+            if (localManager.historyUserTag.isNotEmpty)
+              SliverPadding(
+                padding: EdgeInsets.symmetric(horizontal: 8),
+                sliver: SliverToBoxAdapter(
+                  child: (localManager.historyUserTag.length > 20)
+                      ? Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 5.0),
+                          child: Wrap(
+                            runSpacing: 5.0,
+                            spacing: 5.0,
+                            children: [
+                              if (controller.tagExpand.value)
                                 for (var f in localManager.historyUserTag)
                                   PixChip(
                                       f: f,
@@ -195,64 +137,98 @@ class _SearchRecommmendUserPageState extends State<SearchRecommmendUserPage> {
                                                 word: f,
                                               ),
                                           preventDuplicates: false)),
-                              ],
-                            ),
+                              if (!controller.tagExpand.value)
+                                for (var f in localManager.historyUserTag
+                                    .sublist(0, 12))
+                                  PixChip(
+                                      f: f,
+                                      type: "historyUserTag",
+                                      onTap: () => Get.to(
+                                          () => UserResultPage(
+                                                word: f,
+                                              ),
+                                          preventDuplicates: false)),
+                              MoonChip(
+                                  label: AnimatedSwitcher(
+                                    duration: Duration(milliseconds: 300),
+                                    transitionBuilder: (child, anim) {
+                                      return ScaleTransition(
+                                          scale: anim, child: child);
+                                    },
+                                    child: Icon(!controller.tagExpand.value
+                                        ? Icons.expand_more
+                                        : Icons.expand_less),
+                                  ),
+                                  onTap: () {
+                                    controller.tagExpand.value =
+                                        !controller.tagExpand.value;
+                                  })
+                            ],
                           ),
-                  ),
-                ),
-              if (localManager.historyUserTag.isNotEmpty)
-                SliverToBoxAdapter(
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Button(
-                        style: ButtonStyle.card(density: ButtonDensity.dense),
-                        onPressed: () {
-                          showDialog(
-                              context: context,
-                              builder: (context) {
-                                return AlertDialog(
-                                  title: Text("Clean history?".tr)
-                                      .withAlign(Alignment.centerLeft),
-                                  actions: [
-                                    OutlineButton(
-                                        onPressed: () {
-                                          Get.back();
-                                        },
-                                        child: Text("Cancel".tr)),
-                                    PrimaryButton(
-                                        onPressed: () {
-                                          localManager.clear("historyUserTag");
-                                          Get.back();
-                                        },
-                                        child: Text("Ok".tr)),
-                                  ],
-                                );
-                              });
-                        },
-                        child: Basic(
-                          leading: Icon(Icons.delete_outline),
-                          title: Text("Clear search history".tr).textSmall(),
+                        )
+                      : Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 5.0),
+                          child: Wrap(
+                            runSpacing: 5.0,
+                            spacing: 5.0,
+                            children: [
+                              for (var f in localManager.historyUserTag)
+                                PixChip(
+                                    f: f,
+                                    type: "historyUserTag",
+                                    onTap: () => Get.to(
+                                        () => UserResultPage(
+                                              word: f,
+                                            ),
+                                        preventDuplicates: false)),
+                            ],
+                          ),
                         ),
-                      ),
-                    ],
-                  ).paddingAll(16.0),
-                ),
-              SliverToBoxAdapter(
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                  child: Text("Recommended Users".tr).h4(),
                 ),
               ),
-              SliverPadding(padding: EdgeInsets.only(top: 8.0)),
-              SliverList(
-                  delegate: SliverChildBuilderDelegate((context, index) {
-                return PainterCard(user: controller.users[index]);
-              }, childCount: controller.users.length)),
-            ],
-          );
-        }),
-      ),
+            if (localManager.historyUserTag.isNotEmpty)
+              SliverToBoxAdapter(
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    filledButton(
+                      onPressed: () {
+                        alertDialog(context, "Clean history?".tr, "", [
+                          outlinedButton(
+                            label: "Cancel".tr,
+                            onPressed: () {
+                              Get.back();
+                            },
+                          ),
+                          filledButton(
+                            label: "Ok".tr,
+                            onPressed: () {
+                              localManager.clear("historyUserTag");
+                              Get.back();
+                            },
+                          )
+                        ]);
+                      },
+                      leading: Icon(Icons.delete_outline),
+                      label: "Clear search history".tr,
+                    ),
+                  ],
+                ).paddingAll(16.0),
+              ),
+            SliverToBoxAdapter(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                child: Text("Recommended Users".tr).header(),
+              ),
+            ),
+            SliverPadding(padding: EdgeInsets.only(top: 8.0)),
+            SliverList(
+                delegate: SliverChildBuilderDelegate((context, index) {
+              return PainterCard(user: controller.users[index]);
+            }, childCount: controller.users.length)),
+          ],
+        );
+      }),
     );
   }
 }
@@ -285,6 +261,7 @@ class _SearchRecommendPageState extends State<SearchRecommendPage> {
       () => EasyRefresh(
         onRefresh: hotTagsController.reset,
         header: DefaultHeaderFooter.header(context),
+        refreshOnStartHeader: DefaultHeaderFooter.refreshHeader(context),
         controller: refreshController,
         refreshOnStart: true,
         callRefreshOverOffset: 10,
@@ -302,7 +279,7 @@ class _SearchRecommendPageState extends State<SearchRecommendPage> {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   crossAxisAlignment: CrossAxisAlignment.end,
                   children: [
-                    Text("History".tr).h4(),
+                    Text("History".tr).header(),
                   ],
                 ),
               )),
@@ -349,9 +326,8 @@ class _SearchRecommendPageState extends State<SearchRecommendPage> {
                                                 word: f,
                                               ),
                                           preventDuplicates: false)),
-                              Chip(
-                                  style: ButtonStyle.primary(),
-                                  child: AnimatedSwitcher(
+                              MoonChip(
+                                  label: AnimatedSwitcher(
                                     duration: Duration(milliseconds: 300),
                                     transitionBuilder: (child, anim) {
                                       return ScaleTransition(
@@ -362,7 +338,7 @@ class _SearchRecommendPageState extends State<SearchRecommendPage> {
                                             ? Icons.expand_more
                                             : Icons.expand_less),
                                   ),
-                                  onPressed: () {
+                                  onTap: () {
                                     hotTagsController.tagExpand.value =
                                         !hotTagsController.tagExpand.value;
                                   })
@@ -408,41 +384,33 @@ class _SearchRecommendPageState extends State<SearchRecommendPage> {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Button(
-                      style: ButtonStyle.card(density: ButtonDensity.dense),
+                    filledButton(
                       onPressed: () {
-                        showDialog(
-                            context: context,
-                            builder: (context) {
-                              return AlertDialog(
-                                title: Text("Clean history?".tr)
-                                    .withAlign(Alignment.centerLeft),
-                                actions: [
-                                  OutlineButton(
-                                      onPressed: () {
-                                        Get.back();
-                                      },
-                                      child: Text("Cancel".tr)),
-                                  PrimaryButton(
-                                      onPressed: () {
-                                        if (widget.type == ArtworkType.ILLUST) {
-                                          localManager
-                                              .clear("historyIllustTag");
-                                        } else if (widget.type ==
-                                            ArtworkType.NOVEL) {
-                                          localManager.clear("historyNovelTag");
-                                        }
-                                        Get.back();
-                                      },
-                                      child: Text("Ok".tr)),
-                                ],
-                              );
-                            });
+                        alertDialog(
+                          context,
+                          "Clean history?".tr,
+                          "",
+                          [
+                            outlinedButton(
+                                onPressed: () {
+                                  Get.back();
+                                },
+                                label: "Cancel".tr),
+                            filledButton(
+                                onPressed: () {
+                                  if (widget.type == ArtworkType.ILLUST) {
+                                    localManager.clear("historyIllustTag");
+                                  } else if (widget.type == ArtworkType.NOVEL) {
+                                    localManager.clear("historyNovelTag");
+                                  }
+                                  Get.back();
+                                },
+                                label: "Ok".tr),
+                          ],
+                        );
                       },
-                      child: Basic(
-                        leading: Icon(Icons.delete_outline),
-                        title: Text("Clear search history".tr).textSmall(),
-                      ),
+                      leading: Icon(Icons.delete_outline),
+                      label: "Clear search history".tr,
                     ),
                   ],
                 ).paddingAll(16.0),
@@ -450,14 +418,14 @@ class _SearchRecommendPageState extends State<SearchRecommendPage> {
             SliverToBoxAdapter(
               child: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                child: Text("Recommended Tags".tr).h4(),
+                child: Text("Recommended Tags".tr).header(),
               ),
             ),
             SliverPadding(
               padding: EdgeInsets.all(8.0),
               sliver: SliverGrid(
                   delegate: SliverChildBuilderDelegate((context, index) {
-                    return m.InkWell(
+                    return InkWell(
                       onTap: () {
                         Get.to(() {
                           if (widget.type == ArtworkType.NOVEL) {
@@ -477,7 +445,7 @@ class _SearchRecommendPageState extends State<SearchRecommendPage> {
                               .toString());
                         });
                       },
-                      child: m.Card(
+                      child: Card(
                         clipBehavior: Clip.antiAlias,
                         child: Stack(
                           children: <Widget>[
@@ -502,9 +470,11 @@ class _SearchRecommendPageState extends State<SearchRecommendPage> {
                                     Text(
                                       "#${hotTagsController.tags[index].tag}",
                                       textAlign: TextAlign.center,
+                                      maxLines: 3,
+                                      overflow: TextOverflow.ellipsis,
                                       style: TextStyle(
-                                          color: Colors.white, fontSize: 12),
-                                    ),
+                                          color: Colors.white),
+                                    ).small(),
                                     if (hotTagsController.tags[index].tag
                                                 .translatedName !=
                                             null &&
@@ -514,9 +484,11 @@ class _SearchRecommendPageState extends State<SearchRecommendPage> {
                                         hotTagsController
                                             .tags[index].tag.translatedName!,
                                         textAlign: TextAlign.center,
+                                        maxLines: 3,
+                                        overflow: TextOverflow.ellipsis,
                                         style: TextStyle(
-                                            color: Colors.white, fontSize: 10),
-                                      ),
+                                            color: Colors.white),
+                                      ).xSmall(),
                                   ],
                                 ),
                               ),

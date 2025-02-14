@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:moon_design/moon_design.dart';
 import 'package:skana_pix/controller/account_controller.dart';
 import 'package:skana_pix/utils/widgetplugin.dart';
 import 'package:skana_pix/view/settings/settingpage.dart';
@@ -21,9 +22,10 @@ class _LoginPageState extends State<LoginPage> {
     return Scaffold(
         bottomNavigationBar: BottomAppBar(
           child: Row(
+            mainAxisAlignment: MainAxisAlignment.end,
             children: [
               IconButton(
-                icon: Icon(Icons.settings),
+                icon: Icon(Icons.settings,color: context.moonTheme?.tokens.colors.bulma,),
                 onPressed: () => Get.to(() => Scaffold(
                     appBar: appBar(title: "Settings".tr),
                     body: SettingPage())),
@@ -57,9 +59,9 @@ class _LoginPageState extends State<LoginPage> {
               Align(
                 alignment: Alignment.centerLeft,
                 child: Text(
-                  ("     ${"SkanaPix".tr}"),
+                  "     ${"SkanaPix".tr}",
                   style: const TextStyle(fontSize: 20),
-                ),
+                ).header(),
               ),
               Expanded(
                 child: Center(
@@ -68,9 +70,9 @@ class _LoginPageState extends State<LoginPage> {
                     children: [
                       SizedBox(
                         width: 110,
-                        child: TextButton(
+                        child: filledButton(
                           onPressed: onContinue,
-                          child: Text("Login".tr),
+                          label: "Login".tr,
                         ),
                       ),
                       const SizedBox(
@@ -81,7 +83,7 @@ class _LoginPageState extends State<LoginPage> {
                             horizontal: 8, vertical: 4),
                         child: Text(
                             "You need to complete the login operation in the browser window that will open."
-                                .tr),
+                                .tr).small(),
                       )
                     ],
                   ),
@@ -109,8 +111,8 @@ class _LoginPageState extends State<LoginPage> {
                   "Waiting...".tr,
                   style: const TextStyle(
                       fontSize: 24, fontWeight: FontWeight.bold),
-                ),
-              ),
+                ).subHeader(),
+              ).paddingAll(20),
               Expanded(
                 child: Center(
                   child: Container(
@@ -118,20 +120,20 @@ class _LoginPageState extends State<LoginPage> {
                         const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                     child: Text(
                         "Waiting for authentication. Please finished in the browser."
-                            .tr),
+                            .tr).small(),
                   ),
                 ),
               ),
               Row(
                 children: [
-                  TextButton(
-                      child: Text("Back".tr),
+                  outlinedButton(
+                      label: "Back".tr,
                       onPressed: () {
                         accountController.waitingForAuth.value = false;
                       }),
                   const Spacer(),
                 ],
-              )
+              ).paddingAll(20)
             ],
           ),
         )),
@@ -154,7 +156,7 @@ class _LoginPageState extends State<LoginPage> {
                   "Logging in".tr,
                   style: const TextStyle(
                       fontSize: 24, fontWeight: FontWeight.bold),
-                ),
+                ).subHeader(),
               ),
               const Expanded(
                 child: Center(
@@ -172,36 +174,41 @@ class _LoginPageState extends State<LoginPage> {
     bool useExternal = true;
     bool exitLogin = false;
     if (GetPlatform.isMobile) {
-      await showDialog(
-        context: context,
-        barrierDismissible: true,
-        builder: (context) {
-          var alertDialog = AlertDialog(
-              content: Text(
-                  "I understand this is a free unofficial application.".tr),
-              actions: [
-                Column(
+      await showMoonModal(
+      context: context,
+      builder: (context) {
+        return Dialog(
+            child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            MoonAlert(
+                borderColor: Get
+                    .context?.moonTheme?.buttonTheme.colors.borderColor
+                    .withValues(alpha: 0.5),
+                showBorder: true,
+                label: Text("I understand this is a free unofficial application.".tr).header(),
+                verticalGap: 16,
+                content: Column(
+                  mainAxisSize: MainAxisSize.min,
                   crossAxisAlignment: CrossAxisAlignment.end,
                   children: [
-                    TextButton(
-                      child: Text("Cancel".tr),
+                    outlinedButton(
+                      label: "Cancel".tr,
                       onPressed: () {
                         exitLogin = true;
                         Get.back();
                       },
-                    ),
-                    const SizedBox(height: 16),
-                    TextButton(
-                      child: Text("Continue with Webview".tr),
+                    ).paddingBottom(16),
+                    filledButton(
+                      label: "Continue with Webview".tr,
                       onPressed: () {
                         exitLogin = false;
                         useExternal = false;
                         Get.back();
                       },
-                    ),
-                    const SizedBox(height: 16),
-                    TextButton(
-                      child: Text("Continue with External Browser".tr),
+                    ).paddingBottom(16),
+                    filledButton(
+                      label: "Continue with External Browser".tr,
                       onPressed: () {
                         exitLogin = false;
                         useExternal = true;
@@ -209,11 +216,10 @@ class _LoginPageState extends State<LoginPage> {
                       },
                     ),
                   ],
-                )
-              ]);
-          return alertDialog;
-        },
-      );
+                )),
+          ],
+        ));
+      });
     }
     if (exitLogin) {
       return;

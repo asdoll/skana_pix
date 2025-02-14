@@ -31,6 +31,7 @@ class _BoardPageState extends State<BoardPage> {
           },
           refreshOnStart: true,
           header: DefaultHeaderFooter.header(context),
+          refreshOnStartHeader: DefaultHeaderFooter.refreshHeader(context),
           child: ListView(
             padding: EdgeInsets.zero,
             children: [

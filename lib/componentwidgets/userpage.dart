@@ -370,9 +370,9 @@ class _UserPageState extends State<UserPage> with TickerProviderStateMixin {
 
   PopupMenuButton<int> _buildPopMenu(BuildContext context) {
     return PopupMenuButton<int>(
-      icon: const DecoratedIcon(
-        icon: Icon(Icons.more_vert),
-        decoration: IconDecoration(border: IconBorder(width: 1.5)),
+      icon: DecoratedIcon(
+        icon: Icon(Icons.more_vert,color: Colors.white,),
+        decoration: const IconDecoration(border: IconBorder(width: 1.5)),
       ),
       onSelected: (index) async {
         switch (index) {

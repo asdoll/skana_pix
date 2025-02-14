@@ -121,7 +121,7 @@ Future<T?> alertDialog<T>(BuildContext context, String title, String content,
                               ?.map((action) => action.paddingRight(8))
                               .toList() ??
                           [],
-                    )
+                    ),
                   ],
                 )),
           ],
@@ -143,6 +143,7 @@ Widget filledButton(
     {String? label,
     VoidCallback? onPressed,
     MoonButtonSize? buttonSize,
+    Widget? leading,
     Color? color}) {
   return MoonFilledButton(
     buttonSize: buttonSize ?? MoonButtonSize.sm,
@@ -159,32 +160,39 @@ Widget moonListTile(
     Widget? leading,
     Widget? trailing}) {
   return InkWell(
-    onTap: onTap ?? () {},
-    child: MoonMenuItem(
-    backgroundColor: Get.context?.moonTheme?.tokens.colors.gohan,
-    onTap: onTap ?? () {},
-    label: Text(title).header(),
-    content: subtitle == null ? null : Text(subtitle).subHeader(),
-    leading: leading,
-    trailing: trailing,
-    ).paddingSymmetric(vertical: 2, horizontal: 8)
-  );
+      onTap: onTap ?? () {},
+      child: MoonMenuItem(
+        backgroundColor: Get.context?.moonTheme?.tokens.colors.gohan,
+        onTap: onTap ?? () {},
+        label: Text(title).header(),
+        content: subtitle == null ? null : Text(subtitle).subHeader(),
+        leading: leading,
+        trailing: trailing,
+      ).paddingSymmetric(vertical: 2, horizontal: 8));
 }
 
-Widget moonListTileWidgets({required Widget label, Widget? content, Widget? leading, Widget? trailing, VoidCallback? onTap,EdgeInsetsGeometry? menuItemPadding, CrossAxisAlignment? menuItemCrossAxisAlignment, bool noPadding = false}) {
-return InkWell(
-    onTap: onTap ?? () {},
-    child: MoonMenuItem(
-    backgroundColor: Get.context?.moonTheme?.tokens.colors.gohan,
-    menuItemPadding: menuItemPadding,
-    menuItemCrossAxisAlignment: menuItemCrossAxisAlignment,
-    onTap: onTap ?? () {},
-    label: label,
-    content: content,
-    leading: leading,
-    trailing: trailing,
-    ).paddingSymmetric(vertical: noPadding ? 0 : 2, horizontal: noPadding ? 0 : 8)
-  );
+Widget moonListTileWidgets(
+    {required Widget label,
+    Widget? content,
+    Widget? leading,
+    Widget? trailing,
+    VoidCallback? onTap,
+    EdgeInsetsGeometry? menuItemPadding,
+    CrossAxisAlignment? menuItemCrossAxisAlignment,
+    bool noPadding = false}) {
+  return InkWell(
+      onTap: onTap ?? () {},
+      child: MoonMenuItem(
+        backgroundColor: Get.context?.moonTheme?.tokens.colors.gohan,
+        menuItemPadding: menuItemPadding,
+        menuItemCrossAxisAlignment: menuItemCrossAxisAlignment,
+        onTap: onTap ?? () {},
+        label: label,
+        content: content,
+        leading: leading,
+        trailing: trailing,
+      ).paddingSymmetric(
+          vertical: noPadding ? 0 : 2, horizontal: noPadding ? 0 : 8));
 }
 
 AppBar appBar(
@@ -269,16 +277,18 @@ extension TextExtension on Text {
                 color: style?.color ??
                     Get.context?.moonTheme?.textAreaTheme.colors.textColor),
       );
-  
+
   Text subHeaderForgound() => Text(
         data ?? '',
         maxLines: maxLines,
         overflow: overflow,
         strutStyle: strutStyle,
-        style: Get.context?.moonTheme?.tokens.typography.heading.text14
-            .copyWith(
-              foreground: style?.foreground ?? Get.context?.moonTheme?.tokens.typography.heading.text14.foreground,
-            ),
+        style:
+            Get.context?.moonTheme?.tokens.typography.heading.text14.copyWith(
+          foreground: style?.foreground ??
+              Get.context?.moonTheme?.tokens.typography.heading.text14
+                  .foreground,
+        ),
       );
 
   Text xSmall() => Text(

@@ -124,7 +124,7 @@ class _MyTagsPageState extends State<MyTagsPage> {
                           );
                         },
                     leading: Icon(Icons.delete_outline),
-                    label: Text("Delete all".tr).small(),
+                    label: Text("Delete all".tr, style: TextStyle(color: context.moonTheme?.buttonTheme.colors.filledVariantTextColor)).small(),
                 ),
               ],
             ).paddingAll(16.0),
@@ -229,7 +229,7 @@ class _MyTagsPageState extends State<MyTagsPage> {
                           );
                         },
                     leading: Icon(Icons.delete_outline),
-                    label: Text("Delete all".tr).small(),
+                    label: Text("Delete all".tr,style: TextStyle(color: context.moonTheme?.buttonTheme.colors.filledVariantTextColor)).small(),
                 ),
               ],
             ).paddingAll(16.0),

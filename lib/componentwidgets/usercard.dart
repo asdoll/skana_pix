@@ -105,6 +105,7 @@ class _PainterCardState extends State<PainterCard> {
                   novel.title,
                   maxLines: 3,
                   overflow: TextOverflow.ellipsis,
+                  style: TextStyle(color: Colors.white),
                 ).subHeader(),
               ),
             )

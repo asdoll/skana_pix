@@ -28,6 +28,7 @@ class _NewVersionPageState extends State<NewVersionPage> {
             controller.finishRefresh();
           },
           header: DefaultHeaderFooter.header(context),
+          refreshOnStartHeader: DefaultHeaderFooter.refreshHeader(context),
           refreshOnStart: updateController.hasNewVersion.value,
           child: ListView(
             padding: EdgeInsets.zero,

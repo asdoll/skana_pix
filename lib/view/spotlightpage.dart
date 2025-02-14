@@ -36,6 +36,7 @@ class _SpotlightPageState extends State<SpotlightPage> {
         onLoad: () => spotlightStore.next(),
         onRefresh: () => spotlightStore.fetch(),
         header: DefaultHeaderFooter.header(context),
+        refreshOnStartHeader: DefaultHeaderFooter.refreshHeader(context),
         refreshOnStart: true,
         scrollController: globalScrollController,
         controller: refreshController,

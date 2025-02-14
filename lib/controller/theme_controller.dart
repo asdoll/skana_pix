@@ -33,6 +33,20 @@ class ThemeManager {
 
   ValueNotifier<ThemeData> theme = ValueNotifier<ThemeData>(getTheme(false));
 
+  void updateDarkMode() {
+    updateValue(getUpdatedTheme());
+    if (settings.darkMode == "0") {
+      WidgetsBinding.instance.platformDispatcher.onPlatformBrightnessChanged =
+          () {
+        updateValue(getUpdatedTheme());
+      };
+    } else {
+      WidgetsBinding.instance.platformDispatcher.onPlatformBrightnessChanged =
+          () {
+      };
+    }
+  }
+
   void updateValue(ThemeData themes) {
     theme.value = themes;
     SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
@@ -103,6 +117,6 @@ class ThemeController extends GetxController {
     settings.settings[0] = darkMode;
     settings.updateSettings();
     this.darkMode.value = settings.darkMode;
-    ThemeManager.instance.updateValue(getTheme(settings.isDarkMode));
+    ThemeManager.instance.updateDarkMode();
   }
 }

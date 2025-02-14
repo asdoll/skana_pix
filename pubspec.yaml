@@ -80,6 +80,8 @@ dependencies:
   google_fonts: ^6.2.1
   flutter_colorpicker: ^1.1.0
   like_button: ^2.0.5
+  flutter_spinkit: ^5.2.1
+  calendar_date_picker2: ^1.1.8
 
 
 dev_dependencies:

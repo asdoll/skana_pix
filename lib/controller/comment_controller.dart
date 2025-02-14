@@ -18,6 +18,7 @@ class CommentController extends GetxController {
   RxInt parentCommentId = 0.obs;
   RxString parentCommentName = "".obs;
   bool isReply;
+  RxMap<int, bool> showMenu = RxMap();
 
   CommentController(this.id, this.type, this.isReply);
 
@@ -91,6 +92,9 @@ class CommentController extends GetxController {
         comments.addAll(filterComments(value.data));
         comments.refresh();
         easyRefreshController?.finishRefresh();
+        if(comments.isEmpty) {
+          Leader.showToast("No comments".tr,Duration(seconds: 5));
+        }
       } else {
         var message = value.errorMessage ??
             "Network Error. Please refresh to try again.".tr;

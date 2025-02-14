@@ -154,6 +154,10 @@ class _BlockListPageState extends State<BlockListPage> {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [MoonAlert(
+                borderColor: Get.context?.moonTheme
+                                          ?.buttonTheme.colors.borderColor
+                                          .withValues(alpha: 0.5),
+                                      showBorder: true,
             label: Text("Add".tr).header(),
             content: Column(children: [MoonTextInput(
                 controller: controller,

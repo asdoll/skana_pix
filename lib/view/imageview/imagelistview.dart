@@ -300,6 +300,8 @@ class _IllustPageState extends State<IllustPage> {
         );
       } else {
         return EasyRefresh(
+          header: DefaultHeaderFooter.header(context),
+          refreshOnStartHeader: DefaultHeaderFooter.refreshHeader(context),
           footer: DefaultHeaderFooter.footer(context),
           controller: _refreshController,
           onLoad: () {
@@ -505,8 +507,8 @@ class _IllustPageState extends State<IllustPage> {
                     children: [
                       Expanded(child: Spacer()),
                       MoonButton.icon(
-                        icon: const DecoratedIcon(
-                          icon: Icon(Icons.more_vert),
+                        icon: DecoratedIcon(
+                          icon: Icon(Icons.more_vert,color: Colors.white,),
                           decoration:
                               IconDecoration(border: IconBorder(width: 1.5)),
                         ),

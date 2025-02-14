@@ -12,14 +12,15 @@ import 'package:skana_pix/view/novelview/novelseries.dart';
 import 'package:skana_pix/view/imageview/imagesearchresult.dart';
 import 'package:skana_pix/view/souppage.dart';
 import 'package:skana_pix/componentwidgets/userpage.dart';
-
 class Leader {
-  static showToast(String text) {
+  static showToast(String text,[Duration? duration]) {
     try {
       MoonToast.show(
+        toastAlignment: Alignment(0.0, 0.8),
         backgroundColor: MoonColors.dark.gohan,
         Get.context!,
         label: Text(text, style: TextStyle(color: MoonColors.light.goku)),
+        displayDuration: duration,
       );
     } catch (e) {
       log.e(e);
