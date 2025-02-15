@@ -199,7 +199,9 @@ class _MyBookmarksPageState extends State<MyBookmarksPage>
                       }),
                 ]).paddingOnly(top: 8),
                 Expanded(
-                    child: TabBarView(controller: icontroller, children: [
+                    child: TabBarView(
+                      physics: const NeverScrollableScrollPhysics(),
+                      controller: icontroller, children: [
                   MyBookmarkContent(type: ArtworkType.ILLUST, label: "public"),
                   MyBookmarkContent(type: ArtworkType.ILLUST, label: "private"),
                 ])),
@@ -232,7 +234,9 @@ class _MyBookmarksPageState extends State<MyBookmarksPage>
                       }),
                 ]).paddingOnly(top: 8),
                 Expanded(
-                    child: TabBarView(controller: ncontroller, children: [
+                    child: TabBarView(
+                      physics: const NeverScrollableScrollPhysics(),
+                      controller: ncontroller, children: [
                   MyBookmarkContent(type: ArtworkType.NOVEL, label: "public"),
                   MyBookmarkContent(type: ArtworkType.NOVEL, label: "private"),
                 ])),
