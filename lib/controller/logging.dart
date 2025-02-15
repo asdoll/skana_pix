@@ -1,7 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:logger/logger.dart';
 
-final logger = Logger();
+final logger = Logger(printer: PrettyPrinter(lineLength: 99999));
 final loggerNoStack = Logger(printer: PrettyPrinter(methodCount: 0));
 
 // ignore: camel_case_types

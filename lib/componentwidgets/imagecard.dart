@@ -285,7 +285,7 @@ class _IllustCardState extends State<IllustCard> {
         ),
         Align(
           alignment: Alignment.centerRight,
-          child: StarIcon(id: illust.id.toString(), type: widget.type)
+          child: StarIcon(id: illust.id.toString(), type: widget.type, liked: illust.isBookmarked)
               .paddingOnly(right: 2, top: 8),
         )
       ],
