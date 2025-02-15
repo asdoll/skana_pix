@@ -7,6 +7,7 @@ class ImagesCacheManager extends CacheManager with ImageCacheManager {
   ImagesCacheManager():super(
     Config(
       key,
+      stalePeriod: const Duration(days: 7),
       repo: JsonCacheInfoRepository(databaseName: key),
       fileSystem: IOFileSystem(key),
       fileService: DioFileService(),
@@ -18,6 +19,7 @@ class ThisDownloadManager extends CacheManager {
   ThisDownloadManager():super(
     Config(
       key,
+      stalePeriod: const Duration(days: 3650),
       repo: JsonCacheInfoRepository(databaseName: key),
       fileSystem: IOFileSystem(key),
       fileService: DioFileService(),

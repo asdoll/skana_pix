@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:icon_decoration/icon_decoration.dart';
+import 'package:moon_design/moon_design.dart';
+import 'package:skana_pix/view/homepage.dart';
 
 class CommonBackArea extends StatefulWidget {
   const CommonBackArea({super.key});
@@ -15,19 +18,33 @@ class _CommonBackAreaState extends State<CommonBackArea> {
     return GestureDetector(
       child: IconButton(
         icon: DecoratedIcon(
-          icon: Icon(_isLongPress ? Icons.home : Icons.arrow_back),
+          icon: Icon(_isLongPress ? Icons.home : Icons.arrow_back,color: Colors.white,),
           decoration: const IconDecoration(border: IconBorder(width: 1.5)),
         ),
         onPressed: () {
-          Navigator.pop(context);
+          Get.back();
         },
       ),
       onLongPress: () {
         setState(() {
           _isLongPress = true;
         });
-        Navigator.of(context).popUntil((route) => route.isFirst);
+        Get.offAll(() => const HomePage());
       },
+    );
+  }
+}
+
+class NormalBackButton extends StatelessWidget {
+  const NormalBackButton({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return IconButton(
+      onPressed: () {
+        Get.back();
+      },
+      icon: Icon(Icons.arrow_back,color: context.moonTheme?.tokens.colors.bulma,),
     );
   }
 }

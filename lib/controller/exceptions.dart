@@ -4,7 +4,7 @@ class BadResponseException implements Exception {
   final String message;
 
   BadResponseException(this.message) {
-    loggerError("Bad Response:$message");
+    log.e("Bad Response:$message");
   }
 
   @override
@@ -17,7 +17,7 @@ class BadRequestException implements Exception {
   final String message;
 
   BadRequestException(this.message) {
-    loggerError("Bad Request:$message");
+    log.e("Bad Request:$message");
   }
 
   @override

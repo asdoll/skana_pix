@@ -1,9 +1,3 @@
-import 'dart:convert';
-
-import 'package:dio/dio.dart';
-import 'package:flutter/foundation.dart';
-import 'package:skana_pix/view/defaults.dart';
-
 class BoardInfo {
   BoardInfo({
     required this.title,
@@ -29,34 +23,4 @@ class BoardInfo {
       'startDate': startDate,
       'endDate': endDate,
     };
-  
-  static bool boardDataLoaded = false;
-  
-  static List<BoardInfo> boardList = [];
-
-  static String path() {
-    if (kDebugMode) {
-      return "android.json";
-    }
-    if (DynamicData.isAndroid) {
-      if (Constants.isGooglePlay) {
-        return "android_play.json";
-      }
-      return "android.json";
-    } else if (DynamicData.isIOS) {
-      return "ios.json";
-    }
-    return "";
-  }
-
-  static Future<List<BoardInfo>> load() async {
-    print(path());
-    final request = await Dio().get(
-        'https://raw.githubusercontent.com/asdoll/skana_pix/refs/heads/main/.github/board/${path()}');
-    final list = (jsonDecode(request.data) as List)
-        .map((e) => BoardInfo.fromJson(e))
-        .toList();
-    boardList = list;
-    return list;
-  }
 }

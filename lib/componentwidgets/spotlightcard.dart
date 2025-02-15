@@ -1,77 +1,61 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:moon_design/moon_design.dart';
 import 'package:skana_pix/controller/caches.dart';
-import 'package:skana_pix/pixiv_dart_api.dart';
-
-import 'souppage.dart';
+import 'package:skana_pix/model/spotlight.dart';
+import 'package:skana_pix/utils/widgetplugin.dart';
+import 'package:skana_pix/view/souppage.dart';
 
 class SpotlightCard extends StatelessWidget {
   final SpotlightArticle spotlight;
 
-  const SpotlightCard({Key? key, required this.spotlight}) : super(key: key);
+  const SpotlightCard({super.key, required this.spotlight});
 
+  @override
   Widget build(BuildContext context) {
     return Padding(
       padding: EdgeInsets.all(4.0),
-      child: GestureDetector(
-        onTap: () async {
-          Navigator.of(context, rootNavigator: true).push(MaterialPageRoute(
-              builder: (BuildContext context) =>
-                  SoupPage(url: spotlight.articleUrl, spotlight: spotlight)));
-        },
-        child: Container(
-          height: 230,
-          child: Stack(
-            children: <Widget>[
-              Align(
-                alignment: Alignment.bottomCenter,
-                child: Container(
-                  width: 160.0,
-                  height: 90.0,
-                  decoration: BoxDecoration(
-                      color: Theme.of(context).splashColor,
-                      borderRadius: BorderRadius.all(Radius.circular(8.0))),
-                  child: Align(
-                    alignment: AlignmentDirectional.bottomCenter,
-                    child: ListTile(
-                        title: Text(
-                          spotlight.title,
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                        subtitle: Text(
-                          spotlight.pureTitle,
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                        )),
-                  ),
-                ),
+      child: SizedBox(
+          height: 250,
+          child: moonListTileWidgets(
+            noPadding: true,
+            onTap: () async {
+              Get.to(
+                  () => SoupPage(
+                      url: spotlight.articleUrl,
+                      spotlight: spotlight,
+                      heroTag: "spotlight_${spotlight.id}"),
+                  preventDuplicates: false);
+            },
+            menuItemPadding: EdgeInsets.all(6),
+            content: Column(
+              children: [
+                Text(
+              spotlight.title,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: TextStyle(color: context.moonTheme?.menuItemTheme.colors.labelTextColor),
+            ).subHeader(),
+                Text(
+              spotlight.pureTitle,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+            ).small()
+              ],
+            ),
+            label: SizedBox(
+              height: 190.0,
+              width: 190.0,
+              child: CachedNetworkImage(
+                imageUrl: spotlight.thumbnail,
+                fit: BoxFit.cover,
+                cacheManager: imagesCacheManager,
+                height: 190.0,
+                width: 190.0,
               ),
-              Align(
-                alignment: Alignment.topCenter,
-                child: Card(
-                  elevation: 8.0,
-                  shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.all(Radius.circular(16.0))),
-                  child: Container(
-                    child: CachedNetworkImage(
-                      imageUrl: spotlight.thumbnail,
-                      //httpHeaders: Hoster.header(url: spotlight.thumbnail),
-                      fit: BoxFit.cover,
-                      height: 150.0,
-                      cacheManager: imagesCacheManager,
-                      width: 150.0,
-                    ),
-                    height: 150.0,
-                    width: 150.0,
-                  ),
-                  clipBehavior: Clip.antiAlias,
-                ),
-              )
-            ],
-          ),
-        ),
-      ),
+            ).rounded(8.0).paddingBottom(5),
+          )),
     );
   }
 }

@@ -7,7 +7,8 @@ import 'package:skana_pix/controller/caches.dart';
 
 import 'dart:ui' as ui;
 
-import 'package:skana_pix/pixiv_dart_api.dart';
+import 'package:skana_pix/controller/connector.dart';
+
 
 class UgoiraWidget extends StatefulWidget {
   const UgoiraWidget(
@@ -123,14 +124,15 @@ class _UgoiraWidgetState extends State<UgoiraWidget> {
           .toList(),
     );
     try {
-      var cachingFile = thisDownloadManager.getFileStream(_metadata!.url,withProgress: true);
+      var cachingFile =
+          thisDownloadManager.getFileStream(_metadata!.url, withProgress: true);
       cachingFile.listen((event) async {
         if (event is DownloadProgress) {
           setState(() {
             receivedBytes = event.downloaded;
-            expectedBytes = event.totalSize??1;
+            expectedBytes = event.totalSize ?? 1;
           });
-        }else if(event is FileInfo){
+        } else if (event is FileInfo) {
           await extract(event.file.path);
         }
       });

@@ -1,97 +1,52 @@
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:moon_design/moon_design.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:skana_pix/controller/caches.dart';
 import 'package:skana_pix/model/worktypes.dart';
 
 import 'userpage.dart';
 
-class PainterAvatar extends StatefulWidget {
+class PainterAvatar extends StatelessWidget {
   final String url;
   final int id;
   final GestureTapCallback? onTap;
-  final Size? size;
+  final double? size;
   final ArtworkType type;
   final bool isMe;
 
   const PainterAvatar(
-      {Key? key,
+      {super.key,
       required this.url,
       required this.id,
       this.onTap,
-      this.size,
+      this.size = 60,
       this.type = ArtworkType.ALL,
-      this.isMe = false})
-      : super(key: key);
+      this.isMe = false});
 
-  @override
-  _PainterAvatarState createState() => _PainterAvatarState();
-}
-
-class _PainterAvatarState extends State<PainterAvatar> {
   void pushToUserPage() {
-    Navigator.of(context, rootNavigator: true)
-        .push(MaterialPageRoute(builder: (_) {
-      return UserPage(
-        id: widget.id,
-        type: widget.type,
-        isMe: widget.isMe,
-      );
-    }));
+    Get.to(() => UserPage(
+          id: id,
+          type: type,
+          isMe: isMe,
+        ));
   }
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
         onTap: () {
-          if (widget.onTap == null) {
+          if (onTap == null) {
             pushToUserPage();
-          } else
-            widget.onTap!();
+          } else {
+            onTap!();
+          }
         },
-        child: widget.size == null
-            ? CachedNetworkImage(
-                imageUrl: widget.url,
-                imageBuilder: (context, imageProvider) => Container(
-                  width: 60.0,
-                  height: 60.0,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    image: DecorationImage(
-                        image: imageProvider, fit: BoxFit.cover),
-                  ),
-                ),
-                //httpHeaders: Hoster.header(url: widget.url),
-                cacheManager: imagesCacheManager,
-                errorWidget: (context, url, error) => Container(
-                  width: 60.0,
-                  height: 60.0,
-                  decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      color: Theme.of(context).cardColor),
-                ),
-              )
-            : CachedNetworkImage(
-                imageUrl: widget.url,
-                cacheManager: imagesCacheManager,
-                errorWidget: (context, url, error) => Container(
-                  width: widget.size!.width,
-                  height: widget.size!.height,
-                  decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      color: Theme.of(context).cardColor),
-                ),
-                imageBuilder: (context, imageProvider) => Container(
-                  width: widget.size!.width,
-                  height: widget.size!.height,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    image: DecorationImage(
-                        image: imageProvider, fit: BoxFit.cover),
-                  ),
-                ),
-                width: widget.size!.width,
-                height: widget.size!.height,
-                //httpHeaders: Hoster.header(url: widget.url),
-              ));
+        child: MoonAvatar(
+          height: size,
+          width: size,
+          backgroundImage: CachedNetworkImageProvider(url,
+              cacheManager: imagesCacheManager),
+        ));
   }
 }

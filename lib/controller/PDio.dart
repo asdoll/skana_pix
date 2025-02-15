@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:typed_data';
 
 import 'package:dio/dio.dart';
 import 'package:dio/io.dart';
@@ -8,7 +9,7 @@ import 'logging.dart';
 class LogInterceptor implements Interceptor {
   @override
   void onError(DioException err, ErrorInterceptorHandler handler) {
-    netErrLog(
+    log.e(
         "${err.requestOptions.method} ${err.requestOptions.path}\n$err\n${err.response?.data.toString()}");
     switch (err.type) {
       case DioExceptionType.badResponse:
@@ -74,9 +75,9 @@ class LogInterceptor implements Interceptor {
         "Response ${response.realUri.toString()} ${response.statusCode}\n"
         "headers:\n$headers\n$content";
     if (response.statusCode != null && response.statusCode! < 400) {
-      netInfoLog(msg);
+      log.i(msg);
     } else {
-      netErrLog(msg);
+      log.d(msg);
     }
     handler.next(response);
   }
@@ -86,10 +87,11 @@ class LogInterceptor implements Interceptor {
     options.connectTimeout = const Duration(seconds: 15);
     options.receiveTimeout = const Duration(seconds: 15);
     options.sendTimeout = const Duration(seconds: 15);
+
     if (options.headers["Host"] == null && options.headers["host"] == null) {
       options.headers["host"] = options.uri.host;
     }
-    netInfoLog(
+    log.i(
         "${options.method} ${options.uri}\n${options.headers}\n${options.data}");
     handler.next(options);
   }
@@ -97,6 +99,11 @@ class LogInterceptor implements Interceptor {
 
 class PDio extends DioForNative {
   bool isInitialized = false;
+
+  PDio() {
+    httpClientAdapter = DomainHttpClientAdapter();
+    interceptors.add(LogInterceptor());
+  }
 
   @override
   Future<Response<T>> request<T>(String path,
@@ -158,6 +165,65 @@ class PDio extends DioForNative {
   }
 }
 
+class DomainHttpClientAdapter implements HttpClientAdapter {
+  @override
+  void close({bool force = false}) {}
+
+  final Map<String, dynamic> constMap = {
+    "app-api.pixiv.net": "210.140.131.199",
+    "oauth.secure.pixiv.net": "210.140.131.219",
+    "i.pximg.net": "210.140.92.149",
+    "s.pximg.net": "210.140.92.143",
+    "doh": "doh.dns.sb",
+  };
+
+  @override
+  Future<ResponseBody> fetch(RequestOptions options,
+      Stream<Uint8List>? requestStream, Future<void>? cancelFuture) async {
+    Uri uri = options.uri;
+    if (constMap.containsKey(uri.host)) {
+      String host = options.uri.host;
+      String ipAddress = await resolveHostToIp(host);
+      int port = options.uri.port;
+      String scheme = options.uri.scheme;
+      String newPath =
+          '$scheme://$ipAddress:$port${options.uri.path}${options.uri.query}';
+      options.baseUrl = newPath;
+      options.path = "";
+    }
+    final HttpClient httpClient = HttpClient();
+    final HttpClientRequest request =
+        await httpClient.openUrl(options.method, uri);
+    options.headers.forEach((key, value) {
+      request.headers.set(key, value);
+    });
+    if (requestStream != null) {
+      await requestStream.forEach(request.add);
+    }
+    final HttpClientResponse response = await request.close();
+    final List<int> responseBody =
+        await response.fold([], (List<int> a, List<int> b) => a..addAll(b));
+    return ResponseBody.fromBytes(responseBody, response.statusCode,
+        headers: convertHeaders(response.headers),
+        statusMessage: response.reasonPhrase);
+  }
+
+  Map<String, List<String>> convertHeaders(HttpHeaders headers) {
+    Map<String, List<String>> result = {};
+    headers.forEach((key, value) {
+      result[key] = value;
+    });
+    return result;
+  }
+
+  Future<String> resolveHostToIp(String host) async {
+    if (constMap.containsKey(host)) {
+      return constMap[host]!;
+    }
+    return host;
+  }
+}
+
 void setSystemProxy() {
   HttpOverrides.global = _ProxyHttpOverrides()..findProxy(Uri());
 }
@@ -206,9 +272,9 @@ class _ProxyHttpOverrides extends HttpOverrides {
 
   @override
   HttpClient createHttpClient(SecurityContext? context) {
-    final client = super.createHttpClient(context)..badCertificateCallback =
-                        (X509Certificate cert, String host, int port) =>
-                            true;
+    final client = super.createHttpClient(context)
+      ..badCertificateCallback =
+          (X509Certificate cert, String host, int port) => true;
     client.connectionTimeout = const Duration(seconds: 5);
     client.findProxy = findProxy;
     return client;

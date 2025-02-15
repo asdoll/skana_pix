@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:skana_pix/utils/navigation.dart';
+import 'package:get/get.dart';
+import 'package:skana_pix/controller/theme_controller.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 
@@ -36,14 +37,15 @@ class _WebviewPageState extends State<WebviewPage> {
   Widget build(BuildContext context) {
     controller ??= WebViewController()
       ..setJavaScriptMode(JavaScriptMode.unrestricted)
-      ..setBackgroundColor(Theme.of(context).brightness == Brightness.light
-          ? Colors.white
-          : Colors.black)
+      ..setBackgroundColor(
+          ThemeManager.instance.isDarkMode ? Colors.white : Colors.black)
       ..setNavigationDelegate(
         NavigationDelegate(
-       onPageStarted: (String url) => setState(() => loadingPercentage = 0),
-        onProgress: (int progress) => setState(() => loadingPercentage = progress),
-        onPageFinished: (String url) => setState(() => loadingPercentage = 100),
+          onPageStarted: (String url) => setState(() => loadingPercentage = 0),
+          onProgress: (int progress) =>
+              setState(() => loadingPercentage = progress),
+          onPageFinished: (String url) =>
+              setState(() => loadingPercentage = 100),
           onWebResourceError: (WebResourceError error) {},
           onNavigationRequest: handleNavigation,
         ),
@@ -51,26 +53,29 @@ class _WebviewPageState extends State<WebviewPage> {
       ..loadRequest(Uri.parse(widget.url));
     return Column(
       children: [
-        Padding (
-          padding: EdgeInsets.only(top: MediaQuery.of(context).padding.top, left: 16, right: 16),
-          child: Row(
-            children: [
-              //const Text("Webview"),
-              const Spacer(),
-              IconButton(
-                icon: const Icon(Icons.open_in_new, size: 20,),
-                onPressed: () {
-                  launchUrlString(widget.url);
-                  context.pop();
-                },
-              ),
-              
-            ],
-          )
-        ),
+        Padding(
+            padding: EdgeInsets.only(
+                top: MediaQuery.of(context).padding.top, left: 16, right: 16),
+            child: Row(
+              children: [
+                const Spacer(),
+                IconButton(
+                  icon: const Icon(
+                    Icons.open_in_new,
+                    size: 20,
+                  ),
+                  onPressed: () {
+                    launchUrlString(widget.url);
+                    Get.back();
+                  },
+                ),
+              ],
+            )),
         LinearProgressIndicator(value: loadingPercentage / 100),
         Expanded(
-          child: WebViewWidget(controller: controller!,),
+          child: WebViewWidget(
+            controller: controller!,
+          ),
         ),
       ],
     );

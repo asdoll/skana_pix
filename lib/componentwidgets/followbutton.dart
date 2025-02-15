@@ -1,123 +1,60 @@
+import 'package:moon_design/moon_design.dart';
 import 'package:flutter/material.dart';
-import 'package:skana_pix/utils/translate.dart';
+import 'package:get/get.dart';
+import 'package:skana_pix/controller/like_controller.dart';
+import 'package:skana_pix/utils/widgetplugin.dart';
 
 class UserFollowButton extends StatefulWidget {
-  final bool followed;
-  final Future<Null> Function() onPressed;
-  const UserFollowButton(
-      {super.key, required this.followed, required this.onPressed});
+  final bool liked;
+  final String id;
+  
+  const UserFollowButton({super.key, required this.liked, required this.id});
 
   @override
   State<UserFollowButton> createState() => _UserFollowButtonState();
 }
 
 class _UserFollowButtonState extends State<UserFollowButton> {
-  late bool _followed;
-  late Future<Null> Function() _onPressed;
-  bool _loading = false;
-  @override
-  void initState() {
-    _followed = widget.followed;
-    _onPressed = widget.onPressed;
-    super.initState();
-  }
-
-  @override
-  void didUpdateWidget(covariant UserFollowButton oldWidget) {
-    super.didUpdateWidget(oldWidget);
-    if (_followed != widget.followed) {
-      setState(() {
-        _followed = widget.followed;
-      });
-    }
-  }
+  int get liked => widget.liked ? 2 : 0;
 
   @override
   Widget build(BuildContext context) {
-    if (_loading) {
-      return Container(
-        height: 32,
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(16),
-          border: Border.all(
-            color: Theme.of(context).colorScheme.secondary,
-          ),
-        ),
-        child: const Center(
-          child: Padding(
-            padding: EdgeInsets.symmetric(horizontal: 20),
-            child: SizedBox(
-                width: 12,
-                height: 12,
-                child: CircularProgressIndicator(
-                  strokeWidth: 1,
-                )),
-          ),
-        ),
-      );
-    }
-    if (_followed) {
-      return GestureDetector(
-        onTap: () async {
-          setState(() {
-            _loading = true;
-            _onPressed().then((value) {
-              _loading = false;
-              _followed = false;
-            });
-          });
-        },
-        child: Container(
-          height: 32,
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(16),
-            border: Border.all(
-              color: Theme.of(context).colorScheme.secondary,
-            ),
-          ),
-          child: Center(
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 14),
-              child: Text(
-                "Following".i18n,
-                style: TextStyle(
-                  color: Theme.of(context).colorScheme.secondary,
-                  fontSize: 14,
-                  fontWeight: FontWeight.w400,
-                ),
-              ),
-            ),
-          ),
-        ),
-      );
-    }
-    return GestureDetector(
-      onTap: () {
-        setState(() {
-        _onPressed();
-        _followed = true;
-        });
-      },
-      child: Container(
-        height: 32,
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(16),
-          color: Theme.of(context).colorScheme.secondary,
-        ),
-        child: Center(
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 14),
-            child: Text(
-              "Follow".i18n,
-              style: const TextStyle(
-                color: Colors.white,
-                fontSize: 14,
-                fontWeight: FontWeight.w400,
-              ),
-            ),
-          ),
-        ),
-      ),
+    return Container(
+      height: 40,
+      color: Colors.transparent,
+      child: Obx(() {
+        switch (likeController.users[widget.id] ?? liked) {
+          case 0:
+            return filledButton(
+                onPressed: () {
+                  likeController.toggleUser(widget.id, liked);
+                },
+                label: "Follow".tr);
+          case 1:
+            return MoonButton.icon(
+              buttonSize: MoonButtonSize.sm,
+              showBorder: true,
+              icon: Center(
+                  child: Padding(
+                padding: EdgeInsets.symmetric(horizontal: 20),
+                child: SizedBox(
+                    width: 12,
+                    height: 12,
+                    child: MoonCircularLoader(
+                      color: context.moonTheme?.tokens.colors.bulma,
+                      circularLoaderSize: MoonCircularLoaderSize.sm,
+                    )),
+              )),
+            );
+          default:
+            return filledButton(
+              onPressed: () {
+                likeController.toggleUser(widget.id, liked);
+              },
+              label: "Following".tr,
+            );
+        }
+      }),
     );
   }
 }

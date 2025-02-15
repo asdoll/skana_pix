@@ -1,5 +1,5 @@
 import 'package:app_links/app_links.dart';
-import 'package:skana_pix/pixiv_dart_api.dart';
+import 'package:skana_pix/controller/logging.dart';
 
 /*
 Future<void> _register(String scheme) async {
@@ -64,7 +64,7 @@ void handleLinks() async {
       await Future.delayed(const Duration(milliseconds: 200));
     }
     _firstLink = false;
-    logger("App Link$uri");
+    log.d("App Link$uri");
     if (onLink?.call(uri) == true) {
       return;
     }

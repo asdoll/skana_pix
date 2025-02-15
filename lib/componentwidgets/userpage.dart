@@ -1,24 +1,30 @@
-import 'package:bot_toast/bot_toast.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:icon_decoration/icon_decoration.dart';
+import 'package:moon_design/moon_design.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:skana_pix/componentwidgets/userdetail.dart';
-import 'package:skana_pix/componentwidgets/userworks.dart';
+import 'package:skana_pix/controller/connector.dart';
+import 'package:skana_pix/controller/logging.dart';
+import 'package:skana_pix/controller/res.dart';
+import 'package:skana_pix/controller/settings.dart';
+import 'package:skana_pix/model/user.dart';
+import 'package:skana_pix/utils/io_extension.dart';
+import 'package:skana_pix/view/userview/userworks.dart';
 import 'package:skana_pix/controller/caches.dart';
+import 'package:skana_pix/controller/like_controller.dart';
 import 'package:skana_pix/model/worktypes.dart';
-import 'package:skana_pix/pixiv_dart_api.dart';
-import 'package:skana_pix/utils/translate.dart';
+import 'package:get/get.dart';
+import 'package:skana_pix/utils/leaders.dart';
 import 'package:skana_pix/utils/widgetplugin.dart';
 
 import 'avatar.dart';
 import 'backarea.dart';
 import 'followbutton.dart';
-import 'followlist.dart';
+import '../view/userview/followlist.dart';
 import 'nullhero.dart';
-import 'userbookmarks.dart';
+import '../view/bookmarkspage.dart';
 
 class UserPage extends StatefulWidget {
   final ArtworkType type;
@@ -26,19 +32,17 @@ class UserPage extends StatefulWidget {
   final int id;
   final bool isMe;
   const UserPage(
-      {Key? key,
+      {super.key,
       required this.id,
       this.heroTag,
       this.type = ArtworkType.ALL,
-      this.isMe = false})
-      : super(key: key);
+      this.isMe = false});
 
   @override
-  _UserPageState createState() => _UserPageState();
+  State<UserPage> createState() => _UserPageState();
 }
 
 class _UserPageState extends State<UserPage> with TickerProviderStateMixin {
-  late TabController _tabController;
   late ScrollController _scrollController;
   bool backToTopVisible = false;
   UserDetails? userDetail;
@@ -46,12 +50,13 @@ class _UserPageState extends State<UserPage> with TickerProviderStateMixin {
   bool isError = false;
   ArtworkType get type =>
       widget.type == ArtworkType.ALL ? ArtworkType.ILLUST : widget.type;
+  late TabController tabController;
 
   String restrict = 'public';
 
   @override
   void initState() {
-    _tabController = TabController(length: 3, vsync: this);
+    tabController = TabController(length: 3, vsync: this);
     _scrollController = ScrollController();
     _scrollController.addListener(() {
       if (_scrollController.hasClients) {
@@ -77,112 +82,96 @@ class _UserPageState extends State<UserPage> with TickerProviderStateMixin {
   @override
   void dispose() {
     _scrollController.dispose();
-    _tabController.dispose();
+    tabController.dispose();
     super.dispose();
   }
 
-  int _tabIndex = 0;
-
   @override
   Widget build(BuildContext context) {
-    return Observer(
-        warnWhenNoObservables: false,
-        builder: (_) {
-          if (isMuted) {
-            return Scaffold(
-              appBar: AppBar(
-                backgroundColor: Colors.transparent,
-                elevation: 0.0,
-              ),
-              extendBodyBehindAppBar: true,
-              extendBody: true,
-              body: Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: <Widget>[
-                    Text('X_X'),
-                    Text('${widget.id}'),
-                    FilledButton.tonal(
-                        onPressed: () {
-                          settings.removeBlockedUsers([widget.id.toString()]);
-                          setState(() {
-                            isMuted = false;
-                          });
-                        },
-                        child: Text("Unblock".i18n)),
-                  ],
-                ),
-              ),
-            );
-          }
+    if (isMuted) {
+      return Scaffold(
+        body: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: <Widget>[
+              Text('X_X'),
+              Text('${widget.id}'),
+              filledButton(
+                  onPressed: () {
+                    settings.removeBlockedUsers([widget.id.toString()]);
+                    setState(() {
+                      isMuted = false;
+                    });
+                  },
+                  label: "Unblock".tr),
+            ],
+          ),
+        ),
+      );
+    }
 
-          if (isError && userDetail == null) {
-            return Scaffold(
-              appBar: AppBar(),
-              body: Container(
-                  child: Center(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  mainAxisSize: MainAxisSize.max,
-                  children: <Widget>[
-                    Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: Text(
-                        "Network Error".i18n,
-                      ),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: MaterialButton(
-                        color: Theme.of(context).colorScheme.primary,
-                        onPressed: () {
-                          firstLoad();
-                        },
-                        child: Text("Retry".i18n),
-                      ),
-                    )
-                  ],
+    if (isError && userDetail == null) {
+      return Scaffold(
+        body: Center(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            mainAxisAlignment: MainAxisAlignment.center,
+            mainAxisSize: MainAxisSize.max,
+            children: <Widget>[
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Text(
+                  "Network Error".tr,
                 ),
-              )),
-            );
-          }
-          if (userDetail == null) {
-            return Scaffold(
-              appBar: AppBar(),
-              body: Container(
-                  child: Center(
-                child: CircularProgressIndicator(
-                  color: Theme.of(context).colorScheme.primary,
+              ),
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: filledButton(
+                  onPressed: () {
+                    firstLoad();
+                  },
+                  label: "Retry".tr,
                 ),
-              )),
-            );
-          }
-          return _buildBody(context);
-        });
+              )
+            ],
+          ),
+        ),
+      );
+    }
+    if (userDetail == null) {
+      return Scaffold(
+        body: Center(
+            child: MoonCircularLoader(
+          circularLoaderSize: MoonCircularLoaderSize.lg,
+        )),
+      );
+    }
+    return _buildBody(context);
   }
 
   Widget _buildBody(BuildContext context) {
-    return Container(
-      child: Scaffold(
-        body: NestedScrollView(
-          controller: _scrollController,
-          body: TabBarView(controller: _tabController, children: [
+    return Scaffold(
+      body: NestedScrollView(
+        controller: _scrollController,
+        body: TabBarView(
+          controller: tabController,
+          children: [
             WorksPage(
-                id: userDetail!.id,
-                type: type,
-                portal: '/works-${userDetail!.id}'),
+              id: userDetail!.id,
+              type: type,
+              noScroll: true,
+            ),
             BookmarksPage(
-                id: userDetail!.id,
-                type: type,
-                portal: '/bookmarks-${userDetail!.id}'),
-            UserDetailPage(userDetail!),
-          ]).paddingTop(102 + MediaQuery.of(context).padding.top),
-          headerSliverBuilder:
-              (BuildContext context, bool? innerBoxIsScrolled) {
-            return _HeaderSlivers(innerBoxIsScrolled, context);
-          },
-        ),
+              id: userDetail!.id,
+              type: type,
+              noScroll: true,
+            ),
+            UserDetailPage(userDetail!)
+          ],
+        ).paddingTop(102 + MediaQuery.of(context).padding.top),
+        headerSliverBuilder: (BuildContext context, bool? innerBoxIsScrolled) {
+          return _HeaderSlivers(innerBoxIsScrolled, context);
+        },
       ),
     );
   }
@@ -192,38 +181,37 @@ class _UserPageState extends State<UserPage> with TickerProviderStateMixin {
       SliverOverlapAbsorber(
         handle: NestedScrollView.sliverOverlapAbsorberHandleFor(context),
         sliver: SliverAppBar(
-          pinned: true,
-          elevation: 0.0,
-          forceElevated: innerBoxIsScrolled ?? false,
-          expandedHeight: userDetail?.backgroundImage != null
-              ? MediaQuery.of(context).size.width / 2 +
-                  205 -
-                  MediaQuery.of(context).padding.top
-              : 300,
-          leading: CommonBackArea(),
-          actions: <Widget>[
-            Builder(builder: (context) {
-              return IconButton(
-                  icon: const DecoratedIcon(
-                    icon: Icon(Icons.share),
-                    decoration: IconDecoration(border: IconBorder(width: 1.5)),
-                  ),
-                  onPressed: () {
-                    final box = context.findRenderObject() as RenderBox?;
-                    final pos = box != null
-                        ? box.localToGlobal(Offset.zero) & box.size
-                        : null;
-                    Share.share('https://www.pixiv.net/users/${widget.id}',
-                        sharePositionOrigin: pos);
-                  });
-            }),
-            _buildPopMenu(context)
-          ],
-          flexibleSpace: FlexibleSpaceBar(
-            collapseMode: CollapseMode.pin,
-            background: Container(
-              color: Theme.of(context).cardColor,
-              child: Stack(
+            pinned: true,
+            elevation: 0.0,
+            forceElevated: innerBoxIsScrolled ?? false,
+            expandedHeight: userDetail?.backgroundImage != null
+                ? MediaQuery.of(context).size.width / 2 +
+                    205 -
+                    MediaQuery.of(context).padding.top
+                : 300,
+            leading: CommonBackArea(),
+            actions: <Widget>[
+              Builder(builder: (context) {
+                return MoonButton.icon(
+                    icon: const DecoratedIcon(
+                      icon: Icon(Icons.share),
+                      decoration:
+                          IconDecoration(border: IconBorder(width: 1.5)),
+                    ),
+                    onTap: () {
+                      final box = context.findRenderObject() as RenderBox?;
+                      final pos = box != null
+                          ? box.localToGlobal(Offset.zero) & box.size
+                          : null;
+                      Share.share('https://www.pixiv.net/users/${widget.id}',
+                          sharePositionOrigin: pos);
+                    });
+              }),
+              _buildPopMenu(context)
+            ],
+            flexibleSpace: FlexibleSpaceBar(
+              collapseMode: CollapseMode.pin,
+              background: Stack(
                 children: <Widget>[
                   _buildBackground(context),
                   _buildFakeBg(context),
@@ -234,17 +222,14 @@ class _UserPageState extends State<UserPage> with TickerProviderStateMixin {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: <Widget>[
                         _buildHeader(context),
-                        Container(
-                          color: Theme.of(context).cardColor,
-                          child: Column(
-                            children: <Widget>[
-                              _buildNameFollow(context),
-                              _buildComment(context),
-                              Tab(
-                                text: " ",
-                              )
-                            ],
-                          ),
+                        Column(
+                          children: <Widget>[
+                            _buildNameFollow(context),
+                            _buildComment(context),
+                            const Text(
+                              " ",
+                            ).header(),
+                          ],
                         ),
                       ],
                     ),
@@ -252,45 +237,28 @@ class _UserPageState extends State<UserPage> with TickerProviderStateMixin {
                 ],
               ),
             ),
-          ),
-          bottom: ColoredTabBar(
-            Theme.of(context).cardColor,
-            TabBar(
-              controller: _tabController,
-              onTap: (index) {
-                setState(() {
-                  _tabIndex = index;
-                });
-              },
-              tabs: [
-                GestureDetector(
-                  onDoubleTap: () {
-                    if (_tabIndex == 0) _scrollController.position.jumpTo(0);
-                  },
-                  child: Tab(
-                    text: "Artworks".i18n,
-                  ),
-                ),
-                GestureDetector(
-                  onDoubleTap: () {
-                    if (_tabIndex == 1) _scrollController.position.jumpTo(0);
-                  },
-                  child: Tab(
-                    text: "Bookmarks".i18n,
-                  ),
-                ),
-                GestureDetector(
-                  onDoubleTap: () {
-                    if (_tabIndex == 2) _scrollController.position.jumpTo(0);
-                  },
-                  child: Tab(
-                    text: "Details".i18n,
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
+            bottom: PreferredSize(
+                preferredSize: Size.fromHeight(48),
+                child: Obx(() => MoonTabBar(
+                      tabController: tabController,
+                      tabs: [
+                        MoonTab(
+                          label: Text(
+                            "Artworks".tr,
+                          ),
+                        ),
+                        MoonTab(
+                          label: Text(
+                            "Bookmarks".tr,
+                          ),
+                        ),
+                        MoonTab(
+                          label: Text(
+                            "Details".tr,
+                          ),
+                        )
+                      ],
+                    )))),
       ),
     ];
   }
@@ -305,21 +273,17 @@ class _UserPageState extends State<UserPage> with TickerProviderStateMixin {
         children: <Widget>[
           Container(
             height: 55,
-            color: Theme.of(context).cardColor,
           ),
-          Container(
-            color: Theme.of(context).cardColor,
-            child: Column(
-              children: <Widget>[
-                _buildFakeNameFollow(context),
-                Container(
-                  height: 60,
-                ),
-                const Tab(
-                  text: " ",
-                )
-              ],
-            ),
+          Column(
+            children: <Widget>[
+              _buildFakeNameFollow(context),
+              Container(
+                height: 60,
+              ),
+              const Text(
+                " ",
+              ).header()
+            ],
           ),
         ],
       ),
@@ -327,43 +291,69 @@ class _UserPageState extends State<UserPage> with TickerProviderStateMixin {
   }
 
   Widget _buildBackground(BuildContext context) {
-    return Container(
+    return SizedBox(
         width: MediaQuery.of(context).size.width,
         height: userDetail?.backgroundImage != null
             ? MediaQuery.of(context).size.width / 2
-            : MediaQuery.of(context).padding.top + 160,
+            : MediaQuery.of(context).padding.top + 90,
         child: userDetail != null
             ? userDetail!.backgroundImage != null
                 ? InkWell(
                     onLongPress: () {
-                      showDialog(
+                      showMoonModal<void>(
                           context: context,
                           builder: (context) {
-                            return AlertDialog(
-                              title: Text("Save".i18n),
-                              content: ClipRRect(
-                                borderRadius: BorderRadius.circular(12),
-                                child: CachedNetworkImage(
-                                  imageUrl: userDetail!.backgroundImage!,
-                                  fit: BoxFit.cover,
-                                  cacheManager: imagesCacheManager,
-                                ),
-                              ),
-                              actions: [
-                                TextButton(
-                                    onPressed: () async {
-                                      Navigator.of(context).pop();
-                                    },
-                                    child: Text("Cancel".i18n)),
-                                TextButton(
-                                    onPressed: () async {
-                                      Navigator.of(context).pop();
-                                      await _saveUserBg(context,
-                                          userDetail!.backgroundImage!);
-                                    },
-                                    child: Text("Ok".i18n)),
-                              ],
-                            );
+                            return Dialog(
+                                child: Column(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                  MoonAlert(
+                                      borderColor: Get.context?.moonTheme
+                                          ?.buttonTheme.colors.borderColor
+                                          .withValues(alpha: 0.5),
+                                      showBorder: true,
+                                      label: Text("Save".tr).header(),
+                                      verticalGap: 16,
+                                      content: Column(
+                                        mainAxisSize: MainAxisSize.min,
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          ClipRRect(
+                                            borderRadius:
+                                                BorderRadius.circular(12),
+                                            child: CachedNetworkImage(
+                                              imageUrl:
+                                                  userDetail!.backgroundImage!,
+                                              fit: BoxFit.cover,
+                                              cacheManager: imagesCacheManager,
+                                            ),
+                                          ).paddingBottom(16),
+                                          Row(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.end,
+                                            children: [
+                                              outlinedButton(
+                                                label: "Cancel".tr,
+                                                onPressed: () {
+                                                  Get.back();
+                                                },
+                                              ).paddingRight(8),
+                                              filledButton(
+                                                label: "Ok".tr,
+                                                onPressed: () async {
+                                                  Get.back();
+                                                  await _saveUserBg(
+                                                      context,
+                                                      userDetail!
+                                                          .backgroundImage!);
+                                                },
+                                              ).paddingRight(8),
+                                            ],
+                                          )
+                                        ],
+                                      )),
+                                ]));
                           });
                     },
                     child: CachedNetworkImage(
@@ -380,49 +370,44 @@ class _UserPageState extends State<UserPage> with TickerProviderStateMixin {
 
   PopupMenuButton<int> _buildPopMenu(BuildContext context) {
     return PopupMenuButton<int>(
-      icon: const DecoratedIcon(
-        icon: Icon(Icons.more_vert),
-        decoration: IconDecoration(border: IconBorder(width: 1.5)),
+      icon: DecoratedIcon(
+        icon: Icon(Icons.more_vert,color: Colors.white,),
+        decoration: const IconDecoration(border: IconBorder(width: 1.5)),
       ),
       onSelected: (index) async {
         switch (index) {
           case 0:
             if (widget.isMe) {
-              BotToast.showText(text: "You can't follow yourself".i18n);
+              Leader.showToast("You can't follow yourself".tr);
               return;
             }
-            follow("private");
-
+            ConnectManager()
+                .apiClient
+                .follow(userDetail!.id.toString(), "add", "private");
             break;
           case 1:
             {
-              final result = await showDialog(
-                  context: context,
-                  builder: (context) {
-                    return AlertDialog(
-                      title: Text('${"Block User".i18n}?'),
-                      actions: <Widget>[
-                        TextButton(
-                          child: Text("Ok".i18n),
-                          onPressed: () {
-                            Navigator.of(context).pop("OK");
-                          },
-                        ),
-                        TextButton(
-                          child: Text("Cancel".i18n),
-                          onPressed: () {
-                            Navigator.of(context).pop();
-                          },
-                        )
-                      ],
-                    );
-                  });
+              final result = await alertDialog(
+                  context, "Block User".tr, "${"Block User".tr}?", [
+                outlinedButton(
+                  label: "Cancel".tr,
+                  onPressed: () {
+                    Get.back();
+                  },
+                ),
+                filledButton(
+                  label: "Ok".tr,
+                  onPressed: () {
+                    Get.back(result: "OK");
+                  },
+                ),
+              ]);
               if (result == "OK") {
                 settings.addBlockedUsers([userDetail!.name]);
                 setState(() {
                   isMuted = true;
                 });
-                Navigator.of(context).pop();
+                Get.back();
               }
             }
             break;
@@ -430,7 +415,7 @@ class _UserPageState extends State<UserPage> with TickerProviderStateMixin {
             {
               Clipboard.setData(ClipboardData(
                   text: 'painter:${userDetail?.name ?? ''}\npid:${widget.id}'));
-              BotToast.showText(text: "Copied to clipboard".i18n);
+              Leader.showToast("Copied to clipboard".tr);
               break;
             }
           default:
@@ -441,15 +426,15 @@ class _UserPageState extends State<UserPage> with TickerProviderStateMixin {
           if (!userDetail!.isFollowed)
             PopupMenuItem<int>(
               value: 0,
-              child: Text("Follow privately".i18n),
+              child: Text("Follow privately".tr),
             ),
           PopupMenuItem<int>(
             value: 1,
-            child: Text("Block User".i18n),
+            child: Text("Block User".tr),
           ),
           PopupMenuItem<int>(
             value: 2,
-            child: Text("Copy Info".i18n),
+            child: Text("Copy Info".tr),
           ),
         ];
       },
@@ -457,22 +442,20 @@ class _UserPageState extends State<UserPage> with TickerProviderStateMixin {
   }
 
   Widget _buildFakeNameFollow(BuildContext context) {
-    return Container(
+    return SizedBox(
       width: MediaQuery.of(context).size.width,
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16.0),
+        padding: const EdgeInsets.symmetric(horizontal: 24.0),
         child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
               Text(
                 userDetail?.name ?? "",
-                style: Theme.of(context).textTheme.titleLarge,
-              ),
+              ).header(),
               Text(
                 userDetail == null
                     ? ""
-                    : '${userDetail!.totalFollowUsers} ${"Follow".i18n}',
-                style: Theme.of(context).textTheme.bodySmall,
+                    : '${"Follows".tr}: ${userDetail!.totalFollowUsers}',
               )
             ]),
       ),
@@ -481,37 +464,27 @@ class _UserPageState extends State<UserPage> with TickerProviderStateMixin {
 
   Widget _buildNameFollow(BuildContext context) {
     return Container(
-      color: Theme.of(context).cardColor,
       width: MediaQuery.of(context).size.width,
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16.0),
+        padding: const EdgeInsets.symmetric(horizontal: 24.0),
         child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
               NullHero(
-                tag: userDetail?.name ?? "" + widget.heroTag.toString(),
+                tag: userDetail?.name ?? "${widget.heroTag}",
                 child: Text(
                   userDetail?.name ?? "",
-                  style: Theme.of(context).textTheme.titleLarge,
-                ),
+                ).header(),
               ),
               InkWell(
                 onTap: () {
-                  Navigator.of(context)
-                      .push(MaterialPageRoute(builder: (BuildContext context) {
-                    return Scaffold(
-                      appBar: AppBar(
-                        title: Text("Followed".i18n),
-                      ),
-                      body: FollowList(id: widget.id),
-                    );
-                  }));
+                  Get.to(() =>
+                      FollowList(id: widget.id.toString(), setAppBar: true));
                 },
                 child: Text(
                   userDetail == null
                       ? ""
-                      : '${userDetail!.totalFollowUsers} ${"Follow".i18n}',
-                  style: Theme.of(context).textTheme.bodySmall,
+                      : '${"Follows".tr}: ${userDetail!.totalFollowUsers}',
                 ),
               )
             ]),
@@ -521,7 +494,6 @@ class _UserPageState extends State<UserPage> with TickerProviderStateMixin {
 
   Widget _buildComment(BuildContext context) {
     return Container(
-      color: Theme.of(context).cardColor,
       width: MediaQuery.of(context).size.width,
       height: 60,
       child: Padding(
@@ -530,7 +502,6 @@ class _UserPageState extends State<UserPage> with TickerProviderStateMixin {
           child: SingleChildScrollView(
             child: Text(
               userDetail == null ? "" : userDetail!.comment,
-              style: Theme.of(context).textTheme.bodySmall,
               overflow: TextOverflow.ellipsis,
             ),
           ),
@@ -548,9 +519,7 @@ class _UserPageState extends State<UserPage> with TickerProviderStateMixin {
           alignment: Alignment.bottomCenter,
           child: SizedBox(
             height: 55.0,
-            child: Container(
-              color: Theme.of(context).cardColor,
-            ),
+            child: Container(),
           ),
         ),
         Align(
@@ -561,91 +530,100 @@ class _UserPageState extends State<UserPage> with TickerProviderStateMixin {
     );
   }
 
-  Container _buildAvatarFollow(BuildContext context) {
-    return Container(
-      child: Observer(
-        warnWhenNoObservables: false,
-        builder: (_) => Row(
-          mainAxisSize: MainAxisSize.max,
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          crossAxisAlignment: CrossAxisAlignment.end,
-          children: <Widget>[
-            Padding(
-              padding:
-                  const EdgeInsets.symmetric(horizontal: 16.0, vertical: 0.0),
-              child: NullHero(
-                tag: userDetail!.avatar + widget.heroTag.toString(),
-                child: PainterAvatar(
-                  url: userDetail!.avatar,
-                  size: Size(80, 80),
-                  onTap: () {
-                    showDialog(
-                        context: context,
-                        builder: (context) {
-                          return AlertDialog(
-                            title: Text("Save".i18n),
-                            content: ClipRRect(
-                              borderRadius: BorderRadius.circular(12),
-                              child: CachedNetworkImage(
-                                imageUrl: userDetail!.avatar,
-                                fit: BoxFit.cover,
-                                cacheManager: imagesCacheManager,
-                              ),
-                            ),
-                            actions: [
-                              TextButton(
-                                  onPressed: () async {
-                                    Navigator.of(context).pop();
-                                  },
-                                  child: Text("Cancel".i18n)),
-                              TextButton(
-                                  onPressed: () async {
-                                    Navigator.of(context).pop();
-                                    await _saveUserC(context);
-                                  },
-                                  child: Text("Ok".i18n)),
-                            ],
-                          );
-                        });
-                  },
-                  id: userDetail!.id,
-                ),
+  Widget _buildAvatarFollow(BuildContext context) {
+    return SizedBox(
+      child: Row(
+        mainAxisSize: MainAxisSize.max,
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        crossAxisAlignment: CrossAxisAlignment.end,
+        children: <Widget>[
+          Padding(
+            padding:
+                const EdgeInsets.symmetric(horizontal: 16.0, vertical: 0.0),
+            child: NullHero(
+              tag: userDetail!.avatar + widget.heroTag.toString(),
+              child: PainterAvatar(
+                url: userDetail!.avatar,
+                size: 80,
+                onTap: () {
+                  showMoonModal(
+                      context: context,
+                      builder: (context) => Dialog(
+                              child: Column(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                MoonAlert(
+                                    borderColor: Get.context?.moonTheme
+                                        ?.buttonTheme.colors.borderColor
+                                        .withValues(alpha: 0.5),
+                                    showBorder: true,
+                                    label: Text("Save".tr).header(),
+                                    verticalGap: 16,
+                                    content: Column(
+                                      mainAxisSize: MainAxisSize.min,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        ClipRRect(
+                                          borderRadius:
+                                              BorderRadius.circular(12),
+                                          child: CachedNetworkImage(
+                                            imageUrl: userDetail!.avatar,
+                                            fit: BoxFit.cover,
+                                            cacheManager: imagesCacheManager,
+                                          ),
+                                        ).paddingBottom(16),
+                                        Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.end,
+                                          children: [
+                                            outlinedButton(
+                                              label: "Cancel".tr,
+                                              onPressed: () {
+                                                Get.back();
+                                              },
+                                            ).paddingRight(8),
+                                            filledButton(
+                                              label: "Ok".tr,
+                                              onPressed: () async {
+                                                Get.back();
+                                                await _saveUserC(context);
+                                              },
+                                            ).paddingRight(8),
+                                          ],
+                                        )
+                                      ],
+                                    )),
+                              ])));
+                },
+                id: userDetail!.id,
               ),
             ),
-            Container(
-              child: userDetail == null
-                  ? Container(
-                      padding: const EdgeInsets.only(right: 16.0, bottom: 4.0),
-                      child: CircularProgressIndicator(
-                        color: Theme.of(context).colorScheme.secondary,
-                      ),
-                    )
-                  : Padding(
-                      padding: const EdgeInsets.only(right: 16.0, bottom: 4.0),
-                      child: UserFollowButton(
-                        followed: userDetail!.isFollowed,
-                        onPressed: () async {
-                          if (widget.isMe) {
-                            BotToast.showText(
-                                text: "You can't follow yourself".i18n);
-                            return;
-                          }
-                          follow("public");
-                        },
-                      ),
+          ),
+          Container(
+            child: userDetail == null
+                ? Container(
+                    padding: const EdgeInsets.only(right: 16.0, bottom: 4.0),
+                    child: CircularProgressIndicator(),
+                  )
+                : Padding(
+                    padding: const EdgeInsets.only(right: 16.0, bottom: 4.0),
+                    child: UserFollowButton(
+                      liked: userDetail!.isFollowed,
+                      id: userDetail!.id.toString(),
                     ),
-            )
-          ],
-        ),
+                  ),
+          )
+        ],
       ),
     );
   }
 
   _saveUserBg(BuildContext context, String url) async {
     try {
-      saveUrl(url, context: context);
+      saveUrl(url);
     } catch (e) {
-      print(e);
+      log.e(e);
     }
   }
 
@@ -664,41 +642,10 @@ class _UserPageState extends State<UserPage> with TickerProviderStateMixin {
         .replaceAll("<", "");
     String fileName = "${replaceAll}_${userDetail!.id}.${meme}";
     try {
-      saveUrl(url, filenm: fileName, context: context);
+      saveUrl(url, filenm: fileName);
     } catch (e) {
-      print(e);
+      log.e(e);
     }
-  }
-
-  bool isFollowing = false;
-
-  void follow(String type) async {
-    if (isFollowing) return;
-    setState(() {
-      isFollowing = true;
-    });
-    var method = userDetail!.isFollowed ? "delete" : "add";
-    var res = await followUser(userDetail!.id.toString(), method, type);
-    if (res.error) {
-      if (mounted) {
-        BotToast.showText(text: "Network Error".i18n);
-      }
-    } else {
-      if (method == "add" && type == "private") {
-        BotToast.showText(text: "Followed privately".i18n);
-      } else {
-        BotToast.showText(
-            text: userDetail!.isFollowed ? "Unfollowed".i18n : "Followed".i18n);
-      }
-      userDetail!.isFollowed = !userDetail!.isFollowed;
-    }
-    setState(() {
-      isFollowing = false;
-    });
-    // UserInfoPage.followCallbacks[widget.illust.author.id.toString()]
-    //     ?.call(widget.illust.author.isFollowed);
-    // UserPreviewWidget.followCallbacks[widget.illust.author.id.toString()]
-    //      ?.call(widget.illust.author.isFollowed);
   }
 
   firstLoad() {
@@ -706,14 +653,13 @@ class _UserPageState extends State<UserPage> with TickerProviderStateMixin {
       if (value.success) {
         setState(() {
           userDetail = value.data;
-          isMuted = settings.blockedUsers.contains(userDetail!.name);
+          isMuted = localManager.blockedUsers.contains(userDetail!.name);
         });
       } else {
         setState(() {
           if (value.errorMessage != null &&
               value.errorMessage!.contains("timeout")) {
-            BotToast.showText(
-                text: "Network Error. Please refresh to try again.".i18n);
+            Leader.showToast("Network Error. Please refresh to try again.".tr);
           }
         });
       }
@@ -723,46 +669,4 @@ class _UserPageState extends State<UserPage> with TickerProviderStateMixin {
   Future<Res<UserDetails>> loadData() async {
     return ConnectManager().apiClient.getUserDetails(widget.id);
   }
-}
-
-class StickyTabBarDelegate extends SliverPersistentHeaderDelegate {
-  final TabBar child;
-
-  StickyTabBarDelegate({required this.child});
-
-  @override
-  Widget build(
-      BuildContext context, double shrinkOffset, bool overlapsContent) {
-    return Container(
-      child: this.child,
-      color: Theme.of(context).cardColor,
-    );
-  }
-
-  @override
-  double get maxExtent => this.child.preferredSize.height;
-
-  @override
-  double get minExtent => this.child.preferredSize.height;
-
-  @override
-  bool shouldRebuild(SliverPersistentHeaderDelegate oldDelegate) {
-    return false;
-  }
-}
-
-class ColoredTabBar extends Container implements PreferredSizeWidget {
-  ColoredTabBar(this.color, this.tabBar);
-
-  final Color color;
-  final TabBar tabBar;
-
-  @override
-  Size get preferredSize => tabBar.preferredSize;
-
-  @override
-  Widget build(BuildContext context) => Container(
-        color: color,
-        child: tabBar,
-      );
 }

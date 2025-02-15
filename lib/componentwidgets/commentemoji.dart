@@ -1,13 +1,14 @@
 import 'package:flutter/material.dart';
-
-import 'commentpage.dart';
+import 'package:moon_design/moon_design.dart';
+import 'package:skana_pix/utils/widgetplugin.dart';
+import '../view/commentpage.dart';
 
 class CommentEmojiText extends StatefulWidget {
   final String text;
-  const CommentEmojiText({Key? key, required this.text}) : super(key: key);
+  const CommentEmojiText({super.key, required this.text});
 
   @override
-  _CommentEmojiTextState createState() => _CommentEmojiTextState();
+  State<CommentEmojiText> createState() => _CommentEmojiTextState();
 }
 
 class _CommentEmojiTextState extends State<CommentEmojiText> {
@@ -36,7 +37,7 @@ class _CommentEmojiTextState extends State<CommentEmojiText> {
     for (var element in text.characters) {
       if (element == '(') {
         if (template.isNotEmpty) {
-          spans.add(TextSpan(text: template));
+          spans.add(TextSpan(text: template).small());
           template = "";
         }
         emojiCollecting = true;
@@ -51,21 +52,22 @@ class _CommentEmojiTextState extends State<CommentEmojiText> {
               height: 20,
             )));
           } else {
-            spans.add(TextSpan(text: "($emojiText)"));
+            spans.add(TextSpan(text: "($emojiText)").small());
             template = "";
           }
         }
         emojiCollecting = false;
         emojiText = "";
       } else {
-        if (emojiCollecting)
+        if (emojiCollecting) {
           emojiText += element;
-        else
+        } else {
           template += element;
+        }
       }
     }
     if (template.isNotEmpty) {
-      spans.add(TextSpan(text: template));
+      spans.add(TextSpan(text: template).small());
     }
     setState(() {
       _spans = spans;
@@ -75,10 +77,11 @@ class _CommentEmojiTextState extends State<CommentEmojiText> {
   @override
   Widget build(BuildContext context) {
     return Text.rich(
+      strutStyle: const StrutStyle(forceStrutHeight: true, leading: 0),
       TextSpan(
-        style: Theme.of(context).textTheme.bodyMedium,
+        style: context.moonTheme?.textAreaTheme.properties.textStyle,
         children: [for (var i in _spans) i],
-      ),
+      ).small(),
     );
   }
 }

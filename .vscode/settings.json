@@ -1,0 +1,4 @@
+{
+    "cmake.ignoreCMakeListsMissing": true,
+    "dart.flutterRunAdditionalArgs": [ "--no-enable-impeller" ]
+}

@@ -1,38 +1,61 @@
 import 'dart:async';
 import 'dart:io';
 
-import 'package:bot_toast/bot_toast.dart';
-import 'package:flutter/material.dart';
-import 'package:skana_pix/pixiv_dart_api.dart';
+import 'package:flutter/services.dart';
+import 'package:get/get.dart';
+import 'package:skana_pix/controller/account_controller.dart';
+import 'package:skana_pix/controller/connector.dart';
+import 'package:skana_pix/controller/logging.dart';
+import 'package:skana_pix/controller/mini_controllers.dart';
+import 'package:skana_pix/controller/settings.dart';
+import 'package:skana_pix/controller/text_controller.dart';
+import 'package:skana_pix/controller/theme_controller.dart';
+import 'package:skana_pix/controller/update_controller.dart';
+import 'package:skana_pix/controller/page_index_controller.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:skana_pix/utils/widgetplugin.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 import 'package:flutter_displaymode/flutter_displaymode.dart';
 
 import 'package:skana_pix/utils/applinks.dart';
 import 'package:skana_pix/utils/translate.dart';
 import 'package:skana_pix/view/homepage.dart';
-import 'package:skana_pix/view/defaults.dart';
+import 'package:flutter/material.dart';
+
+import 'controller/like_controller.dart';
 
 Future<void> main() async {
   runZonedGuarded(() async {
     WidgetsFlutterBinding.ensureInitialized();
     FlutterError.onError = (details) {
-      Log.error("Unhandled", "${details.exception}\n${details.stack}");
+      // ignore: avoid_print
+      print("Unhandled:${details.exception}\n${details.stack}");
     };
+    initLogger();
     await settings.init();
     await TextConfigManager.init();
-    setSystemProxy();
+    //setSystemProxy();
     await ConnectManager().init();
-    await TranslateMap.init();
-    await Log.init();
     handleLinks();
+    homeController = Get.put(HomeController(), permanent: true);
+    accountController = Get.put(AccountController(), permanent: true);
+    localManager = Get.put(LocalManager(), permanent: true);
+    localManager.init();
+    likeController = Get.put(LikeController(), permanent: true);
+    boardController = Get.put(BoardController(), permanent: true);
+    boardController.fetchBoard();
+    updateController = Get.put(UpdateController(), permanent: true);
+    updateController.check();
+    tc = Get.put(ThemeController(), permanent: true);
+    searchPageController = Get.put(SearchPageController(), permanent: true);
+    homeController.init();
     if (Platform.isWindows || Platform.isLinux) {
       sqfliteFfiInit();
       databaseFactory = databaseFactoryFfi;
     }
     runApp(MyApp());
   }, (e, s) {
-    loggerError("Unhandled Exception: $e\n$s");
+    log.e("Unhandled Exception: $e\n$s");
   });
 }
 
@@ -43,12 +66,12 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-  ThemeStuff appValueNotifier = ThemeStuff.instance;
+  ThemeManager appValueNotifier = ThemeManager.instance;
 
   @override
   void initState() {
     super.initState();
-    if(Platform.isAndroid && settings.isHighRefreshRate) {
+    if (Platform.isAndroid && settings.isHighRefreshRate) {
       FlutterDisplayMode.setHighRefreshRate();
     }
   }
@@ -58,15 +81,20 @@ class _MyAppState extends State<MyApp> {
     return ValueListenableBuilder(
       valueListenable: appValueNotifier.theme,
       builder: (context, value, child) {
-        return MaterialApp(
+        SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
+        resetOrientation();
+        return GetMaterialApp(
           title: 'Skana_pix',
-          builder: BotToastInit(),
-          navigatorObservers: [BotToastNavigatorObserver()],
-          theme: value.themeData,
-          darkTheme: value.darkTheme,
-          themeMode: value.themeMode,
+          builder: (context, child) => MediaQuery(
+            data: MediaQuery.of(context)
+                .copyWith(textScaler: TextScaler.linear(1.0)),
+            child: child!,
+          ),
+          theme: value,
           home: const HomePage(),
-          navigatorKey: DynamicData.rootNavigatorKey,
+          translations: TranslateMap(),
+          locale: settings.localeObj(),
+          fallbackLocale: const Locale('en', 'US'),
           localizationsDelegates: const [
             GlobalMaterialLocalizations.delegate,
             GlobalWidgetsLocalizations.delegate,

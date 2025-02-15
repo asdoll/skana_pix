@@ -1,89 +1,97 @@
-import 'package:bot_toast/bot_toast.dart';
 import 'package:flutter/material.dart';
-import 'package:skana_pix/pixiv_dart_api.dart';
+import 'package:get/get.dart';
+import 'package:moon_design/moon_design.dart';
+import 'package:skana_pix/controller/account_controller.dart';
+import 'package:skana_pix/utils/widgetplugin.dart';
+import 'package:skana_pix/view/settings/settingpage.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 import '../componentwidgets/webview.dart';
 import '../utils/applinks.dart';
-import '../utils/navigation.dart';
-import '../utils/translate.dart';
-import 'defaults.dart';
 
 class LoginPage extends StatefulWidget {
-  const LoginPage(this.callback, {super.key});
-
-  final void Function() callback;
+  const LoginPage({super.key});
 
   @override
   State<LoginPage> createState() => _LoginPageState();
 }
 
 class _LoginPageState extends State<LoginPage> {
-  bool checked = false;
-
-  bool waitingForAuth = false;
-
-  bool isLogging = false;
-
+  int selected = 0;
   @override
   Widget build(BuildContext context) {
-    if (isLogging) {
-      return buildLoading(context);
-    } else if (!waitingForAuth) {
-      return buildLogin(context);
-    } else {
-      return buildWaiting(context);
-    }
+    return Scaffold(
+        bottomNavigationBar: BottomAppBar(
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: [
+              IconButton(
+                icon: Icon(Icons.settings,color: context.moonTheme?.tokens.colors.bulma,),
+                onPressed: () => Get.to(() => Scaffold(
+                    appBar: appBar(title: "Settings".tr),
+                    body: SettingPage())),
+              )
+            ],
+          ),
+        ),
+        body: Obx(() {
+          if (accountController.isLoading.value) {
+            return buildLoading(context);
+          } else if (!accountController.waitingForAuth.value) {
+            return buildLogin(context);
+          } else {
+            return buildWaiting(context);
+          }
+        }));
   }
 
   Widget buildLogin(BuildContext context) {
     return SizedBox(
       child: Center(
         child: Card(
-            margin: const EdgeInsets.symmetric(vertical: 16, horizontal: 24),
             child: SizedBox(
-              width: 300,
-              height: 300,
-              child: Column(
-                children: [
-                  const SizedBox(
-                    height: 16,
-                  ),
-                  Align(
-                    alignment: Alignment.centerLeft,
-                    child: Text(
-                      ("     ${"SkanaPix".i18n}"),
-                      style: const TextStyle(fontSize: 20),
-                    ),
-                  ),
-                  Expanded(
-                    child: Center(
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          SizedBox(
-                            width: 110,
-                            child: FilledButton(
-                              onPressed: onContinue,
-                              child: Text("Login".i18n),
-                            ),
-                          ),
-                          const SizedBox(
-                            height: 16,
-                          ),
-                          Container(
-                            padding: const EdgeInsets.symmetric(
-                                horizontal: 8, vertical: 4),
-                            child: Text(
-                                "You need to complete the login operation in the browser window that will open."
-                                    .i18n),
-                          )
-                        ],
-                      ),
-                    ),
-                  ),
-                ],
+          width: 300,
+          height: 300,
+          child: Column(
+            children: [
+              const SizedBox(
+                height: 16,
               ),
-            )),
+              Align(
+                alignment: Alignment.centerLeft,
+                child: Text(
+                  "     ${"SkanaPix".tr}",
+                  style: const TextStyle(fontSize: 20),
+                ).header(),
+              ),
+              Expanded(
+                child: Center(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      SizedBox(
+                        width: 110,
+                        child: filledButton(
+                          onPressed: onContinue,
+                          label: "Login".tr,
+                        ),
+                      ),
+                      const SizedBox(
+                        height: 16,
+                      ),
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 8, vertical: 4),
+                        child: Text(
+                            "You need to complete the login operation in the browser window that will open."
+                                .tr).small(),
+                      )
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ),
+        )),
       ),
     );
   }
@@ -92,46 +100,43 @@ class _LoginPageState extends State<LoginPage> {
     return SizedBox(
       child: Center(
         child: Card(
-            margin: const EdgeInsets.symmetric(vertical: 16, horizontal: 24),
             child: SizedBox(
-              width: 300,
-              height: 300,
-              child: Column(
-                children: [
-                  Align(
-                    alignment: Alignment.centerLeft,
+          width: 300,
+          height: 300,
+          child: Column(
+            children: [
+              Align(
+                alignment: Alignment.centerLeft,
+                child: Text(
+                  "Waiting...".tr,
+                  style: const TextStyle(
+                      fontSize: 24, fontWeight: FontWeight.bold),
+                ).subHeader(),
+              ).paddingAll(20),
+              Expanded(
+                child: Center(
+                  child: Container(
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                     child: Text(
-                      "Waiting...".i18n,
-                      style: const TextStyle(
-                          fontSize: 24, fontWeight: FontWeight.bold),
-                    ),
+                        "Waiting for authentication. Please finished in the browser."
+                            .tr).small(),
                   ),
-                  Expanded(
-                    child: Center(
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 8, vertical: 4),
-                        child: Text(
-                            "Waiting for authentication. Please finished in the browser."
-                                .i18n),
-                      ),
-                    ),
-                  ),
-                  Row(
-                    children: [
-                      TextButton(
-                          child: Text("Back".i18n),
-                          onPressed: () {
-                            setState(() {
-                              waitingForAuth = false;
-                            });
-                          }),
-                      const Spacer(),
-                    ],
-                  )
-                ],
+                ),
               ),
-            )),
+              Row(
+                children: [
+                  outlinedButton(
+                      label: "Back".tr,
+                      onPressed: () {
+                        accountController.waitingForAuth.value = false;
+                      }),
+                  const Spacer(),
+                ],
+              ).paddingAll(20)
+            ],
+          ),
+        )),
       ),
     );
   }
@@ -140,28 +145,27 @@ class _LoginPageState extends State<LoginPage> {
     return SizedBox(
       child: Center(
         child: Card(
-            margin: const EdgeInsets.symmetric(vertical: 16, horizontal: 24),
             child: SizedBox(
-              width: 300,
-              height: 300,
-              child: Column(
-                children: [
-                  Align(
-                    alignment: Alignment.centerLeft,
-                    child: Text(
-                      "Logging in".i18n,
-                      style: const TextStyle(
-                          fontSize: 24, fontWeight: FontWeight.bold),
-                    ),
-                  ),
-                  const Expanded(
-                    child: Center(
-                      child: CircularProgressIndicator.adaptive(),
-                    ),
-                  ),
-                ],
+          width: 300,
+          height: 300,
+          child: Column(
+            children: [
+              Align(
+                alignment: Alignment.centerLeft,
+                child: Text(
+                  "Logging in".tr,
+                  style: const TextStyle(
+                      fontSize: 24, fontWeight: FontWeight.bold),
+                ).subHeader(),
               ),
-            )),
+              const Expanded(
+                child: Center(
+                  child: CircularProgressIndicator(),
+                ),
+              ),
+            ],
+          ),
+        )),
       ),
     );
   }
@@ -169,64 +173,73 @@ class _LoginPageState extends State<LoginPage> {
   void onContinue() async {
     bool useExternal = true;
     bool exitLogin = false;
-    if (DynamicData.isMobile) {
-      await showDialog(
-        context: context,
-        barrierDismissible: true,
-        builder: (context) {
-          var alertDialog = AlertDialog(
-              content: Text(
-                  "I understand this is a free unofficial application.".i18n),
-              actions: [
-                TextButton(
-                  child: Text("Cancel".i18n),
-                  onPressed: () {
-                    exitLogin = true;
-                    DynamicData.rootNavigatorKey.currentState!.pop();
-                  },
-                ),
-                TextButton(
-                  child: Text("Continue with Webview".i18n),
-                  onPressed: () {
-                    exitLogin = false;
-                    useExternal = false;
-                    DynamicData.rootNavigatorKey.currentState!.pop();
-                  },
-                ),
-                TextButton(
-                  child: Text("Continue with External Browser".i18n),
-                  onPressed: () {
-                    exitLogin = false;
-                    useExternal = true;
-                    DynamicData.rootNavigatorKey.currentState!.pop();
-                  },
-                ),
-              ]);
-          return alertDialog;
-        },
-      );
+    if (GetPlatform.isMobile) {
+      await showMoonModal(
+      context: context,
+      builder: (context) {
+        return Dialog(
+            child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            MoonAlert(
+                borderColor: Get
+                    .context?.moonTheme?.buttonTheme.colors.borderColor
+                    .withValues(alpha: 0.5),
+                showBorder: true,
+                label: Text("I understand this is a free unofficial application.".tr).header(),
+                verticalGap: 16,
+                content: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    outlinedButton(
+                      label: "Cancel".tr,
+                      onPressed: () {
+                        exitLogin = true;
+                        Get.back();
+                      },
+                    ).paddingBottom(16),
+                    filledButton(
+                      label: "Continue with Webview".tr,
+                      onPressed: () {
+                        exitLogin = false;
+                        useExternal = false;
+                        Get.back();
+                      },
+                    ).paddingBottom(16),
+                    filledButton(
+                      label: "Continue with External Browser".tr,
+                      onPressed: () {
+                        exitLogin = false;
+                        useExternal = true;
+                        Get.back();
+                      },
+                    ),
+                  ],
+                )),
+          ],
+        ));
+      });
     }
     if (exitLogin) {
       return;
     }
-    var url = await generateWebviewUrl();
+    var url = await accountController.generateWebviewUrl();
     onLink = (uri) {
       if (uri.scheme == "pixiv") {
-        onFinished(uri.queryParameters["code"]!);
+        accountController.onFinished(uri.queryParameters["code"]!);
         onLink = null;
         return true;
       }
       return false;
     };
-    setState(() {
-      waitingForAuth = true;
-    });
+    accountController.waitingForAuth.value = true;
     if (!useExternal && mounted) {
-      context.to(() => WebviewPage(
+      Get.to(() => WebviewPage(
             url,
             onNavigation: (req) {
               if (req.url.startsWith("pixiv://")) {
-                DynamicData.rootNavigatorKey.currentState!.pop();
+                Get.back();
                 onLink?.call(Uri.parse(req.url));
                 return false;
               }
@@ -235,24 +248,6 @@ class _LoginPageState extends State<LoginPage> {
           ));
     } else {
       launchUrlString(url);
-    }
-  }
-
-  void onFinished(String code) async {
-    setState(() {
-      isLogging = true;
-      waitingForAuth = false;
-    });
-    var res = await loginWithCode(code);
-    if (res.error) {
-      if (mounted) {
-        BotToast.showText(text: res.errorMessage!);
-      }
-      setState(() {
-        isLogging = false;
-      });
-    } else {
-      widget.callback();
     }
   }
 }

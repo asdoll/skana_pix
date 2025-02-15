@@ -3,7 +3,7 @@ import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:skana_pix/utils/translate.dart';
+import 'package:get/get.dart';
 import 'text_composition.dart';
 
 const indentation = "　";
@@ -14,7 +14,8 @@ void paintText(
     ui.Canvas canvas, ui.Size size, TextPage page, TextCompositionConfig config) {
   print("paintText ${page.chIndex} ${page.number} / ${page.total}");
   final lineCount = page.lines.length;
-  final tp = TextPainter(textDirection: TextDirection.ltr, maxLines: 1);
+  final tp = TextPainter(textDirection: TextDirection.ltr, maxLines: 1,
+      strutStyle: const StrutStyle(forceStrutHeight: true, leading: 0),);
   final titleStyle = TextStyle(
     fontWeight: FontWeight.bold,
     fontSize: config.fontSize + 2,
@@ -70,6 +71,7 @@ void paintText(
       fontSize: 12,
       fontFamily: config.fontFamily,
       color: config.fontColor,
+      overflow: TextOverflow.ellipsis,
     );
     tp.text = TextSpan(text: page.info, style: styleInfo);
     tp.layout(maxWidth: size.width - config.leftPadding - config.rightPadding - 60);
@@ -157,21 +159,21 @@ Widget configSettingBuilder(
       actions: [
         TextButton(
           child: Text(
-            "Cancel".i18n,
+            "Cancel".tr,
             style: TextStyle(color: Theme.of(context).hintColor),
           ),
           onPressed: () => Navigator.of(context).pop(),
         ),
         TextButton(
           child: Text(
-            "Ok".i18n,
+            "Ok".tr,
             style: TextStyle(color: Colors.red),
           ),
           onPressed: () {
             final s = (isInt ? RegExp("^\\d+\$") : RegExp("^\\d+(\\.\\d+)?\$"))
                 .stringMatch(controller.text);
             if (s == null || s.isEmpty) {
-              controller.text += isInt ? "Only numbers are allowed".i18n : "Must enter a number".i18n;
+              controller.text += isInt ? "Only numbers are allowed".tr : "Must enter a number".tr;
               controller.selection =
                   TextSelection(baseOffset: 0, extentOffset: controller.text.length);
               return;
@@ -217,9 +219,9 @@ Widget configSettingBuilder(
     builder: (context, setState) {
       return ListView(
         children: [
-          ListTile(title: Text("Note: Some effects will only take effect after re-entering the main text page or the next chapter, or after a few pages.".i18n)),
+          ListTile(title: Text("Note: Some effects will only take effect after re-entering the main text page or the next chapter, or after a few pages.".tr)),
           Divider(),
-          ListTile(title: Text("Switches and selections".i18n)),
+          ListTile(title: Text("Switches and selections".tr)),
           Divider(),
           SwitchListTile(
             value: config.showStatus,
@@ -231,42 +233,42 @@ Widget configSettingBuilder(
               }
               setState(() => config.showStatus = value);
             },
-            title: Text("Show status bar".i18n),
+            title: Text("Show status bar".tr),
           ),
           SwitchListTile(
             value: config.showInfo,
             onChanged: (value) => setState(() => config.showInfo = value),
-            title: Text("Show bottom".i18n),
-            subtitle: Text("Show book name, page number and progress".i18n),
+            title: Text("Show bottom".tr),
+            subtitle: Text("Show book name, page number and progress".tr),
           ),
           SwitchListTile(
             value: config.justifyHeight,
             onChanged: (value) => setState(() => config.justifyHeight = value),
-            title: Text("Height adjustment".i18n),
-            subtitle: Text("Align bottom: Align bottom line to the same position".i18n),
+            title: Text("Height adjustment".tr),
+            subtitle: Text("Align bottom: Align bottom line to the same position".tr),
           ),
           SwitchListTile(
             value: config.oneHand,
             onChanged: (value) => setState(() => config.oneHand = value),
-            title: Text("One-handed operation".i18n),
-            subtitle: Text("Clicking on left side also turns page down".i18n),
+            title: Text("One-handed operation".tr),
+            subtitle: Text("Clicking on left side also turns page down".tr),
           ),
           SwitchListTile(
             value: config.underLine,
             onChanged: (value) => setState(() => config.underLine = value),
-            title: Text("Underlined text".i18n),
+            title: Text("Underlined text".tr),
           ),
           SwitchListTile(
             value: config.animationStatus,
             onChanged: (value) => setState(() => config.animationStatus = value),
-            title: Text("Status bar animation".i18n),
-            subtitle: Text("Animation can across status bar".i18n),
+            title: Text("Status bar animation".tr),
+            subtitle: Text("Animation can across status bar".tr),
           ),
           SwitchListTile(
             value: config.animationHighImage,
             onChanged: (value) => setState(() => config.animationHighImage = value),
-            title: Text("HD mode".i18n),
-            subtitle: Text("Increase screenshot quality when enabled. Smoother when disabled".i18n),
+            title: Text("HD mode".tr),
+            subtitle: Text("Increase screenshot quality when enabled. Smoother when disabled".tr),
           ),
           // SwitchListTile(
           //   value: config.animationWithImage,
@@ -275,20 +277,20 @@ Widget configSettingBuilder(
           //   subtitle: Text("开启随翻页动画移动，关闭则固定"),
           // ),
           ListTile(
-            subtitle: Text("Page-turning animation selection, try dual-column with flip on widescreen (- is horizontal | is vertical + is automatic)".i18n),
+            subtitle: Text("Page-turning animation selection, try dual-column with flip on widescreen (- is horizontal | is vertical + is automatic)".tr),
             title: Wrap(
               children: [
                 for (var pair in <String, AnimationType>{
-                  "Curl-".i18n: AnimationType.curl,
-                  "Cover+".i18n: AnimationType.cover,
+                  "Curl-".tr: AnimationType.curl,
+                  "Cover+".tr: AnimationType.cover,
                   // "水平覆盖": AnimationType.coverHorizontal,
                   // "垂直覆盖": AnimationType.coverVertical,
-                  "Flip-".i18n: AnimationType.flip,
-                  "Simulate-".i18n: AnimationType.simulation,
+                  "Flip-".tr: AnimationType.flip,
+                  "Simulate-".tr: AnimationType.simulation,
                   // "卷轴半左": AnimationType.simulation2L,
                   // "卷轴半右": AnimationType.simulation2R,
-                  "Scroll|".i18n: AnimationType.scroll,
-                  "Slide+".i18n: AnimationType.slide,
+                  "Scroll|".tr: AnimationType.scroll,
+                  "Slide+".tr: AnimationType.slide,
                   // "滑动水平": AnimationType.slideHorizontal,
                   // "滑动垂直": AnimationType.slideVertical,
                 }.entries)
@@ -307,13 +309,13 @@ Widget configSettingBuilder(
             ),
           ),
           ListTile(
-            title: Text("Animation duration(ms)".i18n),
+            title: Text("Animation duration(ms)".tr),
             subtitle: Text(config.animationDuration.toString() + "(ms)"),
             onTap: () => showDialog(
               context: context,
               builder: (context) => showTextDialog(
                 context,
-                "Animation duration(ms)".i18n,
+                "Animation duration(ms)".tr,
                 config.animationDuration.toString(),
                 (s) => setState(() => config.animationDuration = int.parse(s)),
                 true,
@@ -321,7 +323,7 @@ Widget configSettingBuilder(
             ),
           ),
           Divider(),
-          ListTile(title: Text("Text and layout".i18n)),
+          ListTile(title: Text("Text and layout".tr)),
           Container(
             decoration: BoxDecoration(border: Border.all()),
             margin: EdgeInsets.symmetric(horizontal: 18),
@@ -356,20 +358,20 @@ Widget configSettingBuilder(
                     decoration: getDecoration(c.img, c.bg),
                     padding: EdgeInsets.all(4),
                     margin: EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-                    child: Text("Text".i18n, style: TextStyle(color: c.text)),
+                    child: Text("Text".tr, style: TextStyle(color: c.text)),
                   ),
                 ),
             ],
           ),
           Divider(),
           ListTile(
-            title: Text("Columns".i18n),
-            subtitle: Text("${config.columns}${"(0 for automatic, 2 columns when width exceeds 580)".i18n}"),
+            title: Text("Columns".tr),
+            subtitle: Text("${config.columns}${"(0 for automatic, 2 columns when width exceeds 580)".tr}"),
             onTap: () => showDialog(
               context: context,
               builder: (context) => showTextDialog(
                 context,
-                "Columns".i18n,
+                "Columns".tr,
                 config.columns.toString(),
                 (s) => setState(() => config.columns = int.parse(s)),
                 true,
@@ -377,13 +379,13 @@ Widget configSettingBuilder(
             ),
           ),
           ListTile(
-            title: Text("Paragraph indentation".i18n),
+            title: Text("Paragraph indentation".tr),
             subtitle: Text(config.indentation.toString()),
             onTap: () => showDialog(
               context: context,
               builder: (context) => showTextDialog(
                 context,
-                "Paragraph indentation".i18n,
+                "Paragraph indentation".tr,
                 config.indentation.toString(),
                 (s) => setState(() => config.indentation = int.parse(s)),
                 true,
@@ -391,32 +393,32 @@ Widget configSettingBuilder(
             ),
           ),
           ListTile(
-            title: Text("Font color".i18n),
+            title: Text("Font color".tr),
             subtitle: Text(config.fontColor.value.toRadixString(16).toUpperCase()),
             onTap: () => onColor(
                 config.fontColor, (color) => setState(() => config.fontColor = color)),
           ),
           ListTile(
-            title: Text("Font size".i18n),
+            title: Text("Font size".tr),
             subtitle: Text(config.fontSize.toStringAsFixed(1)),
             onTap: () => showDialog(
               context: context,
               builder: (context) => showTextDialog(
                 context,
-                "Font size".i18n,
+                "Font size".tr,
                 config.fontSize.toStringAsFixed(1),
                 (s) => setState(() => config.fontSize = double.parse(s)),
               ),
             ),
           ),
           ListTile(
-            title: Text("Line height".i18n),
+            title: Text("Line height".tr),
             subtitle: Text(config.fontHeight.toStringAsFixed(1)),
             onTap: () => showDialog(
               context: context,
               builder: (context) => showTextDialog(
                 context,
-                "Line height".i18n,
+                "Line height".tr,
                 config.fontHeight.toStringAsFixed(1),
                 (s) => setState(() => config.fontHeight = double.parse(s)),
               ),
@@ -429,7 +431,7 @@ Widget configSettingBuilder(
           //       config.fontFamily, (font) => setState(() => config.fontFamily = font)),
           // ),
           ListTile(
-            title: Text("Background color".i18n),
+            title: Text("Background color".tr),
             subtitle: Text(config.backgroundColor.value.toRadixString(16).toUpperCase()),
             onTap: () => onColor(
                 config.backgroundColor,
@@ -445,94 +447,94 @@ Widget configSettingBuilder(
           //       (background) => setState(() => config.background = background)),
           // ),
           Divider(),
-          ListTile(title: Text("Margin".i18n)),
+          ListTile(title: Text("Margin".tr)),
           Divider(),
           ListTile(
-            title: Text("Upper margin".i18n),
+            title: Text("Upper margin".tr),
             subtitle: Text(config.topPadding.toStringAsFixed(1)),
             onTap: () => showDialog(
               context: context,
               builder: (context) => showTextDialog(
                 context,
-                "Upper margin".i18n,
+                "Upper margin".tr,
                 config.topPadding.toStringAsFixed(1),
                 (s) => setState(() => config.topPadding = double.parse(s)),
               ),
             ),
           ),
           ListTile(
-            title: Text("Left margin".i18n),
+            title: Text("Left margin".tr),
             subtitle: Text(config.leftPadding.toStringAsFixed(1)),
             onTap: () => showDialog(
               context: context,
               builder: (context) => showTextDialog(
                 context,
-                "Left margin".i18n,
+                "Left margin".tr,
                 config.leftPadding.toStringAsFixed(1),
                 (s) => setState(() => config.leftPadding = double.parse(s)),
               ),
             ),
           ),
           ListTile(
-            title: Text("Lower margin".i18n),
+            title: Text("Lower margin".tr),
             subtitle: Text(config.bottomPadding.toStringAsFixed(1)),
             onTap: () => showDialog(
               context: context,
               builder: (context) => showTextDialog(
                 context,
-                "Lower margin".i18n,
+                "Lower margin".tr,
                 config.bottomPadding.toStringAsFixed(1),
                 (s) => setState(() => config.bottomPadding = double.parse(s)),
               ),
             ),
           ),
           ListTile(
-            title: Text("Right margin".i18n),
+            title: Text("Right margin".tr),
             subtitle: Text(config.rightPadding.toStringAsFixed(1)),
             onTap: () => showDialog(
               context: context,
               builder: (context) => showTextDialog(
                 context,
-                "Right margin".i18n,
+                "Right margin".tr,
                 config.rightPadding.toStringAsFixed(1),
                 (s) => setState(() => config.rightPadding = double.parse(s)),
               ),
             ),
           ),
           ListTile(
-            title: Text("Spacing between title and text".i18n),
+            title: Text("Spacing between title and text".tr),
             subtitle: Text(config.titlePadding.toStringAsFixed(1)),
             onTap: () => showDialog(
               context: context,
               builder: (context) => showTextDialog(
                 context,
-                "Spacing between title and text".i18n,
+                "Spacing between title and text".tr,
                 config.titlePadding.toStringAsFixed(1),
                 (s) => setState(() => config.titlePadding = double.parse(s)),
               ),
             ),
           ),
           ListTile(
-            title: Text("Paragraph spacing".i18n),
+            title: Text("Paragraph spacing".tr),
             subtitle: Text(config.paragraphPadding.toStringAsFixed(1)),
             onTap: () => showDialog(
               context: context,
               builder: (context) => showTextDialog(
                 context,
-                "Paragraph spacing".i18n,
+                "Paragraph spacing".tr,
                 config.paragraphPadding.toStringAsFixed(1),
                 (s) => setState(() => config.paragraphPadding = double.parse(s)),
               ),
             ),
           ),
           ListTile(
-            title: Text("Column spacing".i18n),
+            title: Text("Column spacing".tr),
             subtitle: Text(config.columnPadding.toStringAsFixed(1)),
             onTap: () => showDialog(
               context: context,
               builder: (context) => showTextDialog(
                 context,
-                "Column spacing".i18n,
+                "Column spacing".tr,
                 config.columnPadding.toStringAsFixed(1),
                 (s) => setState(() => config.columnPadding = double.parse(s)),
               ),
