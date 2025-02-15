@@ -151,40 +151,42 @@ class _BlockListPageState extends State<BlockListPage> {
         context: context,
         builder: (context) {
           return Dialog(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [MoonAlert(
-                borderColor: Get.context?.moonTheme
-                                          ?.buttonTheme.colors.borderColor
-                                          .withValues(alpha: 0.5),
-                                      showBorder: true,
-            label: Text("Add".tr).header(),
-            content: Column(children: [MoonTextInput(
-                controller: controller,
-                hintText: isNovel ? "Novel Tag".tr : "Tag".tr).paddingAll(8),
-            
-              Row(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: [
-                  outlinedButton(
-                    label: "Cancel".tr,
-                    onPressed: () {
-                      Get.back();
-                    },
-                  ).paddingRight(8),
-                  filledButton(
-                    label: "Ok".tr,
-                    onPressed: () {
-                      Get.back(result: controller.text);
-                    },
-                  ).paddingRight(8),
-                ],
-              )
+              child: ListView(
+            shrinkWrap: true,
+            children: [
+              MoonAlert(
+                  borderColor: Get
+                      .context?.moonTheme?.buttonTheme.colors.borderColor
+                      .withValues(alpha: 0.5),
+                  showBorder: true,
+                  label: Text("Add".tr).header(),
+                  content: Column(
+                    children: [
+                      MoonTextInput(
+                              controller: controller,
+                              hintText: isNovel ? "Novel Tag".tr : "Tag".tr)
+                          .paddingAll(8),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        children: [
+                          outlinedButton(
+                            label: "Cancel".tr,
+                            onPressed: () {
+                              Get.back();
+                            },
+                          ).paddingRight(8),
+                          filledButton(
+                            label: "Ok".tr,
+                            onPressed: () {
+                              Get.back(result: controller.text);
+                            },
+                          ).paddingRight(8),
+                        ],
+                      )
+                    ],
+                  ))
             ],
-            )
-          )],
-            )
-          );
+          ));
         });
     if (result != null && result is String && result.isNotEmpty) {
       if (isNovel) {

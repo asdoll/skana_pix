@@ -3,6 +3,7 @@ import 'package:moon_design/moon_design.dart';
 import 'package:skana_pix/controller/list_controller.dart';
 import 'package:get/get.dart';
 import 'package:skana_pix/controller/page_index_controller.dart';
+import 'package:skana_pix/utils/widgetplugin.dart';
 import 'package:skana_pix/view/imageview/imagewaterfall.dart';
 import 'package:skana_pix/view/novelview/novellist.dart';
 
@@ -35,27 +36,24 @@ class _RankingPageState extends State<RankingPage>
   Widget build(BuildContext context) {
     return Column(
       children: [
-        AnimatedContainer(
-          duration: Duration(milliseconds: 400),
-          child: MoonTabBar(
-              tabController: tabController,
-              onTabChanged: (value) {
-                homeController.workIndex.value = value;
-                homeController.tagIndex.value = 0;
-                homeController.dateTime.value = null;
-              },
-              tabs: [
-                MoonTab(
-                  label: Text("Illust".tr),
-                ),
-                MoonTab(
-                  label: Text("Manga".tr),
-                ),
-                MoonTab(
-                  label: Text("Novel".tr),
-                ),
-              ]),
-        ),
+        MoonTabBar(
+            tabController: tabController,
+            onTabChanged: (value) {
+              homeController.workIndex.value = value;
+              homeController.tagIndex.value = 0;
+              homeController.dateTime.value = null;
+            },
+            tabs: [
+              MoonTab(
+                label: Text("Illust".tr),
+              ),
+              MoonTab(
+                label: Text("Manga".tr),
+              ),
+              MoonTab(
+                label: Text("Novel".tr),
+              ),
+            ]).paddingLeft(16).toAlign(Alignment.topLeft),
         Expanded(
           child: TabBarView(
             controller: tabController,

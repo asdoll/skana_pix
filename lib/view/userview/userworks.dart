@@ -1,8 +1,9 @@
-import 'package:shadcn_flutter/shadcn_flutter.dart';
+import 'package:flutter/material.dart';
+import 'package:moon_design/moon_design.dart';
 import 'package:skana_pix/controller/list_controller.dart';
-import 'package:skana_pix/controller/mini_controllers.dart';
 import 'package:skana_pix/model/worktypes.dart';
 import 'package:get/get.dart';
+import 'package:skana_pix/utils/widgetplugin.dart';
 import 'package:skana_pix/view/imageview/imagewaterfall.dart';
 import 'package:skana_pix/view/novelview/novellist.dart';
 
@@ -18,77 +19,60 @@ class WorksPage extends StatefulWidget {
   State<WorksPage> createState() => _WorksPageState();
 }
 
-class _WorksPageState extends State<WorksPage> {
+class _WorksPageState extends State<WorksPage>
+    with SingleTickerProviderStateMixin {
+  late TabController tabController;
+
+  @override
+  void initState() {
+    super.initState();
+    tabController = TabController(length: 3, vsync: this);
+  }
+
   @override
   void dispose() {
     super.dispose();
-    Get.delete<MTab>(tag: "works_${widget.id}");
+    tabController.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    MTab mtab = Get.put(MTab(), tag: "works_${widget.id}");
-    return Obx(() {
       return Column(
         children: [
-          TabList(
-            index: mtab.index.value,
-            children: [
-              TabButton(
-                child: Text("Illust".tr),
-                onPressed: () {
-                  mtab.index.value = 0;
-                },
-              ),
-              TabButton(
-                child: Text("Manga".tr),
-                onPressed: () {
-                  mtab.index.value = 1;
-                },
-              ),
-              TabButton(
-                child: Text("Novel".tr),
-                onPressed: () {
-                  mtab.index.value = 2;
-                },
-              ),
-            ],
-          ),
+          MoonTabBar(tabController: tabController, tabs: [
+            MoonTab(
+              label: Text("Illust".tr),
+            ),
+            MoonTab(
+              label: Text("Manga".tr),
+            ),
+            MoonTab(
+              label: Text("Novel".tr),
+            ),
+          ]).paddingLeft(16).toAlign(Alignment.topLeft),
           Expanded(
-            child: (mtab.index.value == 0)
-                ? WorkContent(
-                    id: widget.id,
-                    type: ArtworkType.ILLUST,
-                    noScroll: widget.noScroll,
-                  )
-                : (mtab.index.value == 1)
-                    ? WorkContentManga(
-                        id: widget.id,
-                        noScroll: widget.noScroll,
-                      )
-                    : WorkContent(
-                        id: widget.id,
-                        type: ArtworkType.NOVEL,
-                        noScroll: widget.noScroll,
-                      ),
-          ),
+            child: TabBarView(
+              controller: tabController,
+              children: [
+                WorkContent(
+                  id: widget.id,
+                  type: ArtworkType.ILLUST,
+                  noScroll: widget.noScroll,
+                ),
+                WorkContent(
+                  id: widget.id,
+                  type: ArtworkType.MANGA,
+                  noScroll: widget.noScroll,
+                ),
+                WorkContent(
+                  id: widget.id,
+                  type: ArtworkType.NOVEL,
+                  noScroll: widget.noScroll,
+                ),
+              ],
+            ),
+          )
         ],
-      );
-    });
-  }
-}
-
-class WorkContentManga extends StatelessWidget {
-  final int id;
-  final bool noScroll;
-  const WorkContentManga({super.key, required this.id, this.noScroll = false});
-
-  @override
-  Widget build(BuildContext context) {
-    return WorkContent(
-      id: id,
-      type: ArtworkType.MANGA,
-      noScroll: noScroll,
     );
   }
 }

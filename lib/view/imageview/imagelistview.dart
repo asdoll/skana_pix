@@ -7,7 +7,7 @@ import 'package:flutter/services.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:skana_pix/componentwidgets/headerfooter.dart';
 import 'package:skana_pix/componentwidgets/imagedetail.dart';
-import 'package:skana_pix/componentwidgets/userpage.dart';
+import 'package:skana_pix/view/userview/userpage.dart';
 import 'package:skana_pix/controller/account_controller.dart';
 import 'package:skana_pix/controller/histories.dart';
 import 'package:skana_pix/controller/like_controller.dart';
@@ -153,8 +153,9 @@ class _ImageListViewPageState extends State<ImageListViewPage> {
       return const SizedBox();
     }
     load();
-    return const Center(
-      child: CircularProgressIndicator(),
+    return Center(
+      child:
+          DefaultHeaderFooter.progressIndicator(context, color: Colors.white),
     );
   }
 
@@ -227,28 +228,26 @@ class _IllustPageState extends State<IllustPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       floatingActionButton: Obx(() => AnimatedSwitcher(
+          duration: const Duration(milliseconds: 300),
+          child: (relatedListController.showBackArea.value)
+              ? MoonButton.icon(
+                  buttonSize: MoonButtonSize.lg,
+                  showBorder: true,
+                  borderColor: Get
+                      .context?.moonTheme?.buttonTheme.colors.borderColor
+                      .withValues(alpha: 0.5),
+                  backgroundColor: Get.context?.moonTheme?.tokens.colors.zeno,
+                  onTap: () {
+                    _scrollController.animateTo(0,
                         duration: const Duration(milliseconds: 300),
-                        child: (relatedListController.showBackArea.value)
-                            ? MoonButton.icon(
-                                buttonSize: MoonButtonSize.lg,
-                                showBorder: true,
-                                borderColor: Get.context?.moonTheme?.buttonTheme
-                                    .colors.borderColor
-                                    .withValues(alpha: 0.5),
-                                backgroundColor:
-                                    Get.context?.moonTheme?.tokens.colors.zeno,
-                                onTap: () {
-                                  _scrollController.animateTo(0,
-                                      duration:
-                                          const Duration(milliseconds: 300),
-                                      curve: Curves.easeInOut);
-                                },
-                                icon: Icon(
-                                  Icons.arrow_upward,
-                                  color: Colors.white,
-                                ),
-                              )
-                            : Container())),
+                        curve: Curves.easeInOut);
+                  },
+                  icon: Icon(
+                    Icons.arrow_upward,
+                    color: Colors.white,
+                  ),
+                )
+              : Container())),
       body: ColoredBox(
         color: context.moonTheme?.tokens.colors.goku ??
             Theme.of(context).colorScheme.surface,
@@ -508,7 +507,10 @@ class _IllustPageState extends State<IllustPage> {
                       Expanded(child: Spacer()),
                       MoonButton.icon(
                         icon: DecoratedIcon(
-                          icon: Icon(Icons.more_vert,color: Colors.white,),
+                          icon: Icon(
+                            Icons.more_vert,
+                            color: Colors.white,
+                          ),
                           decoration:
                               IconDecoration(border: IconBorder(width: 1.5)),
                         ),
@@ -531,98 +533,95 @@ class _IllustPageState extends State<IllustPage> {
         context: context,
         builder: (context) {
           return Dialog(
-              child: Column(mainAxisSize: MainAxisSize.min, children: [
+              child: ListView(shrinkWrap: true, children: [
             MoonAlert(
-              borderColor: Get
-                  .context?.moonTheme?.buttonTheme.colors.borderColor
-                  .withValues(alpha: 0.5),
-              showBorder: true,
-              label: Text(illust.title).header(),
-              verticalGap: 16,
-              content: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      SizedBox(
-                        height: context.height / 2,
-                        child: GridView.builder(
-                          itemBuilder: (context, index) {
-                            final data = illust.images[index];
-                            return Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: InkWell(
-                                onTap: () {
-                                    controller.indexs[index] = !controller.indexs[index];
-                                    controller.indexs.refresh();
-                                },
-                                onLongPress: () {
-                                  Get.to(() => ImageViewPage(
-                                      illust.images
-                                          .map((e) => e.large)
-                                          .toList(),
-                                      initialPage: index));
-                                },
-                                child: Stack(
-                                  children: [
-                                    PixivImage(
-                                      data.squareMedium,
-                                      placeWidget: Center(
-                                        child: Text(index.toString()),
-                                      ),
+                borderColor: Get
+                    .context?.moonTheme?.buttonTheme.colors.borderColor
+                    .withValues(alpha: 0.5),
+                showBorder: true,
+                label: Text(illust.title).header(),
+                verticalGap: 16,
+                content: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    SizedBox(
+                      height: context.height / 2,
+                      child: GridView.builder(
+                        itemBuilder: (context, index) {
+                          final data = illust.images[index];
+                          return Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: InkWell(
+                              onTap: () {
+                                controller.indexs[index] =
+                                    !controller.indexs[index];
+                                controller.indexs.refresh();
+                              },
+                              onLongPress: () {
+                                Get.to(() => ImageViewPage(
+                                    illust.images.map((e) => e.large).toList(),
+                                    initialPage: index));
+                              },
+                              child: Stack(
+                                children: [
+                                  PixivImage(
+                                    data.squareMedium,
+                                    placeWidget: Center(
+                                      child: Text(index.toString()),
                                     ),
-                                    Obx(() => Align(
-                                        alignment: Alignment.bottomRight,
-                                        child: Visibility(
-                                            visible: controller.indexs[index],
-                                            child: Padding(
-                                              padding:
-                                                  const EdgeInsets.all(4.0),
-                                              child: Icon(
-                                                Icons.check_circle,
-                                                color: Colors.green,
-                                              ),
-                                            )))),
-                                  ],
-                                ),
+                                  ),
+                                  Obx(() => Align(
+                                      alignment: Alignment.bottomRight,
+                                      child: Visibility(
+                                          visible: controller.indexs[index],
+                                          child: Padding(
+                                            padding: const EdgeInsets.all(4.0),
+                                            child: Icon(
+                                              Icons.check_circle,
+                                              color: Colors.green,
+                                            ),
+                                          )))),
+                                ],
                               ),
-                            );
+                            ),
+                          );
+                        },
+                        itemCount: illust.images.length,
+                        gridDelegate:
+                            SliverGridDelegateWithFixedCrossAxisCount(
+                                crossAxisCount: max(3, context.width ~/ 200)),
+                      ),
+                    ).paddingBottom(16),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: [
+                        MoonFilledButton(
+                          buttonSize: MoonButtonSize.sm,
+                          leading: Icon(!controller.allOn.value
+                              ? Icons.check_circle_outline
+                              : Icons.check_circle),
+                          label: Text("All".tr),
+                          onTap: () {
+                            controller.allOn.value = !controller.allOn.value;
+                            for (var i = 0; i < controller.indexs.length; i++) {
+                              controller.indexs[i] = controller.allOn.value;
+                            }
+                            controller.indexs.refresh();
                           },
-                          itemCount: illust.images.length,
-                          gridDelegate:
-                              SliverGridDelegateWithFixedCrossAxisCount(
-                                  crossAxisCount: 3),
+                        ).paddingRight(8),
+                        MoonFilledButton(
+                          buttonSize: MoonButtonSize.sm,
+                          leading: Icon(Icons.save),
+                          label: Text("Save".tr),
+                          onTap: () {
+                            Get.back(result: "OK");
+                          },
                         ),
-                      ).paddingBottom(16),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.end,
-                        children: [
-                          MoonFilledButton(
-                            buttonSize: MoonButtonSize.sm,
-                            leading: Icon(!controller.allOn.value
-                                ? Icons.check_circle_outline
-                                : Icons.check_circle),
-                            label: Text("All".tr),
-                            onTap: () {
-                              controller.allOn.value = !controller.allOn.value;
-                              for (var i = 0; i < controller.indexs.length; i++) {
-                                controller.indexs[i] = controller.allOn.value;
-                              }
-                              controller.indexs.refresh();
-                            },
-                          ).paddingRight(8),
-                          MoonFilledButton(
-                            buttonSize: MoonButtonSize.sm,
-                            leading: Icon(Icons.save),
-                            label: Text("Save".tr),
-                            onTap: () {
-                              Get.back(result: "OK");
-                            },
-                          ),
-                        ],
-                      )
-                    ],
-                  )),
-            
+                      ],
+                    )
+                  ],
+                )),
           ]));
         });
     switch (result) {

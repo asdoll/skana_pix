@@ -162,9 +162,40 @@ class _CommentPageState extends State<CommentPage> {
                     refreshOnStart: true,
                     onLoad: controller.nextPage,
                     child: ListView.separated(
-                      itemCount: controller.comments.length,
+                      itemCount: controller.comments.length + 1,
                       padding: const EdgeInsets.only(top: 10),
                       itemBuilder: (context, index) {
+                        if (controller.error.isNotEmpty &&
+                            controller.comments.isEmpty) {
+                          return SizedBox(
+                              height: context.height / 1.5,
+                              child: Center(
+                                child: Column(
+                                  children: [
+                                    Text("Error".tr)
+                                        .h2()
+                                        .paddingTop(context.height / 4),
+                                    SizedBox(
+                                      height: 10,
+                                    ),
+                                    filledButton(
+                                      onPressed: () {
+                                        easyRefreshController.callRefresh();
+                                      },
+                                      label: "Retry".tr,
+                                    )
+                                  ],
+                                ),
+                              ));
+                        }
+                        if (controller.comments.isEmpty) {
+                          if (!controller.isLoading.value) {
+                            return emptyPlaceholder(context);
+                          }
+                        }
+                        if (index == controller.comments.length) {
+                          return Container();
+                        }
                         return Row(
                           mainAxisSize: MainAxisSize.max,
                           mainAxisAlignment: MainAxisAlignment.start,
@@ -240,7 +271,9 @@ class _CommentPageState extends State<CommentPage> {
                                                                           index]
                                                                       .name
                                                                 ]);
-                                                            controller.easyRefreshController?.callRefresh();
+                                                            controller
+                                                                .easyRefreshController
+                                                                ?.callRefresh();
                                                           },
                                                         ),
                                                         MoonMenuItem(
@@ -257,7 +290,9 @@ class _CommentPageState extends State<CommentPage> {
                                                                           index]
                                                                       .comment
                                                                 ]);
-                                                            controller.easyRefreshController?.callRefresh();
+                                                            controller
+                                                                .easyRefreshController
+                                                                ?.callRefresh();
                                                           },
                                                         ),
                                                       ],
@@ -408,13 +443,19 @@ class _CommentPageState extends State<CommentPage> {
                                   controller: _editController,
                                   trailing: IconButton(
                                       icon: const Icon(
-                                        Icons.reply,
+                                        MoonIcons.arrows_reply_24_regular,
                                       ),
                                       onPressed: () async {
                                         String txt =
                                             _editController.text.trim();
                                         controller.submitComment(txt);
                                         _editController.clear();
+                                        setState(() {
+                                          _emojiPanelShow = !_emojiPanelShow;
+                                          if (_emojiPanelShow) {
+                                            FocusScope.of(context).unfocus();
+                                          }
+                                        });
                                       }),
                                 ),
                               ),

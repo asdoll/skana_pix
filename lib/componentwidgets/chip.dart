@@ -18,6 +18,15 @@ class PixChip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    if(type == "search"){
+      return MoonChip(
+        chipSize: MoonChipSize.sm,
+          backgroundColor: context.moonTheme?.tokens.colors.frieza,
+          onTap: onTap,
+          label: Text(f,
+              style: TextStyle(color: context.moonTheme?.buttonTheme.colors.filledVariantTextColor),
+              strutStyle: const StrutStyle(forceStrutHeight: true, leading: 0)));
+    }
     if (isSetting) {
       return MoonChip(
           backgroundColor: context.moonTheme?.tokens.colors.frieza,

@@ -13,7 +13,8 @@ import 'package:waterfall_flow/waterfall_flow.dart';
 class NovelList extends StatefulWidget {
   final String controllerTag;
   final bool noScroll;
-  const NovelList({super.key, required this.controllerTag, this.noScroll = false});
+  const NovelList(
+      {super.key, required this.controllerTag, this.noScroll = false});
 
   @override
   State<NovelList> createState() => _NovelListState();
@@ -31,7 +32,8 @@ class _NovelListState extends State<NovelList> {
     return EasyRefresh(
       controller: refreshController,
       refreshOnStart: true,
-      scrollController: widget.noScroll ? localScrollController : globalScrollController,
+      scrollController:
+          widget.noScroll ? localScrollController : globalScrollController,
       onRefresh: controller.reset,
       onLoad: controller.noNextPage ? null : controller.nextPage,
       header: DefaultHeaderFooter.header(context),
@@ -40,46 +42,51 @@ class _NovelListState extends State<NovelList> {
           controller.noNextPage ? null : DefaultHeaderFooter.footer(context),
       child: Obx(
         () {
-          if (controller.error != null &&
-              controller.error!.isNotEmpty &&
-              controller.novels.isEmpty) {
-            return Center(
-              child: Column(
-                children: [
-                  Text("Error".tr).h2().paddingTop(context.height / 4),
-                  filledButton(
-                    onPressed: () {
-                      refreshController.callRefresh();
-                    },
-                    label: "Retry".tr,
-                  )
-                ],
-              ),
-            );
-          }
-          if (controller.novels.isEmpty) {
-            if (!controller.isFirstLoading.value && !controller.isLoading.value) {
-              return Center(
-                child: Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Text('[ ]').h1(),
-                ),
-              );
-            }
-          }
           return WaterfallFlow.builder(
             padding: const EdgeInsets.only(top: 8),
-            controller: widget.noScroll ? localScrollController : globalScrollController,
+            controller: widget.noScroll
+                ? localScrollController
+                : globalScrollController,
             gridDelegate: SliverWaterfallFlowDelegateWithFixedCrossAxisCount(
-              crossAxisCount:
-                  max(1, (context.width / 500).floor()),
+              crossAxisCount: controller.novels.isEmpty
+                  ? 1
+                  : max(1, (context.width / 400).floor()),
               mainAxisSpacing: 8.0,
               crossAxisSpacing: 8.0,
             ),
             itemBuilder: (BuildContext context, int index) {
+              if (controller.error != null &&
+                  controller.error!.isNotEmpty &&
+                  controller.novels.isEmpty) {
+                return Center(
+                  child: Column(
+                    children: [
+                      Text("Error".tr).h2().paddingTop(context.height / 4),
+                      SizedBox(
+                        height: 10,
+                      ),
+                      filledButton(
+                        onPressed: () {
+                          refreshController.callRefresh();
+                        },
+                        label: "Retry".tr,
+                      )
+                    ],
+                  ),
+                );
+              }
+              if (controller.novels.isEmpty) {
+                if (!controller.isFirstLoading.value &&
+                    !controller.isLoading.value) {
+                  return emptyPlaceholder(context);
+                }
+              }
+              if (index == controller.novels.length) {
+                return Container();
+              }
               return NovelCard(index, widget.controllerTag);
             },
-            itemCount: controller.novels.length,
+            itemCount: controller.novels.length + 1,
           );
         },
       ),

@@ -100,8 +100,8 @@ Future<T?> alertDialog<T>(BuildContext context, String title, String content,
       context: context,
       builder: (context) {
         return Dialog(
-            child: Column(
-          mainAxisSize: MainAxisSize.min,
+            child: ListView(
+          shrinkWrap: true,
           children: [
             MoonAlert(
                 borderColor: Get
@@ -193,6 +193,18 @@ Widget moonListTileWidgets(
         trailing: trailing,
       ).paddingSymmetric(
           vertical: noPadding ? 0 : 2, horizontal: noPadding ? 0 : 8));
+}
+
+Widget emptyPlaceholder(BuildContext context) {
+  return Container(
+    padding: const EdgeInsets.only(bottom: 100),
+    width: double.infinity,
+    height: context.height/1.5,
+    alignment: Alignment.center,
+    child: Center(
+      child: Text('[ ]').h1(),
+    ),
+  );
 }
 
 AppBar appBar(

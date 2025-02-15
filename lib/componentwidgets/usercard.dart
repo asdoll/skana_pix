@@ -8,7 +8,7 @@ import 'package:skana_pix/model/worktypes.dart';
 import 'avatar.dart';
 import 'followbutton.dart';
 import 'pixivimage.dart';
-import 'userpage.dart';
+import '../view/userview/userpage.dart';
 
 class PainterCard extends StatefulWidget {
   final UserPreview user;

@@ -90,11 +90,11 @@ class CommentController extends GetxController {
       isLoading.value = false;
       if (value.success) {
         comments.addAll(filterComments(value.data));
+        if (comments.isEmpty) {
+          easyRefreshController?.finishRefresh(IndicatorResult.noMore);
+        }
         comments.refresh();
         easyRefreshController?.finishRefresh();
-        if(comments.isEmpty) {
-          Leader.showToast("No comments".tr,Duration(seconds: 5));
-        }
       } else {
         var message = value.errorMessage ??
             "Network Error. Please refresh to try again.".tr;

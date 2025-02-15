@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:moon_design/moon_design.dart';
+import 'package:skana_pix/componentwidgets/headerfooter.dart';
 import 'package:skana_pix/controller/account_controller.dart';
 import 'package:skana_pix/utils/widgetplugin.dart';
 import 'package:skana_pix/view/settings/settingpage.dart';
@@ -158,9 +159,9 @@ class _LoginPageState extends State<LoginPage> {
                       fontSize: 24, fontWeight: FontWeight.bold),
                 ).subHeader(),
               ),
-              const Expanded(
+              Expanded(
                 child: Center(
-                  child: CircularProgressIndicator(),
+                  child: DefaultHeaderFooter.progressIndicator(context),
                 ),
               ),
             ],
@@ -178,8 +179,8 @@ class _LoginPageState extends State<LoginPage> {
       context: context,
       builder: (context) {
         return Dialog(
-            child: Column(
-          mainAxisSize: MainAxisSize.min,
+            child: ListView(
+                                  shrinkWrap: true,
           children: [
             MoonAlert(
                 borderColor: Get

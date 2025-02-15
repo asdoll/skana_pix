@@ -15,7 +15,10 @@ class TranslateMap extends Translations {
           'violet': 'Violet',
           'slate': 'Slate',
           'orange': 'Orange',
-          'gray': 'Gray'
+          'gray': 'Gray',
+          "all": "All",
+          "illust": "Illust",
+          "manga": "Manga",
         },
         "zh_CN": {
           "Search": "搜索",
@@ -442,6 +445,10 @@ class TranslateMap extends Translations {
           "No comments": "没有评论",
           "Resetted": "已重置",
           "Confirm Reset": "确认重置",
+          "all": "全部",
+          "illust": "插画",
+          "manga": "漫画",
+          "novel": "小说"
         },
         "zh_TW": {
           "Search": "搜索",
@@ -868,6 +875,10 @@ class TranslateMap extends Translations {
           "No comments": "沒有評論",
           "Resetted": "已重置",
           "Confirm Reset": "確認重置",
+          "all": "全部",
+          "illust": "插畫",
+          "manga": "漫畫",
+          "novel": "小說",
         },
       };
 }

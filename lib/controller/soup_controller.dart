@@ -174,13 +174,14 @@ class SpotlightStoreBase extends GetxController {
   RxList<SpotlightArticle> articles = RxList.empty();
   String? nextUrl;
   EasyRefreshController? controller;
+  RxnString error = RxnString(null);
 
   SpotlightStoreBase();
-  bool isLoading = false;
+  RxBool isLoading = false.obs;
 
   Future<bool> fetch() async {
     articles.clear();
-    isLoading = true;
+    isLoading.value = true;
     nextUrl = null;
     try {
       SpotlightResponse response =
@@ -196,16 +197,17 @@ class SpotlightStoreBase extends GetxController {
       controller?.finishRefresh(IndicatorResult.success);
       return true;
     } catch (e) {
+      error.value = e.toString();
       controller?.finishRefresh(IndicatorResult.fail);
       return false;
     } finally {
-      isLoading = false;
+      isLoading.value = false;
     }
   }
 
   Future<bool> next() async {
-    if (isLoading) return false;
-    isLoading = true;
+    if (isLoading.value) return false;
+    isLoading.value = true;
     try {
       if (nextUrl != null && nextUrl!.isNotEmpty) {
         try {
@@ -221,6 +223,7 @@ class SpotlightStoreBase extends GetxController {
               : IndicatorResult.success);
           return true;
         } catch (e) {
+          error.value = e.toString();
           controller?.finishLoad(IndicatorResult.fail);
           return false;
         }
@@ -229,7 +232,7 @@ class SpotlightStoreBase extends GetxController {
         return true;
       }
     } finally {
-      isLoading = false;
+      isLoading.value = false;
     }
   }
 }

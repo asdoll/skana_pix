@@ -164,6 +164,7 @@ class TextComposition extends ChangeNotifier {
   bool? isForward;
   bool _isShowMenu;
   bool get isShowMenu => _isShowMenu;
+  Widget? progressIndicator;
   static const BASE = 8;
   static const QUARTER = BASE * 8;
   static const HALF = QUARTER * 2;
@@ -178,6 +179,7 @@ class TextComposition extends ChangeNotifier {
     percent = 0.0,
     this.cutoffPrevious = 8,
     this.cutoffNext = 92,
+    this.progressIndicator,
   })  : this._initPercent = percent,
         textPages = {},
         pictures = MemoryCache(),
@@ -357,7 +359,7 @@ class TextComposition extends ChangeNotifier {
 
   List<Widget> get pages {
     if (textPages.isEmpty) {
-      return [Center(child: CircularProgressIndicator())];
+      return [Center(child: progressIndicator?? CircularProgressIndicator())];
     }
     return [
       for (var i = _currentIndex + HALF, last = _currentIndex - HALF; i > last; i--)

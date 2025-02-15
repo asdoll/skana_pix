@@ -11,7 +11,7 @@ import 'avatar.dart';
 import '../view/commentpage.dart';
 import 'followbutton.dart';
 import 'selecthtml.dart';
-import 'userpage.dart';
+import '../view/userview/userpage.dart';
 
 class IllustDetailContent extends StatefulWidget {
   final Illust illust;
