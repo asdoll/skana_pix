@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:icon_decoration/icon_decoration.dart';
+import 'package:skana_pix/componentwidgets/headerfooter.dart';
 import 'package:skana_pix/model/spotlight.dart';
 import 'package:skana_pix/utils/io_extension.dart';
 import 'package:skana_pix/view/imageview/imagelistview.dart';
@@ -41,7 +42,7 @@ class _SoupPageState extends State<SoupPage> {
         body: NestedScrollView(
           body: soupFetcher.amWorks.isEmpty
               ? Center(
-                  child: CircularProgressIndicator(),
+                  child: DefaultHeaderFooter.progressIndicator(context),
                 )
               : ListView.builder(
                   itemBuilder: (BuildContext context, int index) {

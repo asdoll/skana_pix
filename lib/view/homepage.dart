@@ -185,8 +185,8 @@ class _HomePageState extends State<HomePage> {
                       builder: (context) {
                         DateTime? date = homeController.dateTime.value;
                         return Dialog(
-                            child: Column(
-                                mainAxisSize: MainAxisSize.min,
+                            child: ListView(
+                                  shrinkWrap: true,
                                 children: [
                               MoonAlert(
                                   borderColor: Get.context?.moonTheme
@@ -305,8 +305,9 @@ class _HomePageState extends State<HomePage> {
                     : null,
               ),
         onTap: () {
-          homeController.pageIndex.value = index;
           closeDrawer();
+          homeController.pageIndex.value = index;
+          globalScrollController.jumpTo(0);
         },
       );
     }

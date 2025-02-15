@@ -48,10 +48,14 @@ class _UserDetailPageState extends State<UserDetailPage> {
           ),
         ),
         SliverToBoxAdapter(
-            child: OverflowBox(
+            child: 
+            SizedBox(
+              width: context.width,
+              height: context.height,
           child: MoonTable(
-            columnsCount: 5,
+            columnsCount: 2,
             rowSize: MoonTableRowSize.sm,
+            width: context.width,
             tablePadding: const EdgeInsets.symmetric(horizontal: 16),
             rows: [
               MoonTableRow(

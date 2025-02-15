@@ -39,7 +39,7 @@ class _BookmarksPageState extends State<BookmarksPage>
 
   @override
   Widget build(BuildContext context) {
-    return Obx(() => Column(
+    return Column(
           children: [
             MoonTabBar(
               tabController: controller,
@@ -53,7 +53,9 @@ class _BookmarksPageState extends State<BookmarksPage>
               ],
             ).paddingLeft(16).toAlign(Alignment.topLeft),
             Expanded(
-                child: TabBarView(children: [
+                child: TabBarView(
+                  controller: controller,
+                  children: [
               BookmarkContent(
                 id: widget.id,
                 type: ArtworkType.ILLUST,
@@ -64,7 +66,7 @@ class _BookmarksPageState extends State<BookmarksPage>
               )
             ])),
           ],
-        ));
+        );
   }
 }
 

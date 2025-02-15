@@ -1,8 +1,8 @@
-import 'package:shadcn_flutter/shadcn_flutter.dart';
-import 'package:skana_pix/componentwidgets/backarea.dart';
+import 'package:flutter/material.dart';
 import 'package:skana_pix/componentwidgets/gotop.dart';
 import 'package:skana_pix/controller/list_controller.dart';
 import 'package:get/get.dart';
+import 'package:skana_pix/utils/widgetplugin.dart';
 import 'package:skana_pix/view/userview/userlist.dart';
 
 class UserResultPage extends StatefulWidget {
@@ -30,20 +30,12 @@ class _UserResultPageState extends State<UserResultPage> {
         tag: "search_${widget.word}");
     controller.id = widget.word;
     return Scaffold(
-      headers: [
-        AppBar(
-          title: Text(
+      appBar: appBar(
+        title:
             widget.translatedName.isEmpty ? widget.word : widget.translatedName,
-            overflow: TextOverflow.ellipsis,
-          ),
-          padding: EdgeInsets.all(10),
-          leading: [const NormalBackButton()],
-        ),
-        const Divider()
-      ],
-      floatingFooter: true,
-      footers: [const GoTop()],
-      child: UserList(controllerTag: "search_${widget.word}"),
+      ),
+      floatingActionButton: const GoTop(),
+      body: UserList(controllerTag: "search_${widget.word}"),
     );
   }
 }

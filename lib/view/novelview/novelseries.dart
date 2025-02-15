@@ -4,7 +4,7 @@ import 'package:moon_design/moon_design.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:skana_pix/componentwidgets/headerfooter.dart';
 import 'package:skana_pix/componentwidgets/staricon.dart';
-import 'package:skana_pix/componentwidgets/userpage.dart';
+import 'package:skana_pix/view/userview/userpage.dart';
 import 'package:skana_pix/controller/novel_controller.dart';
 import 'package:skana_pix/model/worktypes.dart';
 import 'package:get/get.dart';

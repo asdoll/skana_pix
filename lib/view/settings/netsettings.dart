@@ -85,29 +85,30 @@ class _NetworkSettingsState extends State<NetworkSettings> {
                           context: context,
                           builder: (context) {
                             return Dialog(
-                                child: Column(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                     MoonAlert(
-                              borderColor: Get.context?.moonTheme?.buttonTheme
-                                  .colors.borderColor
-                                  .withValues(alpha: 0.5),
-                              showBorder: true,
-                              label: Text('Custom Proxy'.tr).header(),
-                              verticalGap: 16,
-                              content: MoonFormTextInput(
-                                controller: input,
-                                trailing: MoonButton.icon(
-                                  icon: Icon(Icons.done),
-                                  onTap: () {
-                                    controller.setCustomProxyHost(input.text);
-                                    Get.back();
-                                  },
-                                ),
-                              ).paddingBottom(16),
-                            )
-                                  ],
-                                ));
+                                child: ListView(
+                              shrinkWrap: true,
+                              children: [
+                                MoonAlert(
+                                  borderColor: Get.context?.moonTheme
+                                      ?.buttonTheme.colors.borderColor
+                                      .withValues(alpha: 0.5),
+                                  showBorder: true,
+                                  label: Text('Custom Proxy'.tr).header(),
+                                  verticalGap: 16,
+                                  content: MoonFormTextInput(
+                                    controller: input,
+                                    trailing: MoonButton.icon(
+                                      icon: Icon(Icons.done),
+                                      onTap: () {
+                                        controller
+                                            .setCustomProxyHost(input.text);
+                                        Get.back();
+                                      },
+                                    ),
+                                  ).paddingBottom(16),
+                                )
+                              ],
+                            ));
                           });
                     },
                     label: Text('Custom Proxy'.tr),

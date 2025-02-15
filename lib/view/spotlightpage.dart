@@ -44,12 +44,39 @@ class _SpotlightPageState extends State<SpotlightPage> {
           gridDelegate: SliverWaterfallFlowDelegateWithFixedCrossAxisCount(
               mainAxisSpacing: 4,
               crossAxisSpacing: 4,
-              crossAxisCount: max(2, (context.width / 250).floor())),
+              crossAxisCount: spotlightStore.articles.isEmpty
+                  ? 1
+                  : max(2, (context.width / 250).floor())),
           controller: globalScrollController,
           itemBuilder: (BuildContext context, int index) {
+            if (spotlightStore.error.value != null &&
+                spotlightStore.error.value!.isNotEmpty &&
+                spotlightStore.articles.isEmpty) {
+              return SizedBox(
+                  height: context.height / 1.5,
+                  child: Center(
+                    child: Column(
+                      children: [
+                        Text("Error".tr).h2().paddingTop(context.height / 4),
+                        SizedBox(
+                          height: 10,
+                        ),
+                        filledButton(
+                          onPressed: () {
+                            refreshController.callRefresh();
+                          },
+                          label: "Retry".tr,
+                        )
+                      ],
+                    ),
+                  ));
+            }
+            if (index == spotlightStore.articles.length) {
+              return Container();
+            }
             return SpotlightCard(spotlight: spotlightStore.articles[index]);
           },
-          itemCount: spotlightStore.articles.length,
+          itemCount: spotlightStore.articles.length + 1,
         ).paddingTop(4),
       );
     });

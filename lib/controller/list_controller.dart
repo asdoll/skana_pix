@@ -45,6 +45,8 @@ class ListIllustController extends GetxController {
   DateTimeRange? dateTimeRange;
   RxBool showBackArea = false.obs;
   RxBool showDropdown = false.obs;
+  RxBool showPremiumMenu = false.obs;
+  RxBool showSortMenu = false.obs;
   static RxList<int> historyIds = RxList.empty();
 
   bool get showMangaBadage => type != ArtworkType.MANGA;
@@ -176,9 +178,9 @@ class ListIllustController extends GetxController {
       isLoading.value = false;
       isFirstLoading.value = false;
       if (value.success) {
+        nexturl.value = value.subData ?? "end";
         illusts.addAll(filterIllusts(value.data));
         illusts.refresh();
-        nexturl.value = value.subData ?? "end";
         refreshController?.finishRefresh();
       } else {
         var message = value.errorMessage ??
@@ -242,6 +244,8 @@ class ListNovelController extends GetxController {
   Rx<SearchOptions> searchOptions = SearchOptions().obs;
   bool get noNextPage => controllerType == ListType.single;
   RxInt tagIndex = 0.obs;
+  RxBool showPremiumMenu = false.obs;
+  RxBool showSortMenu = false.obs;
 
   bool get novelDirectEntry => settings.novelDirectEntry;
 
@@ -328,6 +332,9 @@ class ListNovelController extends GetxController {
       isFirstLoading.value = false;
       if (value.success) {
         novels.addAll(checkNovels(value.data));
+        if(novels.isEmpty){
+          refreshController?.finishRefresh(IndicatorResult.noMore);
+        }
         novels.refresh();
         nexturl.value = value.subData ?? "end";
         refreshController?.finishRefresh();

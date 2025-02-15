@@ -1,4 +1,4 @@
-import 'dart:math';
+import 'dart:math' show max;
 
 import 'package:easy_refresh/easy_refresh.dart';
 import 'package:flutter/material.dart';
@@ -6,6 +6,8 @@ import 'package:moon_design/moon_design.dart';
 import 'package:skana_pix/componentwidgets/chip.dart';
 import 'package:skana_pix/componentwidgets/headerfooter.dart';
 import 'package:skana_pix/controller/list_controller.dart';
+import 'package:skana_pix/controller/logging.dart';
+import 'package:skana_pix/controller/search_controller.dart';
 import 'package:skana_pix/utils/widgetplugin.dart';
 import 'package:skana_pix/view/imageview/imagelistview.dart';
 import 'package:skana_pix/view/userview/usersearch.dart';
@@ -46,6 +48,17 @@ class _SearchPageState extends State<SearchPage>
       children: [
         MoonTabBar(
           tabController: tabController,
+          onTabChanged: (value) {
+            try {
+              Get.find<SuggestionStore>().type.value = value == 0
+                  ? ArtworkType.ILLUST
+                  : value == 1
+                      ? ArtworkType.NOVEL
+                      : ArtworkType.USER;
+            } catch (e) {
+              log.e(e);
+            }
+          },
           tabs: [
             MoonTab(
               label: Text('Illust•Manga'.tr),
@@ -57,7 +70,7 @@ class _SearchPageState extends State<SearchPage>
               label: Text('User'.tr),
             ),
           ],
-        ),
+        ).paddingLeft(16).toAlign(Alignment.topLeft),
         Expanded(
             child: TabBarView(controller: tabController, children: [
           SearchRecommendPage(ArtworkType.ILLUST),
@@ -472,8 +485,7 @@ class _SearchRecommendPageState extends State<SearchRecommendPage> {
                                       textAlign: TextAlign.center,
                                       maxLines: 3,
                                       overflow: TextOverflow.ellipsis,
-                                      style: TextStyle(
-                                          color: Colors.white),
+                                      style: TextStyle(color: Colors.white),
                                     ).small(),
                                     if (hotTagsController.tags[index].tag
                                                 .translatedName !=
@@ -486,8 +498,7 @@ class _SearchRecommendPageState extends State<SearchRecommendPage> {
                                         textAlign: TextAlign.center,
                                         maxLines: 3,
                                         overflow: TextOverflow.ellipsis,
-                                        style: TextStyle(
-                                            color: Colors.white),
+                                        style: TextStyle(color: Colors.white),
                                       ).xSmall(),
                                   ],
                                 ),

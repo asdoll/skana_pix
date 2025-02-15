@@ -5,7 +5,7 @@ import 'package:get/get.dart';
 import 'package:skana_pix/controller/caches.dart';
 import 'package:skana_pix/model/worktypes.dart';
 
-import 'userpage.dart';
+import '../view/userview/userpage.dart';
 
 class PainterAvatar extends StatelessWidget {
   final String url;

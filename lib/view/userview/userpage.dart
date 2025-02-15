@@ -4,6 +4,7 @@ import 'package:flutter/services.dart';
 import 'package:icon_decoration/icon_decoration.dart';
 import 'package:moon_design/moon_design.dart';
 import 'package:share_plus/share_plus.dart';
+import 'package:skana_pix/componentwidgets/headerfooter.dart';
 import 'package:skana_pix/componentwidgets/userdetail.dart';
 import 'package:skana_pix/controller/connector.dart';
 import 'package:skana_pix/controller/logging.dart';
@@ -19,12 +20,12 @@ import 'package:get/get.dart';
 import 'package:skana_pix/utils/leaders.dart';
 import 'package:skana_pix/utils/widgetplugin.dart';
 
-import 'avatar.dart';
-import 'backarea.dart';
-import 'followbutton.dart';
-import '../view/userview/followlist.dart';
-import 'nullhero.dart';
-import '../view/bookmarkspage.dart';
+import '../../componentwidgets/avatar.dart';
+import '../../componentwidgets/backarea.dart';
+import '../../componentwidgets/followbutton.dart';
+import 'followlist.dart';
+import '../../componentwidgets/nullhero.dart';
+import '../bookmarkspage.dart';
 
 class UserPage extends StatefulWidget {
   final ArtworkType type;
@@ -141,9 +142,8 @@ class _UserPageState extends State<UserPage> with TickerProviderStateMixin {
     if (userDetail == null) {
       return Scaffold(
         body: Center(
-            child: MoonCircularLoader(
-          circularLoaderSize: MoonCircularLoaderSize.lg,
-        )),
+            child: DefaultHeaderFooter.progressIndicator(context)
+            ),
       );
     }
     return _buildBody(context);
@@ -193,8 +193,9 @@ class _UserPageState extends State<UserPage> with TickerProviderStateMixin {
             actions: <Widget>[
               Builder(builder: (context) {
                 return MoonButton.icon(
+                  buttonSize: MoonButtonSize.sm,
                     icon: const DecoratedIcon(
-                      icon: Icon(Icons.share),
+                      icon: Icon(Icons.share,color: Colors.white),
                       decoration:
                           IconDecoration(border: IconBorder(width: 1.5)),
                     ),
@@ -213,8 +214,8 @@ class _UserPageState extends State<UserPage> with TickerProviderStateMixin {
               collapseMode: CollapseMode.pin,
               background: Stack(
                 children: <Widget>[
-                  _buildBackground(context),
-                  _buildFakeBg(context),
+                  _buildBackground(context).paddingBottom(12),
+                  _buildFakeBg(context).paddingBottom(12),
                   Align(
                     alignment: Alignment.bottomCenter,
                     child: Column(
@@ -230,7 +231,7 @@ class _UserPageState extends State<UserPage> with TickerProviderStateMixin {
                               " ",
                             ).header(),
                           ],
-                        ),
+                        ).paddingBottom(12),
                       ],
                     ),
                   )
@@ -239,12 +240,12 @@ class _UserPageState extends State<UserPage> with TickerProviderStateMixin {
             ),
             bottom: PreferredSize(
                 preferredSize: Size.fromHeight(48),
-                child: Obx(() => MoonTabBar(
-                      tabController: tabController,
-                      tabs: [
-                        MoonTab(
-                          label: Text(
-                            "Artworks".tr,
+                child: MoonTabBar(
+                  tabController: tabController,
+                  tabs: [
+                    MoonTab(
+                      label: Text(
+                        "Artworks".tr,
                           ),
                         ),
                         MoonTab(
@@ -258,7 +259,7 @@ class _UserPageState extends State<UserPage> with TickerProviderStateMixin {
                           ),
                         )
                       ],
-                    )))),
+                    ))),
       ),
     ];
   }
@@ -304,9 +305,9 @@ class _UserPageState extends State<UserPage> with TickerProviderStateMixin {
                           context: context,
                           builder: (context) {
                             return Dialog(
-                                child: Column(
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: [
+                                child: ListView(
+                                  shrinkWrap: true,
+                                  children: [
                                   MoonAlert(
                                       borderColor: Get.context?.moonTheme
                                           ?.buttonTheme.colors.borderColor
@@ -456,7 +457,7 @@ class _UserPageState extends State<UserPage> with TickerProviderStateMixin {
                 userDetail == null
                     ? ""
                     : '${"Follows".tr}: ${userDetail!.totalFollowUsers}',
-              )
+              ).subHeader(),
             ]),
       ),
     );
@@ -485,7 +486,7 @@ class _UserPageState extends State<UserPage> with TickerProviderStateMixin {
                   userDetail == null
                       ? ""
                       : '${"Follows".tr}: ${userDetail!.totalFollowUsers}',
-                ),
+                ).subHeader(),
               )
             ]),
       ),
@@ -503,7 +504,7 @@ class _UserPageState extends State<UserPage> with TickerProviderStateMixin {
             child: Text(
               userDetail == null ? "" : userDetail!.comment,
               overflow: TextOverflow.ellipsis,
-            ),
+            ).small(),
           ),
         ),
       ),
@@ -549,8 +550,8 @@ class _UserPageState extends State<UserPage> with TickerProviderStateMixin {
                   showMoonModal(
                       context: context,
                       builder: (context) => Dialog(
-                              child: Column(
-                                  mainAxisSize: MainAxisSize.min,
+                              child: ListView(
+                                  shrinkWrap: true,
                                   children: [
                                 MoonAlert(
                                     borderColor: Get.context?.moonTheme
@@ -604,7 +605,7 @@ class _UserPageState extends State<UserPage> with TickerProviderStateMixin {
             child: userDetail == null
                 ? Container(
                     padding: const EdgeInsets.only(right: 16.0, bottom: 4.0),
-                    child: CircularProgressIndicator(),
+                    child: DefaultHeaderFooter.progressIndicator(context),
                   )
                 : Padding(
                     padding: const EdgeInsets.only(right: 16.0, bottom: 4.0),

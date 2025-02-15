@@ -54,12 +54,19 @@ class DefaultHeaderFooter {
           width: double.infinity,
           height: state.viewportDimension,
           alignment: Alignment.center,
-          child: SpinKitPulse(
+          child: SpinKitFadingFour(
             size: 40,
             color: context.moonTheme?.tokens.colors.bulma,
           ),
         );
       },
+    );
+  }
+
+  static Widget progressIndicator(BuildContext context, {Color? color}) {
+    return SpinKitFadingFour(
+      size: 40,
+      color: color ?? context.moonTheme?.tokens.colors.bulma,
     );
   }
 }
