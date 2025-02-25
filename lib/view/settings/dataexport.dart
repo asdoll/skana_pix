@@ -27,11 +27,11 @@ class _DataExportState extends State<DataExport> {
           title: "Import settings,blocks and bookmarked tags".tr,
         ),
         moonListTile(
-          onTap: historyManager.importIllustData,
+          onTap: M.importIllustData,
           title: "Import Illust History".tr,
         ),
         moonListTile(
-          onTap: historyManager.importNovelData,
+          onTap: M.importNovelData,
           title: "Import Novel History".tr,
         ),
         Text("Export".tr).header().paddingAll(4),
@@ -40,11 +40,11 @@ class _DataExportState extends State<DataExport> {
           title: "Export settings,blocks and bookmarked tags".tr,
         ),
         moonListTile(
-          onTap: historyManager.exportIllustData,
+          onTap: M.exportIllustData,
           title: "Export Illust History".tr,
         ),
         moonListTile(
-          onTap: historyManager.exportNovelData,
+          onTap: M.exportNovelData,
           title: "Export Novel History".tr,
         ),
         Text("Reset".tr).header().paddingAll(4),
@@ -54,14 +54,14 @@ class _DataExportState extends State<DataExport> {
         ),
         moonListTile(
           onTap: () {
-            historyManager.clearIllusts();
+            M.clearIllusts();
             Leader.showToast("Cleared".tr);
           },
           title: "Clear Illust History".tr,
         ),
         moonListTile(
           onTap: () {
-            historyManager.clearNovels();
+            M.clearNovels();
             Leader.showToast("Cleared".tr);
           },
           title: "Clear Novel History".tr,

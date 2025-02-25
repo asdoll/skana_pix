@@ -3,18 +3,22 @@ import 'dart:convert';
 import 'package:easy_refresh/easy_refresh.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
+import 'package:skana_pix/controller/objectbox.dart';
 import 'package:skana_pix/model/illust.dart';
 import 'package:skana_pix/model/novel.dart';
+import 'package:skana_pix/model/objectbox_models.dart';
 import 'package:skana_pix/utils/leaders.dart';
 
 import '../utils/safplugin.dart';
 
-class HistoryManager {
-  final illustHistoryProvider = IllustHistoryProvider();
-  final novelHistoryProvider = NovelHistoryProvider();
+class M {
 
-  Future<void> addIllust(Illust illust) async {
-    await illustHistoryProvider.open();
+  static late ObjectBox o;
+  static Future<void> init() async {
+    o = await ObjectBox.create();
+  }
+
+  static Future<void> addIllust(Illust illust) async {
     var illustHis = IllustHistory(
         illustId: illust.id,
         userId: illust.author.id,
@@ -22,67 +26,47 @@ class HistoryManager {
         time: DateTime.now().millisecondsSinceEpoch,
         title: illust.title,
         userName: illust.author.name);
-    await illustHistoryProvider.insert(illustHis);
+    await o.addIllust(illustHis);
   }
 
-  Future<void> addNovel(Novel novel) async {
-    await novelHistoryProvider.open();
+  static Future<void> addNovel(Novel novel,{int lastRead = 0}) async {
     var novelHis = NovelHistory(
         novelId: novel.id,
         userId: novel.author.id,
         title: novel.title,
         userName: novel.author.name,
         time: DateTime.now().millisecondsSinceEpoch,
-        pictureUrl: novel.image.squareMedium);
-    await novelHistoryProvider.insert(novelHis);
+        pictureUrl: novel.image.squareMedium,
+        lastRead: lastRead);
+    await o.addNovel(novelHis);
   }
 
-  Future<List<IllustHistory>> getIllusts() async {
-    await illustHistoryProvider.open();
-    return await illustHistoryProvider.getAllIllusts();
+  static Future<List<IllustHistory>> getAllIllusts() async {
+    return await o.getAllIllust();
   }
 
-  Future<List<IllustHistory>> searchIllusts(String query) async {
-    await illustHistoryProvider.open();
-    return await illustHistoryProvider.getLikeIllusts(query);
+  static Future<List<NovelHistory>> getAllNovels() async {
+    return await o.getAllNovel();
   }
 
-  Future<List<NovelHistory>> getNovels() async {
-    await novelHistoryProvider.open();
-    return await novelHistoryProvider.getAllNovels();
+
+  static Future<void> removeIllust(int illustId) async {
+    await o.removeIllust(illustId);
   }
 
-  Future<List<NovelHistory>> searchNovels(String query) async {
-    await novelHistoryProvider.open();
-    return await novelHistoryProvider.getLikeNovels(query);
+  static Future<void> removeNovel(int novelId) async {
+    await o.removeNovel(novelId);
   }
 
-  Future<void> removeIllust(int illustId) async {
-    await illustHistoryProvider.open();
-    await illustHistoryProvider.delete(illustId);
+  static Future<void> clearIllusts() async {
+    o.removeAllIllustHistory();
   }
 
-  Future<void> removeNovel(int novelId) async {
-    await novelHistoryProvider.open();
-    await novelHistoryProvider.delete(novelId);
+  static Future<void> clearNovels() async {
+    o.removeAllNovelHistory();
   }
 
-  Future<void> clearIllusts() async {
-    await illustHistoryProvider.open();
-    await illustHistoryProvider.deleteAll();
-  }
-
-  Future<void> clearNovels() async {
-    await novelHistoryProvider.open();
-    await novelHistoryProvider.deleteAll();
-  }
-
-  Future<void> close() async {
-    await illustHistoryProvider.close();
-    await novelHistoryProvider.close();
-  }
-
-  Future<void> importIllustData() async {
+  static Future<void> importIllustData() async {
     final result = await SAFPlugin.openFile();
     if (result == null) return;
     final json = utf8.decode(result);
@@ -97,11 +81,11 @@ class HistoryManager {
           time: illustMap['time'],
           title: illustMap['title'],
           userName: illustMap['user_name']);
-      illustHistoryProvider.insert(illustHis);
+      o.addIllust(illustHis);
     }
   }
 
-  Future<void> importNovelData() async {
+  static Future<void> importNovelData() async {
     final result = await SAFPlugin.openFile();
     if (result == null) return;
     final json = utf8.decode(result);
@@ -115,33 +99,30 @@ class HistoryManager {
           pictureUrl: novelMap['picture_url'],
           time: novelMap['time'],
           title: novelMap['title'],
-          userName: novelMap['user_name']);
-      novelHistoryProvider.insert(noveHis);
+          userName: novelMap['user_name'],
+          lastRead: novelMap['last_read']??0);
+      o.addNovel(noveHis);
     }
   }
 
-  Future<void> exportIllustData() async {
+  static Future<void> exportIllustData() async {
     final uriStr =
         await SAFPlugin.createFile("IllustHis.json", "application/json");
     if (uriStr == null) return;
-    await illustHistoryProvider.open();
-    final exportData = await illustHistoryProvider.getAllIllusts();
+    final exportData = await o.getAllIllust();
     await SAFPlugin.writeUri(
         uriStr, Uint8List.fromList(utf8.encode(jsonEncode(exportData))));
   }
 
-  Future<void> exportNovelData() async {
+  static Future<void> exportNovelData() async {
     final uriStr =
         await SAFPlugin.createFile("NovelHis.json", "application/json");
     if (uriStr == null) return;
-    await novelHistoryProvider.open();
-    final exportData = await novelHistoryProvider.getAllNovels();
+    final exportData = await o.getAllNovel();
     await SAFPlugin.writeUri(
         uriStr, Uint8List.fromList(utf8.encode(jsonEncode(exportData))));
   }
 }
-
-final historyManager = HistoryManager();
 
 class HistoryIllust extends GetxController {
   RxList<IllustHistory> illusts = RxList.empty();
@@ -153,7 +134,7 @@ class HistoryIllust extends GetxController {
     if (isLoading.value) return;
     try {
       isLoading.value = true;
-      var his = await historyManager.getIllusts();
+      var his = await M.getAllIllusts();
       illusts.clear();
       illusts.addAll(his);
       illusts.refresh();
@@ -169,7 +150,7 @@ class HistoryIllust extends GetxController {
   }
 
   void clear() async {
-    await historyManager.clearIllusts();
+    await M.clearIllusts();
     illusts.clear();
     searchResult.clear();
     illusts.refresh();
@@ -178,7 +159,7 @@ class HistoryIllust extends GetxController {
   }
 
   void remove(int illustId) async {
-    await historyManager.removeIllust(illustId);
+    await M.removeIllust(illustId);
     illusts.removeWhere((element) => element.illustId == illustId);
     searchResult.removeWhere((element) => element.illustId == illustId);
     illusts.refresh();
@@ -207,7 +188,7 @@ class HistoryNovel extends GetxController {
     if (isLoading.value) return;
     try {
       isLoading.value = true;
-      var his = await historyManager.getNovels();
+      var his = await M.getAllNovels();
       novels.clear();
       novels.addAll(his);
       novels.refresh();
@@ -223,7 +204,7 @@ class HistoryNovel extends GetxController {
   }
 
   void clear() async {
-    await historyManager.clearNovels();
+    await M.clearNovels();
     novels.clear();
     searchResult.clear();
     novels.refresh();
@@ -232,7 +213,7 @@ class HistoryNovel extends GetxController {
   }
 
   void remove(int novelId) async {
-    await historyManager.removeNovel(novelId);
+    await M.removeNovel(novelId);
     novels.removeWhere((element) => element.novelId == novelId);
     searchResult.removeWhere((element) => element.novelId == novelId);
     novels.refresh();

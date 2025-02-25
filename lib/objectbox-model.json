@@ -1,0 +1,115 @@
+{
+  "_note1": "KEEP THIS FILE! Check it into a version control system (VCS) like git.",
+  "_note2": "ObjectBox manages crucial IDs for your object model. See docs for details.",
+  "_note3": "If you have VCS merge conflicts, you must resolve them according to ObjectBox docs.",
+  "entities": [
+    {
+      "id": "1:3463704868698883050",
+      "lastPropertyId": "7:2483472823840920638",
+      "name": "IllustHistory",
+      "properties": [
+        {
+          "id": "1:1984458245741936302",
+          "name": "id",
+          "type": 6,
+          "flags": 1
+        },
+        {
+          "id": "2:4607933760072196358",
+          "name": "illustId",
+          "type": 6,
+          "flags": 8,
+          "indexId": "1:3052419864629376286"
+        },
+        {
+          "id": "3:6521937257502322384",
+          "name": "userId",
+          "type": 6
+        },
+        {
+          "id": "4:2358193164025649266",
+          "name": "pictureUrl",
+          "type": 9
+        },
+        {
+          "id": "5:5507504946141746117",
+          "name": "userName",
+          "type": 9
+        },
+        {
+          "id": "6:368270718968756168",
+          "name": "title",
+          "type": 9
+        },
+        {
+          "id": "7:2483472823840920638",
+          "name": "time",
+          "type": 6
+        }
+      ],
+      "relations": []
+    },
+    {
+      "id": "2:6326380835377129274",
+      "lastPropertyId": "8:4832103396694345464",
+      "name": "NovelHistory",
+      "properties": [
+        {
+          "id": "1:5710648733776369325",
+          "name": "id",
+          "type": 6,
+          "flags": 1
+        },
+        {
+          "id": "2:6061000690631970721",
+          "name": "novelId",
+          "type": 6,
+          "flags": 8,
+          "indexId": "2:6370072575861674133"
+        },
+        {
+          "id": "3:3098610265294301318",
+          "name": "userId",
+          "type": 6
+        },
+        {
+          "id": "4:1024277531089122418",
+          "name": "pictureUrl",
+          "type": 9
+        },
+        {
+          "id": "5:2023810762011068932",
+          "name": "time",
+          "type": 6
+        },
+        {
+          "id": "6:7486995261077555762",
+          "name": "title",
+          "type": 9
+        },
+        {
+          "id": "7:5885969338935604994",
+          "name": "userName",
+          "type": 9
+        },
+        {
+          "id": "8:4832103396694345464",
+          "name": "lastRead",
+          "type": 6
+        }
+      ],
+      "relations": []
+    }
+  ],
+  "lastEntityId": "2:6326380835377129274",
+  "lastIndexId": "2:6370072575861674133",
+  "lastRelationId": "0:0",
+  "lastSequenceId": "0:0",
+  "modelVersion": 5,
+  "modelVersionParserMinimum": 5,
+  "retiredEntityUids": [],
+  "retiredIndexUids": [],
+  "retiredPropertyUids": [],
+  "retiredRelationUids": [],
+  "version": 1
+}

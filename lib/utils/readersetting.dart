@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:moon_design/moon_design.dart';
+import 'package:skana_pix/controller/text_controller.dart';
 import 'package:skana_pix/utils/leaders.dart';
 import 'package:skana_pix/utils/text_composition/text_composition_config.dart';
 import 'package:skana_pix/utils/widgetplugin.dart';
@@ -179,14 +180,20 @@ Widget configSettingBuilderMoon(
                       SystemChrome.setEnabledSystemUIMode(SystemUiMode.manual,
                           overlays: []);
                     }
-                    setState(() => config.showStatus = value);
+                    setState(() {
+                      config.showStatus = value;
+                      TextConfigManager.config = config;
+                    });
                   })),
           moonListTile(
             title: "Show bottom".tr,
             subtitle: "Show book name, page number and progress".tr,
             trailing: MoonSwitch(
               value: config.showInfo,
-              onChanged: (value) => setState(() => config.showInfo = value),
+              onChanged: (value) => setState(() {
+                config.showInfo = value;
+                TextConfigManager.config = config;
+              }),
             ),
           ),
           moonListTile(
@@ -195,15 +202,20 @@ Widget configSettingBuilderMoon(
                   "Align bottom: Align bottom line to the same position".tr,
               trailing: MoonSwitch(
                 value: config.justifyHeight,
-                onChanged: (value) =>
-                    setState(() => config.justifyHeight = value),
+                onChanged: (value) => setState(() {
+                  config.justifyHeight = value;
+                  TextConfigManager.config = config;
+                }),
               )),
           moonListTile(
             title: "One-handed operation".tr,
             subtitle: "Clicking on left side also turns page down".tr,
             trailing: MoonSwitch(
               value: config.oneHand,
-              onChanged: (value) => setState(() => config.oneHand = value),
+              onChanged: (value) => setState(() {
+                config.oneHand = value;
+                TextConfigManager.config = config;
+              }),
             ),
           ),
           moonListTile(
@@ -211,7 +223,10 @@ Widget configSettingBuilderMoon(
             subtitle: "Underline text when reading".tr,
             trailing: MoonSwitch(
               value: config.underLine,
-              onChanged: (value) => setState(() => config.underLine = value),
+              onChanged: (value) => setState(() {
+                config.underLine = value;
+                TextConfigManager.config = config;
+              }),
             ),
           ),
           moonListTile(
@@ -219,8 +234,10 @@ Widget configSettingBuilderMoon(
             subtitle: "Animation can across status bar".tr,
             trailing: MoonSwitch(
               value: config.animationStatus,
-              onChanged: (value) =>
-                  setState(() => config.animationStatus = value),
+              onChanged: (value) => setState(() {
+                config.animationStatus = value;
+                TextConfigManager.config = config;
+              }),
             ),
           ),
           moonListTile(
@@ -230,8 +247,10 @@ Widget configSettingBuilderMoon(
                     .tr,
             trailing: MoonSwitch(
               value: config.animationHighImage,
-              onChanged: (value) =>
-                  setState(() => config.animationHighImage = value),
+              onChanged: (value) => setState(() {
+                config.animationHighImage = value;
+                TextConfigManager.config = config;
+              }),
             ),
           ),
           // SwitchListTile(
@@ -265,8 +284,10 @@ Widget configSettingBuilderMoon(
                     width: 80,
                     height: 30,
                     child: InkWell(
-                      onTap: () =>
-                          setState(() => config.animation = pair.value),
+                      onTap: () => setState(() {
+                        config.animation = pair.value;
+                        TextConfigManager.config = config;
+                      }),
                       child: Center(
                         child: Text(pair.key,
                             style:
@@ -286,7 +307,10 @@ Widget configSettingBuilderMoon(
                 context,
                 "Animation duration(ms)".tr,
                 config.animationDuration.toString(),
-                (s) => setState(() => config.animationDuration = int.parse(s)),
+                (s) => setState(() {
+                  config.animationDuration = int.parse(s);
+                  TextConfigManager.config = config;
+                }),
                 true,
               ),
             ),
@@ -327,6 +351,7 @@ Widget configSettingBuilderMoon(
                       config.backgroundColor = c.bg;
                       config.background = c.img;
                       config.fontColor = c.text;
+                      TextConfigManager.config = config;
                     }),
                     child: Container(
                       decoration: getDecoration(c.img, c.bg),
@@ -350,7 +375,10 @@ Widget configSettingBuilderMoon(
                 context,
                 "Columns".tr,
                 config.columns.toString(),
-                (s) => setState(() => config.columns = int.parse(s)),
+                (s) => setState(() {
+                  config.columns = int.parse(s);
+                  TextConfigManager.config = config;
+                }),
                 true,
               ),
             ),
@@ -364,7 +392,10 @@ Widget configSettingBuilderMoon(
                 context,
                 "Paragraph indentation".tr,
                 config.indentation.toString(),
-                (s) => setState(() => config.indentation = int.parse(s)),
+                (s) => setState(() {
+                  config.indentation = int.parse(s);
+                  TextConfigManager.config = config;
+                }),
                 true,
               ),
             ),
@@ -374,7 +405,10 @@ Widget configSettingBuilderMoon(
             subtitle:
                 config.fontColor.toARGB32().toRadixString(16).toUpperCase(),
             onTap: () => onColor(config.fontColor,
-                (color) => setState(() => config.fontColor = color)),
+                (color) => setState(() {
+                      config.fontColor = color;
+                      TextConfigManager.config = config;
+                    })),
           ),
           moonListTile(
             title: "Font size".tr,
@@ -385,7 +419,10 @@ Widget configSettingBuilderMoon(
                 context,
                 "Font size".tr,
                 config.fontSize.toStringAsFixed(1),
-                (s) => setState(() => config.fontSize = double.parse(s)),
+                (s) => setState(() {
+                  config.fontSize = double.parse(s);
+                  TextConfigManager.config = config;
+                }),
               ),
             ),
           ),
@@ -398,7 +435,10 @@ Widget configSettingBuilderMoon(
                 context,
                 "Line height".tr,
                 config.fontHeight.toStringAsFixed(1),
-                (s) => setState(() => config.fontHeight = double.parse(s)),
+                (s) => setState(() {
+                  config.fontHeight = double.parse(s);
+                  TextConfigManager.config = config;
+                }),
               ),
             ),
           ),
@@ -419,6 +459,7 @@ Widget configSettingBuilderMoon(
                 (color) => setState(() {
                       config.backgroundColor = color;
                       config.background = '';
+                      TextConfigManager.config = config;
                     })),
           ),
           // ListTile(
@@ -439,7 +480,10 @@ Widget configSettingBuilderMoon(
                 context,
                 "Upper margin".tr,
                 config.topPadding.toStringAsFixed(1),
-                (s) => setState(() => config.topPadding = double.parse(s)),
+                (s) => setState(() {
+                  config.topPadding = double.parse(s);
+                  TextConfigManager.config = config;
+                }),
               ),
             ),
           ),
@@ -452,7 +496,10 @@ Widget configSettingBuilderMoon(
                 context,
                 "Left margin".tr,
                 config.leftPadding.toStringAsFixed(1),
-                (s) => setState(() => config.leftPadding = double.parse(s)),
+                (s) => setState(() {
+                  config.leftPadding = double.parse(s);
+                  TextConfigManager.config = config;
+                }),
               ),
             ),
           ),
@@ -465,7 +512,10 @@ Widget configSettingBuilderMoon(
                 context,
                 "Lower margin".tr,
                 config.bottomPadding.toStringAsFixed(1),
-                (s) => setState(() => config.bottomPadding = double.parse(s)),
+                (s) => setState(() {
+                  config.bottomPadding = double.parse(s);
+                  TextConfigManager.config = config;
+                }),
               ),
             ),
           ),
@@ -478,7 +528,10 @@ Widget configSettingBuilderMoon(
                 context,
                 "Right margin".tr,
                 config.rightPadding.toStringAsFixed(1),
-                (s) => setState(() => config.rightPadding = double.parse(s)),
+                (s) => setState(() {
+                  config.rightPadding = double.parse(s);
+                  TextConfigManager.config = config;
+                }),
               ),
             ),
           ),
@@ -491,7 +544,10 @@ Widget configSettingBuilderMoon(
                 context,
                 "Spacing between title and text".tr,
                 config.titlePadding.toStringAsFixed(1),
-                (s) => setState(() => config.titlePadding = double.parse(s)),
+                (s) => setState(() {
+                  config.titlePadding = double.parse(s);
+                  TextConfigManager.config = config;
+                }),
               ),
             ),
           ),
@@ -504,8 +560,10 @@ Widget configSettingBuilderMoon(
                 context,
                 "Paragraph spacing".tr,
                 config.paragraphPadding.toStringAsFixed(1),
-                (s) =>
-                    setState(() => config.paragraphPadding = double.parse(s)),
+                (s) => setState(() {
+                  config.paragraphPadding = double.parse(s);
+                  TextConfigManager.config = config;
+                }),
               ),
             ),
           ),
@@ -518,7 +576,10 @@ Widget configSettingBuilderMoon(
                 context,
                 "Column spacing".tr,
                 config.columnPadding.toStringAsFixed(1),
-                (s) => setState(() => config.columnPadding = double.parse(s)),
+                (s) => setState(() {
+                  config.columnPadding = double.parse(s);
+                  TextConfigManager.config = config;
+                }),
               ),
             ),
           ),
@@ -539,6 +600,7 @@ Widget configSettingBuilderMoon(
                       label: "Ok".tr,
                       onPressed: () {
                         config.reset();
+                        TextConfigManager.config = config;
                         Get.back();
                         Get.back();
                         Leader.showToast("Resetted".tr);
@@ -547,7 +609,7 @@ Widget configSettingBuilderMoon(
                   ]);
                 });
               }).toAlign(Alignment.center).paddingAll(8),
-          SizedBox(height: context.height/4),
+          SizedBox(height: context.height / 4),
         ],
       ));
     },

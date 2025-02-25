@@ -52,7 +52,7 @@ class _NovelViewerPageState extends State<NovelViewerPage> {
   void initState() {
     super.initState();
     config = TextConfigManager.config;
-    historyManager.addNovel(widget.novel);
+    M.addNovel(widget.novel);
     _novelStore =
         Get.put(NovelStore(widget.novel), tag: widget.novel.id.toString());
     _novelStore.fetch();

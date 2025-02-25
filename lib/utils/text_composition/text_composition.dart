@@ -165,6 +165,7 @@ class TextComposition extends ChangeNotifier {
   bool _isShowMenu;
   bool get isShowMenu => _isShowMenu;
   Widget? progressIndicator;
+  int historyIndex;
   static const BASE = 8;
   static const QUARTER = BASE * 8;
   static const HALF = QUARTER * 2;
@@ -180,6 +181,7 @@ class TextComposition extends ChangeNotifier {
     this.cutoffPrevious = 8,
     this.cutoffNext = 92,
     this.progressIndicator,
+    this.historyIndex = 0,
   })  : this._initPercent = percent,
         textPages = {},
         pictures = MemoryCache(),
@@ -354,6 +356,7 @@ class TextComposition extends ChangeNotifier {
     Future.delayed(duration).then((value) {
       previousChapter();
       nextChapter();
+      if(historyIndex > 0) goToPage(historyIndex);
     });
   }
 

@@ -5,6 +5,7 @@ import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:skana_pix/controller/account_controller.dart';
 import 'package:skana_pix/controller/connector.dart';
+import 'package:skana_pix/controller/histories.dart';
 import 'package:skana_pix/controller/logging.dart';
 import 'package:skana_pix/controller/mini_controllers.dart';
 import 'package:skana_pix/controller/settings.dart';
@@ -14,7 +15,6 @@ import 'package:skana_pix/controller/update_controller.dart';
 import 'package:skana_pix/controller/page_index_controller.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:skana_pix/utils/widgetplugin.dart';
-import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 import 'package:flutter_displaymode/flutter_displaymode.dart';
 
 import 'package:skana_pix/utils/applinks.dart';
@@ -36,6 +36,7 @@ Future<void> main() async {
     await TextConfigManager.init();
     //setSystemProxy();
     await ConnectManager().init();
+    await M.init();
     handleLinks();
     homeController = Get.put(HomeController(), permanent: true);
     accountController = Get.put(AccountController(), permanent: true);
@@ -49,10 +50,6 @@ Future<void> main() async {
     tc = Get.put(ThemeController(), permanent: true);
     searchPageController = Get.put(SearchPageController(), permanent: true);
     homeController.init();
-    if (Platform.isWindows || Platform.isLinux) {
-      sqfliteFfiInit();
-      databaseFactory = databaseFactoryFfi;
-    }
     runApp(MyApp());
   }, (e, s) {
     log.e("Unhandled Exception: $e\n$s");
