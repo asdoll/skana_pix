@@ -3,9 +3,11 @@ import 'package:flutter/rendering.dart';
 import 'package:get/get.dart';
 import 'package:skana_pix/controller/connector.dart';
 import 'package:skana_pix/controller/exceptions.dart';
+import 'package:skana_pix/controller/histories.dart' show M;
 import 'package:skana_pix/controller/logging.dart';
 import 'package:skana_pix/controller/res.dart';
 import 'package:skana_pix/model/novel.dart';
+import 'package:skana_pix/model/objectbox_models.dart';
 import 'package:skana_pix/utils/leaders.dart';
 
 class NovelSeriesDetailController extends GetxController {
@@ -99,6 +101,15 @@ class NovelStore extends GetxController {
   TextSpan? textSpan;
 
   NovelStore(this.novel);
+
+  Future<double> historyPercent(int id) async {
+    NovelHistory? novelHistory = await M.getNovelHistoryByNovelId(novel.id);
+    return novelHistory?.lastRead ?? 0;
+  }
+
+  Future<void> updateHistory(double percent) async {
+    await M.addNovel(novel, lastRead: percent);
+  }
 
   Future<List<String>> fetch() async {
     errorMessage = null;

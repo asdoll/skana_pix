@@ -1,0 +1,1 @@
+/home/yhlu/Documents/git/skana_pix/build/app/intermediates/cxx/Debug/6x861376/obj/x86_64

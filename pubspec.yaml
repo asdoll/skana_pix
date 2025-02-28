@@ -56,13 +56,11 @@ dependencies:
   share_plus: ^10.1.0
   permission_handler: ^11.3.1
   image_gallery_saver_plus: ^4.0.0-0.alpha
-  flutter_widget_from_html: ^0.15.2
+  flutter_widget_from_html: ^0.16.0
   icon_decoration: ^2.0.2
   html: ^0.15.4
   flutter_launcher_icons: ^0.14.1
   archive: ^4.0.2
-  sqflite: ^2.4.0
-  sqflite_common_ffi: ^2.3.4
   path: ^1.9.0
   searchable_listview: ^2.15.2
   sqlite3_flutter_libs: ^0.5.26
@@ -81,6 +79,8 @@ dependencies:
   like_button: ^2.0.5
   flutter_spinkit: ^5.2.1
   calendar_date_picker2: ^1.1.8
+  objectbox: ^4.1.0
+  objectbox_flutter_libs: any
 
 
 dev_dependencies:
@@ -95,6 +95,8 @@ dev_dependencies:
   # package. See that file for information about deactivating specific lint
   # rules and activating additional ones.
   flutter_lints: ^5.0.0
+  build_runner: ^2.4.15
+  objectbox_generator: any
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec

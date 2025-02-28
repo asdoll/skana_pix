@@ -83,7 +83,7 @@ class _ImageListViewPageState extends State<ImageListViewPage> {
   Widget build(BuildContext context) {
     if (listController.illusts.isNotEmpty &&
         widget.index <= listController.illusts.length) {
-      historyManager.addIllust(listController.illusts[widget.index]);
+      M.addIllust(listController.illusts[widget.index]);
     }
 
     var length = listController.illusts.length;
@@ -110,7 +110,7 @@ class _ImageListViewPageState extends State<ImageListViewPage> {
                 onPageChanged: (value) => setState(() {
                   listController.index.value = value;
 
-                  historyManager.addIllust(listController.illusts[value]);
+                  M.addIllust(listController.illusts[value]);
                 }),
               ),
             ),

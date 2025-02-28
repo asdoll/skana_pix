@@ -2,7 +2,6 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 import 'package:moon_design/moon_design.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_xlider/flutter_xlider.dart';
 import 'package:get/get.dart';
 import 'package:path/path.dart' as path;
@@ -13,7 +12,6 @@ import 'package:skana_pix/componentwidgets/staricon.dart';
 import 'package:skana_pix/componentwidgets/tag.dart';
 import 'package:skana_pix/view/userview/userpage.dart';
 import 'package:skana_pix/controller/bases.dart';
-import 'package:skana_pix/controller/histories.dart';
 import 'package:skana_pix/controller/like_controller.dart';
 import 'package:skana_pix/controller/list_controller.dart';
 import 'package:skana_pix/controller/logging.dart';
@@ -45,17 +43,15 @@ class NovelViewerPage extends StatefulWidget {
 class _NovelViewerPageState extends State<NovelViewerPage> {
   late NovelStore _novelStore;
   // ignore: unused_field
-  String _selectedText = "";
+  final String _selectedText = "";
   late TextCompositionConfig config;
 
   @override
   void initState() {
     super.initState();
     config = TextConfigManager.config;
-    historyManager.addNovel(widget.novel);
     _novelStore =
         Get.put(NovelStore(widget.novel), tag: widget.novel.id.toString());
-    _novelStore.fetch();
   }
 
   @override
@@ -74,8 +70,10 @@ class _NovelViewerPageState extends State<NovelViewerPage> {
             loadChapter: (e) => _novelStore.fetch(),
             chapters: [widget.novel.title],
             percent: 0.0,
+            getPercent: () => _novelStore.historyPercent(widget.novel.id),
             progressIndicator: DefaultHeaderFooter.progressIndicator(context, color: config.fontColor),
             onSave: (TextCompositionConfig config, double percent) {
+              _novelStore.updateHistory(percent);
               // Global.prefs.setString(TextConfigKey, config);
               // searchItem.durContentIndex = (percent * NovelContentTotal).floor();
               //print("save config: $config");

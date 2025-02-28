@@ -85,6 +85,7 @@ class TextComposition extends ChangeNotifier {
   final String? name;
   final List<String> chapters;
   final List<AnimationController> _controllers;
+  final Future<double> Function() getPercent;
 
   double _initPercent;
   int _firstChapterIndex;
@@ -165,6 +166,7 @@ class TextComposition extends ChangeNotifier {
   bool _isShowMenu;
   bool get isShowMenu => _isShowMenu;
   Widget? progressIndicator;
+  int historyIndex;
   static const BASE = 8;
   static const QUARTER = BASE * 8;
   static const HALF = QUARTER * 2;
@@ -173,6 +175,7 @@ class TextComposition extends ChangeNotifier {
     required this.config,
     required this.loadChapter,
     required this.chapters,
+    required this.getPercent,
     this.name,
     this.onSave,
     this.menuBuilder,
@@ -180,7 +183,8 @@ class TextComposition extends ChangeNotifier {
     this.cutoffPrevious = 8,
     this.cutoffNext = 92,
     this.progressIndicator,
-  })  : this._initPercent = percent,
+    this.historyIndex = 0,
+  })  : _initPercent = percent,
         textPages = {},
         pictures = MemoryCache(),
         _lastSaveTime = DateTime.now().add(saveDelay).millisecondsSinceEpoch,
@@ -325,6 +329,7 @@ class TextComposition extends ChangeNotifier {
       void Function(List<AnimationController> _controller) initControllers) async {
     initControllers(_controllers);
     await _getBackImage();
+    _initPercent = await getPercent();
     if (_disposed) return;
     final pages = await startX(_firstChapterIndex);
     if (_disposed) return;
@@ -354,6 +359,7 @@ class TextComposition extends ChangeNotifier {
     Future.delayed(duration).then((value) {
       previousChapter();
       nextChapter();
+      if(historyIndex > 0) goToPage(historyIndex);
     });
   }
 
