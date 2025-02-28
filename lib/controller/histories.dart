@@ -29,7 +29,7 @@ class M {
     await o.addIllust(illustHis);
   }
 
-  static Future<void> addNovel(Novel novel,{int lastRead = 0}) async {
+  static Future<NovelHistory> addNovel(Novel novel,{double lastRead = 0}) async {
     var novelHis = NovelHistory(
         novelId: novel.id,
         userId: novel.author.id,
@@ -38,7 +38,11 @@ class M {
         time: DateTime.now().millisecondsSinceEpoch,
         pictureUrl: novel.image.squareMedium,
         lastRead: lastRead);
-    await o.addNovel(novelHis);
+    return await o.addNovel(novelHis);
+  }
+
+  static Future<NovelHistory?> getNovelHistoryByNovelId(int novelId) async {
+    return await o.getNovelHistoryByNovelId(novelId);
   }
 
   static Future<List<IllustHistory>> getAllIllusts() async {

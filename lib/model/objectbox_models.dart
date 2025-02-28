@@ -1,5 +1,6 @@
 
 import 'package:objectbox/objectbox.dart';
+import 'package:skana_pix/model/novel.dart' show Novel;
 
 @Entity()
 class IllustHistory {
@@ -35,7 +36,7 @@ class NovelHistory {
   int time;
   String title;
   String userName;
-  int lastRead;
+  double lastRead;
 
   NovelHistory(
       {
@@ -47,5 +48,16 @@ class NovelHistory {
       required this.userName,
       this.lastRead = 0
       });
+  
+  factory NovelHistory.convert(Novel novel) {
+    return NovelHistory(
+        novelId: novel.id,
+        userId: novel.author.id,
+        pictureUrl: novel.image.squareMedium,
+        time: DateTime.now().millisecondsSinceEpoch,
+        title: novel.title,
+        userName: novel.author.name,
+        lastRead: 0);
+  }
 
 }

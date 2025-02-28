@@ -20,44 +20,44 @@ export 'package:objectbox/objectbox.dart'; // so that callers only have to impor
 
 final _entities = <obx_int.ModelEntity>[
   obx_int.ModelEntity(
-      id: const obx_int.IdUid(1, 3463704868698883050),
+      id: const obx_int.IdUid(1, 439630849446455733),
       name: 'IllustHistory',
-      lastPropertyId: const obx_int.IdUid(7, 2483472823840920638),
+      lastPropertyId: const obx_int.IdUid(7, 6176502742665378360),
       flags: 0,
       properties: <obx_int.ModelProperty>[
         obx_int.ModelProperty(
-            id: const obx_int.IdUid(1, 1984458245741936302),
+            id: const obx_int.IdUid(1, 7532189566074609255),
             name: 'id',
             type: 6,
             flags: 1),
         obx_int.ModelProperty(
-            id: const obx_int.IdUid(2, 4607933760072196358),
+            id: const obx_int.IdUid(2, 4893332967506935707),
             name: 'illustId',
             type: 6,
             flags: 8,
-            indexId: const obx_int.IdUid(1, 3052419864629376286)),
+            indexId: const obx_int.IdUid(1, 1674029535270841300)),
         obx_int.ModelProperty(
-            id: const obx_int.IdUid(3, 6521937257502322384),
+            id: const obx_int.IdUid(3, 5876984942748223084),
             name: 'userId',
             type: 6,
             flags: 0),
         obx_int.ModelProperty(
-            id: const obx_int.IdUid(4, 2358193164025649266),
+            id: const obx_int.IdUid(4, 8532912241528891943),
             name: 'pictureUrl',
             type: 9,
             flags: 0),
         obx_int.ModelProperty(
-            id: const obx_int.IdUid(5, 5507504946141746117),
+            id: const obx_int.IdUid(5, 5070251443740193081),
             name: 'userName',
             type: 9,
             flags: 0),
         obx_int.ModelProperty(
-            id: const obx_int.IdUid(6, 368270718968756168),
+            id: const obx_int.IdUid(6, 5039275599732042778),
             name: 'title',
             type: 9,
             flags: 0),
         obx_int.ModelProperty(
-            id: const obx_int.IdUid(7, 2483472823840920638),
+            id: const obx_int.IdUid(7, 6176502742665378360),
             name: 'time',
             type: 6,
             flags: 0)
@@ -65,51 +65,51 @@ final _entities = <obx_int.ModelEntity>[
       relations: <obx_int.ModelRelation>[],
       backlinks: <obx_int.ModelBacklink>[]),
   obx_int.ModelEntity(
-      id: const obx_int.IdUid(2, 6326380835377129274),
+      id: const obx_int.IdUid(2, 6574117776874131921),
       name: 'NovelHistory',
-      lastPropertyId: const obx_int.IdUid(8, 4832103396694345464),
+      lastPropertyId: const obx_int.IdUid(8, 205924668859597245),
       flags: 0,
       properties: <obx_int.ModelProperty>[
         obx_int.ModelProperty(
-            id: const obx_int.IdUid(1, 5710648733776369325),
+            id: const obx_int.IdUid(1, 906461169703668980),
             name: 'id',
             type: 6,
             flags: 1),
         obx_int.ModelProperty(
-            id: const obx_int.IdUid(2, 6061000690631970721),
+            id: const obx_int.IdUid(2, 8627401262105843936),
             name: 'novelId',
             type: 6,
             flags: 8,
-            indexId: const obx_int.IdUid(2, 6370072575861674133)),
+            indexId: const obx_int.IdUid(2, 2278350802851675677)),
         obx_int.ModelProperty(
-            id: const obx_int.IdUid(3, 3098610265294301318),
+            id: const obx_int.IdUid(3, 7326658429087842678),
             name: 'userId',
             type: 6,
             flags: 0),
         obx_int.ModelProperty(
-            id: const obx_int.IdUid(4, 1024277531089122418),
+            id: const obx_int.IdUid(4, 4712853744001391760),
             name: 'pictureUrl',
             type: 9,
             flags: 0),
         obx_int.ModelProperty(
-            id: const obx_int.IdUid(5, 2023810762011068932),
+            id: const obx_int.IdUid(5, 548954247093261047),
             name: 'time',
             type: 6,
             flags: 0),
         obx_int.ModelProperty(
-            id: const obx_int.IdUid(6, 7486995261077555762),
+            id: const obx_int.IdUid(6, 8913700062829012401),
             name: 'title',
             type: 9,
             flags: 0),
         obx_int.ModelProperty(
-            id: const obx_int.IdUid(7, 5885969338935604994),
+            id: const obx_int.IdUid(7, 9188782442598821838),
             name: 'userName',
             type: 9,
             flags: 0),
         obx_int.ModelProperty(
-            id: const obx_int.IdUid(8, 4832103396694345464),
+            id: const obx_int.IdUid(8, 205924668859597245),
             name: 'lastRead',
-            type: 6,
+            type: 8,
             flags: 0)
       ],
       relations: <obx_int.ModelRelation>[],
@@ -151,8 +151,8 @@ Future<obx.Store> openStore(
 obx_int.ModelDefinition getObjectBoxModel() {
   final model = obx_int.ModelInfo(
       entities: _entities,
-      lastEntityId: const obx_int.IdUid(2, 6326380835377129274),
-      lastIndexId: const obx_int.IdUid(2, 6370072575861674133),
+      lastEntityId: const obx_int.IdUid(2, 6574117776874131921),
+      lastIndexId: const obx_int.IdUid(2, 2278350802851675677),
       lastRelationId: const obx_int.IdUid(0, 0),
       lastSequenceId: const obx_int.IdUid(0, 0),
       retiredEntityUids: const [],
@@ -236,7 +236,7 @@ obx_int.ModelDefinition getObjectBoxModel() {
           fbb.addInt64(4, object.time);
           fbb.addOffset(5, titleOffset);
           fbb.addOffset(6, userNameOffset);
-          fbb.addInt64(7, object.lastRead);
+          fbb.addFloat64(7, object.lastRead);
           fbb.finish(fbb.endTable());
           return object.id;
         },
@@ -256,7 +256,7 @@ obx_int.ModelDefinition getObjectBoxModel() {
           final userNameParam = const fb.StringReader(asciiOptimization: true)
               .vTableGet(buffer, rootOffset, 16, '');
           final lastReadParam =
-              const fb.Int64Reader().vTableGet(buffer, rootOffset, 18, 0);
+              const fb.Float64Reader().vTableGet(buffer, rootOffset, 18, 0);
           final object = NovelHistory(
               novelId: novelIdParam,
               userId: userIdParam,
@@ -337,5 +337,5 @@ class NovelHistory_ {
 
   /// See [NovelHistory.lastRead].
   static final lastRead =
-      obx.QueryIntegerProperty<NovelHistory>(_entities[1].properties[7]);
+      obx.QueryDoubleProperty<NovelHistory>(_entities[1].properties[7]);
 }

@@ -54,6 +54,13 @@ class ObjectBox {
     }
   }
 
+  Future<NovelHistory?> getNovelHistoryByNovelId(int novelId) async {
+    return novelBox
+        .query(NovelHistory_.novelId.equals(novelId))
+        .build()
+        .findFirst();
+  }
+
   Future<List<IllustHistory>> getAllIllust() async {
     return illustBox
             .query()

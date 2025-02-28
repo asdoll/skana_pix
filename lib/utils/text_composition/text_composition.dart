@@ -85,6 +85,7 @@ class TextComposition extends ChangeNotifier {
   final String? name;
   final List<String> chapters;
   final List<AnimationController> _controllers;
+  final Future<double> Function() getPercent;
 
   double _initPercent;
   int _firstChapterIndex;
@@ -174,6 +175,7 @@ class TextComposition extends ChangeNotifier {
     required this.config,
     required this.loadChapter,
     required this.chapters,
+    required this.getPercent,
     this.name,
     this.onSave,
     this.menuBuilder,
@@ -182,7 +184,7 @@ class TextComposition extends ChangeNotifier {
     this.cutoffNext = 92,
     this.progressIndicator,
     this.historyIndex = 0,
-  })  : this._initPercent = percent,
+  })  : _initPercent = percent,
         textPages = {},
         pictures = MemoryCache(),
         _lastSaveTime = DateTime.now().add(saveDelay).millisecondsSinceEpoch,
@@ -327,6 +329,7 @@ class TextComposition extends ChangeNotifier {
       void Function(List<AnimationController> _controller) initControllers) async {
     initControllers(_controllers);
     await _getBackImage();
+    _initPercent = await getPercent();
     if (_disposed) return;
     final pages = await startX(_firstChapterIndex);
     if (_disposed) return;
