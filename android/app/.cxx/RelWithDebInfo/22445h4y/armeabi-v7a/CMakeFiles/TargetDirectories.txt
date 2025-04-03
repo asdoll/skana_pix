@@ -1,0 +1,2 @@
+/home/yhlu/Documents/git/skana_pix/android/app/.cxx/RelWithDebInfo/22445h4y/armeabi-v7a/CMakeFiles/edit_cache.dir
+/home/yhlu/Documents/git/skana_pix/android/app/.cxx/RelWithDebInfo/22445h4y/armeabi-v7a/CMakeFiles/rebuild_cache.dir

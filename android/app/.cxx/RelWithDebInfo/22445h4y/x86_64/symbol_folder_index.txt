@@ -1,0 +1,1 @@
+/home/yhlu/Documents/git/skana_pix/build/app/intermediates/cxx/RelWithDebInfo/22445h4y/obj/x86_64
