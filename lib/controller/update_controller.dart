@@ -9,7 +9,7 @@ import 'package:skana_pix/model/boardinfo.dart';
 
 class Constants {
   static const String appName = 'SkanaPix';
-  static const String appVersion = '1.0.5';
+  static const String appVersion = '1.0.6';
   static const isGooglePlay =
       bool.fromEnvironment("IS_GOOGLEPLAY", defaultValue: false);
 }

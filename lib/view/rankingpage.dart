@@ -77,11 +77,7 @@ class _OneRankingIllustPage extends StatefulWidget {
 }
 
 class _OneRankingIllustPageState extends State<_OneRankingIllustPage> {
-  @override
-  void dispose() {
-    super.dispose();
-    Get.delete<ListIllustController>(tag: "rankingIllust");
-  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -102,11 +98,6 @@ class _OneRankingMangaPage extends StatefulWidget {
 }
 
 class _OneRankingMangaPageState extends State<_OneRankingMangaPage> {
-  @override
-  void dispose() {
-    super.dispose();
-    Get.delete<ListIllustController>(tag: "rankingManga");
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -127,11 +118,6 @@ class _OneRankingNovelPage extends StatefulWidget {
 }
 
 class _OneRankingNovelPageState extends State<_OneRankingNovelPage> {
-  @override
-  void dispose() {
-    super.dispose();
-    Get.delete<ListNovelController>(tag: "rankingNovel");
-  }
 
   @override
   Widget build(BuildContext context) {

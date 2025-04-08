@@ -19,12 +19,7 @@ class SpotlightPage extends StatefulWidget {
 }
 
 class _SpotlightPageState extends State<SpotlightPage> {
-  @override
-  void dispose() {
-    super.dispose();
-    Get.delete<SpotlightStoreBase>();
-  }
-
+  
   @override
   Widget build(BuildContext context) {
     final EasyRefreshController refreshController = EasyRefreshController(

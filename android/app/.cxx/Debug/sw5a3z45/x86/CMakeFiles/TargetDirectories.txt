@@ -1,0 +1,2 @@
+/home/yhlu/Documents/git/skana_pix/android/app/.cxx/Debug/sw5a3z45/x86/CMakeFiles/edit_cache.dir
+/home/yhlu/Documents/git/skana_pix/android/app/.cxx/Debug/sw5a3z45/x86/CMakeFiles/rebuild_cache.dir

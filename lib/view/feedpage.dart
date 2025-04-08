@@ -25,12 +25,6 @@ class _FeedIllustState extends State<FeedIllust>
   }
 
   @override
-  void dispose() {
-    super.dispose();
-    tabController.dispose();
-  }
-
-  @override
   Widget build(BuildContext context) {
     return Column(
       children: [
@@ -75,12 +69,6 @@ class _FeedIllustTabState extends State<FeedIllustTab> {
   String get type => widget.type;
 
   @override
-  void dispose() {
-    super.dispose();
-    Get.delete<ListIllustController>(tag: "feedillust_$type");
-  }
-
-  @override
   Widget build(BuildContext context) {
     // ignore: unused_local_variable
     ListIllustController feedIllustController = Get.put(
@@ -103,13 +91,6 @@ class _FeedNovelState extends State<FeedNovel> with SingleTickerProviderStateMix
   void initState() {
     super.initState();
     tabController = TabController(length: 3, vsync: this);
-  }
-
-  @override
-  void dispose() {
-    super.dispose();
-    tabController.dispose();
-    Get.delete<ListNovelController>(tag: "feednovel");
   }
 
   @override
@@ -157,12 +138,6 @@ class FeedNovelTab extends StatefulWidget {
 
 class _FeedNovelTabState extends State<FeedNovelTab> {
   String get type => widget.type;
-
-  @override
-  void dispose() {
-    super.dispose();
-    Get.delete<ListNovelController>(tag: "feednovel_$type");
-  }
 
   @override
   Widget build(BuildContext context) {

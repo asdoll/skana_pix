@@ -30,12 +30,6 @@ class _HistoryPageState extends State<HistoryPage>
   }
 
   @override
-  void dispose() {
-    tabController.dispose();
-    super.dispose();
-  }
-
-  @override
   Widget build(BuildContext context) {
     return Column(children: [
       MoonTabBar(
@@ -62,11 +56,6 @@ class IllustsHistory extends StatefulWidget {
 }
 
 class _IllustsHistoryState extends State<IllustsHistory> {
-  @override
-  void dispose() {
-    super.dispose();
-    Get.delete<HistoryIllust>(tag: "history_illust");
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -102,7 +91,7 @@ class _IllustsHistoryState extends State<IllustsHistory> {
                   controller: refreshController,
                   scrollController: globalScrollController,
                   onRefresh: controller.load,
-                  refreshOnStart: true,
+                  refreshOnStart: controller.illusts.isEmpty,
                   header: DefaultHeaderFooter.header(context),
                   refreshOnStartHeader:
                       DefaultHeaderFooter.refreshHeader(context),
@@ -169,12 +158,6 @@ class NovelsHistory extends StatefulWidget {
 
 class _NovelsHistoryState extends State<NovelsHistory> {
   @override
-  void dispose() {
-    super.dispose();
-    Get.delete<HistoryNovel>(tag: "history_novel");
-  }
-
-  @override
   Widget build(BuildContext context) {
     HistoryNovel controller = Get.put(HistoryNovel(), tag: "history_novel");
     EasyRefreshController refreshController = EasyRefreshController(
@@ -208,7 +191,7 @@ class _NovelsHistoryState extends State<NovelsHistory> {
                   controller: refreshController,
                   scrollController: globalScrollController,
                   onRefresh: controller.load,
-                  refreshOnStart: true,
+                  refreshOnStart: controller.novels.isEmpty,
                   header: DefaultHeaderFooter.header(context),
                   refreshOnStartHeader:
                       DefaultHeaderFooter.refreshHeader(context),

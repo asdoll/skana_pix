@@ -30,13 +30,7 @@ class _BookmarksPageState extends State<BookmarksPage>
     super.initState();
     controller = TabController(length: 2, vsync: this);
   }
-
-  @override
-  void dispose() {
-    super.dispose();
-    controller.dispose();
-  }
-
+  
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -260,16 +254,6 @@ class MyBookmarkContent extends StatefulWidget {
 }
 
 class _MyBookmarkContentState extends State<MyBookmarkContent> {
-  @override
-  void dispose() {
-    super.dispose();
-    if (widget.type == ArtworkType.ILLUST) {
-      Get.delete<ListIllustController>(
-          tag: "mybookmarks_illust_${widget.label}");
-    } else {
-      Get.delete<ListNovelController>(tag: "mybookmarks_novel_${widget.label}");
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
