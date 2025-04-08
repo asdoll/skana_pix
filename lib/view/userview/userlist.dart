@@ -22,12 +22,6 @@ class UserList extends StatefulWidget {
 
 class _UserListState extends State<UserList> {
   @override
-  void dispose() {
-    super.dispose();
-    Get.delete<ListUserController>(tag: widget.controllerTag);
-  }
-
-  @override
   Widget build(BuildContext context) {
     ListUserController controller =
         Get.find<ListUserController>(tag: widget.controllerTag);
@@ -44,7 +38,7 @@ class _UserListState extends State<UserList> {
           refreshOnStartHeader: DefaultHeaderFooter.refreshHeader(context),
           onLoad: () => controller.nextPage(),
           onRefresh: () => controller.reset(),
-          refreshOnStart: true,
+          refreshOnStart: controller.users.isEmpty,
           child: CustomScrollView(
             controller: widget.noScroll
                 ? localScrollController

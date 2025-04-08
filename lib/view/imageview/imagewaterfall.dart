@@ -34,7 +34,7 @@ class _ImageWaterfallState extends State<ImageWaterfall> {
       controller: refreshController,
       scrollController:
           widget.noScroll ? localScrollController : globalScrollController,
-      refreshOnStart: true,
+      refreshOnStart: controller.illusts.isEmpty,
       onRefresh: controller.reset,
       onLoad: controller.noNextPage ? null : controller.nextPage,
       header: DefaultHeaderFooter.header(context),

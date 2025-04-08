@@ -31,7 +31,7 @@ class _NovelListState extends State<NovelList> {
     ScrollController localScrollController = ScrollController();
     return EasyRefresh(
       controller: refreshController,
-      refreshOnStart: true,
+      refreshOnStart: controller.novels.isEmpty,
       scrollController:
           widget.noScroll ? localScrollController : globalScrollController,
       onRefresh: controller.reset,

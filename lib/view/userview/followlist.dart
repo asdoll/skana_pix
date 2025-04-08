@@ -140,9 +140,10 @@ class _FollowTabsState extends State<FollowTabs> {
   @override
   void dispose() {
     super.dispose();
-    Get.delete<ListUserController>(
-        tag:
-            "${widget.isMe ? "myfollowing" : widget.id}userlist_${widget.type}");
+    if (!widget.isMe) {
+      Get.delete<ListUserController>(
+          tag: "${widget.id}userlist_${widget.type}");
+    }
   }
 
   @override
