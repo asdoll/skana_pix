@@ -162,7 +162,7 @@ Widget moonListTile(
   return InkWell(
       onTap: onTap ?? () {},
       child: MoonMenuItem(
-        backgroundColor: Get.context?.moonTheme?.tokens.colors.gohan,
+        backgroundColor: settings.isDarkMode ? MoonColors.dark.gohan : MoonColors.light.gohan,
         onTap: onTap ?? () {},
         label: Text(title).header(),
         content: subtitle == null ? null : Text(subtitle).subHeader(),
@@ -183,7 +183,7 @@ Widget moonListTileWidgets(
   return InkWell(
       onTap: onTap ?? () {},
       child: MoonMenuItem(
-        backgroundColor: Get.context?.moonTheme?.tokens.colors.gohan,
+        backgroundColor: settings.isDarkMode ? MoonColors.dark.gohan : MoonColors.light.gohan,
         menuItemPadding: menuItemPadding,
         menuItemCrossAxisAlignment: menuItemCrossAxisAlignment,
         onTap: onTap ?? () {},
@@ -235,6 +235,7 @@ AppBar appBar(
     );
 
 extension TextExtension on Text {
+  Color get _textColor => style?.color ?? (settings.isDarkMode ? Colors.white : Colors.black);
   Text appHeader() => Text(
         data ?? '',
         maxLines: maxLines,
@@ -242,8 +243,7 @@ extension TextExtension on Text {
         strutStyle: strutStyle,
         style: Get.context?.moonTheme?.tokens.typography.heading.text18
             .copyWith(
-                color: style?.color ??
-                    Get.context?.moonTheme?.textAreaTheme.colors.textColor),
+                color: _textColor),
       );
 
   Text appSubHeader() => Text(
@@ -253,8 +253,7 @@ extension TextExtension on Text {
         strutStyle: strutStyle,
         style: Get.context?.moonTheme?.tokens.typography.heading.text16
             .copyWith(
-                color: style?.color ??
-                    Get.context?.moonTheme?.textAreaTheme.colors.textColor),
+                color: _textColor),
       );
 
   Text header() => Text(
@@ -264,8 +263,7 @@ extension TextExtension on Text {
         strutStyle: strutStyle,
         style: Get.context?.moonTheme?.tokens.typography.heading.text16
             .copyWith(
-                color: style?.color ??
-                    Get.context?.moonTheme?.textAreaTheme.colors.textColor),
+                color: _textColor),
       );
 
   Text subHeader() => Text(
@@ -275,8 +273,7 @@ extension TextExtension on Text {
         strutStyle: strutStyle,
         style: Get.context?.moonTheme?.tokens.typography.heading.text14
             .copyWith(
-                color: style?.color ??
-                    Get.context?.moonTheme?.textAreaTheme.colors.textColor),
+                color: _textColor),
       );
 
   Text small() => Text(
@@ -286,8 +283,7 @@ extension TextExtension on Text {
         strutStyle: strutStyle,
         style: Get.context?.moonTheme?.tokens.typography.heading.text12
             .copyWith(
-                color: style?.color ??
-                    Get.context?.moonTheme?.textAreaTheme.colors.textColor),
+                color: _textColor),
       );
 
   Text subHeaderForgound() => Text(
@@ -310,8 +306,7 @@ extension TextExtension on Text {
         strutStyle: strutStyle,
         style: Get.context?.moonTheme?.tokens.typography.heading.text10
             .copyWith(
-                color: style?.color ??
-                    Get.context?.moonTheme?.textAreaTheme.colors.textColor),
+                color: _textColor),
       );
 
   Text h1() => Text(
@@ -321,8 +316,7 @@ extension TextExtension on Text {
         strutStyle: strutStyle,
         style: Get.context?.moonTheme?.tokens.typography.heading.text40
             .copyWith(
-                color: style?.color ??
-                    Get.context?.moonTheme?.textAreaTheme.colors.textColor),
+                color: _textColor),
       );
 
   Text h2() => Text(
@@ -332,17 +326,17 @@ extension TextExtension on Text {
         strutStyle: strutStyle,
         style: Get.context?.moonTheme?.tokens.typography.heading.text32
             .copyWith(
-                color: style?.color ??
-                    Get.context?.moonTheme?.textAreaTheme.colors.textColor),
+                color: _textColor),
       );
 }
 
 extension TextSpanExtension on TextSpan {
+  Color get _textColor => style?.color ?? (settings.isDarkMode ? Colors.white : Colors.black);
+
   TextSpan small() => TextSpan(
         style: Get.context?.moonTheme?.tokens.typography.heading.text12
             .copyWith(
-                color: style?.color ??
-                    Get.context?.moonTheme?.textAreaTheme.colors.textColor,
+                color: _textColor,
                 fontStyle: style?.fontStyle),
         text: text,
         children: children,

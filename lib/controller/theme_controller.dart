@@ -70,6 +70,7 @@ ThemeData getTheme(bool isDark) {
                 titleSpacing: 0,
                 backgroundColor:
                     MoonTheme(tokens: MoonTokens.dark).tokens.colors.popo,
+                surfaceTintColor: Colors.transparent,
               ),
               scaffoldBackgroundColor:
                   MoonTheme(tokens: MoonTokens.light).tokens.colors.bulma)
@@ -81,6 +82,7 @@ ThemeData getTheme(bool isDark) {
                 titleSpacing: 0,
                 backgroundColor:
                     MoonTheme(tokens: MoonTokens.dark).tokens.colors.goten,
+                surfaceTintColor: Colors.transparent,
               ),
               scaffoldBackgroundColor:
                   MoonTheme(tokens: MoonTokens.light).tokens.colors.goten))
