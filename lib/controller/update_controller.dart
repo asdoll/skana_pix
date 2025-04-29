@@ -5,11 +5,15 @@ import 'package:easy_refresh/easy_refresh.dart';
 import 'package:flutter/foundation.dart';
 import 'package:get/get.dart';
 import 'package:skana_pix/controller/logging.dart';
+import 'package:skana_pix/controller/settings.dart' show settings;
 import 'package:skana_pix/model/boardinfo.dart';
+import 'package:skana_pix/utils/leaders.dart' show Leader;
+import 'package:skana_pix/utils/widgetplugin.dart';
+import 'package:url_launcher/url_launcher_string.dart';
 
 class Constants {
   static const String appName = 'SkanaPix';
-  static const String appVersion = '1.0.7';
+  static const String appVersion = '1.0.8';
   static const isGooglePlay =
       bool.fromEnvironment("IS_GOOGLEPLAY", defaultValue: false);
 }
@@ -63,14 +67,45 @@ class UpdateController extends GetxController {
   RxBool hasNewVersion = false.obs;
 
   Result result = Result.timeout;
-  String updateUrl = "https://github.com/asdoll/skana_pix/releases";
+  String updateUrl = "https://github.com/asdoll/skana_pix/releases/latest";
   String updateDescription = "";
   String updateVersion = "";
   String updateDate = "";
 
-  Future<void> check() async {
+  void init() {
+    if (settings.settings[9]=="1") {
+      check().then((value) {
+        if (result == Result.yes) {
+          alertDialog(
+              Get.context!,
+              "New version available".tr,
+              "${"Description: ".tr} $updateDescription\n${"Version: ".tr} $updateVersion\n${"Date: ".tr} $updateDate",
+              [
+                outlinedButton(onPressed: () => Get.back(), label: "Cancel".tr),
+                filledButton(
+                    onPressed: () {
+                      launchUrlString(updateUrl);
+                      Get.back();
+                    },
+                    label: "Update".tr)
+              ]);
+        }
+      });
+    }
+  }
+
+  Future<void> check({bool showResult = false}) async {
     //if (Constants.isGooglePlay) return Result.no;
-    final result = await checkUpdate("");
+    result = await checkUpdate("");
+    if (showResult) {
+      if (result == Result.yes) {
+        Leader.showToast('Update available'.tr);
+      } else if (result == Result.no) {
+        Leader.showToast('No update available'.tr);
+      } else {
+        Leader.showToast('Update check failed'.tr);
+      }
+    }
     switch (result) {
       case Result.yes:
         hasNewVersion.value = true;
@@ -105,7 +140,6 @@ class UpdateController extends GetxController {
           log.d("r:$r l$l");
           if (r > l) {
             updateDate = response.data['published_at'];
-            updateUrl = response.data['assets'][0]['browser_download_url'];
             updateDescription = response.data['body'];
             return Result.yes;
           }

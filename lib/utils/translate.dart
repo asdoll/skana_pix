@@ -448,7 +448,10 @@ class TranslateMap extends Translations {
           "all": "全部",
           "illust": "插画",
           "manga": "漫画",
-          "novel": "小说"
+          "novel": "小说",
+          "Update available": "有新版本可用",
+          "No update available": "没有新版本可用",
+          "Update check failed": "更新检查失败",
         },
         "zh_TW": {
           "Search": "搜索",
@@ -879,6 +882,9 @@ class TranslateMap extends Translations {
           "illust": "插畫",
           "manga": "漫畫",
           "novel": "小說",
+          "Update available": "有新版本可用",
+          "No update available": "沒有新版本可用",
+          "Update check failed": "更新檢查失敗",
         },
       };
 }
