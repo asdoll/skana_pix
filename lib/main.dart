@@ -46,7 +46,7 @@ Future<void> main() async {
     boardController = Get.put(BoardController(), permanent: true);
     boardController.fetchBoard();
     updateController = Get.put(UpdateController(), permanent: true);
-    updateController.check();
+    updateController.init();
     tc = Get.put(ThemeController(), permanent: true);
     searchPageController = Get.put(SearchPageController(), permanent: true);
     homeController.init();
