@@ -1,10 +1,16 @@
+import 'dart:ui' show clampDouble;
+
+import 'package:flutter/cupertino.dart' show RefreshIndicatorMode;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart' show SpinKitPulse;
 import 'package:get/get.dart';
 import 'package:moon_design/moon_design.dart';
 import 'package:skana_pix/componentwidgets/backarea.dart';
+import 'package:skana_pix/controller/logging.dart';
 import 'package:skana_pix/controller/settings.dart';
 import 'package:skana_pix/model/illust.dart';
+import 'package:skana_pix/utils/loading_indicator.dart';
 
 extension WidgetExtension on Widget {
   Widget padding(EdgeInsetsGeometry padding) {
@@ -162,7 +168,9 @@ Widget moonListTile(
   return InkWell(
       onTap: onTap ?? () {},
       child: MoonMenuItem(
-        backgroundColor: settings.isDarkMode ? MoonColors.dark.gohan : MoonColors.light.gohan,
+        backgroundColor: settings.isDarkMode
+            ? MoonColors.dark.gohan
+            : MoonColors.light.gohan,
         onTap: onTap ?? () {},
         label: Text(title).header(),
         content: subtitle == null ? null : Text(subtitle).subHeader(),
@@ -183,7 +191,9 @@ Widget moonListTileWidgets(
   return InkWell(
       onTap: onTap ?? () {},
       child: MoonMenuItem(
-        backgroundColor: settings.isDarkMode ? MoonColors.dark.gohan : MoonColors.light.gohan,
+        backgroundColor: settings.isDarkMode
+            ? MoonColors.dark.gohan
+            : MoonColors.light.gohan,
         menuItemPadding: menuItemPadding,
         menuItemCrossAxisAlignment: menuItemCrossAxisAlignment,
         onTap: onTap ?? () {},
@@ -199,7 +209,7 @@ Widget emptyPlaceholder(BuildContext context) {
   return Container(
     padding: const EdgeInsets.only(bottom: 100),
     width: double.infinity,
-    height: context.height/1.5,
+    height: context.height / 1.5,
     alignment: Alignment.center,
     child: Center(
       child: Text('[ ]').h1(),
@@ -235,62 +245,60 @@ AppBar appBar(
     );
 
 extension TextExtension on Text {
-  Color get _textColor => style?.color ?? (settings.isDarkMode ? Colors.white : Colors.black);
+  StrutStyle get _strutStyle =>
+      strutStyle ?? StrutStyle(forceStrutHeight: true, leading: 0);
+  Color get _textColor =>
+      style?.color ?? (settings.isDarkMode ? Colors.white : Colors.black);
   Text appHeader() => Text(
         data ?? '',
         maxLines: maxLines,
         overflow: overflow,
-        strutStyle: strutStyle,
+        strutStyle: _strutStyle,
         style: Get.context?.moonTheme?.tokens.typography.heading.text18
-            .copyWith(
-                color: _textColor),
+            .copyWith(color: _textColor),
       );
 
   Text appSubHeader() => Text(
         data ?? '',
         maxLines: maxLines,
         overflow: overflow,
-        strutStyle: strutStyle,
+        strutStyle: _strutStyle,
         style: Get.context?.moonTheme?.tokens.typography.heading.text16
-            .copyWith(
-                color: _textColor),
+            .copyWith(color: _textColor),
       );
 
   Text header() => Text(
         data ?? '',
         maxLines: maxLines,
         overflow: overflow,
-        strutStyle: strutStyle,
+        strutStyle: _strutStyle,
         style: Get.context?.moonTheme?.tokens.typography.heading.text16
-            .copyWith(
-                color: _textColor),
+            .copyWith(color: _textColor),
       );
 
   Text subHeader() => Text(
         data ?? '',
         maxLines: maxLines,
         overflow: overflow,
-        strutStyle: strutStyle,
+        strutStyle: _strutStyle,
         style: Get.context?.moonTheme?.tokens.typography.heading.text14
-            .copyWith(
-                color: _textColor),
+            .copyWith(color: _textColor),
       );
 
   Text small() => Text(
         data ?? '',
         maxLines: maxLines,
         overflow: overflow,
-        strutStyle: strutStyle,
+        strutStyle: _strutStyle,
         style: Get.context?.moonTheme?.tokens.typography.heading.text12
-            .copyWith(
-                color: _textColor),
+            .copyWith(color: _textColor),
       );
 
   Text subHeaderForgound() => Text(
         data ?? '',
         maxLines: maxLines,
         overflow: overflow,
-        strutStyle: strutStyle,
+        strutStyle: _strutStyle,
         style:
             Get.context?.moonTheme?.tokens.typography.heading.text14.copyWith(
           foreground: style?.foreground ??
@@ -303,41 +311,37 @@ extension TextExtension on Text {
         data ?? '',
         maxLines: maxLines,
         overflow: overflow,
-        strutStyle: strutStyle,
+        strutStyle: _strutStyle,
         style: Get.context?.moonTheme?.tokens.typography.heading.text10
-            .copyWith(
-                color: _textColor),
+            .copyWith(color: _textColor),
       );
 
   Text h1() => Text(
         data ?? '',
         maxLines: maxLines,
         overflow: overflow,
-        strutStyle: strutStyle,
+        strutStyle: _strutStyle,
         style: Get.context?.moonTheme?.tokens.typography.heading.text40
-            .copyWith(
-                color: _textColor),
+            .copyWith(color: _textColor),
       );
 
   Text h2() => Text(
         data ?? '',
         maxLines: maxLines,
         overflow: overflow,
-        strutStyle: strutStyle,
+        strutStyle: _strutStyle,
         style: Get.context?.moonTheme?.tokens.typography.heading.text32
-            .copyWith(
-                color: _textColor),
+            .copyWith(color: _textColor),
       );
 }
 
 extension TextSpanExtension on TextSpan {
-  Color get _textColor => style?.color ?? (settings.isDarkMode ? Colors.white : Colors.black);
+  Color get _textColor =>
+      style?.color ?? (settings.isDarkMode ? Colors.white : Colors.black);
 
   TextSpan small() => TextSpan(
         style: Get.context?.moonTheme?.tokens.typography.heading.text12
-            .copyWith(
-                color: _textColor,
-                fontStyle: style?.fontStyle),
+            .copyWith(color: _textColor, fontStyle: style?.fontStyle),
         text: text,
         children: children,
         recognizer: recognizer,
@@ -409,4 +413,127 @@ void resetOrientation() {
   } else {
     SystemChrome.setPreferredOrientations(DeviceOrientation.values);
   }
+}
+
+const double _kActivityIndicatorRadius = 40.0;
+const double _kActivityIndicatorMargin = 10.0;
+
+Widget buildRefreshIndicator(
+  BuildContext context,
+  RefreshIndicatorMode refreshState,
+  double pulledExtent,
+  double refreshTriggerPullDistance,
+  double refreshIndicatorExtent,
+) {
+  final double percentageComplete = clampDouble(
+    pulledExtent / refreshTriggerPullDistance,
+    0.0,
+    1.0,
+  );
+
+  return Center(
+    child: Stack(
+      clipBehavior: Clip.none,
+      children: <Widget>[
+        Positioned(
+          top: _kActivityIndicatorMargin,
+          left: 0.0,
+          right: 0.0,
+          child: _buildIndicatorForRefreshState(
+            refreshState,
+            _kActivityIndicatorRadius,
+            percentageComplete,
+          ),
+        ),
+      ],
+    ),
+  );
+}
+
+Widget _buildIndicatorForRefreshState(
+  RefreshIndicatorMode refreshState,
+  double radius,
+  double percentageComplete,
+) {
+  switch (refreshState) {
+    case RefreshIndicatorMode.drag:
+      const Curve opacityCurve = Interval(0.0, 0.35, curve: Curves.easeInOut);
+      return Opacity(
+        opacity: opacityCurve.transform(percentageComplete),
+        child: progressIndicator(
+          Get.context!,
+          size: radius,
+          duration: const Duration(milliseconds: 500),
+        ),
+      );
+    case RefreshIndicatorMode.armed:
+    case RefreshIndicatorMode.refresh:
+      return progressIndicator(
+        Get.context!,
+        size: radius,
+      );
+    case RefreshIndicatorMode.done:
+      return progressIndicator(
+        Get.context!,
+        size: radius * percentageComplete,
+      );
+    case RefreshIndicatorMode.inactive:
+      return const SizedBox.shrink();
+  }
+}
+
+Widget dropdownButton<T>(
+        {double minWidth = 100,
+        double maxWidth = 100,
+        double minHeight = 100,
+        double maxHeight = 200,
+        required bool show,
+        VoidCallback? onTapOutside,
+        required List<MoonMenuItem> content,
+        required Widget child}) =>
+    MoonDropdown(
+      minWidth: minWidth,
+      maxWidth: maxWidth,
+      maxHeight: maxHeight,
+      minHeight: minHeight,
+      offset: Offset(0, 0),
+      borderColor: Get.isDarkMode
+          ? Colors.white.withValues(alpha: 0.2)
+          : Colors.black.withValues(alpha: 0.2),
+      borderWidth: 0.2,
+      show: show,
+      onTapOutside: onTapOutside,
+      content: ListView(
+          padding: EdgeInsets.zero, shrinkWrap: true, children: content),
+      child: child,
+    );
+
+Icon moonIcon({required IconData icon, double size = 20, Color? color}) =>
+    Icon(icon,
+        size: size,
+        color: color ?? Get.context?.moonTheme?.tokens.colors.bulma);
+
+Widget progressIndicator(BuildContext context,
+    {Color? color, double? size, Duration? duration}) {
+  return SpinKitPulse(
+    size: size ?? 30,
+    color: color ?? context.moonTheme?.tokens.colors.bulma,
+    duration: duration ?? const Duration(milliseconds: 1000),
+  );
+}
+
+Widget buildLoadMoreIndicator(
+    LoadingState loadingState, VoidCallback loadMore) {
+  return SliverPadding(
+    padding: const EdgeInsets.only(top: 16, bottom: 40),
+    sliver: SliverToBoxAdapter(
+      child: LoadingStateIndicator(
+        loadingState: loadingState,
+        errorTapCallback: () {
+          log.i('LoadMoreIndicator errorTapCallback => loadMore');
+          loadMore();
+        },
+      ),
+    ),
+  );
 }

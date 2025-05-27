@@ -452,6 +452,8 @@ class TranslateMap extends Translations {
           "Update available": "有新版本可用",
           "No update available": "没有新版本可用",
           "Update check failed": "更新检查失败",
+          "Refresh": "刷新",
+          "Cleared": "已清除"
         },
         "zh_TW": {
           "Search": "搜索",
@@ -885,6 +887,8 @@ class TranslateMap extends Translations {
           "Update available": "有新版本可用",
           "No update available": "沒有新版本可用",
           "Update check failed": "更新檢查失敗",
+          "Refresh": "刷新",
+          "Cleared": "已清除",
         },
       };
 }

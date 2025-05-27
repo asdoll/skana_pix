@@ -12,14 +12,15 @@ import 'package:skana_pix/view/novelview/novelseries.dart';
 import 'package:skana_pix/view/imageview/imagesearchresult.dart';
 import 'package:skana_pix/view/souppage.dart';
 import 'package:skana_pix/view/userview/userpage.dart';
+
 class Leader {
-  static showToast(String text,[Duration? duration]) {
+  static showToast(String text, [Duration? duration]) {
     try {
       MoonToast.show(
         toastAlignment: Alignment(0.0, 0.8),
-        backgroundColor: MoonColors.dark.gohan,
+        backgroundColor: MoonColors.light.gohan,
         Get.context!,
-        label: Text(text, style: TextStyle(color: MoonColors.light.goku)),
+        label: Text(text, style: TextStyle(color: MoonColors.light.bulma)),
         displayDuration: duration,
       );
     } catch (e) {
@@ -242,4 +243,8 @@ class Leader {
     }
     return false;
   }
+}
+
+void failedLoadToast({String? text}) {
+  Leader.showToast("Failed to load".tr + (text != null ? ": $text" : ""));
 }

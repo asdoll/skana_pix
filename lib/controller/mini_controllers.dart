@@ -3,6 +3,8 @@ import 'package:get/get.dart';
 import 'package:skana_pix/controller/settings.dart';
 import 'package:skana_pix/model/worktypes.dart';
 
+MTab historyTab = Get.put(MTab(),tag: "history");
+
 class MTab extends GetxController {
   RxInt index = 0.obs;
 }

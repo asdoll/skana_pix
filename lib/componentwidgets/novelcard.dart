@@ -51,14 +51,11 @@ class _NovelCardState extends State<NovelCard> {
             label: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Padding(
-                  padding: EdgeInsets.all(0),
-                  child: Text(
-                    recomNovelsController.novels[widget.index].title,
-                    overflow: TextOverflow.ellipsis,
-                    maxLines: 3,
-                  ).header(),
-                ),
+                Text(
+                  recomNovelsController.novels[widget.index].title,
+                  overflow: TextOverflow.ellipsis,
+                  maxLines: 3,
+                ).subHeader().paddingTop(4),
                 Padding(
                   padding: const EdgeInsets.all(4.0),
                   child: Row(
@@ -116,7 +113,10 @@ class _NovelCardState extends State<NovelCard> {
                       Container(),
                     for (var f
                         in recomNovelsController.novels[widget.index].tags)
-                      Text("${f.name} ",strutStyle: const StrutStyle(forceStrutHeight: true, leading: 0)).xSmall()
+                      Text("${f.name} ",
+                              strutStyle: const StrutStyle(
+                                  forceStrutHeight: true, leading: 0))
+                          .xSmall()
                   ],
                 ).paddingBottom(8),
               ],

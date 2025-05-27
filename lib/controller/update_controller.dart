@@ -1,13 +1,13 @@
 import 'dart:convert';
 
 import 'package:dio/dio.dart' as dio;
-import 'package:easy_refresh/easy_refresh.dart';
 import 'package:flutter/foundation.dart';
 import 'package:get/get.dart';
 import 'package:skana_pix/controller/logging.dart';
 import 'package:skana_pix/controller/settings.dart' show settings;
 import 'package:skana_pix/model/boardinfo.dart';
-import 'package:skana_pix/utils/leaders.dart' show Leader;
+import 'package:skana_pix/utils/leaders.dart' show Leader, failedLoadToast;
+import 'package:skana_pix/utils/loading_indicator.dart';
 import 'package:skana_pix/utils/widgetplugin.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 
@@ -20,20 +20,26 @@ class Constants {
 
 class BoardController extends GetxController {
   RxList<BoardInfo> boardList = RxList.empty();
-  RxBool boardDataLoaded = false.obs;
   RxBool needBoardSection = false.obs;
+  Rx<LoadingState> loadingState = LoadingState.idle.obs;
 
-  void fetchBoard({EasyRefreshController? controller}) async {
+  Future<void> fetchBoard() async {
+    boardList.clear();
+    boardList.refresh();
+    loadingState.value = LoadingState.loading;
+    loadingState.refresh();
     try {
       final list = await load();
-      boardDataLoaded.value = true;
-      boardList.value = list;
+      boardList.addAll(list);
       boardList.refresh();
       needBoardSection.value = boardList.isNotEmpty;
-      controller?.finishRefresh();
+      loadingState.value = LoadingState.success;
+      loadingState.refresh();
     } catch (e) {
       log.e(e);
-      controller?.finishRefresh(IndicatorResult.fail);
+      failedLoadToast(text: e.toString());
+      loadingState.value = LoadingState.error;
+      loadingState.refresh();
     }
   }
 
@@ -65,7 +71,8 @@ class BoardController extends GetxController {
 
 class UpdateController extends GetxController {
   RxBool hasNewVersion = false.obs;
-
+  Rx<LoadingState> loadingState = LoadingState.idle.obs;
+  
   Result result = Result.timeout;
   String updateUrl = "https://github.com/asdoll/skana_pix/releases/latest";
   String updateDescription = "";
@@ -95,6 +102,8 @@ class UpdateController extends GetxController {
   }
 
   Future<void> check({bool showResult = false}) async {
+    loadingState.value = LoadingState.loading;
+    loadingState.refresh();
     //if (Constants.isGooglePlay) return Result.no;
     result = await checkUpdate("");
     if (showResult) {
@@ -113,6 +122,8 @@ class UpdateController extends GetxController {
       default:
         hasNewVersion.value = false;
     }
+    loadingState.value = LoadingState.idle;
+    loadingState.refresh();
   }
 
   String getVersion() {

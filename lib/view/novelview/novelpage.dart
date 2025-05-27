@@ -7,9 +7,9 @@ import 'package:get/get.dart';
 import 'package:path/path.dart' as path;
 import 'package:share_plus/share_plus.dart';
 import 'package:skana_pix/componentwidgets/backarea.dart';
-import 'package:skana_pix/componentwidgets/headerfooter.dart';
 import 'package:skana_pix/componentwidgets/staricon.dart';
 import 'package:skana_pix/componentwidgets/tag.dart';
+import 'package:skana_pix/utils/loading_indicator.dart' show LoadingState;
 import 'package:skana_pix/view/userview/userpage.dart';
 import 'package:skana_pix/controller/bases.dart';
 import 'package:skana_pix/controller/like_controller.dart';
@@ -71,7 +71,7 @@ class _NovelViewerPageState extends State<NovelViewerPage> {
             chapters: [widget.novel.title],
             percent: 0.0,
             getPercent: () => _novelStore.historyPercent(widget.novel.id),
-            progressIndicator: DefaultHeaderFooter.progressIndicator(context, color: config.fontColor),
+            progressIndicator: progressIndicator(context, color: config.fontColor),
             onSave: (TextCompositionConfig config, double percent) {
               _novelStore.updateHistory(percent);
               // Global.prefs.setString(TextConfigKey, config);
@@ -544,11 +544,11 @@ class _NovelPageLiteState extends State<NovelPageLite> {
                 ),
               ),
             )
-          : controller.error == null
-              ? controller.isLoading.value
+          : controller.error.isEmpty
+              ? controller.loadingState.value == LoadingState.loading
                   ? Scaffold(
                       body: Center(
-                        child: DefaultHeaderFooter.progressIndicator(context),
+                        child: progressIndicator(context),
                       ),
                     )
                   : Scaffold(

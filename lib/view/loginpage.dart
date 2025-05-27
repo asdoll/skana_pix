@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:moon_design/moon_design.dart';
-import 'package:skana_pix/componentwidgets/headerfooter.dart';
 import 'package:skana_pix/controller/account_controller.dart';
 import 'package:skana_pix/utils/widgetplugin.dart';
 import 'package:skana_pix/view/settings/settingpage.dart';
@@ -161,7 +160,7 @@ class _LoginPageState extends State<LoginPage> {
               ),
               Expanded(
                 child: Center(
-                  child: DefaultHeaderFooter.progressIndicator(context),
+                  child: progressIndicator(context),
                 ),
               ),
             ],

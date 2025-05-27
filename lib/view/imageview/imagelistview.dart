@@ -1,12 +1,11 @@
 import 'dart:math';
 
-import 'package:easy_refresh/easy_refresh.dart';
 import 'package:flutter/material.dart';
 import 'package:moon_design/moon_design.dart';
 import 'package:flutter/services.dart';
 import 'package:share_plus/share_plus.dart';
-import 'package:skana_pix/componentwidgets/headerfooter.dart';
 import 'package:skana_pix/componentwidgets/imagedetail.dart';
+import 'package:skana_pix/utils/loading_indicator.dart';
 import 'package:skana_pix/view/userview/userpage.dart';
 import 'package:skana_pix/controller/account_controller.dart';
 import 'package:skana_pix/controller/histories.dart';
@@ -154,8 +153,7 @@ class _ImageListViewPageState extends State<ImageListViewPage> {
     }
     load();
     return Center(
-      child:
-          DefaultHeaderFooter.progressIndicator(context, color: Colors.white),
+      child: progressIndicator(context, color: Colors.white),
     );
   }
 
@@ -184,15 +182,12 @@ class _IllustPageState extends State<IllustPage> {
   String get id => "${widget.illust.author.id}#${widget.illust.id}";
 
   late ScrollController _scrollController;
-  late EasyRefreshController _refreshController;
 
   late ListIllustController relatedListController;
 
   @override
   void initState() {
     _scrollController = ScrollController();
-    _refreshController = EasyRefreshController(
-        controlFinishLoad: true, controlFinishRefresh: true);
     relatedListController = Get.put(
         ListIllustController(
             controllerType: ListType.related,
@@ -201,7 +196,6 @@ class _IllustPageState extends State<IllustPage> {
                 ? ArtworkType.ILLUST
                 : ArtworkType.MANGA),
         tag: "related_${widget.illust.id}");
-    relatedListController.refreshController = _refreshController;
     relatedListController.firstLoad();
     if (accountController.isPremium.value) {
       ListIllustController.historyIds.add(widget.illust.id);
@@ -219,7 +213,6 @@ class _IllustPageState extends State<IllustPage> {
   @override
   void dispose() {
     Get.delete<ListIllustController>(tag: "related_${widget.illust.id}");
-    _refreshController.dispose();
     _scrollController.dispose();
     super.dispose();
   }
@@ -298,53 +291,49 @@ class _IllustPageState extends State<IllustPage> {
           ),
         );
       } else {
-        return EasyRefresh(
-          header: DefaultHeaderFooter.header(context),
-          refreshOnStartHeader: DefaultHeaderFooter.refreshHeader(context),
-          footer: DefaultHeaderFooter.footer(context),
-          controller: _refreshController,
-          onLoad: () {
-            relatedListController.nextPage();
-          },
-          child: CustomScrollView(
-            controller: _scrollController,
-            slivers: [
-              if ((widget.illust.width / widget.illust.height) > 5)
-                SliverToBoxAdapter(
-                    child:
-                        Container(height: MediaQuery.of(context).padding.top)),
-              SliverList(
-                  delegate: SliverChildBuilderDelegate((context, index) {
-                return buildImage(width, height, index);
-              }, childCount: widget.illust.images.length + 1)),
+        return CustomScrollView(
+          controller: _scrollController,
+          slivers: [
+            if ((widget.illust.width / widget.illust.height) > 5)
               SliverToBoxAdapter(
-                child: IllustDetailContent(illust: widget.illust),
-              ),
-              SliverGrid(
-                      delegate: SliverChildBuilderDelegate(
-                          (BuildContext context, int index) {
-                        return InkWell(
-                          onTap: () {
-                            Get.to(
-                                () => ImageListViewPage(
-                                    controllerTag:
-                                        "related_${widget.illust.id}",
-                                    index: index),
-                                preventDuplicates: false);
-                          },
-                          child: PixivImage(
-                            relatedListController
-                                .illusts[index].images.first.squareMedium,
-                            enableMemoryCache: false,
-                          ),
-                        );
-                      }, childCount: relatedListController.illusts.length),
-                      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                          crossAxisCount:
-                              max(3, (context.width / 150).floor())))
-                  .sliverPadding(EdgeInsets.all(8)),
-            ],
-          ),
+                  child: Container(height: MediaQuery.of(context).padding.top)),
+            SliverList(
+                delegate: SliverChildBuilderDelegate((context, index) {
+              return buildImage(width, height, index);
+            }, childCount: widget.illust.images.length + 1)),
+            SliverToBoxAdapter(
+              child: IllustDetailContent(illust: widget.illust),
+            ),
+            SliverGrid(
+                    delegate: SliverChildBuilderDelegate(
+                        (BuildContext context, int index) {
+                      if (index == widget.illust.images.length - 1) {
+                        Future.delayed(Duration(milliseconds: 100), () {
+                          relatedListController.nextPage();
+                        });
+                      }
+                      return InkWell(
+                        onTap: () {
+                          Get.to(
+                              () => ImageListViewPage(
+                                  controllerTag: "related_${widget.illust.id}",
+                                  index: index),
+                              preventDuplicates: false);
+                        },
+                        child: PixivImage(
+                          relatedListController
+                              .illusts[index].images.first.squareMedium,
+                          enableMemoryCache: false,
+                        ),
+                      );
+                    }, childCount: relatedListController.illusts.length),
+                    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                        crossAxisCount: max(3, (context.width / 150).floor())))
+                .sliverPadding(EdgeInsets.all(8)),
+            buildLoadMoreIndicator(
+                relatedListController.loadingState.value,
+                relatedListController.nextPage)
+          ],
         );
       }
     });
@@ -588,9 +577,8 @@ class _IllustPageState extends State<IllustPage> {
                           );
                         },
                         itemCount: illust.images.length,
-                        gridDelegate:
-                            SliverGridDelegateWithFixedCrossAxisCount(
-                                crossAxisCount: max(3, context.width ~/ 200)),
+                        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                            crossAxisCount: max(3, context.width ~/ 200)),
                       ),
                     ).paddingBottom(16),
                     Row(
@@ -657,7 +645,7 @@ class _IllustPageLiteState extends State<IllustPageLite> {
             type: ArtworkType.ILLUST),
         tag: "illust_${widget.id}");
     controller.reset();
-    return Obx(() => controller.isLoading.value
+    return Obx(() => controller.loadingState.value == LoadingState.loading
         ? Container()
         : ImageListViewPage(controllerTag: "illust_${widget.id}", index: 0));
   }

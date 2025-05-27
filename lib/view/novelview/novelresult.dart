@@ -100,8 +100,7 @@ class _NovelResultPageState extends State<NovelResultPage> {
                                                           .endTime = null;
                                                   controller.searchOptions
                                                       .refresh();
-                                                  controller.refreshController
-                                                      ?.callRefresh();
+                                                  controller.reset();
                                           },
                                         ),
                                         Spacer(),
@@ -132,8 +131,7 @@ class _NovelResultPageState extends State<NovelResultPage> {
                                                     .endTime =
                                                 controller.dateTimeRange!.end;
                                             controller.searchOptions.refresh();
-                                            controller.refreshController
-                                                ?.callRefresh();
+                                            controller.reset();
                                           },
                                         ).paddingRight(8)
                                       ])
@@ -155,7 +153,7 @@ class _NovelResultPageState extends State<NovelResultPage> {
                               controller.showPremiumMenu.value = false;
                               controller.searchOptions.value.premiumNum = value;
                               controller.searchOptions.refresh();
-                              controller.refreshController?.callRefresh();
+                              controller.reset();
                             });
                       } else {
                         final minStr = value.elementAtOrNull(1) == null
@@ -170,7 +168,7 @@ class _NovelResultPageState extends State<NovelResultPage> {
                               controller.showPremiumMenu.value = false;
                               controller.searchOptions.value.premiumNum = value;
                               controller.searchOptions.refresh();
-                              controller.refreshController?.callRefresh();
+                              controller.reset();
                             });
                       }
                     }).toList(),
@@ -196,7 +194,7 @@ class _NovelResultPageState extends State<NovelResultPage> {
                             controller.searchOptions.value.favoriteNumber =
                                 value;
                             controller.searchOptions.refresh();
-                            controller.refreshController?.callRefresh();
+                            controller.reset();
                           });
                     } else {
                       return MoonMenuItem(
@@ -206,7 +204,7 @@ class _NovelResultPageState extends State<NovelResultPage> {
                             controller.searchOptions.value.favoriteNumber =
                                 value;
                             controller.searchOptions.refresh();
-                            controller.refreshController?.callRefresh();
+                            controller.reset();
                           });
                     }
                   }).toList(),
@@ -243,8 +241,7 @@ class _NovelResultPageState extends State<NovelResultPage> {
                                       ),
                                       filledButton(
                                           onPressed: () {
-                                            controller.refreshController
-                                                ?.callRefresh();
+                                            controller.reset();
                                             Get.back();
                                           },
                                           label: "Apply".tr),

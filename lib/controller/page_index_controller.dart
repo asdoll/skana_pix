@@ -25,19 +25,13 @@ class HomeController extends GetxController {
     try {
       switch (workIndex.value) {
         case 0:
-          Get.find<ListIllustController>(tag: "rankingIllust")
-              .refreshController
-              ?.callRefresh();
+          Get.find<ListIllustController>(tag: "rankingIllust").reset();
           break;
         case 1:
-          Get.find<ListIllustController>(tag: "rankingManga")
-              .refreshController
-              ?.callRefresh();
+          Get.find<ListIllustController>(tag: "rankingManga").reset();
           break;
         case 2:
-          Get.find<ListNovelController>(tag: "rankingNovel")
-              .refreshController
-              ?.callRefresh();
+          Get.find<ListNovelController>(tag: "rankingNovel").reset();
           break;
       }
     } catch (e) {
