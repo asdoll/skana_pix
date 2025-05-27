@@ -1,4 +1,3 @@
-import 'package:easy_refresh/easy_refresh.dart';
 import 'package:flutter/rendering.dart';
 import 'package:get/get.dart';
 import 'package:skana_pix/controller/connector.dart';
@@ -9,34 +8,47 @@ import 'package:skana_pix/controller/res.dart';
 import 'package:skana_pix/model/novel.dart';
 import 'package:skana_pix/model/objectbox_models.dart';
 import 'package:skana_pix/utils/leaders.dart';
+import 'package:skana_pix/utils/loading_indicator.dart' show LoadingState;
 
 class NovelSeriesDetailController extends GetxController {
   Rx<NovelSeriesDetail?> novelSeriesDetail = Rxn<NovelSeriesDetail>();
-  EasyRefreshController? easyRefreshController;
+  Rx<LoadingState> loadingState = LoadingState.idle.obs;
   RxString nextUrl = "".obs;
   String seriesId;
   RxList<Novel> novels = <Novel>[].obs;
   Rx<Novel?> last = Rxn<Novel>();
-  NovelSeriesDetailController(
-      {required this.seriesId});
+  NovelSeriesDetailController({required this.seriesId});
 
-  void nextPage() {
-    loadData().then((value) {
-      if (value.success) {
-        novels.addAll(value.data.novels);
-        novels.refresh();
-        last.value = value.data.last ?? last.value;
-        last.refresh();
-      } else {
-        if (value.errorMessage != null &&
-            value.errorMessage!.contains("timeout")) {
-          Leader.showToast("Network Error. Please refresh to try again.".tr);
-        }
+  Future<void> nextPage() async {
+    if (loadingState.value == LoadingState.loading) return;
+    if (loadingState.value == LoadingState.noMore) return;
+    var value = await loadData();
+    if (value.success) {
+      novels.addAll(value.data.novels);
+      novels.refresh();
+      last.value = value.data.last ?? last.value;
+      last.refresh();
+      if (nextUrl.value == "end") {
+        loadingState.value = LoadingState.noMore;
+        loadingState.refresh();
+        return;
       }
-    });
+      loadingState.value = LoadingState.idle;
+      loadingState.refresh();
+    } else {
+      if (value.errorMessage == "No more data") {
+        loadingState.value = LoadingState.noMore;
+        loadingState.refresh();
+        return;
+      }
+      if (value.errorMessage != null &&
+          value.errorMessage!.contains("timeout")) {
+        failedLoadToast(text: "Network Error. Please refresh to try again.".tr);
+      }
+    }
   }
 
-  void reset() {
+  Future<void> reset() async {
     novels.clear();
     novels.refresh();
     last.value = null;
@@ -44,49 +56,57 @@ class NovelSeriesDetailController extends GetxController {
     novelSeriesDetail.value = null;
     novelSeriesDetail.refresh();
     nextUrl.value = "";
-
-    firstLoad();
+    await firstLoad();
   }
 
-  void firstLoad() {
+  Future<void> firstLoad() async {
+    if (loadingState.value == LoadingState.loading) return;
     nextUrl.value = "";
-    loadData().then((value) {
-      if (value.success) {
-        novels.clear();
-        last.value = null;
-        novelSeriesDetail.value = null;
-        novelSeriesDetail.value = value.data.novelSeriesDetail;
-        novelSeriesDetail.refresh();
-        novels.addAll(value.data.novels);
-        novels.refresh();
-        last.value = value.data.last;
-        last.refresh();
-        easyRefreshController?.finishRefresh();
-      } else {
-        if (value.errorMessage != null &&
-            value.errorMessage!.contains("timeout")) {
-          Leader.showToast("Network Error. Please refresh to try again.".tr);
-        }
-        easyRefreshController?.finishRefresh(IndicatorResult.fail);
+    var value = await loadData();
+    if (value.success) {
+      novels.clear();
+      last.value = null;
+      novelSeriesDetail.value = null;
+      novelSeriesDetail.value = value.data.novelSeriesDetail;
+      novelSeriesDetail.refresh();
+      novels.addAll(value.data.novels);
+      novels.refresh();
+      last.value = value.data.last;
+      last.refresh();
+      if (nextUrl.value == "end") {
+        loadingState.value = LoadingState.noMore;
+        loadingState.refresh();
+        return;
       }
-    });
+      loadingState.value = LoadingState.idle;
+      loadingState.refresh();
+    } else {
+      if (value.errorMessage == "No more data") {
+        loadingState.value = LoadingState.noMore;
+        loadingState.refresh();
+        return;
+      }
+      if (value.errorMessage != null &&
+          value.errorMessage!.contains("timeout")) {
+        failedLoadToast(text: "Network Error. Please refresh to try again.".tr);
+      }
+      loadingState.value = LoadingState.error;
+      loadingState.refresh();
+    }
   }
 
   Future<Res<NovelSeriesResponse>> loadData() async {
+    if (loadingState.value == LoadingState.loading) return Res(null);
     if (nextUrl.value == "end") {
-      easyRefreshController?.finishLoad(IndicatorResult.noMore);
       return Res.error("No more data");
     }
+    loadingState.value = LoadingState.loading;
+
     Res<NovelSeriesResponse> res = await ConnectManager()
         .apiClient
         .getNovelSeries(seriesId, nextUrl.value.isEmpty ? null : nextUrl.value);
     if (!res.error) {
       nextUrl.value = res.subData ?? "end";
-    }
-    if (nextUrl.value == "end") {
-      easyRefreshController?.finishLoad(IndicatorResult.noMore);
-    } else {
-      easyRefreshController?.finishLoad();
     }
     return res;
   }

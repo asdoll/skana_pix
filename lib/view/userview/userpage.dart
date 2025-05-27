@@ -4,7 +4,6 @@ import 'package:flutter/services.dart';
 import 'package:icon_decoration/icon_decoration.dart';
 import 'package:moon_design/moon_design.dart';
 import 'package:share_plus/share_plus.dart';
-import 'package:skana_pix/componentwidgets/headerfooter.dart';
 import 'package:skana_pix/componentwidgets/userdetail.dart';
 import 'package:skana_pix/controller/connector.dart';
 import 'package:skana_pix/controller/logging.dart';
@@ -142,7 +141,7 @@ class _UserPageState extends State<UserPage> with TickerProviderStateMixin {
     if (userDetail == null) {
       return Scaffold(
         body: Center(
-            child: DefaultHeaderFooter.progressIndicator(context)
+            child: progressIndicator(context)
             ),
       );
     }
@@ -605,7 +604,7 @@ class _UserPageState extends State<UserPage> with TickerProviderStateMixin {
             child: userDetail == null
                 ? Container(
                     padding: const EdgeInsets.only(right: 16.0, bottom: 4.0),
-                    child: DefaultHeaderFooter.progressIndicator(context),
+                    child: progressIndicator(context),
                   )
                 : Padding(
                     padding: const EdgeInsets.only(right: 16.0, bottom: 4.0),

@@ -1,7 +1,6 @@
 import 'dart:io';
 
 import 'package:dio/dio.dart' as dio;
-import 'package:easy_refresh/easy_refresh.dart';
 import 'package:get/get.dart';
 import 'package:html/dom.dart' as dom;
 import 'package:html/parser.dart';
@@ -10,6 +9,7 @@ import 'package:skana_pix/controller/logging.dart';
 import 'package:skana_pix/controller/settings.dart';
 import 'package:skana_pix/model/spotlight.dart';
 import 'package:skana_pix/utils/leaders.dart';
+import 'package:skana_pix/utils/loading_indicator.dart';
 
 class SoupFetcher extends GetxController {
   RxList<AmWork> amWorks = RxList();
@@ -173,66 +173,74 @@ extension ElementExt on dom.Element {
 class SpotlightStoreBase extends GetxController {
   RxList<SpotlightArticle> articles = RxList.empty();
   String? nextUrl;
-  EasyRefreshController? controller;
   RxnString error = RxnString(null);
+  Rx<LoadingState> loadingState = LoadingState.idle.obs;
 
   SpotlightStoreBase();
-  RxBool isLoading = false.obs;
 
   Future<bool> fetch() async {
-    articles.clear();
-    isLoading.value = true;
+    loadingState.value = LoadingState.loading;
+    loadingState.refresh();
     nextUrl = null;
     try {
       SpotlightResponse response =
           await ConnectManager().apiClient.getSpotlightArticles("all");
       if (response.nextUrl != null && response.nextUrl == "error") {
-        controller?.finishRefresh(IndicatorResult.fail);
+        loadingState.value = LoadingState.error;
+        loadingState.refresh();
         return false;
       }
       articles.clear();
       articles.addAll(response.spotlightArticles);
       articles.refresh();
       nextUrl = response.nextUrl;
-      controller?.finishRefresh(IndicatorResult.success);
+      loadingState.value = LoadingState.success;
+      loadingState.refresh();
       return true;
     } catch (e) {
       error.value = e.toString();
-      controller?.finishRefresh(IndicatorResult.fail);
+      failedLoadToast(text: e.toString());
+      loadingState.value = LoadingState.error;
+      loadingState.refresh();
       return false;
     } finally {
-      isLoading.value = false;
+      loadingState.value = LoadingState.idle;
+      loadingState.refresh();
     }
   }
 
   Future<bool> next() async {
-    if (isLoading.value) return false;
-    isLoading.value = true;
+    if (loadingState.value == LoadingState.loading) return false;
+    loadingState.value = LoadingState.loading;
     try {
       if (nextUrl != null && nextUrl!.isNotEmpty) {
         try {
           SpotlightResponse response = await ConnectManager().apiClient.getNextSpotlightArticles(nextUrl!);
           if (response.nextUrl != null && response.nextUrl == "error") {
-            controller?.finishRefresh(IndicatorResult.fail);
+            loadingState.value = LoadingState.error;
+            loadingState.refresh();
             return false;
           }
           nextUrl = response.nextUrl;
           articles.addAll(response.spotlightArticles);
-          controller?.finishLoad(nextUrl == null
-              ? IndicatorResult.noMore
-              : IndicatorResult.success);
+          articles.refresh();
+          loadingState.value = nextUrl == null ? LoadingState.noMore : LoadingState.success;
+          loadingState.refresh();
           return true;
         } catch (e) {
           error.value = e.toString();
-          controller?.finishLoad(IndicatorResult.fail);
+          loadingState.value = LoadingState.error;
+          loadingState.refresh();
           return false;
         }
       } else {
-        controller?.finishLoad(IndicatorResult.noMore);
+        loadingState.value = LoadingState.noMore;
+        loadingState.refresh();
         return true;
       }
     } finally {
-      isLoading.value = false;
+      loadingState.value = LoadingState.idle;
+      loadingState.refresh();
     }
   }
 }

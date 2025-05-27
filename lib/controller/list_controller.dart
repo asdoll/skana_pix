@@ -1,4 +1,3 @@
-import 'package:easy_refresh/easy_refresh.dart';
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
 import 'package:skana_pix/controller/connector.dart';
@@ -14,6 +13,7 @@ import 'package:skana_pix/model/tag.dart';
 import 'package:skana_pix/model/worktypes.dart';
 import 'package:skana_pix/utils/filters.dart';
 import 'package:skana_pix/utils/leaders.dart';
+import 'package:skana_pix/utils/loading_indicator.dart' show LoadingState;
 
 enum ListType {
   single,
@@ -31,12 +31,11 @@ class ListIllustController extends GetxController {
   ArtworkType type;
   RxList<Illust> illusts = RxList.empty();
   RxString nexturl = "".obs;
-  RxBool isLoading = false.obs;
+  Rx<LoadingState> loadingState = LoadingState.idle.obs;
   RxBool isFirstLoading = true.obs;
   RxString error = "".obs;
   RxInt index = 0.obs;
   RxInt page = 1.obs;
-  EasyRefreshController? refreshController;
   String id;
   String tag;
   String restrict;
@@ -65,24 +64,25 @@ class ListIllustController extends GetxController {
     historyIds.refresh();
   }
 
-  ListIllustController(
-      {required this.controllerType,
-      required this.type,
-      this.id = "",
-      this.tag = "",
-      this.restrict = "public",
-      });
+  ListIllustController({
+    required this.controllerType,
+    required this.type,
+    this.id = "",
+    this.tag = "",
+    this.restrict = "public",
+  });
 
   Future<Res<List<Illust>>> loadData() async {
-    if (isLoading.value) {
-      return Res.error("Loading");
+    if (loadingState.value == LoadingState.loading) {
+      return Res(null);
     }
     if (nexturl.value == "end") {
-      refreshController?.finishLoad(IndicatorResult.noMore);
-      refreshController?.finishRefresh(IndicatorResult.noMore);
+      loadingState.value = LoadingState.noMore;
+      loadingState.refresh();
       return Res.error("No more data");
     }
-    isLoading.value = true;
+    loadingState.value = LoadingState.loading;
+    loadingState.refresh();
     switch (controllerType) {
       case ListType.single:
         return ConnectManager().apiClient.getIllustByID(id);
@@ -135,17 +135,18 @@ class ListIllustController extends GetxController {
     }
   }
 
-  void reset() {
+  Future<void> reset() async {
     if (likeController.illusts.length > 500) {
       likeController.illusts.clear();
     }
-    isLoading.value = false;
+    loadingState.value = LoadingState.idle;
+    loadingState.refresh();
     illusts.clear();
     illusts.refresh();
     error.value = "";
     page.value = 1;
     nexturl.value = "";
-    firstLoad();
+    await firstLoad();
   }
 
   List<Illust> filterIllusts(List<Illust> datas) {
@@ -168,75 +169,82 @@ class ListIllustController extends GetxController {
     return checkIllusts(datas);
   }
 
-  void firstLoad() {
+  Future<void> firstLoad() async {
+    if (loadingState.value == LoadingState.loading) return;
+    if (loadingState.value == LoadingState.noMore) return;
     if (isFirstLoading.value) {
       if (controllerType == ListType.search) {
         localManager.add("historyIllustTag", [tag]);
       }
     }
-    loadData().then((value) {
-      isLoading.value = false;
-      isFirstLoading.value = false;
-      if (value.success) {
-        nexturl.value = value.subData ?? "end";
-        illusts.addAll(filterIllusts(value.data));
-        illusts.refresh();
-        refreshController?.finishRefresh();
-      } else {
-        var message = value.errorMessage ??
-            "Network Error. Please refresh to try again.".tr;
-        if (message == "No more data") {
-          refreshController?.finishRefresh(IndicatorResult.noMore);
-          return;
-        }
-        if (message.length > 45) {
-          message = "${message.substring(0, 20)}...";
-        }
-        error = message.obs;
-        Leader.showToast(message);
-        refreshController?.finishRefresh(IndicatorResult.fail);
+    var value = await loadData();
+    if (value.success) {
+      nexturl.value = value.subData ?? "end";
+      illusts.addAll(filterIllusts(value.data));
+      illusts.refresh();
+      loadingState.value = LoadingState.idle;
+      loadingState.refresh();
+    } else {
+      var message = value.errorMessage ??
+          "Network Error. Please refresh to try again.".tr;
+      if (message == "No more data") {
+        error.value = "";
+        loadingState.value = LoadingState.noMore;
+        loadingState.refresh();
+        return;
       }
-    });
+      if (message.length > 45) {
+        message = "${message.substring(0, 20)}...";
+      }
+      error.value = message;
+      failedLoadToast(text: message);
+      loadingState.value = LoadingState.error;
+      loadingState.refresh();
+    }
   }
 
-  void nextPage() {
-    loadData().then((value) {
-      isLoading.value = false;
-      if (value.success) {
-        page.value++;
-        nexturl.value = value.subData ?? "end";
-        refreshController?.finishLoad();
-        illusts.addAll(filterIllusts(value.data));
-        illusts.refresh();
-      } else {
-        var message = value.errorMessage ??
-            "Network Error. Please refresh to try again.".tr;
-        if (message == "No more data") {
-          refreshController?.finishLoad(IndicatorResult.noMore);
-          return;
-        }
-        if (message.length > 45) {
-          message = "${message.substring(0, 20)}...";
-        }
-        error = message.obs;
-        Leader.showToast(message);
-        refreshController?.finishLoad(IndicatorResult.fail);
+  Future<void> nextPage() async {
+    if (loadingState.value == LoadingState.loading) return;
+    if (loadingState.value == LoadingState.noMore) return;
+    var value = await loadData();
+    if (value.success) {
+      loadingState.value = LoadingState.success;
+      loadingState.refresh();
+      page.value++;
+      nexturl.value = value.subData ?? "end";
+      loadingState.value = LoadingState.idle;
+      loadingState.refresh();
+      illusts.addAll(filterIllusts(value.data));
+      illusts.refresh();
+    } else {
+      var message = value.errorMessage ??
+          "Network Error. Please refresh to try again.".tr;
+      if (message == "No more data") {
+        error.value = "";
+        loadingState.value = LoadingState.noMore;
+        loadingState.refresh();
+        return;
       }
-    });
+      if (message.length > 45) {
+        message = "${message.substring(0, 20)}...";
+      }
+      error.value = message;
+      failedLoadToast(text: message);
+      loadingState.value = LoadingState.error;
+      loadingState.refresh();
+    }
   }
-
 }
 
 class ListNovelController extends GetxController {
   RxList<Novel> novels = RxList.empty();
   RxString nexturl = "".obs;
-  RxBool isLoading = false.obs;
   RxBool isFirstLoading = true.obs;
   String restrict;
-  RxString? error;
+  RxString error = "".obs;
   RxInt index = 0.obs;
   RxInt page = 1.obs;
-  EasyRefreshController? refreshController;
+  Rx<LoadingState> loadingState = LoadingState.idle.obs;
   String tag;
   ListType controllerType;
   String id;
@@ -256,15 +264,16 @@ class ListNovelController extends GetxController {
       this.restrict = "public"});
 
   Future<Res<List<Novel>>> loadData() async {
-    if (isLoading.value) {
-      return Res.error("Loading");
+    if (loadingState.value == LoadingState.loading) {
+      return Res(null);
     }
     if (nexturl.value == "end") {
-      refreshController?.finishLoad(IndicatorResult.noMore);
-      refreshController?.finishRefresh(IndicatorResult.noMore);
+      loadingState.value = LoadingState.noMore;
+      loadingState.refresh();
       return Res.error("No more data");
     }
-    isLoading.value = true;
+    loadingState.value = LoadingState.loading;
+    loadingState.refresh();
     switch (controllerType) {
       case ListType.single:
         return ConnectManager().apiClient.getNovelById(id);
@@ -308,74 +317,93 @@ class ListNovelController extends GetxController {
     }
   }
 
-  void reset() {
+  Future<void> reset() async {
     if (likeController.novels.length > 100) {
       likeController.novels.clear();
     }
-    isLoading.value = false;
+    loadingState.value = LoadingState.idle;
     novels.clear();
     novels.refresh();
-    error = null;
+    error.value = "";
     page.value = 1;
     nexturl.value = "";
-    firstLoad();
+    await firstLoad();
   }
 
-  void firstLoad() {
+  Future<void> firstLoad() async {
+    if (loadingState.value == LoadingState.loading) return;
+    if (loadingState.value == LoadingState.noMore) return;
     if (isFirstLoading.value) {
       if (controllerType == ListType.search) {
         localManager.add("historyNovelTag", [tag]);
       }
     }
-    loadData().then((value) {
-      isLoading.value = false;
-      isFirstLoading.value = false;
-      if (value.success) {
-        novels.addAll(checkNovels(value.data));
-        if(novels.isEmpty){
-          refreshController?.finishRefresh(IndicatorResult.noMore);
-        }
-        novels.refresh();
-        nexturl.value = value.subData ?? "end";
-        refreshController?.finishRefresh();
-      } else {
-        var message = value.errorMessage ??
-            "Network Error. Please refresh to try again.".tr;
-        if (message == "No more data") {
-          refreshController?.finishRefresh(IndicatorResult.noMore);
-          return;
-        }
-        if (message.length > 45) {
-          message = "${message.substring(0, 20)}...";
-        }
-        error = message.obs;
-        Leader.showToast(message);
-        refreshController?.finishRefresh(IndicatorResult.fail);
+    var value = await loadData();
+    isFirstLoading.value = false;
+    if (value.success) {
+      loadingState.value = LoadingState.success;
+      loadingState.refresh();
+      novels.addAll(checkNovels(value.data));
+      novels.refresh();
+      nexturl.value = value.subData ?? "end";
+      if (nexturl.value == "end") {
+        loadingState.value = LoadingState.noMore;
+        loadingState.refresh();
+        return;
       }
-    });
+      loadingState.value = LoadingState.idle;
+      loadingState.refresh();
+    } else {
+      var message = value.errorMessage ??
+          "Network Error. Please refresh to try again.".tr;
+      if (message == "No more data") {
+        error.value = "";
+        loadingState.value = LoadingState.noMore;
+        loadingState.refresh();
+        return;
+      }
+      if (message.length > 45) {
+        message = "${message.substring(0, 20)}...";
+      }
+      error.value = message;
+      failedLoadToast(text: message);
+      loadingState.value = LoadingState.error;
+      loadingState.refresh();
+    }
   }
 
-  void nextPage() {
-    loadData().then((value) {
-      isLoading.value = false;
-      if (value.success) {
-        page.value++;
-        nexturl.value = value.subData ?? "end";
-        refreshController?.finishLoad();
-        novels.addAll(checkNovels(value.data));
-        novels.refresh();
-      } else {
-        var message = value.errorMessage ??
-            "Network Error. Please refresh to try again.".tr;
-        if (message == "No more data") {
-          refreshController?.finishLoad(IndicatorResult.noMore);
-          return;
-        }
-        error = message.obs;
-        Leader.showToast(message);
-        refreshController?.finishLoad(IndicatorResult.fail);
+  Future<void> nextPage() async {
+    if (loadingState.value == LoadingState.loading) return;
+    if (loadingState.value == LoadingState.noMore) return;
+    var value = await loadData();
+    if (value.success) {
+      loadingState.value = LoadingState.success;
+      loadingState.refresh();
+      page.value++;
+      nexturl.value = value.subData ?? "end";
+      novels.addAll(checkNovels(value.data));
+      novels.refresh();
+      if (nexturl.value == "end") {
+        loadingState.value = LoadingState.noMore;
+        loadingState.refresh();
+        return;
       }
-    });
+      loadingState.value = LoadingState.idle;
+      loadingState.refresh();
+    } else {
+      var message = value.errorMessage ??
+          "Network Error. Please refresh to try again.".tr;
+      if (message == "No more data") {
+        error.value = "";
+        loadingState.value = LoadingState.noMore;
+        loadingState.refresh();
+        return;
+      }
+      error.value = message;
+      failedLoadToast(text: message);
+      loadingState.value = LoadingState.error;
+      loadingState.refresh();
+    }
   }
 }
 
@@ -391,12 +419,11 @@ enum UserListType {
 class ListUserController extends GetxController {
   RxList<UserPreview> users = RxList.empty();
   RxString nexturl = "".obs;
-  RxBool isLoading = false.obs;
+  Rx<LoadingState> loadingState = LoadingState.idle.obs;
   RxBool isFirstLoading = true.obs;
   RxString error = "".obs;
   RxInt index = 0.obs;
   RxInt page = 1.obs;
-  EasyRefreshController? refreshController;
   RxBool tagExpand = false.obs;
   UserListType userListType;
   String id;
@@ -405,13 +432,14 @@ class ListUserController extends GetxController {
       {required this.userListType, this.id = "", this.restrict = "public"});
 
   Future<Res<List<UserPreview>>> loadData() async {
-    if (isLoading.value) {
+    if (loadingState.value == LoadingState.loading) {
       return Res.error("Loading");
     }
     if (nexturl.value == "end") {
       return Res.error("No more data");
     }
-    isLoading.value = true;
+    loadingState.value = LoadingState.loading;
+    loadingState.refresh();
     Res<List<UserPreview>> res;
     switch (userListType) {
       case UserListType.recom:
@@ -437,98 +465,123 @@ class ListUserController extends GetxController {
     return res;
   }
 
-  void firstLoad() {
+  Future<void> firstLoad() async {
+    if (loadingState.value == LoadingState.loading) return;
+    if (loadingState.value == LoadingState.noMore) return;
     if (isFirstLoading.value) {
       if (userListType == UserListType.search) {
         localManager.add("historyUserTag", [id]);
       }
     }
-    loadData().then((value) {
-      isLoading.value = false;
-      if (value.success) {
-        page.value++;
-        nexturl.value = value.subData ?? "end";
-        isFirstLoading.value = false;
-        users.addAll(value.data);
-        users.refresh();
-        refreshController?.finishRefresh();
-      } else {
-        var message = value.errorMessage ??
-            "Network Error. Please refresh to try again.".tr;
-        if (message == "No more data") {
-          refreshController?.finishRefresh(IndicatorResult.noMore);
-          return;
-        }
-        error.value = message;
-        Leader.showToast(message);
-        refreshController?.finishRefresh(IndicatorResult.fail);
+    var value = await loadData();
+    isFirstLoading.value = false;
+    if (value.success) {
+      loadingState.value = LoadingState.success;
+      loadingState.refresh();
+      users.addAll(value.data);
+      users.refresh();
+      nexturl.value = value.subData ?? "end";
+      if (nexturl.value == "end") {
+        loadingState.value = LoadingState.noMore;
+        loadingState.refresh();
+        return;
       }
-    });
+      loadingState.value = LoadingState.idle;
+      loadingState.refresh();
+    } else {
+      var message = value.errorMessage ??
+          "Network Error. Please refresh to try again.".tr;
+      if (message == "No more data") {
+        error.value = "";
+        loadingState.value = LoadingState.noMore;
+        loadingState.refresh();
+        return;
+      }
+      if (message.length > 45) {
+        message = "${message.substring(0, 20)}...";
+      }
+      error.value = message;
+      failedLoadToast(text: message);
+      loadingState.value = LoadingState.error;
+      loadingState.refresh();
+    }
   }
 
-  void reset() {
+  Future<void> reset() async {
     if (likeController.users.length > 100) {
       likeController.users.clear();
     }
-    isLoading.value = false;
+    loadingState.value = LoadingState.idle;
     users.clear();
     users.refresh();
     error.value = "";
     page.value = 1;
     nexturl.value = "";
-    firstLoad();
+    await firstLoad();
   }
 
-  void nextPage() {
-    loadData().then((value) {
-      isLoading.value = false;
-      if (value.success) {
-        page.value++;
-        nexturl.value = value.subData ?? "end";
-        users.addAll(value.data);
-        users.refresh();
-        refreshController?.finishLoad();
-      } else {
-        var message = value.errorMessage ??
-            "Network Error. Please refresh to try again.".tr;
-        if (message == "No more data") {
-          refreshController?.finishLoad(IndicatorResult.noMore);
-          return;
-        }
-        if (message.length > 45) {
-          message = "${message.substring(0, 20)}...";
-        }
-        error.value = message;
-        Leader.showToast(message);
-        refreshController?.finishLoad(IndicatorResult.fail);
+  Future<void> nextPage() async {
+    if (loadingState.value == LoadingState.loading) return;
+    if (loadingState.value == LoadingState.noMore) return;
+    var value = await loadData();
+    if (value.success) {
+      loadingState.value = LoadingState.success;
+      loadingState.refresh();
+      page.value++;
+      nexturl.value = value.subData ?? "end";
+      users.addAll(value.data);
+      users.refresh();
+      if (nexturl.value == "end") {
+        loadingState.value = LoadingState.noMore;
+        loadingState.refresh();
+        return;
       }
-    });
+      loadingState.value = LoadingState.idle;
+      loadingState.refresh();
+    } else {
+      var message = value.errorMessage ??
+          "Network Error. Please refresh to try again.".tr;
+      if (message == "No more data") {
+        error.value = "";
+        loadingState.value = LoadingState.noMore;
+        loadingState.refresh();
+        return;
+      }
+      error.value = message;
+      failedLoadToast(text: message);
+      loadingState.value = LoadingState.error;
+      loadingState.refresh();
+    }
   }
 }
 
 class HotTagsController extends GetxController {
   RxList<TrendingTag> tags = RxList.empty();
   ArtworkType type;
-  EasyRefreshController? refreshController;
   RxBool tagExpand = false.obs;
-  RxBool isLoading = false.obs;
+  Rx<LoadingState> loadingState = LoadingState.idle.obs;
+  RxString error = "".obs;
 
   HotTagsController(this.type);
 
-  void reset() {
-    isLoading.value = true;
-    loadData().then((value) {
-      isLoading.value = false;
-      if (value.success) {
-        tags.clear();
-        tags.addAll(value.data);
-        tags.refresh();
-        refreshController?.finishRefresh();
-      } else {
-        Leader.showToast("Network error".tr);
-        refreshController?.finishRefresh(IndicatorResult.fail);
-      }
-    });
+  Future<void> reset() async {
+    if (loadingState.value == LoadingState.loading) return;
+    loadingState.value = LoadingState.loading;
+    var value = await loadData();
+    if (value.success) {
+      tags.clear();
+      tags.addAll(value.data);
+      tags.refresh();
+      loadingState.value = LoadingState.idle;
+      loadingState.refresh();
+    } else {
+      var message = value.errorMessage ??
+          "Network Error. Please refresh to try again.".tr;
+      error.value = message;
+      failedLoadToast(text: message);
+      loadingState.value = LoadingState.error;
+      loadingState.refresh();
+    }
   }
 
   Future<Res<List<TrendingTag>>> loadData() async {

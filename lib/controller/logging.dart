@@ -29,7 +29,7 @@ class log {
 
 void initLogger() {
   if (kDebugMode) {
-    Logger.level = Level.debug;
+    Logger.level = Level.warning;
   } else 
   {
     Logger.level = Level.warning;

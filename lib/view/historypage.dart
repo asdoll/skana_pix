@@ -1,9 +1,9 @@
 import 'dart:math';
+import 'package:flutter/cupertino.dart' show CupertinoSliverRefreshControl;
 import 'package:flutter/material.dart';
-import 'package:easy_refresh/easy_refresh.dart';
 import 'package:moon_design/moon_design.dart';
-import 'package:skana_pix/componentwidgets/headerfooter.dart';
 import 'package:skana_pix/controller/mini_controllers.dart';
+import 'package:skana_pix/utils/loading_indicator.dart' show LoadingState;
 import 'package:skana_pix/view/imageview/imagelistview.dart';
 import 'package:skana_pix/view/novelview/novelpage.dart';
 import 'package:skana_pix/componentwidgets/pixivimage.dart';
@@ -27,6 +27,7 @@ class _HistoryPageState extends State<HistoryPage>
   void initState() {
     super.initState();
     tabController = TabController(length: 2, vsync: this);
+    historyTab.index.value = tabController.index;
   }
 
   @override
@@ -38,6 +39,9 @@ class _HistoryPageState extends State<HistoryPage>
           MoonTab(label: Text("Illust•Manga".tr)),
           MoonTab(label: Text("Novel".tr)),
         ],
+        onTabChanged: (index) {
+          historyTab.index.value = index;
+        },
       ).paddingLeft(16).toAlign(Alignment.topLeft),
       Expanded(
           child: TabBarView(controller: tabController, children: [
@@ -56,96 +60,104 @@ class IllustsHistory extends StatefulWidget {
 }
 
 class _IllustsHistoryState extends State<IllustsHistory> {
-
   @override
   Widget build(BuildContext context) {
     HistoryIllust controller = Get.put(HistoryIllust(), tag: "history_illust");
-    EasyRefreshController refreshController = EasyRefreshController(
-        controlFinishLoad: true, controlFinishRefresh: true);
-    controller.refreshController = refreshController;
     TextEditingController searchController = TextEditingController();
+    controller.load();
     return Scaffold(
-      body: Column(
-        children: [
-          MoonTextInput(
-            padding: EdgeInsets.only(left: 8),
-            hintText: "Search Illusts or Pianters".tr,
-            controller: searchController,
-            leading: Icon(MoonIcons.generic_search_24_light),
-            trailing: IconButton(
-              icon: Icon(MoonIcons.controls_close_24_light),
-              onPressed: () {
-                setState(() {
-                  searchController.clear();
-                  controller.search("");
-                });
+        appBar: PreferredSize(
+            preferredSize: Size.fromHeight(56),
+            child: MoonTextInput(
+              padding: EdgeInsets.only(left: 8),
+              hintText: "Search Illusts or Pianters".tr,
+              controller: searchController,
+              leading: Icon(MoonIcons.generic_search_24_light),
+              trailing: IconButton(
+                icon: Icon(MoonIcons.controls_close_24_light),
+                onPressed: () {
+                  setState(() {
+                    searchController.clear();
+                    controller.search("");
+                  });
+                },
+              ),
+              onChanged: (value) {
+                controller.search(value);
               },
-            ),
-            onChanged: (value) {
-              controller.search(value);
-            },
-          ).paddingAll(8),
-          Expanded(
-            child: Obx(
-              () => EasyRefresh(
-                  controller: refreshController,
-                  scrollController: globalScrollController,
-                  onRefresh: controller.load,
-                  refreshOnStart: controller.illusts.isEmpty,
-                  header: DefaultHeaderFooter.header(context),
-                  refreshOnStartHeader:
-                      DefaultHeaderFooter.refreshHeader(context),
-                  child: WaterfallFlow.builder(
-                    padding: const EdgeInsets.only(top: 8),
-                    controller: globalScrollController,
-                    gridDelegate:
-                        SliverWaterfallFlowDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: max(2, (context.width / 200).floor()),
-                      mainAxisSpacing: 8.0,
-                      crossAxisSpacing: 8.0,
-                    ),
-                    itemBuilder: (BuildContext context, int index) {
-                      return GestureDetector(
-                          onTap: () {
-                            Get.to(
-                                IllustPageLite(controller
-                                    .searchResult[index].illustId
-                                    .toString()),
-                                preventDuplicates: false);
-                          },
-                          onLongPress: () async {
-                            final result = await alertDialog(
-                                context, "${"Delete".tr}?", "", [
-                              outlinedButton(
-                                label: "Cancel".tr,
-                                onPressed: () {
-                                  Get.back();
-                                },
-                              ),
-                              filledButton(
-                                label: "Ok".tr,
-                                onPressed: () {
-                                  Get.back(result: "OK");
-                                },
-                              )
-                            ]);
-                            if (result == "OK") {
-                              controller.remove(
-                                  controller.searchResult[index].illustId);
-                            }
-                          },
-                          child: Card(
-                              child: PixivImage(
-                                      controller.searchResult[index].pictureUrl)
-                                  .rounded(16.0)));
-                    },
-                    itemCount: controller.searchResult.length,
-                  )),
-            ),
-          )
-        ],
-      ),
-    );
+            ).paddingVertical(4)),
+        body: Obx(
+          () => controller.loadingState.value == LoadingState.loading &&
+                  controller.illusts.isEmpty
+              ? progressIndicator(context)
+              : CustomScrollView(
+                  controller: globalScrollController,
+                  physics: const BouncingScrollPhysics(),
+                  slivers: <Widget>[
+                      CupertinoSliverRefreshControl(
+                        refreshTriggerPullDistance: 70,
+                        onRefresh: controller.load,
+                        builder: buildRefreshIndicator,
+                      ),
+                      SliverToBoxAdapter(child: SizedBox(height: 4)),
+                      SliverWaterfallFlow(
+                          gridDelegate:
+                              SliverWaterfallFlowDelegateWithFixedCrossAxisCount(
+                            crossAxisCount:
+                                max(2, (context.width / 200).floor()),
+                            mainAxisSpacing: 8.0,
+                            crossAxisSpacing: 8.0,
+                          ),
+                          delegate: SliverChildBuilderDelegate(
+                            (BuildContext context, int index) {
+                              return GestureDetector(
+                                  onTap: () {
+                                    Get.to(
+                                        IllustPageLite(controller
+                                            .searchResult[index].illustId
+                                            .toString()),
+                                        preventDuplicates: false);
+                                  },
+                                  onLongPress: () async {
+                                    final result = await alertDialog(
+                                        context, "${"Delete".tr}?", "", [
+                                      outlinedButton(
+                                        label: "Cancel".tr,
+                                        onPressed: () {
+                                          Get.back();
+                                        },
+                                      ),
+                                      filledButton(
+                                        label: "Ok".tr,
+                                        onPressed: () {
+                                          Get.back(result: "OK");
+                                        },
+                                      )
+                                    ]);
+                                    if (result == "OK") {
+                                      controller.remove(controller
+                                          .searchResult[index].illustId);
+                                    }
+                                  },
+                                  child: Card(
+                                      child: PixivImage(controller
+                                              .searchResult[index].pictureUrl)
+                                          .rounded(16.0)));
+                            },
+                            childCount: controller.searchResult.length,
+                          )),
+                      SliverToBoxAdapter(
+                              child: Center(
+                                  child: Text('No more'.tr,
+                                      style: TextStyle(
+                                          color: context
+                                              .theme.colorScheme.outline))
+                                  .subHeader()))
+                          .sliverPaddingVertical(6),
+                      if (controller.illusts.length < 20)
+                        SliverToBoxAdapter(child: SizedBox(height: Get.height))
+                    ]),
+        ));
   }
 }
 
@@ -160,121 +172,132 @@ class _NovelsHistoryState extends State<NovelsHistory> {
   @override
   Widget build(BuildContext context) {
     HistoryNovel controller = Get.put(HistoryNovel(), tag: "history_novel");
-    EasyRefreshController refreshController = EasyRefreshController(
-        controlFinishLoad: true, controlFinishRefresh: true);
-    controller.refreshController = refreshController;
     TextEditingController searchController = TextEditingController();
+    controller.load();
     return Scaffold(
-      body: Column(
-        children: [
-          MoonTextInput(
-            padding: EdgeInsets.only(left: 8),
-            hintText: "Search Novels or Authors".tr,
-            controller: searchController,
-            leading: Icon(MoonIcons.generic_search_24_light),
-            trailing: IconButton(
-              icon: Icon(MoonIcons.controls_close_24_light),
-              onPressed: () {
-                setState(() {
-                  searchController.clear();
-                  controller.search("");
-                });
+        appBar: PreferredSize(
+            preferredSize: Size.fromHeight(56),
+            child: MoonTextInput(
+              padding: EdgeInsets.only(left: 8),
+              hintText: "Search Novels or Authors".tr,
+              controller: searchController,
+              leading: Icon(MoonIcons.generic_search_24_light),
+              trailing: IconButton(
+                icon: Icon(MoonIcons.controls_close_24_light),
+                onPressed: () {
+                  setState(() {
+                    searchController.clear();
+                    controller.search("");
+                  });
+                },
+              ),
+              onChanged: (value) {
+                controller.search(value);
               },
-            ),
-            onChanged: (value) {
-              controller.search(value);
-            },
-          ).paddingAll(8),
-          Expanded(
-            child: Obx(
-              () => EasyRefresh(
-                  controller: refreshController,
-                  scrollController: globalScrollController,
-                  onRefresh: controller.load,
-                  refreshOnStart: controller.novels.isEmpty,
-                  header: DefaultHeaderFooter.header(context),
-                  refreshOnStartHeader:
-                      DefaultHeaderFooter.refreshHeader(context),
-                  child: WaterfallFlow.builder(
-                    padding: const EdgeInsets.only(top: 8),
-                    controller: globalScrollController,
-                    gridDelegate:
-                        SliverWaterfallFlowDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: max(2, (context.width / 200).floor()),
-                      mainAxisSpacing: 8.0,
-                      crossAxisSpacing: 8.0,
+            ).paddingVertical(4)),
+        body: Obx(
+          () => controller.loadingState.value == LoadingState.loading &&
+                  controller.novels.isEmpty
+              ? progressIndicator(context)
+              : CustomScrollView(
+                  physics: const BouncingScrollPhysics(),
+                  controller: globalScrollController,
+                  slivers: [
+                    CupertinoSliverRefreshControl(
+                      refreshTriggerPullDistance: 70,
+                      onRefresh: controller.load,
+                      builder: buildRefreshIndicator,
                     ),
-                    itemBuilder: (BuildContext context, int index) {
-                      return GestureDetector(
-                          onTap: () {
-                            Get.to(
-                                NovelPageLite(controller
-                                    .searchResult[index].novelId
-                                    .toString()),
-                                preventDuplicates: false);
-                          },
-                          onLongPress: () async {
-                            final result = await alertDialog(
-                                context, "${"Delete".tr}?", "", [
-                              outlinedButton(
-                                label: "Cancel".tr,
-                                onPressed: () {
-                                  Get.back();
-                                },
-                              ),
-                              filledButton(
-                                label: "Ok".tr,
-                                onPressed: () {
-                                  Get.back(result: "OK");
-                                },
-                              )
-                            ]);
-                            if (result == "OK") {
-                              controller.remove(
-                                  controller.searchResult[index].novelId);
-                            }
-                          },
-                          child: Card(
-                              child: AspectRatio(
-                            aspectRatio: 1.0,
-                            child: Stack(
-                              children: [
-                                AspectRatio(
-                                  aspectRatio: 1.0,
-                                  child: PixivImage(
-                                    controller.searchResult[index].pictureUrl,
-                                    fit: BoxFit.cover,
+                    SliverToBoxAdapter(child: SizedBox(height: 4)),
+                    SliverWaterfallFlow(
+                      gridDelegate:
+                          SliverWaterfallFlowDelegateWithFixedCrossAxisCount(
+                        crossAxisCount: max(2, (context.width / 200).floor()),
+                        mainAxisSpacing: 8.0,
+                        crossAxisSpacing: 8.0,
+                      ),
+                      delegate: SliverChildBuilderDelegate(
+                        (BuildContext context, int index) {
+                          return GestureDetector(
+                              onTap: () {
+                                Get.to(
+                                    NovelPageLite(controller
+                                        .searchResult[index].novelId
+                                        .toString()),
+                                    preventDuplicates: false);
+                              },
+                              onLongPress: () async {
+                                final result = await alertDialog(
+                                    context, "${"Delete".tr}?", "", [
+                                  outlinedButton(
+                                    label: "Cancel".tr,
+                                    onPressed: () {
+                                      Get.back();
+                                    },
                                   ),
+                                  filledButton(
+                                    label: "Ok".tr,
+                                    onPressed: () {
+                                      Get.back(result: "OK");
+                                    },
+                                  )
+                                ]);
+                                if (result == "OK") {
+                                  controller.remove(
+                                      controller.searchResult[index].novelId);
+                                }
+                              },
+                              child: Card(
+                                  child: AspectRatio(
+                                aspectRatio: 1.0,
+                                child: Stack(
+                                  children: [
+                                    AspectRatio(
+                                      aspectRatio: 1.0,
+                                      child: PixivImage(
+                                        controller
+                                            .searchResult[index].pictureUrl,
+                                        fit: BoxFit.cover,
+                                      ),
+                                    ),
+                                    Opacity(
+                                      opacity: 0.4,
+                                      child: Container(
+                                        decoration:
+                                            BoxDecoration(color: Colors.black),
+                                      ),
+                                    ),
+                                    Align(
+                                      alignment: Alignment.center,
+                                      child: Padding(
+                                        padding: const EdgeInsets.all(8.0),
+                                        child: Text(
+                                          controller.searchResult[index].title,
+                                          maxLines: 3,
+                                          overflow: TextOverflow.ellipsis,
+                                          style: TextStyle(color: Colors.white),
+                                        ).small(),
+                                      ),
+                                    )
+                                  ],
                                 ),
-                                Opacity(
-                                  opacity: 0.4,
-                                  child: Container(
-                                    decoration:
-                                        BoxDecoration(color: Colors.black),
-                                  ),
-                                ),
-                                Align(
-                                  alignment: Alignment.center,
-                                  child: Padding(
-                                    padding: const EdgeInsets.all(8.0),
-                                    child: Text(
-                                      controller.searchResult[index].title,
-                                      maxLines: 3,
-                                      overflow: TextOverflow.ellipsis,
-                                      style: TextStyle(color: Colors.white),
-                                    ).small(),
-                                  ),
-                                )
-                              ],
-                            ),
-                          ).rounded(16.0)));
-                    },
-                    itemCount: controller.searchResult.length,
-                  )),
-            ),
-          )
-        ],
-      ),
-    );
+                              ).rounded(16.0)));
+                        },
+                        childCount: controller.searchResult.length,
+                      ),
+                    ),
+                    SliverToBoxAdapter(
+                            child: Center(
+                                child: Text("No more".tr,
+                                    style: TextStyle(
+                                        color:
+                                            context.theme.colorScheme.outline))
+                                .subHeader()))
+                        .sliverPaddingVertical(6),
+                    if (controller.novels.length < 20)
+                      SliverToBoxAdapter(child: SizedBox(height: Get.height))
+                  ],
+                ),
+        ));
   }
 }

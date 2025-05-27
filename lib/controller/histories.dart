@@ -1,6 +1,5 @@
 import 'dart:convert';
 
-import 'package:easy_refresh/easy_refresh.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:skana_pix/controller/objectbox.dart';
@@ -8,11 +7,11 @@ import 'package:skana_pix/model/illust.dart';
 import 'package:skana_pix/model/novel.dart';
 import 'package:skana_pix/model/objectbox_models.dart';
 import 'package:skana_pix/utils/leaders.dart';
+import 'package:skana_pix/utils/loading_indicator.dart';
 
 import '../utils/safplugin.dart';
 
 class M {
-
   static late ObjectBox o;
   static Future<void> init() async {
     o = await ObjectBox.create();
@@ -29,7 +28,8 @@ class M {
     await o.addIllust(illustHis);
   }
 
-  static Future<NovelHistory> addNovel(Novel novel,{double lastRead = 0}) async {
+  static Future<NovelHistory> addNovel(Novel novel,
+      {double lastRead = 0}) async {
     var novelHis = NovelHistory(
         novelId: novel.id,
         userId: novel.author.id,
@@ -52,7 +52,6 @@ class M {
   static Future<List<NovelHistory>> getAllNovels() async {
     return await o.getAllNovel();
   }
-
 
   static Future<void> removeIllust(int illustId) async {
     await o.removeIllust(illustId);
@@ -104,7 +103,7 @@ class M {
           time: novelMap['time'],
           title: novelMap['title'],
           userName: novelMap['user_name'],
-          lastRead: novelMap['last_read']??0);
+          lastRead: novelMap['last_read'] ?? 0);
       o.addNovel(noveHis);
     }
   }
@@ -131,25 +130,24 @@ class M {
 class HistoryIllust extends GetxController {
   RxList<IllustHistory> illusts = RxList.empty();
   RxList<IllustHistory> searchResult = RxList.empty();
-  RxBool isLoading = false.obs;
-  EasyRefreshController? refreshController;
+  Rx<LoadingState> loadingState = LoadingState.idle.obs;
 
-  void load() async {
-    if (isLoading.value) return;
+  Future<void> load() async {
+    if (loadingState.value == LoadingState.loading) return;
     try {
-      isLoading.value = true;
-      var his = await M.getAllIllusts();
+      loadingState.value = LoadingState.loading;
       illusts.clear();
-      illusts.addAll(his);
       illusts.refresh();
       searchResult.clear();
-      searchResult.addAll(his.reversed);
       searchResult.refresh();
-      isLoading.value = false;
-      refreshController?.finishRefresh();
+      var his = await M.getAllIllusts();
+      illusts.addAll(his);
+      illusts.refresh();
+      searchResult.addAll(his);
+      searchResult.refresh();
+      loadingState.value = LoadingState.idle;
     } catch (e) {
-      isLoading.value = false;
-      refreshController?.finishRefresh(IndicatorResult.fail);
+      loadingState.value = LoadingState.error;
     }
   }
 
@@ -177,7 +175,7 @@ class HistoryIllust extends GetxController {
             obj.userName!.toLowerCase().contains(searchText.toLowerCase()))
         .toList();
     searchResult.clear();
-    searchResult.addAll(tmp.reversed);
+    searchResult.addAll(tmp);
     searchResult.refresh();
   }
 }
@@ -185,25 +183,24 @@ class HistoryIllust extends GetxController {
 class HistoryNovel extends GetxController {
   RxList<NovelHistory> novels = RxList.empty();
   RxList<NovelHistory> searchResult = RxList.empty();
-  RxBool isLoading = false.obs;
-  EasyRefreshController? refreshController;
+  Rx<LoadingState> loadingState = LoadingState.idle.obs;
 
-  void load() async {
-    if (isLoading.value) return;
+  Future<void> load() async {
+    if (loadingState.value == LoadingState.loading) return;
     try {
-      isLoading.value = true;
-      var his = await M.getAllNovels();
+      loadingState.value = LoadingState.loading;
       novels.clear();
-      novels.addAll(his);
       novels.refresh();
       searchResult.clear();
-      searchResult.addAll(his.reversed);
       searchResult.refresh();
-      isLoading.value = false;
-      refreshController?.finishRefresh();
+      var his = await M.getAllNovels();
+      novels.addAll(his);
+      novels.refresh();
+      searchResult.addAll(his);
+      searchResult.refresh();
+      loadingState.value = LoadingState.idle;
     } catch (e) {
-      isLoading.value = false;
-      refreshController?.finishRefresh(IndicatorResult.fail);
+      loadingState.value = LoadingState.error;
     }
   }
 
@@ -231,7 +228,7 @@ class HistoryNovel extends GetxController {
             obj.userName.toLowerCase().contains(searchText.toLowerCase()))
         .toList();
     searchResult.clear();
-    searchResult.addAll(tmp.reversed);
+    searchResult.addAll(tmp);
     searchResult.refresh();
   }
 }

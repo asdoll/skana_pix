@@ -1,4 +1,3 @@
-import 'package:easy_refresh/easy_refresh.dart';
 import 'package:get/get.dart';
 import 'package:skana_pix/controller/connector.dart';
 import 'package:skana_pix/controller/like_controller.dart';
@@ -6,13 +5,13 @@ import 'package:skana_pix/controller/res.dart';
 import 'package:skana_pix/model/comment.dart';
 import 'package:skana_pix/model/worktypes.dart';
 import 'package:skana_pix/utils/leaders.dart';
+import 'package:skana_pix/utils/loading_indicator.dart';
 
 class CommentController extends GetxController {
   String? nextUrl;
   String id;
   ArtworkType type;
-  EasyRefreshController? easyRefreshController;
-  RxBool isLoading = false.obs;
+  Rx<LoadingState> loadingState = LoadingState.idle.obs;
   RxList<Comment> comments = RxList.empty();
   RxString error = "".obs;
   RxInt parentCommentId = 0.obs;
@@ -23,12 +22,14 @@ class CommentController extends GetxController {
   CommentController(this.id, this.type, this.isReply);
 
   Future<Res<List<Comment>>> loadData() async {
-    if (isLoading.value) return Res.error("Loading");
+    if (loadingState.value == LoadingState.loading) return Res(null);
     if (nextUrl == "end") {
-      easyRefreshController?.finishLoad(IndicatorResult.noMore);
+      loadingState.value = LoadingState.noMore;
+      loadingState.refresh();
       return Res.error("No more data");
     }
-    isLoading.value = true;
+    loadingState.value = LoadingState.loading;
+    loadingState.refresh();
     Res<List<Comment>> res = type == ArtworkType.NOVEL
         ? (isReply
             ? await ConnectManager()
@@ -45,71 +46,80 @@ class CommentController extends GetxController {
       nextUrl ??= "end";
     }
     if (nextUrl == "end") {
-      easyRefreshController?.finishLoad(IndicatorResult.noMore);
+      loadingState.value = LoadingState.noMore;
+      loadingState.refresh();
     } else {
-      easyRefreshController?.finishLoad();
+      loadingState.value = LoadingState.success;
+      loadingState.refresh();
     }
     return res;
   }
 
-  void nextPage() {
-    loadData().then((value) {
-      isLoading.value = false;
-      if (value.success) {
-        comments.addAll(filterComments(value.data));
-        comments.refresh();
-        easyRefreshController?.finishLoad();
-      } else {
-        var message = value.errorMessage ??
-            "Network Error. Please refresh to try again.".tr;
-        if (message == "No more data") {
-          easyRefreshController?.finishLoad(IndicatorResult.noMore);
-          return;
-        }
-        if (message.length > 45) {
-          message = "${message.substring(0, 20)}...";
-        }
-        error.value = message;
-        Leader.showToast(message);
-        easyRefreshController?.finishLoad(IndicatorResult.fail);
+  Future<void> nextPage() async {
+    if (loadingState.value == LoadingState.loading) return;
+    if (loadingState.value == LoadingState.noMore) return;
+    var value = await loadData();
+    if (value.success) {
+      comments.addAll(filterComments(value.data));
+      comments.refresh();
+      loadingState.value = LoadingState.success;
+      loadingState.refresh();
+    } else {
+      var message = value.errorMessage ??
+          "Network Error. Please refresh to try again.".tr;
+      if (message == "No more data") {
+        loadingState.value = LoadingState.noMore;
+        loadingState.refresh();
+        return;
       }
-    });
+      if (message.length > 45) {
+        message = "${message.substring(0, 20)}...";
+      }
+      error.value = message;
+      Leader.showToast(message);
+      loadingState.value = LoadingState.error;
+      loadingState.refresh();
+    }
   }
 
-  void reset() {
+  Future<void> reset() async {
     nextUrl = null;
-    isLoading.value = false;
+    loadingState.value = LoadingState.idle;
     comments.clear();
     comments.refresh();
     error.value = "";
-    firstLoad();
+    await firstLoad();
   }
 
-  void firstLoad() {
-    loadData().then((value) {
-      isLoading.value = false;
-      if (value.success) {
-        comments.addAll(filterComments(value.data));
-        if (comments.isEmpty) {
-          easyRefreshController?.finishRefresh(IndicatorResult.noMore);
-        }
-        comments.refresh();
-        easyRefreshController?.finishRefresh();
-      } else {
-        var message = value.errorMessage ??
-            "Network Error. Please refresh to try again.".tr;
-        if (message == "No more data") {
-          easyRefreshController?.finishRefresh(IndicatorResult.noMore);
-          return;
-        }
-        if (message.length > 45) {
-          message = "${message.substring(0, 20)}...";
-        }
-        error = message.obs;
-        Leader.showToast(message);
-        easyRefreshController?.finishRefresh(IndicatorResult.fail);
+  Future<void> firstLoad() async {
+    if (loadingState.value == LoadingState.loading) return;
+    if (loadingState.value == LoadingState.noMore) return;
+    var value = await loadData();
+    if (value.success) {
+      comments.addAll(filterComments(value.data));
+      if (comments.isEmpty) {
+        loadingState.value = LoadingState.noMore;
+        loadingState.refresh();
       }
-    });
+      comments.refresh();
+      loadingState.value = LoadingState.success;
+      loadingState.refresh();
+    } else {
+      var message = value.errorMessage ??
+          "Network Error. Please refresh to try again.".tr;
+      if (message == "No more data") {
+        loadingState.value = LoadingState.noMore;
+        loadingState.refresh();
+        return;
+      }
+      if (message.length > 45) {
+        message = "${message.substring(0, 20)}...";
+      }
+      error.value = message;
+      Leader.showToast(message);
+      loadingState.value = LoadingState.error;
+      loadingState.refresh();
+    }
   }
 
   bool commentHateByUser(Comment comment) {
@@ -135,7 +145,7 @@ class CommentController extends GetxController {
         Leader.showToast(res.errorMessage ?? "Network Error".tr);
       } else {
         Leader.showToast("Commented".tr);
-        easyRefreshController?.callRefresh();
+        reset();
       }
     } else if (type == ArtworkType.NOVEL) {
       res =
@@ -144,7 +154,7 @@ class CommentController extends GetxController {
         Leader.showToast(res.errorMessage ?? "Network Error".tr);
       } else {
         Leader.showToast("Commented".tr);
-        easyRefreshController?.callRefresh();
+        reset();
       }
     }
   }
