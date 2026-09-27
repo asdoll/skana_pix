@@ -11,6 +11,7 @@ import 'package:skana_pix/utils/io_extension.dart';
 import 'package:skana_pix/utils/leaders.dart';
 import 'package:skana_pix/utils/widgetplugin.dart';
 import '../../controller/caches.dart';
+import '../../componentwidgets/artworkbarscrim.dart';
 import '../../componentwidgets/pixivimage.dart';
 
 import 'package:share_plus/share_plus.dart';
@@ -56,7 +57,7 @@ class _ImageViewPageState extends State<ImageViewPage> {
       if (widget.urls.length == 1) {
         final url = widget.urls.first;
         return Scaffold(
-                    extendBody: true,
+          extendBody: true,
           extendBodyBehindAppBar: true,
           backgroundColor: Colors.black,
           bottomNavigationBar: _buildBottom(context),
@@ -70,7 +71,7 @@ class _ImageViewPageState extends State<ImageViewPage> {
         );
       } else {
         return Scaffold(
-                    extendBody: true,
+          extendBody: true,
           extendBodyBehindAppBar: true,
           bottomNavigationBar: _buildBottom(context),
           backgroundColor: Colors.black,
@@ -111,140 +112,155 @@ class _ImageViewPageState extends State<ImageViewPage> {
 
   Widget _buildBottom(BuildContext context) {
     if (_fullScreen) {
-      return BottomAppBar(
-        color: Colors.transparent,
-        child: Row(
-          children: [
-            MoonButton.icon(
-                onTap: () {
-                  setState(() {
-                    _fullScreen = false;
-                  });
-                  SystemChrome.setEnabledSystemUIMode(SystemUiMode.manual,
-                      overlays: SystemUiOverlay.values);
-                },
-                icon: Icon(
-                  Icons.fullscreen_exit,
-                  color: Colors.white.withValues(alpha: 0.5),
-                ))
-          ],
+      return SafeArea(
+        top: false,
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(12, 0, 12, 8),
+          child: Row(
+            children: [
+              ArtworkBarScrim(
+                padding: const EdgeInsets.all(4),
+                child: MoonButton.icon(
+                    onTap: () {
+                      setState(() {
+                        _fullScreen = false;
+                      });
+                      SystemChrome.setEnabledSystemUIMode(SystemUiMode.manual,
+                          overlays: SystemUiOverlay.values);
+                    },
+                    icon: Icon(
+                      Icons.fullscreen_exit,
+                      color: Colors.white.withValues(alpha: 0.5),
+                    )),
+              ),
+            ],
+          ),
         ),
       );
     }
-    return BottomAppBar(
-      color: Colors.transparent,
-      child: Visibility(
-        visible: true,
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            Row(
+    return SafeArea(
+      top: false,
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(12, 0, 12, 8),
+        child: ArtworkBarScrim(
+          child: Visibility(
+            visible: true,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                MoonButton.icon(
-                  icon: Icon(
-                    Icons.photo_library_outlined,
-                    color: Colors.white,
-                  ),
-                  onTap: () {},
-                ),
-                Text(
-                  "${currentPage + 1}/${widget.urls.length}",
-                  style: TextStyle(color: Colors.white),
-                ).header(),
-              ],
-            ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: [
-                MoonButton.icon(
-                    icon: Icon(
-                      Icons.arrow_back,
-                      color: Colors.white,
+                Row(
+                  children: [
+                    MoonButton.icon(
+                      icon: Icon(
+                        Icons.photo_library_outlined,
+                        color: Colors.white,
+                      ),
+                      onTap: () {},
                     ),
-                    onTap: () async {
-                      Navigator.of(context).pop();
-                    }),
-                MoonButton.icon(
-                  icon: Icon(Icons.fullscreen, color: Colors.white),
-                  onTap: () {
-                    setState(() {
-                      _fullScreen = true;
-                    });
-                    SystemChrome.setEnabledSystemUIMode(SystemUiMode.manual,
-                        overlays: []);
-                  },
+                    Text(
+                      "${currentPage + 1}/${widget.urls.length}",
+                      style: TextStyle(color: Colors.white),
+                    ).header(),
+                  ],
                 ),
-                GestureDetector(
-                    child: MoonButton.icon(
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    MoonButton.icon(
                         icon: Icon(
-                          Icons.save_alt,
-                          color: Colors.white,
-                        ),
-                        onTap: () {
-                          File file = File(path.join(
-                              BasePath.cachePath,
-                              "share_cache",
-                              path.basenameWithoutExtension(nowUrl) +
-                                  (nowUrl.endsWith(".png") ? ".png" : ".jpg")));
-                          if (!file.existsSync()) {
-                            file.createSync(recursive: true);
-                          }
-
-                          saveUrl(widget.urls[currentPage]);
-                        }),
-                    onLongPress: () async {
-                      saveUrl(widget.urls[currentPage]);
-                    }),
-                AnimatedOpacity(
-                  opacity: shareShow ? 1 : 0.5,
-                  duration: Duration(milliseconds: 500),
-                  child: Builder(builder: (context) {
-                    return MoonButton.icon(
-                        icon: Icon(
-                          Icons.share,
+                          Icons.arrow_back,
                           color: Colors.white,
                         ),
                         onTap: () async {
-                          var file =
-                              await imagesCacheManager.getFileFromCache(nowUrl);
-                          if (file != null) {
-                            String targetPath = path.join(
-                                BasePath.cachePath,
-                                "share_cache",
-                                path.basenameWithoutExtension(file.file.path) +
-                                    (nowUrl.endsWith(".png")
-                                        ? ".png"
-                                        : ".jpg"));
-                            File targetFile = File(targetPath);
-                            if (!targetFile.existsSync()) {
-                              targetFile.createSync(recursive: true);
-                            }
-                            file.file.copySync(targetPath);
-                            final box =
-                                context.findRenderObject() as RenderBox?;
-                            Share.shareXFiles([XFile(targetPath)],
-                                sharePositionOrigin:
-                                    box!.localToGlobal(Offset.zero) & box.size);
-                          } else {
-                            Leader.showToast("can not find image cache");
-                          }
+                          Navigator.of(context).pop();
+                        }),
+                    MoonButton.icon(
+                      icon: Icon(Icons.fullscreen, color: Colors.white),
+                      onTap: () {
+                        setState(() {
+                          _fullScreen = true;
                         });
-                  }),
+                        SystemChrome.setEnabledSystemUIMode(SystemUiMode.manual,
+                            overlays: []);
+                      },
+                    ),
+                    GestureDetector(
+                        child: MoonButton.icon(
+                            icon: Icon(
+                              Icons.save_alt,
+                              color: Colors.white,
+                            ),
+                            onTap: () {
+                              File file = File(path.join(
+                                  BasePath.cachePath,
+                                  "share_cache",
+                                  path.basenameWithoutExtension(nowUrl) +
+                                      (nowUrl.endsWith(".png")
+                                          ? ".png"
+                                          : ".jpg")));
+                              if (!file.existsSync()) {
+                                file.createSync(recursive: true);
+                              }
+
+                              saveUrl(widget.urls[currentPage]);
+                            }),
+                        onLongPress: () async {
+                          saveUrl(widget.urls[currentPage]);
+                        }),
+                    AnimatedOpacity(
+                      opacity: shareShow ? 1 : 0.5,
+                      duration: Duration(milliseconds: 500),
+                      child: Builder(builder: (context) {
+                        return MoonButton.icon(
+                            icon: Icon(
+                              Icons.share,
+                              color: Colors.white,
+                            ),
+                            onTap: () async {
+                              var file = await imagesCacheManager
+                                  .getFileFromCache(nowUrl);
+                              if (file != null) {
+                                String targetPath = path.join(
+                                    BasePath.cachePath,
+                                    "share_cache",
+                                    path.basenameWithoutExtension(
+                                            file.file.path) +
+                                        (nowUrl.endsWith(".png")
+                                            ? ".png"
+                                            : ".jpg"));
+                                File targetFile = File(targetPath);
+                                if (!targetFile.existsSync()) {
+                                  targetFile.createSync(recursive: true);
+                                }
+                                file.file.copySync(targetPath);
+                                final box =
+                                    context.findRenderObject() as RenderBox?;
+                                Share.shareXFiles([XFile(targetPath)],
+                                    sharePositionOrigin:
+                                        box!.localToGlobal(Offset.zero) &
+                                            box.size);
+                              } else {
+                                Leader.showToast("can not find image cache");
+                              }
+                            });
+                      }),
+                    ),
+                    // IconButton(
+                    //     icon: Icon(
+                    //       !_loadSource ? Icons.hd_outlined : Icons.hd,
+                    //       color: Colors.white,
+                    //     ),
+                    //     onPressed: () {
+                    //       setState(() {
+                    //         _loadSource = !_loadSource;
+                    //       });
+                    //     }),
+                  ],
                 ),
-                // IconButton(
-                //     icon: Icon(
-                //       !_loadSource ? Icons.hd_outlined : Icons.hd,
-                //       color: Colors.white,
-                //     ),
-                //     onPressed: () {
-                //       setState(() {
-                //         _loadSource = !_loadSource;
-                //       });
-                //     }),
               ],
             ),
-          ],
+          ),
         ),
       ),
     );

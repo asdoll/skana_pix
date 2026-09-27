@@ -4,7 +4,7 @@ import 'package:moon_design/moon_design.dart';
 import 'package:skana_pix/controller/account_controller.dart';
 import 'package:skana_pix/utils/widgetplugin.dart';
 import 'package:skana_pix/view/settings/settingpage.dart';
-import 'package:url_launcher/url_launcher_string.dart';
+import 'package:skana_pix/utils/launch.dart';
 import '../componentwidgets/webview.dart';
 import '../utils/applinks.dart';
 
@@ -25,10 +25,12 @@ class _LoginPageState extends State<LoginPage> {
             mainAxisAlignment: MainAxisAlignment.end,
             children: [
               IconButton(
-                icon: Icon(Icons.settings,color: context.moonTheme?.tokens.colors.bulma,),
+                icon: Icon(
+                  Icons.settings,
+                  color: context.moonTheme?.tokens.colors.bulma,
+                ),
                 onPressed: () => Get.to(() => Scaffold(
-                    appBar: appBar(title: "Settings".tr),
-                    body: SettingPage())),
+                    appBar: appBar(title: "Settings".tr), body: SettingPage())),
               )
             ],
           ),
@@ -82,8 +84,9 @@ class _LoginPageState extends State<LoginPage> {
                         padding: const EdgeInsets.symmetric(
                             horizontal: 8, vertical: 4),
                         child: Text(
-                            "You need to complete the login operation in the browser window that will open."
-                                .tr).small(),
+                                "You need to complete the login operation in the browser window that will open."
+                                    .tr)
+                            .small(),
                       )
                     ],
                   ),
@@ -119,8 +122,9 @@ class _LoginPageState extends State<LoginPage> {
                     padding:
                         const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                     child: Text(
-                        "Waiting for authentication. Please finished in the browser."
-                            .tr).small(),
+                            "Waiting for authentication. Please finished in the browser."
+                                .tr)
+                        .small(),
                   ),
                 ),
               ),
@@ -171,55 +175,58 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   void onContinue() async {
-    bool useExternal = true;
+    bool useExternal = !isOhos;
     bool exitLogin = false;
-    if (GetPlatform.isMobile) {
+    if (GetPlatform.isMobile || isOhos) {
       await showMoonModal(
-      context: context,
-      builder: (context) {
-        return Dialog(
-            child: ListView(
-                                  shrinkWrap: true,
-          children: [
-            MoonAlert(
-                borderColor: Get
-                    .context?.moonTheme?.buttonTheme.colors.borderColor
-                    .withValues(alpha: 0.5),
-                showBorder: true,
-                label: Text("I understand this is a free unofficial application.".tr).header(),
-                verticalGap: 16,
-                content: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.end,
-                  children: [
-                    outlinedButton(
-                      label: "Cancel".tr,
-                      onPressed: () {
-                        exitLogin = true;
-                        Get.back();
-                      },
-                    ).paddingBottom(16),
-                    filledButton(
-                      label: "Continue with Webview".tr,
-                      onPressed: () {
-                        exitLogin = false;
-                        useExternal = false;
-                        Get.back();
-                      },
-                    ).paddingBottom(16),
-                    filledButton(
-                      label: "Continue with External Browser".tr,
-                      onPressed: () {
-                        exitLogin = false;
-                        useExternal = true;
-                        Get.back();
-                      },
-                    ),
-                  ],
-                )),
-          ],
-        ));
-      });
+          context: context,
+          builder: (context) {
+            return Dialog(
+                child: ListView(
+              shrinkWrap: true,
+              children: [
+                MoonAlert(
+                    borderColor: Get
+                        .context?.moonTheme?.buttonTheme.colors.borderColor
+                        .withValues(alpha: 0.5),
+                    showBorder: true,
+                    label: Text(
+                            "I understand this is a free unofficial application."
+                                .tr)
+                        .header(),
+                    verticalGap: 16,
+                    content: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      crossAxisAlignment: CrossAxisAlignment.end,
+                      children: [
+                        outlinedButton(
+                          label: "Cancel".tr,
+                          onPressed: () {
+                            exitLogin = true;
+                            Get.back();
+                          },
+                        ).paddingBottom(16),
+                        filledButton(
+                          label: "Continue with Webview".tr,
+                          onPressed: () {
+                            exitLogin = false;
+                            useExternal = false;
+                            Get.back();
+                          },
+                        ).paddingBottom(16),
+                        filledButton(
+                          label: "Continue with External Browser".tr,
+                          onPressed: () {
+                            exitLogin = false;
+                            useExternal = true;
+                            Get.back();
+                          },
+                        ),
+                      ],
+                    )),
+              ],
+            ));
+          });
     }
     if (exitLogin) {
       return;
@@ -234,20 +241,24 @@ class _LoginPageState extends State<LoginPage> {
       return false;
     };
     accountController.waitingForAuth.value = true;
-    if (!useExternal && mounted) {
-      Get.to(() => WebviewPage(
-            url,
-            onNavigation: (req) {
-              if (req.url.startsWith("pixiv://")) {
-                Get.back();
-                onLink?.call(Uri.parse(req.url));
-                return false;
-              }
-              return true;
-            },
-          ));
-    } else {
-      launchUrlString(url);
+    if (useExternal) {
+      // On HarmonyOS the external browser is the reliable route: the in-app
+      // browser page of url_launcher_ohos is not part of this project. If the
+      // hand-off fails, fall back to the bundled webview below.
+      final opened = await openInBrowser(url);
+      if (opened || !mounted) return;
     }
+    if (!mounted) return;
+    Get.to(() => WebviewPage(
+          url,
+          onNavigation: (req) {
+            if (req.url.startsWith("pixiv://")) {
+              Get.back();
+              onLink?.call(Uri.parse(req.url));
+              return false;
+            }
+            return true;
+          },
+        ));
   }
 }

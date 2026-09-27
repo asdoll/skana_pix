@@ -9,7 +9,7 @@ import 'package:skana_pix/model/boardinfo.dart';
 import 'package:skana_pix/utils/leaders.dart' show Leader, failedLoadToast;
 import 'package:skana_pix/utils/loading_indicator.dart';
 import 'package:skana_pix/utils/widgetplugin.dart';
-import 'package:url_launcher/url_launcher_string.dart';
+import 'package:skana_pix/utils/launch.dart';
 
 class Constants {
   static const String appName = 'SkanaPix';
@@ -72,7 +72,7 @@ class BoardController extends GetxController {
 class UpdateController extends GetxController {
   RxBool hasNewVersion = false.obs;
   Rx<LoadingState> loadingState = LoadingState.idle.obs;
-  
+
   Result result = Result.timeout;
   String updateUrl = "https://github.com/asdoll/skana_pix/releases/latest";
   String updateDescription = "";
@@ -80,7 +80,7 @@ class UpdateController extends GetxController {
   String updateDate = "";
 
   void init() {
-    if (settings.settings[9]=="1") {
+    if (settings.settings[9] == "1") {
       check().then((value) {
         if (result == Result.yes) {
           alertDialog(
@@ -91,7 +91,7 @@ class UpdateController extends GetxController {
                 outlinedButton(onPressed: () => Get.back(), label: "Cancel".tr),
                 filledButton(
                     onPressed: () {
-                      launchUrlString(updateUrl);
+                      openInBrowser(updateUrl);
                       Get.back();
                     },
                     label: "Update".tr)

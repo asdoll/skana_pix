@@ -1,0 +1,16 @@
+{
+  "string": [
+    {
+      "name": "module_desc",
+      "value": "pixiv 第三方客户端"
+    },
+    {
+      "name": "EntryAbility_desc",
+      "value": "pixiv 第三方客户端"
+    },
+    {
+      "name": "EntryAbility_label",
+      "value": "SkanaPix"
+    }
+  ]
+}

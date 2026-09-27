@@ -5,7 +5,7 @@ import 'package:skana_pix/utils/io_extension.dart';
 import 'package:skana_pix/utils/leaders.dart';
 import 'package:skana_pix/utils/loading_indicator.dart' show LoadingState;
 import 'package:skana_pix/utils/widgetplugin.dart';
-import 'package:url_launcher/url_launcher_string.dart';
+import 'package:skana_pix/utils/launch.dart';
 
 class NewVersionPage extends StatefulWidget {
   const NewVersionPage({super.key});
@@ -60,7 +60,7 @@ class _NewVersionPageState extends State<NewVersionPage> {
                             Leader.showToast('No download link'.tr);
                             return;
                           }
-                          await launchUrlString(updateController.updateUrl);
+                          await openInBrowser(updateController.updateUrl);
                         },
                       ),
                     Row(

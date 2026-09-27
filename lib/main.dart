@@ -24,6 +24,15 @@ import 'package:flutter/material.dart';
 
 import 'controller/like_controller.dart';
 
+/// Runs a startup step, logging instead of rethrowing when it fails.
+Future<void> safeInit(String label, Future<void> Function() task) async {
+  try {
+    await task();
+  } catch (e, s) {
+    log.e("startup: $label failed: $e", error: "$s");
+  }
+}
+
 Future<void> main() async {
   runZonedGuarded(() async {
     WidgetsFlutterBinding.ensureInitialized();
@@ -32,11 +41,14 @@ Future<void> main() async {
       print("Unhandled:${details.exception}\n${details.stack}");
     };
     initLogger();
-    await settings.init();
-    await TextConfigManager.init();
+    // Every startup step is isolated: a plugin that is missing on the current
+    // platform (for example objectbox on HarmonyOS) must not abort main()
+    // before runApp(), otherwise the app only ever shows a white screen.
+    await safeInit("settings", () => settings.init());
+    await safeInit("text config", () => TextConfigManager.init());
     //setSystemProxy();
-    await ConnectManager().init();
-    await M.init();
+    await safeInit("connection", () => ConnectManager().init());
+    await safeInit("history database", () => M.init());
     handleLinks();
     homeController = Get.put(HomeController(), permanent: true);
     accountController = Get.put(AccountController(), permanent: true);

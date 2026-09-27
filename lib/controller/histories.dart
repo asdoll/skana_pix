@@ -2,19 +2,32 @@ import 'dart:convert';
 
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
-import 'package:skana_pix/controller/objectbox.dart';
+import 'package:skana_pix/controller/history_store.dart';
+import 'package:skana_pix/controller/logging.dart';
+import 'package:skana_pix/model/history_models.dart';
 import 'package:skana_pix/model/illust.dart';
 import 'package:skana_pix/model/novel.dart';
-import 'package:skana_pix/model/objectbox_models.dart';
 import 'package:skana_pix/utils/leaders.dart';
 import 'package:skana_pix/utils/loading_indicator.dart';
 
 import '../utils/safplugin.dart';
 
 class M {
-  static late ObjectBox o;
+  static HistoryStore? _o;
+
+  /// True once the local history database has been opened successfully.
+  ///
+  /// When opening fails (for example on a platform without an objectbox native
+  /// library) every method below degrades to a no-op instead of throwing, so a
+  /// missing history store can never break the UI.
+  static bool get available => _o != null;
+
   static Future<void> init() async {
-    o = await ObjectBox.create();
+    try {
+      _o = await HistoryStore.create();
+    } catch (e, s) {
+      log.e("history database unavailable: $e", error: "$s");
+    }
   }
 
   static Future<void> addIllust(Illust illust) async {
@@ -25,7 +38,7 @@ class M {
         time: DateTime.now().millisecondsSinceEpoch,
         title: illust.title,
         userName: illust.author.name);
-    await o.addIllust(illustHis);
+    await _o?.addIllust(illustHis);
   }
 
   static Future<NovelHistory> addNovel(Novel novel,
@@ -38,38 +51,41 @@ class M {
         time: DateTime.now().millisecondsSinceEpoch,
         pictureUrl: novel.image.squareMedium,
         lastRead: lastRead);
+    final o = _o;
+    if (o == null) return novelHis;
     return await o.addNovel(novelHis);
   }
 
   static Future<NovelHistory?> getNovelHistoryByNovelId(int novelId) async {
-    return await o.getNovelHistoryByNovelId(novelId);
+    return await _o?.getNovelHistoryByNovelId(novelId);
   }
 
   static Future<List<IllustHistory>> getAllIllusts() async {
-    return await o.getAllIllust();
+    return await _o?.getAllIllust() ?? [];
   }
 
   static Future<List<NovelHistory>> getAllNovels() async {
-    return await o.getAllNovel();
+    return await _o?.getAllNovel() ?? [];
   }
 
   static Future<void> removeIllust(int illustId) async {
-    await o.removeIllust(illustId);
+    await _o?.removeIllust(illustId);
   }
 
   static Future<void> removeNovel(int novelId) async {
-    await o.removeNovel(novelId);
+    await _o?.removeNovel(novelId);
   }
 
   static Future<void> clearIllusts() async {
-    o.removeAllIllustHistory();
+    _o?.removeAllIllustHistory();
   }
 
   static Future<void> clearNovels() async {
-    o.removeAllNovelHistory();
+    _o?.removeAllNovelHistory();
   }
 
   static Future<void> importIllustData() async {
+    if (_o == null) return;
     final result = await SAFPlugin.openFile();
     if (result == null) return;
     final json = utf8.decode(result);
@@ -84,11 +100,12 @@ class M {
           time: illustMap['time'],
           title: illustMap['title'],
           userName: illustMap['user_name']);
-      o.addIllust(illustHis);
+      _o?.addIllust(illustHis);
     }
   }
 
   static Future<void> importNovelData() async {
+    if (_o == null) return;
     final result = await SAFPlugin.openFile();
     if (result == null) return;
     final json = utf8.decode(result);
@@ -104,24 +121,26 @@ class M {
           title: novelMap['title'],
           userName: novelMap['user_name'],
           lastRead: novelMap['last_read'] ?? 0);
-      o.addNovel(noveHis);
+      _o?.addNovel(noveHis);
     }
   }
 
   static Future<void> exportIllustData() async {
+    if (_o == null) return;
     final uriStr =
         await SAFPlugin.createFile("IllustHis.json", "application/json");
     if (uriStr == null) return;
-    final exportData = await o.getAllIllust();
+    final exportData = await _o!.getAllIllust();
     await SAFPlugin.writeUri(
         uriStr, Uint8List.fromList(utf8.encode(jsonEncode(exportData))));
   }
 
   static Future<void> exportNovelData() async {
+    if (_o == null) return;
     final uriStr =
         await SAFPlugin.createFile("NovelHis.json", "application/json");
     if (uriStr == null) return;
-    final exportData = await o.getAllNovel();
+    final exportData = await _o!.getAllNovel();
     await SAFPlugin.writeUri(
         uriStr, Uint8List.fromList(utf8.encode(jsonEncode(exportData))));
   }

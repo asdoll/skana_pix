@@ -148,8 +148,13 @@ class TextCompositionPageState extends State<TextCompositionPage>
                   ),
                 ),
                 ...widget.controller.pages,
-                if (widget.controller.isShowMenu && widget.controller.menuBuilder != null)
-                  widget.controller.menuBuilder!(widget.controller),
+                if (widget.controller.menuBuilder != null)
+                  IgnorePointer(
+                    // Kept in the tree while hidden so the bars can animate
+                    // in and out; taps pass straight through in the meantime.
+                    ignoring: !widget.controller.isShowMenu,
+                    child: widget.controller.menuBuilder!(widget.controller),
+                  ),
               ],
             ),
           ),

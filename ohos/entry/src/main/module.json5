@@ -1,0 +1,67 @@
+
+{
+  "module": {
+    "name": "entry",
+    "type": "entry",
+    "description": "$string:module_desc",
+    "mainElement": "EntryAbility",
+    "deviceTypes": [
+      "phone"
+    ],
+    "deliveryWithInstall": true,
+    "installationFree": false,
+    "pages": "$profile:main_pages",
+    "abilities": [
+      {
+        "name": "EntryAbility",
+        "srcEntry": "./ets/entryability/EntryAbility.ets",
+        "description": "$string:EntryAbility_desc",
+        "icon": "$media:icon",
+        "label": "$string:EntryAbility_label",
+        // Dedicated 144x144 asset: the launch window icon must not exceed 144px,
+        // while the ability icon next to it wants a larger master (432px).
+        "startWindowIcon": "$media:startIcon",
+        "startWindowBackground": "$color:start_window_background",
+        "exported": true,
+        "skills": [
+          {
+            "entities": [
+              "entity.system.home"
+            ],
+            "actions": [
+              "action.system.home"
+            ]
+          },
+          // Lets HarmonyOS hand pixiv:// links to this app (login callback from
+          // an external browser, and deep links opened elsewhere). Without this
+          // entry the system has no handler and drops the link once the page
+          // does not need it.
+          {
+            "actions": [
+              "ohos.want.action.viewData"
+            ],
+            "uris": [
+              {
+                "scheme": "pixiv"
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "requestPermissions": [
+      // ---- system_grant: granted automatically at install, no runtime prompt ----
+      // Pixiv API calls, image/video downloads and the in-app WebView.
+      {
+        "name": "ohos.permission.INTERNET"
+      }
+      // Saving illustrations to the gallery needs no permission: the OHOS
+      // implementation of image_gallery_saver_plus saves through
+      // photoAccessHelper.showAssetsCreationDialog, which asks the user with a
+      // system dialog (see dependency_overrides in pubspec.yaml).
+      //
+      // Optional, only if you add a connectivity/network-state check:
+      // { "name": "ohos.permission.GET_NETWORK_INFO" }
+    ]
+  }
+}

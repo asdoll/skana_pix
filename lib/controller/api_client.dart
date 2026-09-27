@@ -8,6 +8,7 @@ import 'package:intl/intl.dart';
 import 'package:crypto/crypto.dart';
 import '../controller/exceptions.dart';
 import '../controller/logging.dart';
+import '../utils/rate_limit.dart';
 import '../model/user.dart';
 
 import '../model/author.dart';
@@ -163,6 +164,7 @@ class ApiClient extends BaseClient {
       if (!path.startsWith("http")) {
         path = "$baseUrl$path";
       }
+      log.d("ApiClient apiGet: $path");
       final res = await pDio.get<Map<String, dynamic>>(path,
           queryParameters: query,
           options: Options(headers: headers, validateStatus: (status) => true));
@@ -199,6 +201,7 @@ class ApiClient extends BaseClient {
       if (!path.startsWith("http")) {
         path = "$baseUrl$path";
       }
+      log.d("ApiClient apiGetPlain: $path");
       final res = await pDio.get<String>(path,
           queryParameters: query,
           options: Options(headers: headers, validateStatus: (status) => true));
@@ -443,6 +446,11 @@ class ApiClient extends BaseClient {
       }
       var res = await request;
       if (res.error) {
+        // Do not retry while pixiv is rate limiting us: every extra request
+        // extends the block, and the caller already surfaces the error.
+        if (looksRateLimited(res.errMsg)) {
+          throw BadRequestException(res.errMsg);
+        }
         retryCount++;
         if (retryCount > 3) {
           throw BadRequestException(res.errMsg);
@@ -643,8 +651,10 @@ class ApiClient extends BaseClient {
     }
   }
 
-  Future<Res<List<Comment>>> getIllustCommentsReplies(String id, [String? nextUrl]) async {
-    var res = await apiGet(nextUrl ?? "/v2/illust/comment/replies?comment_id=$id");
+  Future<Res<List<Comment>>> getIllustCommentsReplies(String id,
+      [String? nextUrl]) async {
+    var res =
+        await apiGet(nextUrl ?? "/v2/illust/comment/replies?comment_id=$id");
     if (res.success) {
       return Res(
           (res.data["comments"] as List)
@@ -934,8 +944,10 @@ class ApiClient extends BaseClient {
         subData: res.data["next_url"]);
   }
 
-  Future<Res<List<Comment>>> getNovelCommentsReplies(String id, [String? nextUrl]) async {
-    var res = await apiGet(nextUrl ?? "/v2/novel/comment/replies?comment_id=$id");
+  Future<Res<List<Comment>>> getNovelCommentsReplies(String id,
+      [String? nextUrl]) async {
+    var res =
+        await apiGet(nextUrl ?? "/v2/novel/comment/replies?comment_id=$id");
     if (res.error) {
       return Res.fromErrorRes(res);
     }

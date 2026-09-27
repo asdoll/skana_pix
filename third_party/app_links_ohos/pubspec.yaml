@@ -1,0 +1,21 @@
+name: app_links_ohos
+description: HarmonyOS implementation of app_links, vendored from the CPF-Flutter
+  port (tag 7.0.0-ohos-1.0.1). It contains no Dart code; the official app_links
+  package talks to it over the com.llfbandit.app_links channels.
+version: 1.0.0
+publish_to: none
+homepage: https://gitcode.com/CPF-Flutter/fluttertpc_app_links
+
+environment:
+  sdk: ^3.5.0
+  flutter: ">=3.19.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+flutter:
+  plugin:
+    platforms:
+      ohos:
+        pluginClass: AppLinksPlugin

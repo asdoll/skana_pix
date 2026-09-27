@@ -5,8 +5,8 @@ import 'package:skana_pix/controller/exceptions.dart';
 import 'package:skana_pix/controller/histories.dart' show M;
 import 'package:skana_pix/controller/logging.dart';
 import 'package:skana_pix/controller/res.dart';
+import 'package:skana_pix/model/history_models.dart';
 import 'package:skana_pix/model/novel.dart';
-import 'package:skana_pix/model/objectbox_models.dart';
 import 'package:skana_pix/utils/leaders.dart';
 import 'package:skana_pix/utils/loading_indicator.dart' show LoadingState;
 

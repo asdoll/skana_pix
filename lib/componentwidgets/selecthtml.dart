@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_colorpicker/flutter_colorpicker.dart';
-import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
+import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart';
 import 'package:moon_design/moon_design.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:skana_pix/controller/logging.dart';
@@ -26,7 +26,8 @@ class _SelectableHtmlState extends State<SelectableHtml> {
         }
         return null;
       },
-      textStyle: context.moonTheme?.tokens.typography.heading.text14.apply(color: context.moonTheme?.textAreaTheme.colors.textColor),
+      textStyle: context.moonTheme?.tokens.typography.heading.text14
+          .apply(color: context.moonTheme?.textAreaTheme.colors.textColor),
       onTapUrl: (String url) async {
         try {
           log.d("html tap url: $url");

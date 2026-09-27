@@ -206,6 +206,12 @@ class ListIllustController extends GetxController {
   Future<void> nextPage() async {
     if (loadingState.value == LoadingState.loading) return;
     if (loadingState.value == LoadingState.noMore) return;
+    if (nexturl.value == "end") {
+      // Cursor exhausted - calling the API again would only burn rate limit.
+      loadingState.value = LoadingState.noMore;
+      loadingState.refresh();
+      return;
+    }
     var value = await loadData();
     if (value.success) {
       loadingState.value = LoadingState.success;

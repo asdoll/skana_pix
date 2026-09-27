@@ -5,7 +5,7 @@ import 'package:moon_design/moon_design.dart';
 import 'package:skana_pix/controller/logging.dart';
 import 'package:skana_pix/view/imageview/imagelistview.dart';
 import 'package:skana_pix/model/worktypes.dart';
-import 'package:url_launcher/url_launcher_string.dart';
+import 'package:skana_pix/utils/launch.dart';
 
 import 'package:skana_pix/view/novelview/novelpage.dart';
 import 'package:skana_pix/view/novelview/novelseries.dart';
@@ -54,7 +54,7 @@ class Leader {
         }
       } catch (e) {
         try {
-          launchUrlString(link.toString());
+          openInBrowser(link.toString());
         } catch (e) {
           Leader.showToast(e.toString());
         }

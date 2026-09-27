@@ -3,7 +3,7 @@ import 'package:get/get.dart';
 import 'package:skana_pix/componentwidgets/backarea.dart';
 import 'package:skana_pix/controller/update_controller.dart';
 import 'package:skana_pix/utils/widgetplugin.dart';
-import 'package:url_launcher/url_launcher_string.dart';
+import 'package:skana_pix/utils/launch.dart';
 
 class AboutPage extends StatefulWidget {
   const AboutPage({super.key});
@@ -36,7 +36,7 @@ class _AboutPageState extends State<AboutPage> {
         moonListTile(
           title: 'Website'.tr,
           subtitle: 'https://github.com/asdoll/skana_pix',
-          onTap: () => launchUrlString("https://github.com/asdoll/skana_pix"),
+          onTap: () => openInBrowser("https://github.com/asdoll/skana_pix"),
         ),
         moonListTileWidgets(
           label: Column(

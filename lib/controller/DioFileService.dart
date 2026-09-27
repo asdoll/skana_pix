@@ -9,6 +9,7 @@ import 'package:intl/intl.dart';
 import 'package:skana_pix/controller/PDio.dart';
 import 'package:skana_pix/controller/bases.dart';
 import 'package:skana_pix/controller/exceptions.dart';
+import 'package:skana_pix/controller/logging.dart' show log;
 import 'package:skana_pix/utils/io_extension.dart';
 
 class DioFileService extends FileService {
@@ -25,6 +26,7 @@ class DioFileService extends FileService {
         md5.convert(utf8.encode(time + BaseClient.hashSalt)).toString();
     Uri uri = Uri.parse(url);
     uri = toTrueUri(uri);
+    log.d("DioFileService get: $uri");
 
     var res = await dio.get<ResponseBody>(uri.toString(),
         options: Options(
@@ -37,6 +39,7 @@ class DioFileService extends FileService {
               "x-client-hash": hash,
               "accept-enconding": "gzip"
             }));
+    log.d("DioFileService get response: ${res.statusCode}");
     if (res.statusCode != 200) {
       throw BadRequestException("Failed to load image: ${res.statusCode}");
     }

@@ -1,0 +1,16 @@
+{
+  "string": [
+    {
+      "name": "module_desc",
+      "value": "Third-party pixiv client"
+    },
+    {
+      "name": "EntryAbility_desc",
+      "value": "Third-party pixiv client"
+    },
+    {
+      "name": "EntryAbility_label",
+      "value": "SkanaPix"
+    }
+  ]
+}

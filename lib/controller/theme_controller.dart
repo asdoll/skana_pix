@@ -1,6 +1,5 @@
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:moon_design/moon_design.dart';
 import 'package:flutter/material.dart';
 import 'package:skana_pix/controller/logging.dart';
@@ -42,8 +41,7 @@ class ThemeManager {
       };
     } else {
       WidgetsBinding.instance.platformDispatcher.onPlatformBrightnessChanged =
-          () {
-      };
+          () {};
     }
   }
 
@@ -63,9 +61,6 @@ class ThemeManager {
 ThemeData getTheme(bool isDark) {
   return (isDark
           ? ThemeData.dark().copyWith(
-              textTheme: GoogleFonts.notoSansTextTheme(
-                Get.theme.textTheme
-              ),
               appBarTheme: AppBarTheme(
                 titleSpacing: 0,
                 backgroundColor:
@@ -75,9 +70,6 @@ ThemeData getTheme(bool isDark) {
               scaffoldBackgroundColor:
                   MoonTheme(tokens: MoonTokens.light).tokens.colors.bulma)
           : ThemeData.light().copyWith(
-              textTheme: GoogleFonts.notoSansTextTheme(
-                Get.theme.textTheme,
-              ),
               appBarTheme: AppBarTheme(
                 titleSpacing: 0,
                 backgroundColor:
@@ -87,25 +79,7 @@ ThemeData getTheme(bool isDark) {
               scaffoldBackgroundColor:
                   MoonTheme(tokens: MoonTokens.light).tokens.colors.goten))
       .copyWith(extensions: <ThemeExtension<dynamic>>[
-    MoonTheme(tokens: isDark ? MoonTokens.dark.copyWith(
-      typography: MoonTypography.typography.copyWith(
-        heading: MoonTypography.typography.heading.apply(
-          fontFamily: GoogleFonts.notoSans().fontFamily,
-        ),
-        body: MoonTypography.typography.body.apply(
-          fontFamily: GoogleFonts.notoSans().fontFamily,
-        )
-      )
-    ) : MoonTokens.light.copyWith(
-      typography: MoonTypography.typography.copyWith(
-        heading: MoonTypography.typography.heading.apply(
-          fontFamily: GoogleFonts.notoSans().fontFamily,
-        ),
-        body: MoonTypography.typography.body.apply(
-          fontFamily: GoogleFonts.notoSans().fontFamily,
-        )
-      )
-    ))
+    MoonTheme(tokens: isDark ? MoonTokens.dark : MoonTokens.light)
   ]);
 }
 

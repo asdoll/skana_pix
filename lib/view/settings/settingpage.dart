@@ -8,7 +8,7 @@ import 'package:skana_pix/view/settings/netsettings.dart';
 import 'package:skana_pix/view/settings/newversion.dart';
 import 'package:skana_pix/view/settings/prefsettings.dart';
 import 'package:skana_pix/view/homepage.dart';
-import 'package:url_launcher/url_launcher_string.dart';
+import 'package:skana_pix/utils/launch.dart';
 
 import 'about.dart';
 import '../../componentwidgets/avatar.dart';
@@ -48,8 +48,8 @@ class _SettingPageState extends State<SettingPage> {
             if (accountController.isLoggedIn.value)
               SliverToBoxAdapter(
                 child: moonListTile(
-                    onTap: () => launchUrlString(
-                        "https://www.pixiv.net/setting_user.php"),
+                    onTap: () =>
+                        openInBrowser("https://www.pixiv.net/setting_user.php"),
                     leading: Icon(Icons.account_box),
                     title: "Account Settings".tr),
               ),

@@ -6,6 +6,7 @@ import 'package:flutter/services.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:skana_pix/componentwidgets/imagedetail.dart';
 import 'package:skana_pix/utils/loading_indicator.dart';
+import 'package:skana_pix/view/homepage.dart';
 import 'package:skana_pix/view/userview/userpage.dart';
 import 'package:skana_pix/controller/account_controller.dart';
 import 'package:skana_pix/controller/histories.dart';
@@ -17,13 +18,13 @@ import 'package:skana_pix/utils/leaders.dart';
 import 'package:skana_pix/utils/widgetplugin.dart';
 
 import '../../model/worktypes.dart';
+import '../../componentwidgets/artworkbarscrim.dart';
 import '../../componentwidgets/avatar.dart';
-import '../../componentwidgets/backarea.dart';
 import '../../componentwidgets/followbutton.dart';
+import '../../componentwidgets/moonbariconbutton.dart';
 import 'imageviewpage.dart';
 import '../../componentwidgets/pixivimage.dart';
 import '../../componentwidgets/ugoira.dart';
-import 'package:icon_decoration/icon_decoration.dart';
 import 'package:get/get.dart';
 
 const _kBottomBarHeight = 64.0;
@@ -50,6 +51,11 @@ class _ImageListViewPageState extends State<ImageListViewPage> {
   late final PageController controller;
   late ListIllustController listController;
   String type = "";
+
+  /// Pagination cursor ( `nexturl`) we have already asked a next page for, so
+  /// that rebuilding the trailing placeholder cannot fire the same request
+  /// again on every list update.
+  String? _requestedNextUrl;
 
   @override
   void initState() {
@@ -110,6 +116,11 @@ class _ImageListViewPageState extends State<ImageListViewPage> {
                   listController.index.value = value;
 
                   M.addIllust(listController.illusts[value]);
+                  // Leaving the trailing placeholder arms it again, so the user
+                  // can retry a failed page by swiping away and back.
+                  if (value != listController.illusts.length) {
+                    _requestedNextUrl = null;
+                  }
                 }),
               ),
             ),
@@ -151,14 +162,25 @@ class _ImageListViewPageState extends State<ImageListViewPage> {
     if (listController.nexturl.isEmpty) {
       return const SizedBox();
     }
-    load();
+    _loadMoreOnce();
     return Center(
       child: progressIndicator(context, color: Colors.white),
     );
   }
 
-  void load() async {
-    listController.nextPage();
+  /// Asks for the next page at most once per pagination cursor.
+  ///
+  /// This placeholder is rebuilt after every list update, so requesting here on
+  /// every build made the app hammer pixiv with the same page over and over
+  /// (which is what got us rate limited).
+  void _loadMoreOnce() {
+    final String next = listController.nexturl.value;
+    if (next.isEmpty || next == "end") return;
+    if (_requestedNextUrl == next) return;
+    _requestedNextUrl = next;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) listController.nextPage();
+    });
   }
 }
 
@@ -206,6 +228,7 @@ class _IllustPageState extends State<IllustPage> {
       } else {
         relatedListController.showBackArea.value = true;
       }
+      _maybeLoadMoreRelated();
     });
     super.initState();
   }
@@ -215,6 +238,16 @@ class _IllustPageState extends State<IllustPage> {
     Get.delete<ListIllustController>(tag: "related_${widget.illust.id}");
     _scrollController.dispose();
     super.dispose();
+  }
+
+  /// Loads the next page of related artworks once the list bottom comes into
+  /// view. [ListIllustController.nextPage] no-ops while a request is in flight,
+  /// and a fresh scroll event is needed to trigger it again.
+  void _maybeLoadMoreRelated() {
+    if (!_scrollController.hasClients) return;
+    final ScrollPosition position = _scrollController.position;
+    if (position.pixels < position.maxScrollExtent - 600) return;
+    relatedListController.nextPage();
   }
 
   @override
@@ -307,11 +340,6 @@ class _IllustPageState extends State<IllustPage> {
             SliverGrid(
                     delegate: SliverChildBuilderDelegate(
                         (BuildContext context, int index) {
-                      if (index == widget.illust.images.length - 1) {
-                        Future.delayed(Duration(milliseconds: 100), () {
-                          relatedListController.nextPage();
-                        });
-                      }
                       return InkWell(
                         onTap: () {
                           Get.to(
@@ -330,8 +358,7 @@ class _IllustPageState extends State<IllustPage> {
                     gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                         crossAxisCount: max(3, (context.width / 150).floor())))
                 .sliverPadding(EdgeInsets.all(8)),
-            buildLoadMoreIndicator(
-                relatedListController.loadingState.value,
+            buildLoadMoreIndicator(relatedListController.loadingState.value,
                 relatedListController.nextPage)
           ],
         );
@@ -389,127 +416,140 @@ class _IllustPageState extends State<IllustPage> {
   Widget _buildAppbar(BuildContext context) {
     return Column(
       children: [
+        // The status-bar spacer stays outside the scrim, so the translucent
+        // pill only covers the buttons and never the system inset.
         Container(
           height: MediaQuery.of(context).padding.top,
         ),
-        Row(
-          mainAxisSize: MainAxisSize.max,
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            CommonBackArea(),
-            Obx(() => MoonDropdown(
-                constrainWidthToChild: true,
-                show: relatedListController.showDropdown.value,
-                onTapOutside: () =>
-                    relatedListController.showDropdown.value = false,
-                content: SizedBox(
-                  child: Column(children: [
-                    MoonMenuItem(
-                      onTap: () => Get.to(UserPage(
-                        id: widget.illust.author.id,
-                        heroTag: hashCode.toString(),
-                        type: widget.illust.type == "illust"
-                            ? ArtworkType.ILLUST
-                            : ArtworkType.MANGA,
-                      )),
-                      leading: Hero(
-                        tag: widget.illust.author.avatar + hashCode.toString(),
-                        child: PainterAvatar(
-                          url: widget.illust.author.avatar,
-                          id: widget.illust.author.id,
-                          size: 32,
-                        ),
-                      ),
-                      trailing: UserFollowButton(
-                          liked: widget.illust.author.isFollowed,
-                          id: widget.illust.author.id.toString()),
-                      label: SelectionArea(
-                        child: Text(widget.illust.author.name,
-                                maxLines: 1, overflow: TextOverflow.ellipsis)
-                            .subHeader(),
-                      ),
-                    ),
-                    if (widget.illust.images.length > 1)
-                      MoonMenuItem(
-                        onTap: () {
-                          relatedListController.showDropdown.value = false;
-                          _showMutiChoiceDialog(widget.illust, context);
-                        },
-                        leading: const Icon(
-                          Icons.save,
-                        ),
-                        label: Text("Multi-choice Save".tr),
-                      ),
-                    MoonMenuItem(
-                      leading: const Icon(
-                        Icons.share,
-                      ),
-                      onTap: () {
-                        relatedListController.showDropdown.value = false;
-                        final box = context.findRenderObject() as RenderBox?;
-                        final pos = box != null
-                            ? box.localToGlobal(Offset.zero) & box.size
-                            : null;
-                        Share.share(
-                            "https://www.pixiv.net/artworks/${widget.illust.id}",
-                            sharePositionOrigin: pos);
-                      },
-                      label: Text("Share".tr),
-                    ),
-                    MoonMenuItem(
-                      leading: Icon(
-                        Icons.link,
-                      ),
-                      label: Text("Link".tr),
-                      onTap: () async {
-                        relatedListController.showDropdown.value = false;
-                        await Clipboard.setData(ClipboardData(
-                            text:
-                                "https://www.pixiv.net/artworks/${widget.illust.id}"));
-                        Leader.showToast("Copied to clipboard".tr);
-                      },
-                    ),
-                    MoonMenuItem(
-                        leading: Icon(Icons.block),
-                        onTap: () {
-                          relatedListController.showDropdown.value = false;
-                          if (localManager.blockedIllusts
-                              .contains(widget.illust.id.toString())) {
-                            localManager.delete("blockedIllusts",
-                                [widget.illust.id.toString()]);
-                          } else {
-                            localManager.add("blockedIllusts",
-                                [widget.illust.id.toString()]);
-                          }
-                        },
-                        label: Obx(() => localManager.blockedIllusts
-                                .contains(widget.illust.id.toString())
-                            ? Text("Unblock".tr)
-                            : Text("Block".tr))),
-                  ]),
+        Padding(
+          padding: const EdgeInsets.fromLTRB(8, 4, 8, 4),
+          child: ArtworkBarScrim(
+            padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 4),
+            child: Row(
+              mainAxisSize: MainAxisSize.max,
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                MoonBarIconButton(
+                  icon: Icons.arrow_back,
+                  color: Colors.white,
+                  onTap: () => Get.back(),
+                  // Same hidden shortcut the app's back area offers: long press
+                  // jumps straight home.
+                  onLongPress: () => Get.offAll(() => const HomePage()),
                 ),
-                child: SizedBox(
-                  width: max(200, min(300, context.width / 1.5)),
-                  child: Row(
-                    children: [
-                      Expanded(child: Spacer()),
-                      MoonButton.icon(
-                        icon: DecoratedIcon(
-                          icon: Icon(
-                            Icons.more_vert,
-                            color: Colors.white,
+                Obx(() => MoonDropdown(
+                    constrainWidthToChild: true,
+                    show: relatedListController.showDropdown.value,
+                    onTapOutside: () =>
+                        relatedListController.showDropdown.value = false,
+                    content: SizedBox(
+                      child: Column(children: [
+                        MoonMenuItem(
+                          onTap: () => Get.to(UserPage(
+                            id: widget.illust.author.id,
+                            heroTag: hashCode.toString(),
+                            type: widget.illust.type == "illust"
+                                ? ArtworkType.ILLUST
+                                : ArtworkType.MANGA,
+                          )),
+                          leading: Hero(
+                            tag: widget.illust.author.avatar +
+                                hashCode.toString(),
+                            child: PainterAvatar(
+                              url: widget.illust.author.avatar,
+                              id: widget.illust.author.id,
+                              size: 32,
+                            ),
                           ),
-                          decoration:
-                              IconDecoration(border: IconBorder(width: 1.5)),
+                          trailing: UserFollowButton(
+                              liked: widget.illust.author.isFollowed,
+                              id: widget.illust.author.id.toString()),
+                          label: SelectionArea(
+                            child: Text(widget.illust.author.name,
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis)
+                                .subHeader(),
+                          ),
                         ),
-                        onTap: () => relatedListController.showDropdown.value =
-                            !relatedListController.showDropdown.value,
-                      )
-                    ],
-                  ),
-                )))
-          ],
+                        if (widget.illust.images.length > 1)
+                          MoonMenuItem(
+                            onTap: () {
+                              relatedListController.showDropdown.value = false;
+                              _showMutiChoiceDialog(widget.illust, context);
+                            },
+                            leading: const Icon(
+                              Icons.save,
+                            ),
+                            label: Text("Multi-choice Save".tr),
+                          ),
+                        MoonMenuItem(
+                          leading: const Icon(
+                            Icons.share,
+                          ),
+                          onTap: () {
+                            relatedListController.showDropdown.value = false;
+                            final box =
+                                context.findRenderObject() as RenderBox?;
+                            final pos = box != null
+                                ? box.localToGlobal(Offset.zero) & box.size
+                                : null;
+                            Share.share(
+                                "https://www.pixiv.net/artworks/${widget.illust.id}",
+                                sharePositionOrigin: pos);
+                          },
+                          label: Text("Share".tr),
+                        ),
+                        MoonMenuItem(
+                          leading: Icon(
+                            Icons.link,
+                          ),
+                          label: Text("Link".tr),
+                          onTap: () async {
+                            relatedListController.showDropdown.value = false;
+                            await Clipboard.setData(ClipboardData(
+                                text:
+                                    "https://www.pixiv.net/artworks/${widget.illust.id}"));
+                            Leader.showToast("Copied to clipboard".tr);
+                          },
+                        ),
+                        MoonMenuItem(
+                            leading: Icon(Icons.block),
+                            onTap: () {
+                              relatedListController.showDropdown.value = false;
+                              if (localManager.blockedIllusts
+                                  .contains(widget.illust.id.toString())) {
+                                localManager.delete("blockedIllusts",
+                                    [widget.illust.id.toString()]);
+                              } else {
+                                localManager.add("blockedIllusts",
+                                    [widget.illust.id.toString()]);
+                              }
+                            },
+                            label: Obx(() => localManager.blockedIllusts
+                                    .contains(widget.illust.id.toString())
+                                ? Text("Unblock".tr)
+                                : Text("Block".tr))),
+                      ]),
+                    ),
+                    child: SizedBox(
+                      width: max(200, min(300, context.width / 1.5)),
+                      child: Row(
+                        children: [
+                          Expanded(child: Spacer()),
+                          MoonBarIconButton(
+                            icon: Icons.more_vert,
+                            color: Colors.white,
+                            onTap: () =>
+                                relatedListController.showDropdown.value =
+                                    !relatedListController.showDropdown.value,
+                          )
+                        ],
+                      ),
+                    )))
+              ],
+            ),
+          ),
         ),
       ],
     );

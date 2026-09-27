@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:skana_pix/controller/theme_controller.dart';
-import 'package:url_launcher/url_launcher_string.dart';
+import 'package:skana_pix/utils/launch.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 
 class WebviewPage extends StatefulWidget {
@@ -65,7 +65,7 @@ class _WebviewPageState extends State<WebviewPage> {
                     size: 20,
                   ),
                   onPressed: () {
-                    launchUrlString(widget.url);
+                    openInBrowser(widget.url);
                     Get.back();
                   },
                 ),
