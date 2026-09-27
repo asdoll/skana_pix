@@ -45,6 +45,9 @@ class BoardController extends GetxController {
 
   Future<List<BoardInfo>> load() async {
     log.d(path());
+    if (path().isEmpty) {
+      return [];
+    }
     final request = await dio.Dio().get(
         'https://raw.githubusercontent.com/asdoll/skana_pix/refs/heads/main/.github/board/${path()}');
     final list = (jsonDecode(request.data) as List)
